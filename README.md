@@ -1,24 +1,13 @@
-# README
+ - Install latest rails version 
+    - gem install rails
+ - Install yarn 
+    - brew install yarn
+ - Install foreman 
+    - gem install foreman
+ 
+ To start server in background
+   - foreman start -f Procfile.dev -p 3000
+   - If you ger error("cannot load such file -- bundler/dep_proxy (LoadError)") while running above command then run "gem update --system"
+   - It will run two processes simultaneously: <b>rails s</b> and <b>webpack-dev-server</b> that will analyse changes in our app/javascript folder and rebuild the front end on the fly.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
