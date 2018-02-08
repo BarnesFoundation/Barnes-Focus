@@ -4,6 +4,8 @@
     - brew install yarn
  - Install foreman 
     - gem install foreman
+ - bundle install
+ - rake db:migrate
  
  To start server in background
    - foreman start -f Procfile.dev -p 3000
