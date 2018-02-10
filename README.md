@@ -5,6 +5,7 @@
  - Install foreman 
     - gem install foreman
  - bundle install
+ - yarn install
  - rake db:migrate
  
  To start server in background
