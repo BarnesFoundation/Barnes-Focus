@@ -34,9 +34,11 @@ gem 'jbuilder', '~> 2.5'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
-
 gem 'rest-client', require: false
 gem 'aasm'
+gem 'elasticsearch'
+gem 'faraday_middleware-aws-signers-v4'
+gem 'aws-sdk-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
