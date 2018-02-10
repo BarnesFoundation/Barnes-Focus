@@ -28,5 +28,12 @@ module BarnesSnap
     # Don't generate system test files.
     config.generators.system_tests = nil
     config.autoload_paths << Rails.root.join('lib')
+
+    config.active_job.queue_adapter = :delayed_job
+
+    Aws.config.update({
+                          region: Rails.application.secrets[:aws][:region],
+                          credentials: Aws::Credentials.new(Rails.application.secrets[:aws][:access_key_id], Rails.application.secrets[:aws][:secret_access_key])
+                      })
   end
 end

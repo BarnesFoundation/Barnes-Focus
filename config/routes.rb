@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     resources :snaps, only: [ :show ] do
       collection do
-        post 'search'
+        get 'search'
       end
     end
   end

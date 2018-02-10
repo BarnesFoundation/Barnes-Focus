@@ -9,10 +9,11 @@ class Api::SnapsController < Api::BaseController
     #using test image for API testing
     pastec_obj = Pastec.new
     file = pastec_obj.loadFileData("public/test-image.png")
-
-    #send image to s3 with background job if image is valid
-
     searched_result = process_searched_images_response(pastec_obj.search_image(file))
+
+    # send image to s3 with background job if image is valid and log result to db
+    ImageUploadJob.perform_later(file.path, searched_result)
+
     render json: searched_result
   end
 
