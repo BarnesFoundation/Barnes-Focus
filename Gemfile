@@ -36,8 +36,8 @@ gem 'jbuilder', '~> 2.5'
 # gem 'capistrano-rails', group: :development
 gem 'rest-client', require: false
 gem 'aasm'
-gem 'elasticsearch'
-gem 'aws-sdk', '~> 3'
+gem 'aws-sdk-s3'
+gem 'aws-sdk-elasticsearchservice'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 
