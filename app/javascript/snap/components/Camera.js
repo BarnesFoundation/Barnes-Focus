@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import CameraDisplay from './CameraDisplay';
 import CameraControls from './CameraControls';
 import CameraSnap from './CameraSnap';
+import axios from 'axios';
 
 class Camera extends Component {
 
@@ -36,6 +37,15 @@ class Camera extends Component {
 
     submitPhoto = () => {
         console.log('submitting photo to backend');
+
+        axios.post('/api/snaps/search', {
+          image_data: this.state.currentImage
+        }).then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
 
     componentDidMount() {
