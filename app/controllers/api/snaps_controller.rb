@@ -13,13 +13,13 @@ class Api::SnapsController < Api::BaseController
     if true
       pastec_obj = Pastec.new
       image_data = Base64.decode64(data['data:image/png;base64,'.length .. -1])
-      file_name = "#{Rails.root}/tmp/#{SecureRandom.hex}.png"
+      file_name = "#{Rails.root}/public/#{SecureRandom.hex}.png"
       File.open(file_name, 'wb') do |f|
         f.write image_data
       end
 
       #file_name = "#{Rails.root}/public/test-image.png"
-      file = pastec_obj.loadFileData(open(file_name))
+      file = pastec_obj.loadFileData(file_name)
       searched_result = process_searched_images_response(pastec_obj.search_image(file))
 
       # send image to s3 with background job if image is valid and log result to db
@@ -50,6 +50,7 @@ class Api::SnapsController < Api::BaseController
 
     def get_similar_images image_ids, response
       if image_ids.present?
+        response[:data][:message] = 'Result Found'
         image_ids.uniq!
         #send these image_ids to elastic search to get recommended result and send list to API
         image_ids.each do |img|
