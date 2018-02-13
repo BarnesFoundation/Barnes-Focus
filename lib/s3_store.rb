@@ -10,11 +10,12 @@ class S3Store
 
   def store
     @obj = @bucket.object(filename).upload_file(@file.path)
+    puts self.url
     self
   end
 
   def url
-    @obj.public_url.to_s
+    @bucket.object(filename).public_url.to_s
   end
 
   private
