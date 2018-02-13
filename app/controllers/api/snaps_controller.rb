@@ -17,14 +17,12 @@ class Api::SnapsController < Api::BaseController
       File.open(file_name, 'wb') do |f|
         f.write image_data
       end
-      puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-      puts File.exists? file_name
-      puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
       #file_name = "#{Rails.root}/public/test-image.png"
       file = pastec_obj.loadFileData(file_name)
       searched_result = process_searched_images_response(pastec_obj.search_image(file))
 
       # send image to s3 with background job if image is valid and log result to db
+      # We can make it asyc with perform_later, on heroku we can not store file in temp for later processing with job
       ImageUploadJob.perform_now(file.path, searched_result)
     end
 
