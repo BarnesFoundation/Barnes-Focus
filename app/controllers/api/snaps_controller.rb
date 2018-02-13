@@ -13,7 +13,7 @@ class Api::SnapsController < Api::BaseController
     if true
       pastec_obj = Pastec.new
       image_data = Base64.decode64(data['data:image/png;base64,'.length .. -1])
-      file_name = "#{Rails.root}/public/#{SecureRandom.hex}.png"
+      file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
       File.open(file_name, 'wb') do |f|
         f.write image_data
       end
