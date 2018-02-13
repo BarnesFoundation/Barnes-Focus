@@ -1,3 +1,5 @@
+require 's3_store'
+
 class ImageUploadJob < ApplicationJob
   queue_as :default
 
@@ -9,6 +11,8 @@ class ImageUploadJob < ApplicationJob
       end
 
       File.delete(args[0])
+
+      #save search result and image captured URL in db for logging
     end
   end
 end
