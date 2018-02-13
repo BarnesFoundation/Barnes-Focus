@@ -6,7 +6,9 @@ class ImageUploadJob < ApplicationJob
   def perform(*args)
     # Save to S3
     if args[0] && File.exists?(args[0])
+      puts "INSIDE valid file"
       File.open(args[0]) do |f|
+        puts "INSIDE valid file: store"
        S3Store.new(f).store
       end
 
