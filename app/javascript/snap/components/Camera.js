@@ -10,7 +10,8 @@ class Camera extends Component {
         videoStream: null,
         frontCamera: false,
         currentImage: null,
-        showVideo: true
+        showVideo: true,
+        searchedImageURL: ''
     };
 
     // switchCamera() {
@@ -41,8 +42,13 @@ class Camera extends Component {
         axios.post('/api/snaps/search', {
           image_data: this.state.currentImage
         }).then(function (response) {
-                console.log(response);
-            })
+            var search_resp= response["data"];
+            if(search_resp["success"] && search_resp["data"]["records"].length > 0){
+               var art_obj = search_resp["data"]["records"][0];
+               var art_url= "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
+                this.setState({ searchedImageURL: art_url})
+            }
+            }.bind(this))
             .catch(function (error) {
                 console.log(error);
             });
@@ -85,6 +91,7 @@ class Camera extends Component {
                     height='600'
                     style={{ display: 'none' }}>
                 </canvas>
+                <a className="image-url" href={this.state.searchedImageURL} target="_blank">{this.state.searchedImageURL}</a>
             </div>
         );
     }

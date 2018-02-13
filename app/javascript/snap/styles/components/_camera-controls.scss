@@ -89,7 +89,13 @@ h3{
     display: flex;
 }
 
-
+.image-url{
+    float: left;
+    font-size: 18px;
+    font-weight: bold;
+    padding-top: 15px;
+    text-decoration: underline;
+}
 
 // @media(max-width: 1000px){
 //     .container{
