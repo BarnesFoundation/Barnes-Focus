@@ -1,3 +1,5 @@
+require 'barnes_elastic_search'
+
 class Api::SnapsController < Api::BaseController
 
   def index
@@ -16,7 +18,7 @@ class Api::SnapsController < Api::BaseController
         f.write image_data
       end
 
-      file_name = "#{Rails.root}/public/test-image.png"
+      #file_name = "#{Rails.root}/public/test-image.png"
       file = pastec_obj.loadFileData(open(file_name))
       searched_result = process_searched_images_response(pastec_obj.search_image(file))
 
