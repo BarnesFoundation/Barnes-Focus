@@ -25,7 +25,7 @@ class Api::SnapsController < Api::BaseController
       searched_result = process_searched_images_response(pastec_obj.search_image(file))
 
       # send image to s3 with background job if image is valid and log result to db
-      ImageUploadJob.perform(file.path, searched_result)
+      ImageUploadJob.perform_now(file.path, searched_result)
     end
 
     render json: searched_result
