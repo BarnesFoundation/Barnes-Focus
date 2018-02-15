@@ -105,11 +105,11 @@ class Camera extends Component {
                 </a>
                 {this.state.searchedImageURL &&
                     <div className="results">
-                        <small><strong>Title:&nbsp;</strong> this.state.searchResults[0].title</small>
-                        <small><strong>Artist:&nbsp;</strong> this.state.searchResults[0].artist</small>
-                        <small><strong>Classification:&nbsp;</strong> this.state.searchResults[0].classification</small>
-                        <small><strong>Medium:&nbsp;</strong> this.state.searchResults[0].medium</small>
-                        <small><strong>Location:&nbsp;</strong> this.state.searchResults[0].locations</small>
+                        <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
+                        <p><strong>Artist:&nbsp;</strong> {this.state.searchResults[0].artist}</p>
+                        <p><strong>Classification:&nbsp;</strong> {this.state.searchResults[0].classification}</p>
+                        <p><strong>Medium:&nbsp;</strong> {this.state.searchResults[0].medium}</p>
+                        <p><strong>Location:&nbsp;</strong> {this.state.searchResults[0].locations}</p>
                     </div>
                 }
             </div>
