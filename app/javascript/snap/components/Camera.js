@@ -99,17 +99,20 @@ class Camera extends Component {
                         loading={this.state.loading}
                     />
                 </div>
-
-                <a className="image-url" href={this.state.searchedImageURL} target="_blank">
-                    {this.state.searchedImageURL && <img src={this.state.searchedImageURL} alt="result" className="img-thumbnail" />}
-                </a>
+                <div className="row">
+                    <a className="image-url col-sm-12" href={this.state.searchedImageURL} target="_blank">
+                        {this.state.searchedImageURL && <img src={this.state.searchedImageURL} alt="result" className="img-thumbnail" />}
+                    </a>
+                </div>
                 {this.state.searchedImageURL &&
-                    <div className="results">
-                        <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
-                        <p><strong>Artist:&nbsp;</strong> {this.state.searchResults[0].artist}</p>
-                        <p><strong>Classification:&nbsp;</strong> {this.state.searchResults[0].classification}</p>
-                        <p><strong>Medium:&nbsp;</strong> {this.state.searchResults[0].medium}</p>
-                        <p><strong>Location:&nbsp;</strong> {this.state.searchResults[0].locations}</p>
+                    <div className="row">
+                        <div className="results col-sm-12">
+                            <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
+                            <p><strong>Artist:&nbsp;</strong> {this.state.searchResults[0].artist}</p>
+                            <p><strong>Classification:&nbsp;</strong> {this.state.searchResults[0].classification}</p>
+                            <p><strong>Medium:&nbsp;</strong> {this.state.searchResults[0].medium}</p>
+                            <p><strong>Location:&nbsp;</strong> {this.state.searchResults[0].locations}</p>
+                        </div>
                     </div>
                 }
             </div>
