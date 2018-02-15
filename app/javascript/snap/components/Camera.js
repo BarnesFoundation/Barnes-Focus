@@ -3,6 +3,7 @@ import CameraDisplay from './CameraDisplay';
 import CameraControls from './CameraControls';
 import CameraSnap from './CameraSnap';
 import axios from 'axios';
+import { ClipLoader } from 'react-spinners';
 
 class Camera extends Component {
 
@@ -11,7 +12,9 @@ class Camera extends Component {
         frontCamera: false,
         currentImage: null,
         showVideo: true,
-        searchedImageURL: ''
+        searchedImageURL: '',
+        loading: false,
+        searchResults: []
     };
 
     // switchCamera() {
@@ -33,22 +36,33 @@ class Camera extends Component {
     }
 
     clearPhoto = () => {
-        this.setState({ currentImage: null, showVideo: true });
+        this.setState({ currentImage: null, showVideo: true, searchedImageURL: '', searchResults: [] });
     }
 
     submitPhoto = () => {
         console.log('submitting photo to backend');
-
+        this.setState({ loading: true });
         axios.post('/api/snaps/search', {
-          image_data: this.state.currentImage
+            image_data: this.state.currentImage
         }).then(function (response) {
-            var search_resp= response["data"];
-            if(search_resp["success"] && search_resp["data"]["records"].length > 0){
-               var art_obj = search_resp["data"]["records"][0];
-               var art_url= "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
-                this.setState({ searchedImageURL: art_url})
+            const search_resp = response["data"];
+            if (search_resp["success"] && search_resp["data"]["records"].length > 0) {
+                const art_obj = search_resp["data"]["records"][0];
+                const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
+                const result = {};
+                result['title'] = art_obj.title;
+                result['artist'] = art_obj.people;
+                result['classification'] = art_obj.classification;
+                result['locations'] = art_obj.locations;
+                result['medium'] = art_obj.medium;
+                result['url'] = art_obj.art_url;
+                this.setState({ searchedImageURL: art_url, searchResults: this.state.searchResults.concat(result) });
+
+            } else {
+                this.setState({ searchedImageURL: "No records found!" });
             }
-            }.bind(this))
+            this.setState({ loading: false });
+        }.bind(this))
             .catch(function (error) {
                 console.log(error);
             });
@@ -58,19 +72,7 @@ class Camera extends Component {
 
         navigator.mediaDevices.getUserMedia({
             video: {
-                "facingMode": (this.state.frontCamera) ? "user" : "environment",
-                // "mandatory": {
-                //     "maxWidth": 1920,
-                //     "maxHeight": 1080
-                // },
-                // "optional": [
-                //     {
-                //         "minWidth": 1920
-                //     },
-                //     {
-                //         "minHeight": 1080
-                //     }
-                // ]
+                "facingMode": (this.state.frontCamera) ? "user" : "environment"
             }
         })
             .then(videoStream => this.setState({ videoStream }))
@@ -91,7 +93,25 @@ class Camera extends Component {
                     height='600'
                     style={{ display: 'none' }}>
                 </canvas>
-                <a className="image-url" href={this.state.searchedImageURL} target="_blank">{this.state.searchedImageURL}</a>
+                <div className="snap-spinner">
+                    <ClipLoader
+                        color={'#BD10E0'}
+                        loading={this.state.loading}
+                    />
+                </div>
+
+                <a className="image-url" href={this.state.searchedImageURL} target="_blank">
+                    {this.state.searchedImageURL && <img src={this.state.searchedImageURL} alt="result" className="img-thumbnail" />}
+                </a>
+                {this.state.searchedImageURL &&
+                    <div className="results">
+                        <small><strong>Title:&nbsp;</strong> this.state.searchResults[0].title</small>
+                        <small><strong>Artist:&nbsp;</strong> this.state.searchResults[0].artist</small>
+                        <small><strong>Classification:&nbsp;</strong> this.state.searchResults[0].classification</small>
+                        <small><strong>Medium:&nbsp;</strong> this.state.searchResults[0].medium</small>
+                        <small><strong>Location:&nbsp;</strong> this.state.searchResults[0].locations</small>
+                    </div>
+                }
             </div>
         );
     }
