@@ -14,7 +14,8 @@ class Camera extends Component {
         showVideo: true,
         searchedImageURL: '',
         loading: false,
-        searchResults: []
+        searchResults: [],
+        error: ''
     };
 
     // switchCamera() {
@@ -36,7 +37,7 @@ class Camera extends Component {
     }
 
     clearPhoto = () => {
-        this.setState({ currentImage: null, showVideo: true, searchedImageURL: '', searchResults: [] });
+        this.setState({ currentImage: null, showVideo: true, searchedImageURL: '', searchResults: [], error: '' });
     }
 
     submitPhoto = () => {
@@ -59,7 +60,7 @@ class Camera extends Component {
                 this.setState({ searchedImageURL: art_url, searchResults: this.state.searchResults.concat(result) });
 
             } else {
-                this.setState({ searchedImageURL: "No records found!" });
+                this.setState({ error: "No records found!" });
             }
             this.setState({ loading: false });
         }.bind(this))
@@ -100,11 +101,18 @@ class Camera extends Component {
                     />
                 </div>
                 <div className="row">
-                    <a className="image-url col-sm-12" href={this.state.searchedImageURL} target="_blank">
-                        {this.state.searchedImageURL && <img src={this.state.searchedImageURL} alt="result" className="img-thumbnail" />}
-                    </a>
+                    {this.state.searchResults.length > 0 &&
+                        <a className="image-url col-sm-12" href={this.state.searchedImageURL} target="_blank">
+                            <img src={this.state.searchedImageURL} alt="result" className="img-thumbnail" />
+                        </a>
+                    }
+                    {this.state.error &&
+                        <div className="col-sm-12">
+                            <p>No results found!</p>
+                        </div>
+                    }
                 </div>
-                {this.state.searchedImageURL &&
+                {this.state.searchResults.length > 0 &&
                     <div className="row">
                         <div className="results col-sm-12">
                             <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
