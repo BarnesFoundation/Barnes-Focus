@@ -26,7 +26,7 @@ class CameraDisplay extends Component {
 
     render() {
         return (
-            <video id="video" ref={c => this.videoEl = c} width="100%" height="100%" />
+            <video id="video" ref={c => this.videoEl = c} width="100%" height="100%" autoPlay playsInline />
         );
     }
 }
