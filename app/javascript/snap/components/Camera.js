@@ -38,7 +38,8 @@ class Camera extends Component {
         return image;
     }
 
-    clearPhoto = () => {
+    clearPhoto = (ev) => {
+        ev.preventDefault();
         this.setState((prevState, props) => {
             return {
                 ...prevState,
@@ -49,6 +50,7 @@ class Camera extends Component {
                 error: ''
             };
         });
+        window.location.reload(); // TODO: this is a hack for now. Need to see why CameraDisplay 'componentDidUpdate' method is not getting called on state change.
         //this.setState({ currentImage: null, showVideo: true, searchedImageURL: '', searchResults: [], error: '' });
     }
 
@@ -83,7 +85,6 @@ class Camera extends Component {
     }
 
     componentDidMount() {
-
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",
@@ -93,8 +94,6 @@ class Camera extends Component {
         })
             .then(videoStream => this.setState({ videoStream }))
             .catch(err => this.setState({ error: "Error accessing device camera." }));
-
-
     }
 
     getCanvas = () => {
