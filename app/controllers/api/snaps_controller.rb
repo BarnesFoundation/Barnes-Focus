@@ -19,7 +19,8 @@ class Api::SnapsController < Api::BaseController
       end
       #file_name = "#{Rails.root}/public/test-image.png"
       file = pastec_obj.loadFileData(file_name)
-      searched_result = process_searched_images_response(pastec_obj.search_image(file))
+
+      searched_result = process_searched_images_response(pastec_obj.search_image(file))  if file
 
       # send image to s3 with background job if image is valid and log result to db
       # We can make it asyc with perform_later, on heroku we can not store file in temp for later processing with job
@@ -34,10 +35,16 @@ class Api::SnapsController < Api::BaseController
       response = { }
       response[:data] = {records: [], message: "No records found"}
       response[:success] = false
+      response[:pastec_data] = []
       case searched_images["type"]
         when Pastec::RESPONSE_CODES[:SEARCH_RESULTS]
           response[:success] = true
           get_similar_images(searched_images["image_ids"], response)
+          #Add response from pastec to final result
+          pastec_result = TrainingRecord.where(identifier: searched_images["image_ids"])
+          pastec_result.each do |img|
+            response[:pastec_data] << {image_id: img.identifier, image_url: img.image_url}
+          end
         when Pastec::RESPONSE_CODES[:IMAGE_NOT_DECODED]
           response[:data][:message] = "Invalid image data"
         when Pastec::RESPONSE_CODES[:IMAGE_SIZE_TOO_BIG]

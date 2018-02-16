@@ -15,6 +15,7 @@ class Camera extends Component {
         searchedImageURL: '',
         loading: false,
         searchResults: [],
+        pastecResults:[],
         error: ''
     };
 
@@ -47,17 +48,25 @@ class Camera extends Component {
             image_data: this.state.currentImage
         }).then(function (response) {
             const search_resp = response["data"];
-            if (search_resp["success"] && search_resp["data"]["records"].length > 0) {
-                const art_obj = search_resp["data"]["records"][0];
-                const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
-                const result = {};
-                result['title'] = art_obj.title;
-                result['artist'] = art_obj.people;
-                result['classification'] = art_obj.classification;
-                result['locations'] = art_obj.locations;
-                result['medium'] = art_obj.medium;
-                result['url'] = art_obj.art_url;
-                this.setState({ searchedImageURL: art_url, searchResults: this.state.searchResults.concat(result) });
+            const result = {};
+            if (search_resp["success"]) {
+                if(search_resp["data"]["records"].length > 0) {
+                    const art_obj = search_resp["data"]["records"][0];
+                    const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
+                    result['title'] = art_obj.title;
+                    result['artist'] = art_obj.people;
+                    result['classification'] = art_obj.classification;
+                    result['locations'] = art_obj.locations;
+                    result['medium'] = art_obj.medium;
+                    result['url'] = art_obj.art_url;
+                    this.setState({
+                        searchedImageURL: art_url,
+                        searchResults: this.state.searchResults.concat(result)
+                    });
+                }
+                this.setState({
+                    pastecResults: search_resp['pastec_data']
+                });
 
             } else {
                 this.setState({ error: "No records found!" });
@@ -123,6 +132,17 @@ class Camera extends Component {
                         </div>
                     </div>
                 }
+                <div className="row">
+                    {this.state.pastecResults.length > 0 &&
+                    <div className="pastec-data">
+                        <p><strong>PASTEC DATA</strong></p>
+                        <p><strong>Image Idetifier:&nbsp;</strong> {this.state.pastecResults[0]['image_id']}</p>
+                        <a className="image-url col-sm-12" href={this.state.pastecResults[0]['image_url']} target="_blank">
+                            <img src={this.state.pastecResults[0]['image_url']} alt="result" className="img-thumbnail" />
+                        </a>
+                    </div>
+                    }
+                </div>
             </div>
         );
     }
