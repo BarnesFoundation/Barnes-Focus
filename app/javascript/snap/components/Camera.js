@@ -168,10 +168,13 @@ class Camera extends Component {
                     {this.state.pastecResults.length > 0 &&
                     <div className="pastec-data">
                         <p><strong>PASTEC DATA</strong></p>
-                        <p><strong>Image Idetifier:&nbsp;</strong> {this.state.pastecResults[0]['image_id']}</p>
-                        <a className="image-url col-sm-12" href={this.state.pastecResults[0]['image_url']} target="_blank">
-                            <img src={this.state.pastecResults[0]['image_url']} alt="result" className="img-thumbnail" />
-                        </a>
+                        {this.state.pastecResults.map(function(img, index){
+                            return <div key={'mykey' + index}><p><strong>Image Idetifier:&nbsp;</strong> {img['image_id']}</p>
+                            <a className="image-url col-sm-12" href={img['image_url']} target="_blank">
+                                <img src={img['image_url']} alt="result" className="img-thumbnail" />
+                                </a>
+                            </div> ;
+                        })}
                     </div>
                     }
                 </div>
