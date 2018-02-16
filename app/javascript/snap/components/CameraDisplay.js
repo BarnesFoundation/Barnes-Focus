@@ -17,10 +17,6 @@ class CameraDisplay extends Component {
     }
 
     componentWillUnmount() {
-        // if (this.videoEl && this.videoEl.srcObject) {
-        //     this.videoEl.srcObject.getTracks().forEach(t => t.stop());
-        // }
-        //this.videoEl.pause();
         console.log('componentWillUnmount : CameraDisplay');
     }
 
