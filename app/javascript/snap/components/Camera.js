@@ -69,6 +69,7 @@ class Camera extends Component {
                 result['locations'] = art_obj.locations;
                 result['medium'] = art_obj.medium;
                 result['url'] = art_obj.art_url;
+                result['invno'] = art_obj.invno;
                 this.setState({ searchedImageURL: art_url, searchResults: this.state.searchResults.concat(result) });
 
             } else {
@@ -147,6 +148,7 @@ class Camera extends Component {
                         <div className="results col-sm-12">
                             <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
                             <p><strong>Artist:&nbsp;</strong> {this.state.searchResults[0].artist}</p>
+                            <p><strong>Accession No.:&nbsp;</strong> {this.state.searchResults[0].invno}</p>
                             <p><strong>Classification:&nbsp;</strong> {this.state.searchResults[0].classification}</p>
                             <p><strong>Medium:&nbsp;</strong> {this.state.searchResults[0].medium}</p>
                             <p><strong>Location:&nbsp;</strong> {this.state.searchResults[0].locations}</p>
