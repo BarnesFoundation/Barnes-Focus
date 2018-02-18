@@ -20,11 +20,12 @@ class Api::SnapsController < Api::BaseController
       #file_name = "#{Rails.root}/public/test-image.png"
       file = pastec_obj.loadFileData(file_name)
 
-      searched_result = process_searched_images_response(pastec_obj.search_image(file))  if file
+      pastec_response = pastec_obj.search_image(file)
+      searched_result = process_searched_images_response(pastec_response)
 
       # send image to s3 with background job if image is valid and log result to db
       # We can make it asyc with perform_later, on heroku we can not store file in temp for later processing with job
-      ImageUploadJob.perform_now(file.path, searched_result)
+      ImageUploadJob.perform_now(file.path, {pastec_response: pastec_response, es_response: searched_result["data"]})
     end
 
     render json: searched_result
@@ -33,35 +34,35 @@ class Api::SnapsController < Api::BaseController
   private
     def process_searched_images_response searched_images
       response = { }
-      response[:data] = {records: [], message: "No records found"}
-      response[:success] = false
-      response[:pastec_data] = []
+      response["data"] = {"records" => [], "message" => "No records found"}
+      response["success"] = false
+      response["pastec_data"] = []
       case searched_images["type"]
         when Pastec::RESPONSE_CODES[:SEARCH_RESULTS]
-          response[:success] = true
+          response["success"] = true
           get_similar_images(searched_images["image_ids"], response)
           #Add response from pastec to final result
           pastec_result = TrainingRecord.where(identifier: searched_images["image_ids"])
           pastec_result.each do |img|
-            response[:pastec_data] << {image_id: img.identifier, image_url: img.image_url}
+            response["pastec_data"] << {"image_id" => img.identifier, "image_url" => img.image_url}
           end
         when Pastec::RESPONSE_CODES[:IMAGE_NOT_DECODED]
-          response[:data][:message] = "Invalid image data"
+          response["data"]["message"] = "Invalid image data"
         when Pastec::RESPONSE_CODES[:IMAGE_SIZE_TOO_BIG]
-          response[:data][:message] = "Image size is too big"
+          response["data"]["message"] = "Image size is too big"
         when Pastec::RESPONSE_CODES[:IMAGE_SIZE_TOO_SMALL]
-          response[:data][:message] = "Image size is too small"
+          response["data"]["message"] = "Image size is too small"
       end
       response
     end
 
     def get_similar_images image_ids, response
       if image_ids.present?
-        response[:data][:message] = 'Result Found'
+        response["data"]["message"] = 'Result Found'
         image_ids.uniq!
         #send these image_ids to elastic search to get recommended result and send list to API
         image_ids.each do |img|
-          response[:data][:records] << BarnesElasticSearch.instance.get_object(img)
+          response["data"]["records"] << BarnesElasticSearch.instance.get_object(img)
         end
       end
       response
