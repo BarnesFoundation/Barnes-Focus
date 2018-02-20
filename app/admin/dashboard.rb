@@ -39,7 +39,7 @@ ActiveAdmin.register_page "Dashboard" do
                     img.es_response["records"].each do |es_image|
                       tr do
                         td do
-                          image_tag "https://barnes-image-repository.s3.amazonaws.com/images/" + es_image['id'] + "_" + es_image['imageSecret'] + "_n.jpg", class: 'es_image_size'
+                          image_tag "https://barnes-image-repository.s3.amazonaws.com/images/" + es_image['id'].to_s + "_" + es_image['imageSecret'] + "_n.jpg", class: 'es_image_size'
                         end
                       end
                     end if img.es_response["records"].present?
