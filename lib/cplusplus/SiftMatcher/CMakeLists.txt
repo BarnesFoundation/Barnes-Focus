@@ -1,0 +1,7 @@
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+cmake_minimum_required(VERSION 2.8)
+project( SiftMatcher )
+find_package( OpenCV REQUIRED )
+add_executable( SiftMatcher SiftMatcher.cpp )
+target_link_libraries( SiftMatcher ${OpenCV_LIBS} )
