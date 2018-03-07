@@ -10,12 +10,12 @@ class Camera extends Component {
     state = {
         videoStream: null,
         frontCamera: false,
-        currentImage: null,
+        capturedImage: null,
         showVideo: true,
         searchedImageURL: '',
         loading: false,
         searchResults: [],
-        pastecResults:[],
+        pastecResults: [],
         error: ''
     };
 
@@ -26,7 +26,9 @@ class Camera extends Component {
 
     takePhoto = () => {
         const image = this.capturePhoto();
-        this.setState({ currentImage: image, showVideo: false });
+        this.img.src = image;
+        this.setState({ capturedImage: image, showVideo: false });
+        this.img.style.visibility = 'visible';
     }
 
     capturePhoto = () => {
@@ -34,37 +36,36 @@ class Camera extends Component {
         var canvas = this.getCanvas();
         const context = canvas.getContext("2d");
         console.log('canvas.width, canvas.height', canvas.width, canvas.height);
-        context.drawImage(this.camera.videoEl, 0, 0, canvas.width, canvas.height);
+        context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
         const image = canvas.toDataURL('image/jpeg', 1.0);
         return image;
     }
 
     clearPhoto = (ev) => {
         ev.preventDefault();
+        this.img.src = '';
+        this.img.style.visibility = 'hidden';
         this.setState((prevState, props) => {
             return {
                 ...prevState,
-                currentImage: null,
                 showVideo: true,
                 searchedImageURL: '',
                 searchResults: [],
                 error: ''
             };
         });
-        window.location.reload(); // TODO: this is a hack for now. Need to see why CameraDisplay 'componentDidUpdate' method is not getting called on state change.
-        //this.setState({ currentImage: null, showVideo: true, searchedImageURL: '', searchResults: [], error: '' });
     }
 
     submitPhoto = () => {
         console.log('submitting photo to backend');
         this.setState({ loading: true });
         axios.post('/api/snaps/search', {
-            image_data: this.state.currentImage
+            image_data: this.state.capturedImage
         }).then(function (response) {
             const search_resp = response["data"];
             const result = {};
             if (search_resp["success"]) {
-                if(search_resp["data"]["records"].length > 0) {
+                if (search_resp["data"]["records"].length > 0) {
                     const art_obj = search_resp["data"]["records"][0];
                     const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
                     result['title'] = art_obj.title;
@@ -105,8 +106,21 @@ class Camera extends Component {
             .catch(err => this.setState({ error: "Error accessing device camera." }));
     }
 
+    componentDidUpdate() {
+        if (this.state.showVideo) {
+            console.log('componentDidUpdate : Camera');
+            this.video.srcObject = this.state.videoStream;
+            this.video.play().then(() => {
+                console.log('Camera is up and running!');
+            }).catch((error) => {
+                console.log('Not allowed to access camera. Please check settings!');
+            });
+        }
+
+    }
+
     getCanvas = () => {
-        const video = this.camera.videoEl;
+        const video = this.video;
 
         if (!video.videoHeight) return null;
 
@@ -129,8 +143,8 @@ class Camera extends Component {
     render() {
         return (
             <div className="camera">
-                {this.state.showVideo && <CameraDisplay stream={this.state.videoStream} ref={(camera) => { this.camera = camera }} />}
-                {!this.state.showVideo && <CameraSnap currentImage={this.state.currentImage} />}
+                {this.state.showVideo && <video id="video" ref={c => this.video = c} width="100%" height="100%" autoPlay playsInline />}
+                <img ref={img => this.img = img} width="100%" height="100%" />
                 <CameraControls showVideo={this.state.showVideo} takePhoto={this.takePhoto} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />
 
                 <div className="snap-spinner">
@@ -165,16 +179,16 @@ class Camera extends Component {
                 }
                 <div className="row">
                     {this.state.pastecResults.length > 0 &&
-                    <div className="pastec-data">
-                        <p><strong>PASTEC DATA</strong></p>
-                        {this.state.pastecResults.map(function(img, index){
-                            return <div key={'mykey' + index}><p><strong>Image Idetifier:&nbsp;</strong> {img['image_id']}</p>
-                            <a className="image-url col-sm-12" href={img['image_url']} target="_blank">
-                                <img src={img['image_url']} alt="result" className="img-thumbnail" />
-                                </a>
-                            </div> ;
-                        })}
-                    </div>
+                        <div className="pastec-data">
+                            <p><strong>PASTEC DATA</strong></p>
+                            {this.state.pastecResults.map(function (img, index) {
+                                return <div key={'mykey' + index}><p><strong>Image Idetifier:&nbsp;</strong> {img['image_id']}</p>
+                                    <a className="image-url col-sm-12" href={img['image_url']} target="_blank">
+                                        <img src={img['image_url']} alt="result" className="img-thumbnail" />
+                                    </a>
+                                </div>;
+                            })}
+                        </div>
                     }
                 </div>
             </div>
