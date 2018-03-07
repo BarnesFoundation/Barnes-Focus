@@ -36,13 +36,13 @@ def get_similar_images image_ids, response
   response
 end
 
-@aws_data = Rails.application.secrets[:aws]
-@s3       = Aws::S3::Resource.new(region:@aws_data[:region])
-@bucket   = @s3.bucket("images-iphone")
-pastec_obj = Pastec.new
-
-@bucket.objects.each do |obj|
-  pastec_response = pastec_obj.search_image(obj.get.body.read)
-  searched_result = process_searched_images_response(pastec_response)
-  SnapSearchResult.create(searched_image_url: obj.public_url, pastec_response: pastec_response, es_response: searched_result["data"])
-end
+# @aws_data = Rails.application.secrets[:aws]
+# @s3       = Aws::S3::Resource.new(region:@aws_data[:region])
+# @bucket   = @s3.bucket("images-iphone")
+# pastec_obj = Pastec.new
+#
+# @bucket.objects.each do |obj|
+#   pastec_response = pastec_obj.search_image(obj.get.body.read)
+#   searched_result = process_searched_images_response(pastec_response)
+#   SnapSearchResult.create(searched_image_url: obj.public_url, pastec_response: pastec_response, es_response: searched_result["data"])
+# end
