@@ -16,6 +16,7 @@ class CudaSift
     IMAGE_NOT_DECODED: "IMAGE_NOT_DECODED"
   }
 
+
   def initialize
     self.endpoint = ENV['CUDASIFT_ENDPOINT']
   end
