@@ -26,26 +26,6 @@ class CudaSift
     data['image_ids']
   end
 
-  def load_csv
-    csv_path = File.join(Rails.root, 'db', 'SNAP_Prototype_Training_Data.csv')
-    `gunzip -c #{csv_path}.gz > #{csv_path}`
-    CSV.foreach(csv_path, headers: true) do |row|
-      tr = TrainingRecord.where(identifier: row['id']).first_or_initialize
-      pp row['URL']
-      tr.image_url = row['URL']
-      tr.title = row['Title']
-      tr.artist = row['Artist']
-      tr.accession = row['Accession']
-      tr.save
-      begin
-        tr.index! if !tr.indexed?
-      rescue AASM::InvalidTransition => ex
-        puts "AASM::InvalidTransition: #{ex.message}"
-        puts ex.backtrace
-      end
-    end
-    `rm -f #{csv_path}`
-  end
 
   #Answer type: "IMAGE_ADDED"
   #Possible error types: "IMAGE_NOT_DECODED", "IMAGE_SIZE_TOO_BIG", "IMAGE_SIZE_TOO_SMALL"
