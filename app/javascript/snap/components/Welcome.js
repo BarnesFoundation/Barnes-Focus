@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom';
 
 const WelcomeComponent = () => (
     <div className="container-fluid">
-        Hello, welcome to Barnes Foundation
+        <div className="content">
+            <h1>It's a snap!</h1>
 
-        <p>Click on the button below to continue.</p>
-        <Link className="btn btn-primary" to="/snap">Continue</Link>
+            <p>Take a photo of any work of art to get information about it.</p>
+            <Link className="btn btn-primary" to="/snap">Continue</Link>
+        </div>
     </div>
 
 );
