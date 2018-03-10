@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'bootstrap';
 
 import AppRouter from './routes/AppRouter';
 
