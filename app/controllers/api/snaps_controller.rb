@@ -10,23 +10,26 @@ class Api::SnapsController < Api::BaseController
     data = params[:image_data]
     searched_result = { success: false }
     #using test image for API testing
-    if true
-      pastec_obj = Pastec.new
-      image_data = Base64.decode64(data['data:image/png;base64,'.length .. -1])
-      file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
-      File.open(file_name, 'wb') do |f|
-        f.write image_data
-      end
-      #file_name = "#{Rails.root}/public/test-image.png"
-      file = pastec_obj.loadFileData(file_name)
 
-      pastec_response = pastec_obj.search_image(file)
-      searched_result = process_searched_images_response(pastec_response)
-
-      # send image to s3 with background job if image is valid and log result to db
-      # We can make it asyc with perform_later, on heroku we can not store file in temp for later processing with job
-      ImageUploadJob.perform_now(file.path, {pastec_response: pastec_response, es_response: searched_result["data"]})
+    #pastec_obj = Pastec.new
+    pastec_obj = CudaSift.new
+    image_data = Base64.decode64(data['data:image/png;base64,'.length .. -1])
+    file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
+    File.open(file_name, 'wb') do |f|
+      f.write image_data
     end
+    #file_name = "#{Rails.root}/public/test-image.png"
+    file = pastec_obj.loadFileData(file_name)
+
+    pastec_response = pastec_obj.search_image(file)
+    pastec_response["image_ids"] = pastec_response["type"]== Pastec::RESPONSE_CODES[:SEARCH_RESULTS] ? [pastec_response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]] : []
+
+    searched_result = process_searched_images_response(pastec_response)
+
+    # send image to s3 with background job if image is valid and log result to db
+    # We can make it asyc with perform_later, on heroku we can not store file in temp for later processing with job
+    ImageUploadJob.perform_now(file.path, {pastec_response: pastec_response, es_response: searched_result["data"]})
+
 
     render json: searched_result
   end
