@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Hammer from 'hammerjs';
-import Select from 'react-select';
 
 import { Link } from 'react-router-dom';
 import img1 from 'images/welcome-img1.jpg';
@@ -29,13 +28,16 @@ class WelcomeComponent extends Component {
             var $carousel = $(this);
             var hammertime = new Hammer(this, {
                 recognizers: [
-                    [Hammer.Swipe, { direction: Hammer.DIRECTION_HORIZONTAL }]
+                    [Hammer.Swipe, { direction: Hammer.DIRECTION_HORIZONTAL, threshold: 0 }],
+                    [Hammer.Pinch, { enable: true }]
                 ]
             });
             hammertime.on('swipeleft', function () {
+                console.log('swipeleft');
                 $carousel.carousel('next');
             });
             hammertime.on('swiperight', function () {
+                console.log('swiperight');
                 $carousel.carousel('prev');
             });
         });

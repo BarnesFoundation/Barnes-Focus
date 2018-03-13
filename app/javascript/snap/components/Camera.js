@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Hammer from 'hammerjs';
 import CameraDisplay from './CameraDisplay';
 import CameraControls from './CameraControls';
 import CameraSnap from './CameraSnap';
@@ -95,6 +96,22 @@ class Camera extends Component {
     }
 
     componentDidMount() {
+
+        $('.camera').each(function () {
+            var hammertime = new Hammer(this, {
+                recognizers: [
+                    [Hammer.Swipe, { direction: Hammer.DIRECTION_HORIZONTAL }],
+                    [Hammer.Pinch, { enable: true }]
+                ]
+            });
+            hammertime.on('swipeleft', function (e) {
+                console.log('pinchstart')
+            });
+            hammertime.on('swiperight', function (e) {
+                console.log('pinchmove');
+            });
+        });
+
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",
