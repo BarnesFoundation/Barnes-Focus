@@ -21,6 +21,8 @@ class Camera extends Component {
         error: ''
     };
 
+
+
     // switchCamera() {
     //     this.setState({ frontCamera: !this.state.frontCamera });
     //     console.log('front camera = ' + this.state.frontCamera);
@@ -96,16 +98,12 @@ class Camera extends Component {
             });
     }
 
-    onPinch = (e) => {
-        console.log('event :: ' + e.type);
-    }
-
     componentDidMount() {
         $('.camera').each(function () {
-            const mc = new Hammer.Manager(this);
+            const mc = new Hammer.Manager(this, { preventDefault: true });
             mc.add(new Hammer.Pinch({ threshold: 0 }));
-            mc.on("pinchstart pinchmove", (e) => {
-                console.log('pinch event :: ' + e.type);
+            mc.on("pinchin pinchout", (e) => {
+                console.log('pinch event :: ' + e.type + ' scale :: ' + e.scale);
             });
         });
         navigator.mediaDevices.getUserMedia({
@@ -132,6 +130,14 @@ class Camera extends Component {
             }).catch((error) => {
                 console.log('Not allowed to access camera. Please check settings!');
             });
+            this.video.onloadedmetadata = (e) => {
+                const track = this.state.videoStream.getVideoTracks()[0];
+                this.camera_capabilities = track.getCapabilities();
+                this.camera_settings = track.getSettings();
+
+                console.log(this.camera_capabilities);
+                console.log(this.camera_settings);
+            };
         }
 
     }
