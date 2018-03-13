@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
+import Hammer from 'hammerjs';
 import CameraDisplay from './CameraDisplay';
 import CameraControls from './CameraControls';
 import CameraSnap from './CameraSnap';
 import axios from 'axios';
 import { ClipLoader } from 'react-spinners';
 
-import Hammer from 'hammerjs';
 
 class Camera extends Component {
 
@@ -101,18 +101,13 @@ class Camera extends Component {
     }
 
     componentDidMount() {
-        const mc = new Hammer.Manager(this.video);
-        mc.add(new Hammer.Pinch({ threshold: 0 }));
-        mc.on("pinchstart pinchmove", (e) => {
-            console.log('event :: ' + e.type);
+        $('.camera').each(function () {
+            const mc = new Hammer.Manager(this);
+            mc.add(new Hammer.Pinch({ threshold: 0 }));
+            mc.on("pinchstart pinchmove", (e) => {
+                console.log('pinch event :: ' + e.type);
+            });
         });
-
-        // var hammertime = new Hammer(this.video);
-        // hammertime.get('pinch').set({ enable: true });
-        // hammertime.on("pinch", function (e) {
-        //     console.log("pinch too hard !!");
-
-        // });
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",
