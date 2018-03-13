@@ -5,6 +5,8 @@ import CameraSnap from './CameraSnap';
 import axios from 'axios';
 import { ClipLoader } from 'react-spinners';
 
+import Hammer from 'hammerjs';
+
 class Camera extends Component {
 
     state = {
@@ -95,6 +97,12 @@ class Camera extends Component {
     }
 
     componentDidMount() {
+        var hammertime = new Hammer(this.video);
+        hammertime.get('pinch').set({ enable: true });
+        hammertime.on("pinch", function (e) {
+            console.log("pinch too hard !!");
+
+        });
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",
@@ -104,14 +112,6 @@ class Camera extends Component {
         })
             .then(videoStream => {
                 this.setState({ videoStream });
-                const track = videoStream.getVideoTracks()[0];
-                console.log('track::' + JSON.stringify(track.getCapabilities()));
-
-                this.video.addEventListener('loadedmetadata', (e) => {
-                    window.setTimeout(() => (
-                        console.log('loadedmetadata >> track :: ' + JSON.stringify(track.getCapabilities()))
-                    ), 500);
-                });
 
 
             })
@@ -157,8 +157,10 @@ class Camera extends Component {
             <div className="camera">
                 {
                     this.state.showVideo &&
-                    <div className="video-wrapper">
+                    <div>
                         <video id="video" ref={c => this.video = c} width="100%" height="100%" autoPlay playsInline />
+                        <div className="video-frame">
+                        </div>
                     </div>
                 }
                 <img ref={img => this.img = img} width="100%" height="100%" />
