@@ -96,13 +96,23 @@ class Camera extends Component {
             });
     }
 
-    componentDidMount() {
-        var hammertime = new Hammer(this.video);
-        hammertime.get('pinch').set({ enable: true });
-        hammertime.on("pinch", function (e) {
-            console.log("pinch too hard !!");
+    onPinch = (e) => {
+        console.log('event :: ' + e.type);
+    }
 
+    componentDidMount() {
+        const mc = new Hammer.Manager(this.video);
+        mc.add(new Hammer.Pinch({ threshold: 0 }));
+        mc.on("pinchstart pinchmove", (e) => {
+            console.log('event :: ' + e.type);
         });
+
+        // var hammertime = new Hammer(this.video);
+        // hammertime.get('pinch').set({ enable: true });
+        // hammertime.on("pinch", function (e) {
+        //     console.log("pinch too hard !!");
+
+        // });
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",
