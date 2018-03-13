@@ -99,24 +99,7 @@ class Camera extends Component {
     }
 
     componentDidMount() {
-        $('.camera').each(function () {
-            const mc = new Hammer.Manager(this, { preventDefault: true });
-            mc.add(new Hammer.Pinch({ threshold: 0 }));
-            mc.on("pinchin pinchout", (e) => {
-                console.log('pinch event :: ' + e.type + ' scale :: ' + e.scale);
-                const current_zoom = this.camera_settings.zoom;
-                let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
-                zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
 
-                // if device supports zoom
-                if ('zoom' in this.camera_capabilities && zoomLevel >= this.camera_capabilities.zoom.min && zoomLevel <= this.camera_capabilities.zoom.max) {
-                    this.mediaStreamTrack.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
-                } else {
-                    console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
-                }
-
-            });
-        });
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",
@@ -126,10 +109,32 @@ class Camera extends Component {
         })
             .then(videoStream => {
                 this.setState({ videoStream });
-
-
             })
             .catch(err => this.setState({ error: "Error accessing device camera." }));
+
+        $('.camera').each(function () {
+            const mc = new Hammer.Manager(this, { preventDefault: true });
+            mc.add(new Hammer.Pinch({ threshold: 0 }));
+            mc.on("pinchin pinchout", (e) => {
+
+                const track = this.state.videoStream.getVideoTracks()[0];
+                const camera_capabilities = track.getCapabilities();
+                const camera_settings = track.getSettings();
+
+                console.log('pinch event :: ' + e.type + ' scale :: ' + e.scale);
+                const current_zoom = camera_settings.zoom;
+                let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
+                zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
+
+                // if device supports zoom
+                if ('zoom' in camera_capabilities && zoomLevel >= camera_capabilities.zoom.min && zoomLevel <= camera_capabilities.zoom.max) {
+                    track.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
+                } else {
+                    console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
+                }
+
+            });
+        });
     }
 
     componentDidUpdate() {
@@ -141,14 +146,6 @@ class Camera extends Component {
             }).catch((error) => {
                 console.log('Not allowed to access camera. Please check settings!');
             });
-            this.video.onloadedmetadata = (e) => {
-                this.mediaStreamTrack = this.state.videoStream.getVideoTracks()[0];
-                this.camera_capabilities = this.mediaStreamTrack.getCapabilities();
-                this.camera_settings = this.mediaStreamTrack.getSettings();
-
-                console.log(this.camera_capabilities.zoom);
-                console.log(this.camera_settings.zoom);
-            };
         }
 
     }
