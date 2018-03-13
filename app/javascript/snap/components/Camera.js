@@ -104,6 +104,17 @@ class Camera extends Component {
             mc.add(new Hammer.Pinch({ threshold: 0 }));
             mc.on("pinchin pinchout", (e) => {
                 console.log('pinch event :: ' + e.type + ' scale :: ' + e.scale);
+                const current_zoom = this.camera_settings.zoom;
+                let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
+                zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
+
+                // if device supports zoom
+                if ('zoom' in this.camera_capabilities && zoomLevel >= this.camera_capabilities.zoom.min && zoomLevel <= this.camera_capabilities.zoom.max) {
+                    this.mediaStreamTrack.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
+                } else {
+                    console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
+                }
+
             });
         });
         navigator.mediaDevices.getUserMedia({
@@ -131,12 +142,12 @@ class Camera extends Component {
                 console.log('Not allowed to access camera. Please check settings!');
             });
             this.video.onloadedmetadata = (e) => {
-                const track = this.state.videoStream.getVideoTracks()[0];
-                this.camera_capabilities = track.getCapabilities();
-                this.camera_settings = track.getSettings();
+                this.mediaStreamTrack = this.state.videoStream.getVideoTracks()[0];
+                this.camera_capabilities = this.mediaStreamTrack.getCapabilities();
+                this.camera_settings = this.mediaStreamTrack.getSettings();
 
-                console.log(this.camera_capabilities);
-                console.log(this.camera_settings);
+                console.log(this.camera_capabilities.zoom);
+                console.log(this.camera_settings.zoom);
             };
         }
 
