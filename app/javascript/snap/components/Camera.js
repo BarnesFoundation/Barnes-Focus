@@ -97,21 +97,6 @@ class Camera extends Component {
 
     componentDidMount() {
 
-        $('.camera').each(function () {
-            var hammertime = new Hammer(this, {
-                recognizers: [
-                    [Hammer.Swipe, { direction: Hammer.DIRECTION_HORIZONTAL }],
-                    [Hammer.Pinch, { enable: true }]
-                ]
-            });
-            hammertime.on('swipeleft', function (e) {
-                console.log('pinchstart')
-            });
-            hammertime.on('swiperight', function (e) {
-                console.log('pinchmove');
-            });
-        });
-
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",
@@ -121,6 +106,28 @@ class Camera extends Component {
         })
             .then(videoStream => this.setState({ videoStream }))
             .catch(err => this.setState({ error: "Error accessing device camera." }));
+
+        const el = document.querySelector('.camera');
+        const mc = new Hammer.Manager(el, { preventDefault: true });
+        mc.add(new Hammer.Pinch({ threshold: 0 }));
+        mc.on("pinchin pinchout", (e) => {
+            const track = this.state.videoStream.getVideoTracks()[0];
+            const camera_capabilities = track.getCapabilities();
+            const camera_settings = track.getSettings();
+
+            console.log('pinch event :: ' + e.type + ' scale :: ' + e.scale);
+            const current_zoom = camera_settings.zoom;
+            let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
+            zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
+            console.log('current_zoom = ' + current_zoom + '. new_zoom = ' + zoomLevel);
+            // if device supports zoom
+            if ('zoom' in camera_capabilities && zoomLevel >= camera_capabilities.zoom.min && zoomLevel <= camera_capabilities.zoom.max) {
+                track.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
+            } else {
+                console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
+            }
+
+        });
     }
 
     componentDidUpdate() {
@@ -159,55 +166,63 @@ class Camera extends Component {
 
     render() {
         return (
-            <div className="camera">
-                {this.state.showVideo && <video id="video" ref={c => this.video = c} width="100%" height="100%" autoPlay playsInline />}
-                <img ref={img => this.img = img} width="100%" height="100%" />
-                <CameraControls showVideo={this.state.showVideo} takePhoto={this.takePhoto} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />
+            <div>
+                <div className="camera">
+                    {
+                        this.state.showVideo &&
+                        <div>
+                            <video id="video" ref={c => this.video = c} width="100%" height="100%" autoPlay playsInline />
+                            <div className="video-frame"></div>
+                        </div>
+                    }
+                    <img ref={img => this.img = img} width="100%" height="100%" />
 
-                <div className="snap-spinner">
-                    <ClipLoader
-                        color={'#BD10E0'}
-                        loading={this.state.loading}
-                    />
-                </div>
-                <div className="row">
-                    {this.state.searchResults.length > 0 &&
-                        <a className="image-url col-sm-12" href={this.state.searchedImageURL} target="_blank">
-                            <img src={this.state.searchedImageURL} alt="result" className="img-thumbnail" />
-                        </a>
-                    }
-                    {this.state.error &&
-                        <div className="col-sm-12">
-                            <p>No results found!</p>
-                        </div>
-                    }
-                </div>
-                {this.state.searchResults.length > 0 &&
-                    <div className="row">
-                        <div className="results col-sm-12">
-                            <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
-                            <p><strong>Artist:&nbsp;</strong> {this.state.searchResults[0].artist}</p>
-                            <p><strong>Accession No.:&nbsp;</strong> {this.state.searchResults[0].invno}</p>
-                            <p><strong>Classification:&nbsp;</strong> {this.state.searchResults[0].classification}</p>
-                            <p><strong>Medium:&nbsp;</strong> {this.state.searchResults[0].medium}</p>
-                            <p><strong>Location:&nbsp;</strong> {this.state.searchResults[0].locations}</p>
-                        </div>
+                    <div className="snap-spinner">
+                        <ClipLoader
+                            color={'#BD10E0'}
+                            loading={this.state.loading}
+                        />
                     </div>
-                }
-                <div className="row">
-                    {this.state.pastecResults.length > 0 &&
-                        <div className="pastec-data">
-                            <p><strong>PASTEC DATA</strong></p>
-                            {this.state.pastecResults.map(function (img, index) {
-                                return <div key={'mykey' + index}><p><strong>Image Idetifier:&nbsp;</strong> {img['image_id']}</p>
-                                    <a className="image-url col-sm-12" href={img['image_url']} target="_blank">
-                                        <img src={img['image_url']} alt="result" className="img-thumbnail" />
-                                    </a>
-                                </div>;
-                            })}
+                    <div className="row">
+                        {this.state.searchResults.length > 0 &&
+                            <a className="image-url col-sm-12" href={this.state.searchedImageURL} target="_blank">
+                                <img src={this.state.searchedImageURL} alt="result" className="img-thumbnail" />
+                            </a>
+                        }
+                        {this.state.error &&
+                            <div className="col-sm-12">
+                                <p>No results found!</p>
+                            </div>
+                        }
+                    </div>
+                    {this.state.searchResults.length > 0 &&
+                        <div className="row">
+                            <div className="results col-sm-12">
+                                <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
+                                <p><strong>Artist:&nbsp;</strong> {this.state.searchResults[0].artist}</p>
+                                <p><strong>Accession No.:&nbsp;</strong> {this.state.searchResults[0].invno}</p>
+                                <p><strong>Classification:&nbsp;</strong> {this.state.searchResults[0].classification}</p>
+                                <p><strong>Medium:&nbsp;</strong> {this.state.searchResults[0].medium}</p>
+                                <p><strong>Location:&nbsp;</strong> {this.state.searchResults[0].locations}</p>
+                            </div>
                         </div>
                     }
+                    <div className="row">
+                        {this.state.pastecResults.length > 0 &&
+                            <div className="pastec-data">
+                                <p><strong>PASTEC DATA</strong></p>
+                                {this.state.pastecResults.map(function (img, index) {
+                                    return <div key={'mykey' + index}><p><strong>Image Idetifier:&nbsp;</strong> {img['image_id']}</p>
+                                        <a className="image-url col-sm-12" href={img['image_url']} target="_blank">
+                                            <img src={img['image_url']} alt="result" className="img-thumbnail" />
+                                        </a>
+                                    </div>;
+                                })}
+                            </div>
+                        }
+                    </div>
                 </div>
+                <CameraControls showVideo={this.state.showVideo} takePhoto={this.takePhoto} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />
             </div>
         );
     }
