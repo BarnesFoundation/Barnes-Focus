@@ -117,7 +117,6 @@ class Camera extends Component {
         const mc = new Hammer.Manager(el, { preventDefault: true });
         mc.add(new Hammer.Pinch({ threshold: 0 }));
         mc.on("pinchin pinchout", (e) => {
-            e.persist();
             throttle(500, function () {
                 // Throttled function 
                 const track = this.state.videoStream.getVideoTracks()[0];
