@@ -5,6 +5,7 @@ import CameraControls from './CameraControls';
 import CameraSnap from './CameraSnap';
 import axios from 'axios';
 import { ClipLoader } from 'react-spinners';
+import throttle from 'throttle-debounce/throttle';
 
 
 class Camera extends Component {
@@ -116,22 +117,26 @@ class Camera extends Component {
         const mc = new Hammer.Manager(el, { preventDefault: true });
         mc.add(new Hammer.Pinch({ threshold: 0 }));
         mc.on("pinchin pinchout", (e) => {
+            e.persist();
+            throttle(500, function () {
+                // Throttled function 
+                const track = this.state.videoStream.getVideoTracks()[0];
+                const camera_capabilities = track.getCapabilities();
+                const camera_settings = track.getSettings();
 
-            const track = this.state.videoStream.getVideoTracks()[0];
-            const camera_capabilities = track.getCapabilities();
-            const camera_settings = track.getSettings();
+                console.log('pinch event :: ' + e.type + ' scale :: ' + e.scale);
+                const current_zoom = camera_settings.zoom;
+                let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
+                zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
 
-            console.log('pinch event :: ' + e.type + ' scale :: ' + e.scale);
-            const current_zoom = camera_settings.zoom;
-            let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
-            zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
+                // if device supports zoom
+                if ('zoom' in camera_capabilities && zoomLevel >= camera_capabilities.zoom.min && zoomLevel <= camera_capabilities.zoom.max) {
+                    track.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
+                } else {
+                    console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
+                }
+            });
 
-            // if device supports zoom
-            if ('zoom' in camera_capabilities && zoomLevel >= camera_capabilities.zoom.min && zoomLevel <= camera_capabilities.zoom.max) {
-                track.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
-            } else {
-                console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
-            }
 
         });
     }
