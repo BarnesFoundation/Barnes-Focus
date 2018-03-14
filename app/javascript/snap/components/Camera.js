@@ -117,7 +117,7 @@ class Camera extends Component {
         const mc = new Hammer.Manager(el, { preventDefault: true });
         mc.add(new Hammer.Pinch({ threshold: 0 }));
         mc.on("pinchin pinchout", (e) => {
-            throttle(500, function () {
+            debounce(100, function () {
                 // Throttled function 
                 const track = this.state.videoStream.getVideoTracks()[0];
                 const camera_capabilities = track.getCapabilities();
@@ -127,7 +127,7 @@ class Camera extends Component {
                 const current_zoom = camera_settings.zoom;
                 let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
                 zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
-
+                console.log('zoomLevel set to :: ' + zoomLevel);
                 // if device supports zoom
                 if ('zoom' in camera_capabilities && zoomLevel >= camera_capabilities.zoom.min && zoomLevel <= camera_capabilities.zoom.max) {
                     track.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
