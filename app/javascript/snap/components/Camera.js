@@ -5,7 +5,7 @@ import CameraControls from './CameraControls';
 import CameraSnap from './CameraSnap';
 import axios from 'axios';
 import { ClipLoader } from 'react-spinners';
-import throttle from 'throttle-debounce/throttle';
+import debounce from 'throttle-debounce/debounce';
 
 
 class Camera extends Component {
