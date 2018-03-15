@@ -4,6 +4,7 @@ import { BrowserRouter, Route, NavLink, Switch } from 'react-router-dom';
 import Header from '../components/Header';
 import Welcome from '../components/Welcome'
 import Camera from '../components/Camera';
+import SnapResults from '../components/SnapResults';
 
 
 const AppRouter = () => (
@@ -13,11 +14,11 @@ const AppRouter = () => (
             <Switch>
                 <Route path="/" component={Welcome} exact={true} />
                 <Route path="/snap" component={Camera} />
+                <Route path="/results" component={SnapResults} />
             </Switch>
         </div>
     </BrowserRouter>
 );
-
 
 
 export default AppRouter;
