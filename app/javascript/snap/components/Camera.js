@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import Hammer from 'hammerjs';
 import CameraDisplay from './CameraDisplay';
 import CameraControls from './CameraControls';
 import CameraSnap from './CameraSnap';
 import axios from 'axios';
-import { ClipLoader } from 'react-spinners';
+import { PulseLoader } from 'react-spinners';
+import barnes_logo from 'images/logo.svg';
 
 class Camera extends Component {
 
@@ -14,7 +16,7 @@ class Camera extends Component {
         capturedImage: null,
         showVideo: true,
         searchedImageURL: '',
-        loading: false,
+        searchInProgress: false,
         searchResults: [],
         pastecResults: [],
         error: ''
@@ -25,12 +27,22 @@ class Camera extends Component {
     //     console.log('front camera = ' + this.state.frontCamera);
     // }
 
+    toggleImage = (show) => {
+        if (show) {
+            this.img.style.visibility = 'visible';
+            this.img.style.display = 'block';
+        } else {
+            this.img.src = '';
+            this.img.style.visibility = 'hidden';
+            this.img.style.display = 'none';
+        }
+    }
+
     takePhoto = () => {
         const image = this.capturePhoto();
         this.img.src = image;
         this.setState({ capturedImage: image, showVideo: false });
-        this.img.style.visibility = 'visible';
-        this.img.style.display = 'block';
+        this.toggleImage(true);
     }
 
     capturePhoto = () => {
@@ -44,9 +56,9 @@ class Camera extends Component {
     }
 
     clearPhoto = (ev) => {
-        ev.preventDefault();
-        this.img.src = '';
-        this.img.style.visibility = 'hidden';
+        //ev.preventDefault();
+        console.log('Clear taken photo');
+        this.toggleImage(false);
         this.setState((prevState, props) => {
             return {
                 ...prevState,
@@ -60,7 +72,9 @@ class Camera extends Component {
 
     submitPhoto = () => {
         console.log('submitting photo to backend');
-        this.setState({ loading: true });
+        console.log(this.props.history);
+        this.toggleImage(false);
+        this.setState({ searchInProgress: true });
         axios.post('/api/snaps/search', {
             image_data: this.state.capturedImage
         }).then(function (response) {
@@ -89,7 +103,15 @@ class Camera extends Component {
             } else {
                 this.setState({ error: "No records found!" });
             }
-            this.setState({ loading: false });
+            this.setState({ searchInProgress: false });
+
+            // Navigate to search result page
+            this.props.history.push({
+                pathname: '/results',
+                state: {
+                    ...this.state
+                }
+            })
         }.bind(this))
             .catch(function (error) {
                 console.log(error);
@@ -108,8 +130,8 @@ class Camera extends Component {
             .then(videoStream => this.setState({ videoStream }))
             .catch(err => this.setState({ error: "Error accessing device camera." }));
 
-        const el = document.querySelector('.camera');
-        const mc = new Hammer.Manager(el, { preventDefault: true });
+        const el = document.querySelector('.camera-container');
+        const mc = new Hammer.Manager(el, { drag_lock_to_axis: true, preventDefault: true });
         mc.add(new Hammer.Pinch({ threshold: 0 }));
         mc.on("pinchin pinchout", (e) => {
 
@@ -130,8 +152,12 @@ class Camera extends Component {
                 console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
             }
             // }, 0);
+        });
 
-
+        mc.on("swipe drag", function (event) {
+            if (event.gesture.direction == Hammer.DIRECTION_UP || event.gesture.direction == Hammer.DIRECTION_DOWN) {
+                event.gesture.preventDefault();
+            }
         });
     }
 
@@ -173,7 +199,7 @@ class Camera extends Component {
 
     render() {
         return (
-            <div>
+            <div className="camera-container">
                 <div className="camera">
                     {
                         this.state.showVideo &&
@@ -184,55 +210,36 @@ class Camera extends Component {
                     }
                     <img ref={img => this.img = img} width="100%" height="100%" />
 
-                    <div className="snap-spinner">
-                        <ClipLoader
-                            color={'#BD10E0'}
-                            loading={this.state.loading}
-                        />
-                    </div>
-                    <div className="row">
-                        {this.state.searchResults.length > 0 &&
-                            <a className="image-url col-sm-12" href={this.state.searchedImageURL} target="_blank">
-                                <img src={this.state.searchedImageURL} alt="result" className="img-thumbnail" />
-                            </a>
-                        }
-                        {this.state.error &&
-                            <div className="col-sm-12">
-                                <p>No results found!</p>
-                            </div>
-                        }
-                    </div>
-                    {this.state.searchResults.length > 0 &&
-                        <div className="row">
-                            <div className="results col-sm-12">
-                                <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
-                                <p><strong>Artist:&nbsp;</strong> {this.state.searchResults[0].artist}</p>
-                                <p><strong>Accession No.:&nbsp;</strong> {this.state.searchResults[0].invno}</p>
-                                <p><strong>Classification:&nbsp;</strong> {this.state.searchResults[0].classification}</p>
-                                <p><strong>Medium:&nbsp;</strong> {this.state.searchResults[0].medium}</p>
-                                <p><strong>Location:&nbsp;</strong> {this.state.searchResults[0].locations}</p>
+                    {/* ========= Search in progress screen ============ */}
+                    {
+                        this.state.searchInProgress &&
+                        <div>
+                            <nav className="narbar header">
+                                <a className="navbar-brand">
+                                    <img src={barnes_logo} alt="Barnes" />
+                                </a>
+                            </nav>
+                            <div className="search-progress-container">
+                                <div className="snap-spinner">
+                                    <PulseLoader
+                                        color={'#999999'}
+                                        size={20}
+                                        margin={'5px'}
+                                        loading={this.state.searchInProgress}
+                                    />
+                                </div>
+                                <div className="content">
+                                    <h1>Searching</h1>
+                                    <p>Please wait while we search our database.</p>
+                                </div>
                             </div>
                         </div>
                     }
-                    <div className="row">
-                        {this.state.pastecResults.length > 0 &&
-                            <div className="pastec-data">
-                                <p><strong>PASTEC DATA</strong></p>
-                                {this.state.pastecResults.map(function (img, index) {
-                                    return <div key={'mykey' + index}><p><strong>Image Idetifier:&nbsp;</strong> {img['image_id']}</p>
-                                        <a className="image-url col-sm-12" href={img['image_url']} target="_blank">
-                                            <img src={img['image_url']} alt="result" className="img-thumbnail" />
-                                        </a>
-                                    </div>;
-                                })}
-                            </div>
-                        }
-                    </div>
                 </div>
-                <CameraControls showVideo={this.state.showVideo} takePhoto={this.takePhoto} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />
+                <CameraControls searchInProgress={this.state.searchInProgress} showVideo={this.state.showVideo} takePhoto={this.takePhoto} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />
             </div>
         );
     }
 }
 
-export default Camera;
+export default withRouter(Camera);
