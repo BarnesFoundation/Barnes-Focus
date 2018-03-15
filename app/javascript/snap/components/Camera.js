@@ -30,6 +30,7 @@ class Camera extends Component {
         this.img.src = image;
         this.setState({ capturedImage: image, showVideo: false });
         this.img.style.visibility = 'visible';
+        this.img.style.display = 'block';
     }
 
     capturePhoto = () => {
@@ -111,6 +112,8 @@ class Camera extends Component {
         const mc = new Hammer.Manager(el, { preventDefault: true });
         mc.add(new Hammer.Pinch({ threshold: 0 }));
         mc.on("pinchin pinchout", (e) => {
+
+            //setTimeout(() => {
             const track = this.state.videoStream.getVideoTracks()[0];
             const camera_capabilities = track.getCapabilities();
             const camera_settings = track.getSettings();
@@ -126,6 +129,8 @@ class Camera extends Component {
             } else {
                 console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
             }
+            // }, 0);
+
 
         });
     }
@@ -139,6 +144,8 @@ class Camera extends Component {
             }).catch((error) => {
                 console.log('Not allowed to access camera. Please check settings!');
             });
+
+            this.img.style.display = 'none';
         }
 
     }
@@ -171,7 +178,7 @@ class Camera extends Component {
                     {
                         this.state.showVideo &&
                         <div>
-                            <video id="video" ref={c => this.video = c} width="100%" height="100%" autoPlay playsInline />
+                            <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline />
                             <div className="video-frame"></div>
                         </div>
                     }
