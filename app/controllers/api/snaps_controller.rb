@@ -2,10 +2,6 @@ require 'barnes_elastic_search'
 
 class Api::SnapsController < Api::BaseController
 
-  def index
-    render :json => "tarun"
-  end
-
   def search
     data = params[:image_data]
     searched_result = { success: false }
@@ -19,7 +15,7 @@ class Api::SnapsController < Api::BaseController
       f.write image_data
     end
     # for testing
-    #file_name = "#{Rails.root}/public/test-image.jpg"
+    file_name = "#{Rails.root}/public/test-image.png"
 
     file = pastec_obj.loadFileData(file_name)
     pastec_response = pastec_obj.search_image(file)
@@ -33,6 +29,11 @@ class Api::SnapsController < Api::BaseController
 
 
     render json: searched_result
+  end
+
+  def languages
+    translator = GoogleTranslate.new preferred_language
+    render json: translator.supported_languages
   end
 
   private
@@ -80,6 +81,6 @@ class Api::SnapsController < Api::BaseController
     end
 
     def preferred_language
-      #params["language"]
+      params["language"]
     end
 end
