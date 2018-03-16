@@ -7,7 +7,8 @@ class SnapResults extends Component {
 
     constructor(props) {
         super(props);
-        this.state = props.location.state
+        this.state = props.location.state;
+        console.log('Search results :: ' + props.location.state);
     }
 
     render() {
