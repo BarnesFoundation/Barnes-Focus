@@ -79,7 +79,7 @@ class Camera extends Component {
         this.setState({ searchInProgress: true });
         axios.post('/api/snaps/search', {
             image_data: this.state.capturedImage,
-            language: "es"
+            language: this.props.location.language
         }).then(function (response) {
             const search_resp = response["data"];
             const result = {};
@@ -123,7 +123,6 @@ class Camera extends Component {
     }
 
     componentDidMount() {
-
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",
