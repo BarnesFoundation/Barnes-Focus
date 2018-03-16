@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import share from 'images/share_icon.svg';
+import bookmark from 'images/bookmark_icon.svg';
 
 /** 
  * withHeader HOC provides props with location, history and match objects
@@ -27,6 +29,8 @@ class SnapResults extends Component {
                 result['medium'] = art_obj.medium;
                 result['url'] = art_url
                 result['invno'] = art_obj.invno;
+                result['displayDate'] = art_obj.displayDate;
+                result['shortDescription'] = art_obj.shortDescription;
                 this.setState({
                     searchResults: this.state.searchResults.concat(result)
                 });
@@ -39,8 +43,37 @@ class SnapResults extends Component {
 
     render() {
         return (
-            <div>
+            <div className="container-fluid search-container">
+
                 <div className="row">
+                    <div className="col-12 col-md-12">
+                        <div className="card">
+                            <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image" />
+                            <div className="card-img-overlay">
+                                <h5 className="card-title">{this.state.searchResults[0].title}</h5>
+                            </div>
+                            <div className="card-body">
+                                <div className="d-flex justify-content-around action-icons">
+                                    <span><img src={share} alt="share" />Share it</span>
+                                    <span><img src={bookmark} alt="share" />Bookmark it</span>
+                                </div>
+                                <hr />
+                                <p className="card-text">
+                                    <small className="text-muted">{this.state.searchResults[0].artist}. {this.state.searchResults[0].title}, {this.state.searchResults[0].displayDate}. {this.state.searchResults[0].medium}</small>
+                                </p>
+                                <p className="card-text">{this.state.searchResults[0].shortDescription}.</p>
+                                <p>- John House, Renoir in the Barnes Foundation.</p>
+                            </div>
+                            <div class="card-footer">
+                                <p>Albert Barnes taught people to look at works of art primarily in terms of their visual relationships.</p>
+                                <p><small>Swipe for visually similar works</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                {/* <div className="row">
                     {this.state.searchResults.length > 0 &&
                         <a className="image-url col-sm-12" href={this.state.searchedImageURL} target="_blank">
                             <img src={this.state.searchResults[0].url} alt="result" className="img-thumbnail" />
@@ -64,7 +97,7 @@ class SnapResults extends Component {
                             <p><strong>Location:&nbsp;</strong> {this.state.searchResults[0].locations}</p>
                         </div>
                     </div>
-                }
+                } */}
             </div>
         );
     }

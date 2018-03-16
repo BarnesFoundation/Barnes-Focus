@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import Welcome from '../components/Welcome'
 import Camera from '../components/Camera';
 import SnapResults from '../components/SnapResults';
-
+import SnapErrors from '../components/SnapErrors';
 
 const AppRouter = () => (
     <BrowserRouter>
@@ -15,6 +15,7 @@ const AppRouter = () => (
                 <Route path="/" component={Welcome} exact={true} />
                 <Route path="/snap" component={Camera} exact={true} />
                 <Route path="/results" component={SnapResults} exact={true} />
+                <Route path="/errors" component={SnapErrors} exact={true} />
             </Switch>
         </div>
     </BrowserRouter>
