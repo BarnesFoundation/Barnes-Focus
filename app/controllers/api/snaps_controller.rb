@@ -80,6 +80,6 @@ class Api::SnapsController < Api::BaseController
     end
 
     def preferred_language
-      params["language"]
+      #params["language"]
     end
 end
