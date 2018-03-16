@@ -15,11 +15,12 @@ class Api::SnapsController < Api::BaseController
       f.write image_data
     end
     # for testing
-    # file_name = "#{Rails.root}/public/test-image.png"
+    #file_name = "#{Rails.root}/public/test-image1.JPG"
 
     file = pastec_obj.loadFileData(file_name)
     pastec_response = pastec_obj.search_image(file)
-    pastec_response["image_ids"] = pastec_response["type"]== Pastec::RESPONSE_CODES[:SEARCH_RESULTS] ? [pastec_response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]] : []
+
+    pastec_response["image_ids"] = pastec_response["type"]== Pastec::RESPONSE_CODES[:SEARCH_RESULTS] ? [pastec_response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact : []
 
     searched_result = process_searched_images_response(pastec_response)
 

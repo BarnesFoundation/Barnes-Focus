@@ -17,11 +17,13 @@ import img9 from 'images/wifi-img3.jpg';
 
 import photo_prompt from 'images/photo-prompt.jpg';
 import icon_camera from 'images/camera_icon.svg';
+import axios from 'axios';
 
 class WelcomeComponent extends Component {
 
     state = {
-        selectedLanguage: 'English'
+        selectedLanguage: 'en',
+        languages: []
     }
 
     componentDidMount() {
@@ -29,6 +31,16 @@ class WelcomeComponent extends Component {
             interval: false,
             wrap: false
         };
+        axios
+            .get('/api/snaps/languages')
+            .then((response) => {
+                this.setState({languages: response.data});
+            })
+            .catch((e) =>
+            {
+                console.error(e);
+            });
+
         $('#snapCarousel').carousel(settings);
 
         $('#snapCarousel').each(function () {
@@ -59,8 +71,7 @@ class WelcomeComponent extends Component {
     }
 
     render() {
-        const { selectedLanguage } = this.state;
-        const lang = selectedLanguage && selectedLanguage.value;
+        const newTo = {pathname: "/snap", language: this.state.selectedLanguage};
         return (
             <div id="snapCarousel" className="carousel slide">
                 <ol className="carousel-indicators">
@@ -135,11 +146,9 @@ class WelcomeComponent extends Component {
                                     <label>
 
                                         <select value={this.state.selectedLanguage} onChange={this.handleChange}>
-                                            <option value="English">English (Default)</option>
-                                            <option value="Français">Français</option>
-                                            <option value="Deutsch">Deutsch</option>
-                                            <option value="Italiano">Italiano</option>
-                                            <option value="Español">Español</option>
+                                            {this.state.languages.map(function(lan, index){
+                                                return <option key = {index} value={ lan.code }>{lan.name}</option>;
+                                            })}
                                         </select>
                                     </label>
                                 </form>
@@ -188,7 +197,8 @@ class WelcomeComponent extends Component {
                             <div className="content">
                                 <h1>Take a photo to learn more about a work of art in our collection.</h1>
                             </div>
-                            <Link className="btn take-photo-btn" to="/snap">
+
+                            <Link className="btn take-photo-btn" to={newTo}>
                                 Take Photo
                                 <span className="icon">
                                     <img src={icon_camera} alt="camera_icon" />
