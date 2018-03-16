@@ -22,6 +22,8 @@ class Camera extends Component {
         error: ''
     };
 
+
+
     // switchCamera() {
     //     this.setState({ frontCamera: !this.state.frontCamera });
     //     console.log('front camera = ' + this.state.frontCamera);
@@ -127,7 +129,9 @@ class Camera extends Component {
                 "height": 1080
             }
         })
-            .then(videoStream => this.setState({ videoStream }))
+            .then(videoStream => {
+                this.setState({ videoStream });
+            })
             .catch(err => this.setState({ error: "Error accessing device camera." }));
 
         const el = document.querySelector('.camera-container');
