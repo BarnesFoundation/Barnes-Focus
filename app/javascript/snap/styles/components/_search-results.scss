@@ -1,0 +1,36 @@
+.search-container {
+    padding-left: 0;
+    padding-right: 0;
+
+    .card {
+        border: none;
+        border-radius: 0;
+        text-align: center;
+
+        .card-img-overlay {
+            .card-title {
+                color: #fff;
+                padding: 24vh 24vw 0;
+                font-size: 25px;
+            }
+        }
+
+        .card-body {
+            .action-icons {
+                img {
+                    padding: 0 10px;
+                }
+            }
+        }
+
+        .card-footer {
+            background-color: #F74D31;
+            color: #FFF;
+            font-size: 22px;
+
+            small {
+                opacity: 0.8;
+            }
+        }
+    }
+}

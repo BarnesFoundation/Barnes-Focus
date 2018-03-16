@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import Hammer from 'hammerjs';
-import CameraDisplay from './CameraDisplay';
 import CameraControls from './CameraControls';
-import CameraSnap from './CameraSnap';
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
@@ -15,11 +13,7 @@ class Camera extends Component {
         frontCamera: false,
         capturedImage: null,
         showVideo: true,
-        searchedImageURL: '',
-        searchInProgress: false,
-        searchResults: [],
-        pastecResults: [],
-        error: ''
+        searchInProgress: false
     };
 
 
@@ -73,40 +67,12 @@ class Camera extends Component {
     }
 
     submitPhoto = () => {
-        console.log('submitting photo to backend');
-        console.log(this.props.history);
         this.toggleImage(false);
         this.setState({ searchInProgress: true });
         axios.post('/api/snaps/search', {
             image_data: this.state.capturedImage
-        }).then(function (response) {
-            const search_resp = response["data"];
-            const result = {};
-            if (search_resp["success"]) {
-                if (search_resp["data"]["records"].length > 0) {
-                    const art_obj = search_resp["data"]["records"][0];
-                    const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
-                    result['title'] = art_obj.title;
-                    result['artist'] = art_obj.people;
-                    result['classification'] = art_obj.classification;
-                    result['locations'] = art_obj.locations;
-                    result['medium'] = art_obj.medium;
-                    result['url'] = art_obj.art_url;
-                    result['invno'] = art_obj.invno;
-                    this.setState({
-                        searchedImageURL: art_url,
-                        searchResults: this.state.searchResults.concat(result)
-                    });
-                }
-                this.setState({
-                    pastecResults: search_resp['pastec_data']
-                });
-
-            } else {
-                this.setState({ error: "No records found!" });
-            }
+        }).then(response => {
             this.setState({ searchInProgress: false });
-
             // Navigate to search result page
             this.props.history.push({
                 pathname: '/results',
@@ -114,9 +80,10 @@ class Camera extends Component {
                     result: response.data
                 }
             })
-        }.bind(this))
-            .catch(function (error) {
-                console.log(error);
+        })
+            .catch(error => {
+                this.setState({ searchInProgress: false });
+                this.props.history.push({ pathname: '/errors' });
             });
     }
 
@@ -139,23 +106,20 @@ class Camera extends Component {
         mc.add(new Hammer.Pinch({ threshold: 0 }));
         mc.on("pinchin pinchout", (e) => {
 
-            //setTimeout(() => {
             const track = this.state.videoStream.getVideoTracks()[0];
             const camera_capabilities = track.getCapabilities();
             const camera_settings = track.getSettings();
 
-            console.log('pinch event :: ' + e.type + ' scale :: ' + e.scale);
             const current_zoom = camera_settings.zoom;
             let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
             zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
-            console.log('current_zoom = ' + current_zoom + '. new_zoom = ' + zoomLevel);
+
             // if device supports zoom
             if ('zoom' in camera_capabilities && zoomLevel >= camera_capabilities.zoom.min && zoomLevel <= camera_capabilities.zoom.max) {
                 track.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
             } else {
                 console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
             }
-            // }, 0);
         });
 
         mc.on("swipe drag", function (event) {
