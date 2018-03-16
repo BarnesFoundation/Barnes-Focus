@@ -14,7 +14,9 @@ class Header extends Component {
     render() {
         return (
             <div>
-                {this.props.location.pathname !== '/snap' &&
+                {
+                    this.props.location.pathname !== '/snap' &&
+                    this.props.location.pathname !== '/results' &&
                     <nav className="narbar header">
                         <a className="navbar-brand">
                             <img src={barnes_logo} alt="Barnes" />
