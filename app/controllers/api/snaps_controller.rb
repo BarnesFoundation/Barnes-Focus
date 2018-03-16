@@ -15,7 +15,7 @@ class Api::SnapsController < Api::BaseController
       f.write image_data
     end
     # for testing
-    #file_name = "#{Rails.root}/public/test-image.png"
+    # file_name = "#{Rails.root}/public/test-image.png"
 
     file = pastec_obj.loadFileData(file_name)
     pastec_response = pastec_obj.search_image(file)
