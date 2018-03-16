@@ -19,4 +19,8 @@ class GoogleTranslate
       puts "target language is invalid"
       text
   end
+
+  def supported_languages
+    @google_translate.languages "en"
+  end
 end
