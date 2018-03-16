@@ -13,8 +13,8 @@ const AppRouter = () => (
             <Header />
             <Switch>
                 <Route path="/" component={Welcome} exact={true} />
-                <Route path="/snap" component={Camera} />
-                <Route path="/results" component={SnapResults} />
+                <Route path="/snap" component={Camera} exact={true} />
+                <Route path="/results" component={SnapResults} exact={true} />
             </Switch>
         </div>
     </BrowserRouter>

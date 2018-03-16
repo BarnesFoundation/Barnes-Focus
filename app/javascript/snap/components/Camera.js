@@ -111,7 +111,10 @@ class Camera extends Component {
             this.props.history.push({
                 pathname: '/results',
                 state: {
-                    ...this.state
+                    searchedImageURL: { ...this.state.searchedImageURL },
+                    searchResults: { ...this.state.searchResults },
+                    pastecResults: { ...this.state.pastecResults },
+                    error: (this.state.error === 'No records found!') ? { ...this.state.error } : ''
                 }
             })
         }.bind(this))
