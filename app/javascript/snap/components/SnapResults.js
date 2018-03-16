@@ -7,8 +7,34 @@ class SnapResults extends Component {
 
     constructor(props) {
         super(props);
-        this.state = props.location.state;
-        console.log('Search results :: ' + props.location.state);
+        this.state = {
+            ...props.location.state,
+            searchResults: []
+        }
+    }
+
+    componentWillMount() {
+        const search_result = this.state.result;
+        if (search_result["success"]) {
+            if (search_result["data"]["records"].length > 0) {
+                const result = {};
+                const art_obj = search_result["data"]["records"][0];
+                const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
+                result['title'] = art_obj.title;
+                result['artist'] = art_obj.people;
+                result['classification'] = art_obj.classification;
+                result['locations'] = art_obj.locations;
+                result['medium'] = art_obj.medium;
+                result['url'] = art_url
+                result['invno'] = art_obj.invno;
+                this.setState({
+                    searchResults: this.state.searchResults.concat(result)
+                });
+            }
+
+        } else {
+            this.setState({ error: "No records found!" });
+        }
     }
 
     render() {
@@ -17,7 +43,7 @@ class SnapResults extends Component {
                 <div className="row">
                     {this.state.searchResults.length > 0 &&
                         <a className="image-url col-sm-12" href={this.state.searchedImageURL} target="_blank">
-                            <img src={this.state.searchedImageURL} alt="result" className="img-thumbnail" />
+                            <img src={this.state.searchResults[0].url} alt="result" className="img-thumbnail" />
                         </a>
                     }
                     {this.state.error &&
@@ -39,21 +65,6 @@ class SnapResults extends Component {
                         </div>
                     </div>
                 }
-                <div className="row">
-                    {
-                        this.state.pastecResults.length > 0 &&
-                        <div className="pastec-data">
-                            <p><strong>PASTEC DATA</strong></p>
-                            {this.state.pastecResults.map(function (img, index) {
-                                return <div key={'mykey' + index}><p><strong>Image Idetifier:&nbsp;</strong> {img['image_id']}</p>
-                                    <a className="image-url col-sm-12" href={img['image_url']} target="_blank">
-                                        <img src={img['image_url']} alt="result" className="img-thumbnail" />
-                                    </a>
-                                </div>;
-                            })}
-                        </div>
-                    }
-                </div>
             </div>
         );
     }
