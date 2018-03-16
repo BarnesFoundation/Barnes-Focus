@@ -65,7 +65,8 @@ class Camera extends Component {
         console.log('submitting photo to backend');
         this.setState({ loading: true });
         axios.post('/api/snaps/search', {
-            image_data: this.state.capturedImage
+            image_data: this.state.capturedImage,
+            language: "es"
         }).then(function (response) {
             const search_resp = response["data"];
             const result = {};
@@ -74,6 +75,7 @@ class Camera extends Component {
                     const art_obj = search_resp["data"]["records"][0];
                     const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
                     result['title'] = art_obj.title;
+                    result['shortDescription'] = art_obj.shortDescription;
                     result['artist'] = art_obj.people;
                     result['classification'] = art_obj.classification;
                     result['locations'] = art_obj.locations;
@@ -210,6 +212,7 @@ class Camera extends Component {
                     <div className="row">
                         <div className="results col-sm-12">
                             <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
+                            <p><strong>Short Description:&nbsp;</strong> {this.state.searchResults[0].shortDescription}</p>
                             <p><strong>Artist:&nbsp;</strong> {this.state.searchResults[0].artist}</p>
                             <p><strong>Accession No.:&nbsp;</strong> {this.state.searchResults[0].invno}</p>
                             <p><strong>Classification:&nbsp;</strong> {this.state.searchResults[0].classification}</p>
