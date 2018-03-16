@@ -18,9 +18,10 @@ class Api::SnapsController < Api::BaseController
     File.open(file_name, 'wb') do |f|
       f.write image_data
     end
-    #file_name = "#{Rails.root}/public/test-image.png"
-    file = pastec_obj.loadFileData(file_name)
+    # for testing
+    #file_name = "#{Rails.root}/public/test-image.jpg"
 
+    file = pastec_obj.loadFileData(file_name)
     pastec_response = pastec_obj.search_image(file)
     pastec_response["image_ids"] = pastec_response["type"]== Pastec::RESPONSE_CODES[:SEARCH_RESULTS] ? [pastec_response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]] : []
 
@@ -65,9 +66,20 @@ class Api::SnapsController < Api::BaseController
         image_ids.uniq!
         #send these image_ids to elastic search to get recommended result and send list to API
         image_ids.each do |img|
-          response["data"]["records"] << BarnesElasticSearch.instance.get_object(img)
+          searched_data = BarnesElasticSearch.instance.get_object(img)
+          if preferred_language.present?
+            translator = GoogleTranslate.new preferred_language
+            #as of now I am sending translated version of title as shortdescription is coming null from elastic search
+            searched_data["title"] = translator.translate(searched_data["title"])
+            searched_data["shortDescription"] = translator.translate(searched_data["shortDescription"]) if searched_data["shortDescription"]
+          end
+          response["data"]["records"] << searched_data
         end
       end
       response
+    end
+
+    def preferred_language
+      params["language"]
     end
 end
