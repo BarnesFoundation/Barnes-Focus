@@ -24,6 +24,62 @@ h2 {
     left: 5vw;
 }
 
+.language-select {
+    padding: 0 15px;
+    .btn-group {
+        .btn {
+            background-color: #FFF;
+            color: #333;
+            border-radius: 0;
+            text-align: left;
+
+            &:focus {
+                outline: none;
+                box-shadow: none;
+            }
+        }
+    }
+}
+
+.Modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid rgb(204, 204, 204);
+    background: rgb(255, 255, 255);
+    overflow: auto;
+    border-radius: 0px;
+    outline: none;
+    padding: 20px;
+    text-align: center;
+
+    .close {
+        font-size: 30px;
+    }
+
+    .list-group {
+        
+        .list-group-item {
+            text-align: left;
+
+            &:first-child {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            &:last-child {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+        }
+    }
+    
+}
+
+
+
 // /* Smartphones (portrait and landscape) ----------- */
 // @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
 // /* Styles */
