@@ -16,6 +16,7 @@ import img8 from 'images/wifi-img2.jpg';
 import img9 from 'images/wifi-img3.jpg';
 import photo_prompt from 'images/photo-prompt.jpg';
 import icon_camera from 'images/camera_icon.svg';
+import axios from 'axios';
 
 class WelcomeComponent extends Component {
 
@@ -40,6 +41,15 @@ class WelcomeComponent extends Component {
             interval: false,
             wrap: false
         };
+        axios
+            .get('/api/snaps/languages')
+            .then((response) => {
+                this.setState({ languages: response.data });
+            })
+            .catch((e) => {
+                console.error(e);
+            });
+
         $('#snapCarousel').carousel(settings);
 
         $('#snapCarousel').each(function () {
@@ -189,6 +199,7 @@ class WelcomeComponent extends Component {
                             <div className="content">
                                 <h1>Take a photo to learn more about a work of art in our collection.</h1>
                             </div>
+
                             <Link className="btn take-photo-btn" to="/snap">
                                 Take Photo
                                 <span className="icon">

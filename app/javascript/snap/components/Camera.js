@@ -88,7 +88,6 @@ class Camera extends Component {
     }
 
     componentDidMount() {
-
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",
