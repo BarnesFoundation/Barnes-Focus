@@ -75,17 +75,23 @@ class Camera extends Component {
             language: prefLang
         }).then(response => {
             this.setState({ searchInProgress: false });
-            // Navigate to search result page
-            this.props.history.push({
-                pathname: '/results',
-                state: {
-                    result: response.data
-                }
-            })
+            // Navigate to search result page or not found page
+
+            if (response.data.records.length === 0) {
+                this.props.history.push({ pathname: '/not-found' });
+            } else {
+                this.props.history.push({
+                    pathname: '/results',
+                    state: {
+                        result: response.data
+                    }
+                });
+            }
+
         })
             .catch(error => {
                 this.setState({ searchInProgress: false });
-                this.props.history.push({ pathname: '/errors' });
+                this.props.history.push({ pathname: '/not-found' });
             });
     }
 

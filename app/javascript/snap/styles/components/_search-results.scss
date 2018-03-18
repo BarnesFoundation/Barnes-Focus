@@ -49,3 +49,19 @@
         }
     }
 }
+
+.search-error-container {
+
+    .error-container {
+        padding: 60px 30px;
+        height: 60vh;
+        text-align: center;
+    }
+
+
+    .btn {
+        border-radius: 0;
+        color: #8C8C8D;
+        border: 2px solid #E3E3E3;
+    }
+}
