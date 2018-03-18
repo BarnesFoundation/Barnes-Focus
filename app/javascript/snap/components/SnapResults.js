@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import LanguageSelect from '../components/LanguageSelect';
 import share from 'images/share_icon.svg';
 import bookmark from 'images/bookmark_icon.svg';
 import icon_camera from 'images/camera_icon.svg';
+import Footer from './Footer';
 
 /** 
  * withHeader HOC provides props with location, history and match objects
@@ -77,6 +79,15 @@ class SnapResults extends Component {
                         </div>
                     </div>
                 </div>
+                <div className="mt-5">
+                    <LanguageSelect />
+                </div>
+                <div className="row mt-5 mb-3">
+                    <div className="col-6 offset-3 text-center">
+                        <span className="reset-experience">Reset Experience</span>
+                    </div>
+                </div>
+                <Footer />
 
 
                 {/* <div className="row">
