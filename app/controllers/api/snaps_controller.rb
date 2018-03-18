@@ -15,7 +15,7 @@ class Api::SnapsController < Api::BaseController
       f.write image_data
     end
     # for testing
-    #file_name = "#{Rails.root}/public/test-image1.JPG"
+    #file_name = "#{Rails.root}/public/test-image1.jpeg"
 
     file = pastec_obj.loadFileData(file_name)
     pastec_response = pastec_obj.search_image(file)
@@ -34,7 +34,7 @@ class Api::SnapsController < Api::BaseController
 
   def languages
     translator = GoogleTranslate.new preferred_language
-    render json: translator.supported_languages
+    render json: translator.supported_languages(preferred_language)
   end
 
   private
@@ -82,6 +82,6 @@ class Api::SnapsController < Api::BaseController
     end
 
     def preferred_language
-      #params["language"]
+      params["language"]
     end
 end

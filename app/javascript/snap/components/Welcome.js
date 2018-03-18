@@ -21,7 +21,7 @@ import axios from 'axios';
 class WelcomeComponent extends Component {
 
     state = {
-        selectedLanguage: localStorage.getItem('barnes.snap.pref.lang') || 'English (Default)',
+        selectedLanguage: {},
         modalIsOpen: false,
         languageOptions: [
             'English (Default)',
@@ -42,9 +42,11 @@ class WelcomeComponent extends Component {
             wrap: false
         };
         axios
-            .get('/api/snaps/languages')
+            .get('/api/snaps/languages?language=en')
             .then((response) => {
-                this.setState({ languages: response.data });
+                var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
+                var savedLanguage = response.data.find(function (obj) { return obj.code === prefLang; });
+                this.setState({ languageOptions: response.data , selectedLanguage: savedLanguage});
             })
             .catch((e) => {
                 console.error(e);
@@ -84,9 +86,9 @@ class WelcomeComponent extends Component {
     }
 
     selectLanguage = (e) => {
-        const selectedLanguage = e.currentTarget.dataset.id;
-        this.setState({ selectedLanguage: selectedLanguage });
-        localStorage.setItem('barnes.snap.pref.lang', selectedLanguage);
+        var selectedLang = {code: e.currentTarget.dataset.id, name: e.currentTarget.dataset.lang} ;
+        this.setState({ selectedLanguage: selectedLang });
+        localStorage.setItem('barnes.snap.pref.lang', selectedLang.code);
         this.closeModal();
     }
 
@@ -142,7 +144,7 @@ class WelcomeComponent extends Component {
                                     <div className="col-12 col-md-4 offset-md-4">
                                         <div className="btn-group d-flex" role="group">
                                             <button className="btn btn-secondary btn-lg w-100" type="button" onClick={this.openModal}>
-                                                {this.state.selectedLanguage}
+                                                {this.state.selectedLanguage.name}
                                             </button>
                                             <button type="button" className="btn btn-lg btn-secondary dropdown-toggle dropdown-toggle-split" onClick={this.openModal}>
                                                 <span className="sr-only">Toggle Dropdown</span>
@@ -163,7 +165,7 @@ class WelcomeComponent extends Component {
                                     <h1>Please select your language.</h1>
                                     <p>We are using Google to help us automatically translate our text.</p>
                                     <ul className="list-group">
-                                        {this.state.languageOptions.map(lang => <li className="list-group-item" key={lang} data-id={lang} onClick={this.selectLanguage}>{lang}</li>)}
+                                        {this.state.languageOptions.map((lang, index )=> <li className="list-group-item" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name}</li>)}
                                     </ul>
                                 </Modal>
                             </div>
