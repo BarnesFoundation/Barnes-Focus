@@ -82,7 +82,7 @@ class SnapResults extends Component {
                 <div className="mt-5">
                     <LanguageSelect />
                 </div>
-                <div className="row mt-5 mb-3">
+                <div id="reset-experience" className="row mt-5 mb-3">
                     <div className="col-6 offset-3 text-center">
                         <span className="reset-experience">Reset Experience</span>
                     </div>
