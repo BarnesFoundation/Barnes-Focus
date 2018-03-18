@@ -16,6 +16,7 @@
         }
 
         .card-body {
+            margin-top: -30px;
             .action-icons {
                 img {
                     padding: 0 10px;
@@ -31,6 +32,20 @@
             small {
                 opacity: 0.8;
             }
+        }
+        
+        .btn-circle {
+            width: 60px;
+            height: 60px;
+            padding: 10px 16px;
+            border-radius: 35px;
+            font-size: 24px;
+            line-height: 1.33;
+            position: relative;
+            top: -30px;
+            left: 75vw;
+            background-color: #000;
+            color: #FFF;
         }
     }
 }

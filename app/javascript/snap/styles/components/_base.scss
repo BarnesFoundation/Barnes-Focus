@@ -21,7 +21,7 @@ h2 {
 
 .content {
     text-align: center;
-    left: 5vw;
+    padding: 5vw;
 }
 
 .language-select {
@@ -47,7 +47,6 @@ h2 {
     left: 0;
     right: 0;
     bottom: 0;
-    border: 1px solid rgb(204, 204, 204);
     background: rgb(255, 255, 255);
     overflow: auto;
     border-radius: 0px;
@@ -72,6 +71,11 @@ h2 {
             &:last-child {
                 border-bottom-left-radius: 0;
                 border-bottom-right-radius: 0;
+            }
+
+            .selected-lang {
+                color: #F74D31;
+                float: right;
             }
         }
     }
