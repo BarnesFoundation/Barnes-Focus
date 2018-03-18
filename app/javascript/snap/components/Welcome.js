@@ -20,8 +20,6 @@ import axios from 'axios';
 
 class WelcomeComponent extends Component {
 
-
-
     constructor(props) {
         super(props);
 
@@ -45,9 +43,29 @@ class WelcomeComponent extends Component {
             modalIsOpen: false,
             languageOptions: langOptions
         }
+
     }
 
+    checkIndex = () => {
+        const $this = $("#snapCarousel");
+        if ($("#snapCarousel .carousel-inner .carousel-item:first").hasClass("active")) {
+            $this.children(".carousel-control-prev").hide();
+            $this.children(".carousel-control-next").show();
+            $this.children(".carousel-indicators").show();
+        } else if ($("#snapCarousel .carousel-inner .carousel-item:last").hasClass("active")) {
+            $this.children(".carousel-control-next").hide();
+            $this.children(".carousel-control-prev").hide();
+            $this.children(".carousel-indicators").hide();
+        } else {
+            $this.children(".carousel-control-prev").show();
+            $this.children(".carousel-control-next").show();
+            $this.children(".carousel-indicators").show();
+        }
+    };
+
     componentDidMount() {
+
+        this.checkIndex();
 
         const settings = {
             interval: false,
@@ -75,14 +93,16 @@ class WelcomeComponent extends Component {
                 ]
             });
             hammertime.on('swipeleft', function () {
-                console.log('swipeleft');
                 $carousel.carousel('next');
             });
             hammertime.on('swiperight', function () {
-                console.log('swiperight');
                 $carousel.carousel('prev');
             });
         });
+
+        $('#snapCarousel').on('slid.bs.carousel', () => {
+            this.checkIndex();
+        })
 
         $('.dropdown-toggle').dropdown();
 
@@ -177,7 +197,7 @@ class WelcomeComponent extends Component {
                                     <h1>Please select your language.</h1>
                                     <p>We are using Google to help us automatically translate our text.</p>
                                     <ul className="list-group">
-                                        {this.state.languageOptions.map((lang, index) => <li className="list-group-item" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name}</li>)}
+                                        {this.state.languageOptions.map((lang, index) => <li className="list-group-item" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name} {this.state.selectedLanguage.name === lang.name ? <span className="selected-lang">Selected</span> : ''}</li>)}
                                     </ul>
                                 </Modal>
                             </div>
@@ -225,11 +245,11 @@ class WelcomeComponent extends Component {
                     </div>
                 </div>
                 <a className="carousel-control-prev" href="#snapCarousel" role="button" data-slide="prev">
-                    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <i className="fa fa-2x fa-angle-left"></i>
                     <span className="sr-only">Previous</span>
                 </a>
                 <a className="carousel-control-next" href="#snapCarousel" role="button" data-slide="next">
-                    <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                    <i className="fa fa-2x fa-angle-right"></i>
                     <span className="sr-only">Next</span>
                 </a>
             </div >

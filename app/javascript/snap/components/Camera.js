@@ -155,7 +155,7 @@ class Camera extends Component {
             const aspectRatio = video.videoWidth / video.videoHeight;
 
             canvas.width = video.clientWidth;
-            canvas.height = video.clientWidth / aspectRatio;
+            canvas.height = video.clientWidth;
 
             this.canvas = canvas;
             this.ctx = canvas.getContext('2d');

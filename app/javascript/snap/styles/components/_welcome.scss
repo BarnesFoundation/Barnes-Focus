@@ -1,7 +1,7 @@
 .welcome-screen {
     .img-gallery {
         top: 15vh;
-        height: 50vh;
+        height: 46vh;
         padding: 5vw;
         
         .gallery-item {           
@@ -32,35 +32,35 @@
 
 .lang-dropdown-screen {
     .img-gallery {
-        top: 15vh;
-        height: 55vh;
+        top: 5vh;
+        height: 45vh;
         padding: 5vw;
         
         .gallery-item {           
             position: absolute;
             
             &:nth-child(1) {
-                top: 20vh;
+                top: 10vh;
                 left: 2vh;
                 z-index: 100;
                 img {
-                    width: 40vw;
+                    width: 35vw;
                 }
             }
 
             &:nth-child(2) {
-                top: 5vh;
-                left: 20vw;  
+                top: 0vh;
+                left: 25vw;  
                 img {
-                    width: 60vw;
+                    width: 50vw;
                 }
             }
 
             &:nth-child(3) {
-                top: 30vh;
+                top: 20vh;
                 left: 50vw;
                 img {
-                    width: 50vw;
+                    width: 45vw;
                 }
             }
 

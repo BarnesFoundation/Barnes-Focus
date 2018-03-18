@@ -3,7 +3,7 @@
 
     .carousel-indicators {
         position: absolute;
-        bottom: 10vh;
+        bottom: 15vh;
         z-index: 0;
         text-align: center;
         list-style: none;
@@ -33,9 +33,9 @@
 
     .carousel-control-prev, .carousel-control-next {
         position: absolute;
-        bottom: 5vh;
+        bottom: 15vh;
         top: unset;
-        width: 65%;
+        width: 50%;
         height: 1.5vh;
         color: #6E6E6E;
         text-align: center;
