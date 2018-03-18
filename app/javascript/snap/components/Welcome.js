@@ -24,33 +24,37 @@ class WelcomeComponent extends Component {
         selectedLanguage: {},
         modalIsOpen: false,
         languageOptions: [
-            'English (Default)',
-            '中文',
-            'Français',
-            'Deutsch',
-            'Italiano',
-            '日本語',
-            '한국어',
-            'русский',
-            'Español'
+            { name: 'English (Default)', code: 'en' },
+            { name: '中文', code: 'zh' },
+            { name: 'Français', code: 'fr' },
+            { name: 'Deutsch', code: 'de' },
+            { name: 'Italiano', code: 'it' },
+            { name: '日本語', code: 'ja' },
+            { name: '한국어', code: 'ko' },
+            { name: 'русский', code: 'ru' },
+            { name: 'Español', code: 'es' }
         ]
     }
 
     componentDidMount() {
+        const lang = localStorage.getItem('barnes.snap.pref.lang') || 'en';
+        const langObj = this.state.languageOptions.filter(obj => obj.code === lang);
+        this.setState({ selectedLanguage: langObj[0] });
+
         const settings = {
             interval: false,
             wrap: false
         };
-        axios
-            .get('/api/snaps/languages?language=en')
-            .then((response) => {
-                var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
-                var savedLanguage = response.data.find(function (obj) { return obj.code === prefLang; });
-                this.setState({ languageOptions: response.data , selectedLanguage: savedLanguage});
-            })
-            .catch((e) => {
-                console.error(e);
-            });
+        // axios
+        //     .get('/api/snaps/languages?language=en')
+        //     .then((response) => {
+        //         var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
+        //         var savedLanguage = response.data.find(function (obj) { return obj.code === prefLang; });
+        //         this.setState({ languageOptions: response.data, selectedLanguage: savedLanguage });
+        //     })
+        //     .catch((e) => {
+        //         console.error(e);
+        //     });
 
         $('#snapCarousel').carousel(settings);
 
@@ -86,7 +90,7 @@ class WelcomeComponent extends Component {
     }
 
     selectLanguage = (e) => {
-        var selectedLang = {code: e.currentTarget.dataset.id, name: e.currentTarget.dataset.lang} ;
+        var selectedLang = { code: e.currentTarget.dataset.id, name: e.currentTarget.dataset.lang };
         this.setState({ selectedLanguage: selectedLang });
         localStorage.setItem('barnes.snap.pref.lang', selectedLang.code);
         this.closeModal();
@@ -165,7 +169,7 @@ class WelcomeComponent extends Component {
                                     <h1>Please select your language.</h1>
                                     <p>We are using Google to help us automatically translate our text.</p>
                                     <ul className="list-group">
-                                        {this.state.languageOptions.map((lang, index )=> <li className="list-group-item" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name}</li>)}
+                                        {this.state.languageOptions.map((lang, index) => <li className="list-group-item" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name}</li>)}
                                     </ul>
                                 </Modal>
                             </div>
