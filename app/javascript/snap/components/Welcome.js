@@ -20,10 +20,12 @@ import axios from 'axios';
 
 class WelcomeComponent extends Component {
 
-    state = {
-        selectedLanguage: { name: 'English (Default)', code: 'en' },
-        modalIsOpen: false,
-        languageOptions: [
+
+
+    constructor(props) {
+        super(props);
+
+        const langOptions = [
             { name: 'English (Default)', code: 'en' },
             { name: '中文', code: 'zh' },
             { name: 'Français', code: 'fr' },
@@ -33,13 +35,19 @@ class WelcomeComponent extends Component {
             { name: '한국어', code: 'ko' },
             { name: 'русский', code: 'ru' },
             { name: 'Español', code: 'es' }
-        ]
+        ];
+
+        const lang = localStorage.getItem('barnes.snap.pref.lang') || 'en';
+        const langObj = langOptions.filter(obj => obj.code === lang);
+
+        this.state = {
+            selectedLanguage: langObj[0],
+            modalIsOpen: false,
+            languageOptions: langOptions
+        }
     }
 
     componentDidMount() {
-        const lang = localStorage.getItem('barnes.snap.pref.lang') || 'en';
-        const langObj = this.state.languageOptions.filter(obj => obj.code === lang);
-        this.setState({ selectedLanguage: langObj[0] });
 
         const settings = {
             interval: false,
