@@ -14,3 +14,10 @@
    - It will run two processes simultaneously: <b>rails s</b> and <b>webpack-dev-server</b> that will analyse changes in our app/javascript folder and rebuild the front end on the fly.
 
 
+ Deployment on Heroku:
+ - Note: GOOGLE_APPLICATION_CREDENTIALS as json file can not be added in heroku so add these three params in heroku
+    - GOOGLE_ACCOUNT_TYPE=service_account
+    - GOOGLE_PRIVATE_KEY=XXX
+    - GOOGLE_CLIENT_EMAIL=XXX
+ 
+ 
