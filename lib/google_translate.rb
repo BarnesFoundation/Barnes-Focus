@@ -20,7 +20,7 @@ class GoogleTranslate
       text
   end
 
-  def supported_languages
-    @google_translate.languages "en"
+  def supported_languages(local_culture="en")
+    @google_translate.languages local_culture
   end
 end

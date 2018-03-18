@@ -69,8 +69,10 @@ class Camera extends Component {
     submitPhoto = () => {
         this.toggleImage(false);
         this.setState({ searchInProgress: true });
+        var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
         axios.post('/api/snaps/search', {
-            image_data: this.state.capturedImage
+            image_data: this.state.capturedImage,
+            language: prefLang
         }).then(response => {
             this.setState({ searchInProgress: false });
             // Navigate to search result page
