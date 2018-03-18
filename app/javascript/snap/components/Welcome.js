@@ -21,7 +21,7 @@ import axios from 'axios';
 class WelcomeComponent extends Component {
 
     state = {
-        selectedLanguage: {},
+        selectedLanguage: {code: "en", name: "English"},
         modalIsOpen: false,
         languageOptions: [
             'English (Default)',
