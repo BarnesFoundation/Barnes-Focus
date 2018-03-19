@@ -4,7 +4,7 @@ require 'csv'
 require 'open-uri'
 
 class CudaSift
-  attr_accessor :endpoint
+  attr_accessor :endpoints
 
   RESPONSE_CODES={
     IMAGE_ADDED: "IMAGE_ADDED",
@@ -18,33 +18,7 @@ class CudaSift
 
 
   def initialize
-    self.endpoint = ENV['CUDASIFT_ENDPOINT']
-  end
-
-  def ids_in_index
-    response = RestClient.get url_index_imageIds
-    data = json_response(response)
-    data['image_ids']
-  end
-
-
-  #Answer type: "IMAGE_ADDED"
-  #Possible error types: "IMAGE_NOT_DECODED", "IMAGE_SIZE_TOO_BIG", "IMAGE_SIZE_TOO_SMALL"
-  def index_image(image_url, identifier)
-    begin
-      file = open(image_url, 'rb')
-    rescue Exception => ex
-      return false
-    end
-    response = RestClient.put(url_index_image(identifier), file)
-    json_response(response)
-  end
-
-  # Answer type: "IMAGE_REMOVED"
-  # Possible error type: "IMAGE_NOT_FOUND"
-  def remove_image(identifier)
-    response = RestClient.delete url_index_image(identifier)
-    json_response(response)
+    self.endpoints = ENV['CUDASIFT_ENDPOINTS'].split(',').map(&:strip).uniq
   end
 
 
@@ -52,8 +26,20 @@ class CudaSift
   #Answer: "SEARCH_RESULTS" as type field and a list of the the matched image ids from the most to the least relevant one in the "image_ids" field
   #Possible error types: "IMAGE_NOT_DECODED", "IMAGE_SIZE_TOO_BIG", "IMAGE_SIZE_TOO_SMALL"
   def search_image(image_data)
-    response = RestClient.post(url_search_image, image_data)
-    json_response(response)
+    all_results = []
+    threads = endpoints.map{|end_point| Thread.new{ find_image(image_data, end_point, all_results) }}
+    threads.each(&:join)
+    images_found = {"results" => [], "type" => ""}
+    all_results.each do |res|
+      if res["type"] == RESPONSE_CODES[:SEARCH_RESULTS]
+        images_found["results"] += res["results"]
+        images_found["type"] = res["type"]
+      elsif res["type"] != RESPONSE_CODES[:SEARCH_RESULTS]
+        images_found["type"] = res["type"]
+      end
+    end
+    images_found["results"].sort_by! {|_key, value| value}
+    images_found
   end
 
   # read file data from given path
@@ -66,26 +52,31 @@ class CudaSift
     end
   end
 
-  protected
 
   def json_response(response)
     JSON.parse response.body
   end
 
-  def url_index_image(identifier)
-    full_url("index/images/#{identifier}")
+  def url_search_image end_point_url
+    full_url(end_point_url,"index/searcher")
   end
 
-  def url_index_imageIds
-    full_url("index/imageIds")
+  def full_url(end_point_url, path)
+    "#{end_point_url}/#{path}"
   end
 
-  def url_search_image
-    full_url("index/searcher")
+  def find_image(image_data, server_end_point, result)
+    #response = RestClient.post(url_search_image(server_end_point), image_data)
+    # uri = URI.parse(url_search_image(server_end_point))
+    # request = Net::HTTP::Post.new(uri)
+    # request.body = ''
+    # request.body << image_data.read.delete("\r\n")
+    # request.content_type = 'multipart/form-data'
+    #
+    # response = Net::HTTP.start(uri.hostname, uri.port, {}) do |http|
+    #   http.request(request)
+    # end
+    response = `curl -X POST --data-binary @#{image_data.path} #{url_search_image(server_end_point)}`
+    result << JSON.parse(response)
   end
-
-  def full_url(path)
-    "#{self.endpoint}/#{path}"
-  end
-
 end
