@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Modal from 'react-modal';
+import { SNAP_LANGUAGE_PREFERENCE } from './Constants';
 
 /** 
  * withLanguageSelect HOC provides props with location, history and match objects
@@ -21,7 +22,7 @@ class LanguageSelect extends Component {
             { name: 'Español', code: 'es' }
         ];
 
-        const lang = localStorage.getItem('barnes.snap.pref.lang') || 'en';
+        const lang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || 'en';
         const langObj = langOptions.filter(obj => obj.code === lang);
 
         this.state = {
@@ -46,7 +47,7 @@ class LanguageSelect extends Component {
     selectLanguage = (e) => {
         var selectedLang = { code: e.currentTarget.dataset.id, name: e.currentTarget.dataset.lang };
         this.setState({ selectedLanguage: selectedLang });
-        localStorage.setItem('barnes.snap.pref.lang', selectedLang.code);
+        localStorage.setItem(SNAP_LANGUAGE_PREFERENCE, selectedLang.code);
         this.closeModal();
     }
 
