@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 
+import LanguageSelect from '../components/LanguageSelect';
 import Hammer from 'hammerjs';
 import Modal from 'react-modal';
 
@@ -20,37 +21,45 @@ import axios from 'axios';
 
 class WelcomeComponent extends Component {
 
-    state = {
-        selectedLanguage: {code: "en", name: "English"},
-        modalIsOpen: false,
-        languageOptions: [
-            'English (Default)',
-            '中文',
-            'Français',
-            'Deutsch',
-            'Italiano',
-            '日本語',
-            '한국어',
-            'русский',
-            'Español'
-        ]
+    constructor(props) {
+        super(props);
     }
 
+    checkIndex = () => {
+        const $this = $("#snapCarousel");
+        if ($("#snapCarousel .carousel-inner .carousel-item:first").hasClass("active")) {
+            $this.children(".carousel-control-prev").hide();
+            $this.children(".carousel-control-next").show();
+            $this.children(".carousel-indicators").show();
+        } else if ($("#snapCarousel .carousel-inner .carousel-item:last").hasClass("active")) {
+            $this.children(".carousel-control-next").hide();
+            $this.children(".carousel-control-prev").hide();
+            $this.children(".carousel-indicators").hide();
+        } else {
+            $this.children(".carousel-control-prev").show();
+            $this.children(".carousel-control-next").show();
+            $this.children(".carousel-indicators").show();
+        }
+    };
+
     componentDidMount() {
+
+        this.checkIndex();
+
         const settings = {
             interval: false,
             wrap: false
         };
-        axios
-            .get('/api/snaps/languages?language=en')
-            .then((response) => {
-                var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
-                var savedLanguage = response.data.find(function (obj) { return obj.code === prefLang; });
-                this.setState({ languageOptions: response.data , selectedLanguage: savedLanguage});
-            })
-            .catch((e) => {
-                console.error(e);
-            });
+        // axios
+        //     .get('/api/snaps/languages?language=en')
+        //     .then((response) => {
+        //         var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
+        //         var savedLanguage = response.data.find(function (obj) { return obj.code === prefLang; });
+        //         this.setState({ languageOptions: response.data, selectedLanguage: savedLanguage });
+        //     })
+        //     .catch((e) => {
+        //         console.error(e);
+        //     });
 
         $('#snapCarousel').carousel(settings);
 
@@ -63,33 +72,16 @@ class WelcomeComponent extends Component {
                 ]
             });
             hammertime.on('swipeleft', function () {
-                console.log('swipeleft');
                 $carousel.carousel('next');
             });
             hammertime.on('swiperight', function () {
-                console.log('swiperight');
                 $carousel.carousel('prev');
             });
         });
 
-        $('.dropdown-toggle').dropdown();
-
-        Modal.setAppElement('#language-select');
-    }
-
-    openModal = () => {
-        this.setState({ modalIsOpen: true });
-    }
-
-    closeModal = () => {
-        this.setState({ modalIsOpen: false });
-    }
-
-    selectLanguage = (e) => {
-        var selectedLang = {code: e.currentTarget.dataset.id, name: e.currentTarget.dataset.lang} ;
-        this.setState({ selectedLanguage: selectedLang });
-        localStorage.setItem('barnes.snap.pref.lang', selectedLang.code);
-        this.closeModal();
+        $('#snapCarousel').on('slid.bs.carousel', () => {
+            this.checkIndex();
+        })
     }
 
     render() {
@@ -136,38 +128,9 @@ class WelcomeComponent extends Component {
                                     <img src={img6} alt="img6" />
                                 </div>
                             </div>
-                            <div id="language-select" className="language-select text-center">
-
+                            <div>
                                 <h1>Please select your language</h1>
-
-                                <div className="row">
-                                    <div className="col-12 col-md-4 offset-md-4">
-                                        <div className="btn-group d-flex" role="group">
-                                            <button className="btn btn-secondary btn-lg w-100" type="button" onClick={this.openModal}>
-                                                {this.state.selectedLanguage.name}
-                                            </button>
-                                            <button type="button" className="btn btn-lg btn-secondary dropdown-toggle dropdown-toggle-split" onClick={this.openModal}>
-                                                <span className="sr-only">Toggle Dropdown</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <Modal
-                                    isOpen={this.state.modalIsOpen}
-                                    onRequestClose={this.closeModal}
-                                    contentLabel="Example Modal"
-                                    className="Modal"
-                                    overlayClassName="Overlay"
-                                >
-                                    <button type="button" className="close pull-right offset-11" aria-label="Close" onClick={this.closeModal}>
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    <h1>Please select your language.</h1>
-                                    <p>We are using Google to help us automatically translate our text.</p>
-                                    <ul className="list-group">
-                                        {this.state.languageOptions.map((lang, index )=> <li className="list-group-item" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name}</li>)}
-                                    </ul>
-                                </Modal>
+                                <LanguageSelect />
                             </div>
                         </div>
                     </div>
@@ -213,11 +176,11 @@ class WelcomeComponent extends Component {
                     </div>
                 </div>
                 <a className="carousel-control-prev" href="#snapCarousel" role="button" data-slide="prev">
-                    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <i className="fa fa-2x fa-angle-left"></i>
                     <span className="sr-only">Previous</span>
                 </a>
                 <a className="carousel-control-next" href="#snapCarousel" role="button" data-slide="next">
-                    <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                    <i className="fa fa-2x fa-angle-right"></i>
                     <span className="sr-only">Next</span>
                 </a>
             </div >

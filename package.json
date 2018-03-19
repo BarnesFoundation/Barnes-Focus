@@ -9,6 +9,7 @@
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "bootstrap": "4.0.0",
+    "font-awesome": "^4.7.0",
     "hammerjs": "^2.0.8",
     "html-webpack-plugin": "^2.30.1",
     "jquery": "^3.3.1",
