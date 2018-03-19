@@ -18,7 +18,7 @@ class Api::SnapsController < Api::BaseController
     #file_name = "#{Rails.root}/public/IMG_4971.jpg"
 
     file = pastec_obj.loadFileData(file_name)
-    pastec_response = pastec_obj.search_image(file_name)
+    pastec_response = pastec_obj.search_image(file)
 
     pastec_response["image_ids"] = pastec_response["type"]== Pastec::RESPONSE_CODES[:SEARCH_RESULTS] ? [pastec_response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact : []
 
