@@ -75,17 +75,23 @@ class Camera extends Component {
             language: prefLang
         }).then(response => {
             this.setState({ searchInProgress: false });
-            // Navigate to search result page
-            this.props.history.push({
-                pathname: '/results',
-                state: {
-                    result: response.data
-                }
-            })
+            // Navigate to search result page or not found page
+            const res = response.data;
+            if (res.data.records.length === 0) {
+                this.props.history.push({ pathname: '/not-found' });
+            } else {
+                this.props.history.push({
+                    pathname: '/results',
+                    state: {
+                        result: res
+                    }
+                });
+            }
+
         })
             .catch(error => {
                 this.setState({ searchInProgress: false });
-                this.props.history.push({ pathname: '/errors' });
+                this.props.history.push({ pathname: '/not-found' });
             });
     }
 
@@ -155,7 +161,7 @@ class Camera extends Component {
             const aspectRatio = video.videoWidth / video.videoHeight;
 
             canvas.width = video.clientWidth;
-            canvas.height = video.clientWidth / aspectRatio;
+            canvas.height = video.clientWidth;
 
             this.canvas = canvas;
             this.ctx = canvas.getContext('2d');

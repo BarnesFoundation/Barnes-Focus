@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import LanguageSelect from '../components/LanguageSelect';
 import share from 'images/share_icon.svg';
 import bookmark from 'images/bookmark_icon.svg';
+import icon_camera from 'images/camera_icon.svg';
+import Footer from './Footer';
 
 /** 
  * withHeader HOC provides props with location, history and match objects
@@ -53,6 +57,9 @@ class SnapResults extends Component {
                             <div className="card-img-overlay">
                                 <h5 className="card-title">{this.state.searchResults[0].title}</h5>
                             </div>
+                            <Link type="button" className="btn btn-circle" to="/snap">
+                                <img src={icon_camera} className="profile-avatar" alt="camera" />
+                            </Link>
                             <div className="card-body">
                                 <div className="d-flex justify-content-around action-icons">
                                     <span><img src={share} alt="share" />Share it</span>
@@ -65,13 +72,22 @@ class SnapResults extends Component {
                                 <p className="card-text">{this.state.searchResults[0].shortDescription}.</p>
                                 <p>- John House, Renoir in the Barnes Foundation.</p>
                             </div>
-                            <div class="card-footer">
+                            <div className="card-footer">
                                 <p>Albert Barnes taught people to look at works of art primarily in terms of their visual relationships.</p>
                                 <p><small>Swipe for visually similar works</small></p>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div className="mt-5">
+                    <LanguageSelect />
+                </div>
+                <div id="reset-experience" className="row mt-5 mb-3">
+                    <div className="col-6 offset-3 text-center">
+                        <span className="reset-experience">Reset Experience</span>
+                    </div>
+                </div>
+                <Footer />
 
 
                 {/* <div className="row">

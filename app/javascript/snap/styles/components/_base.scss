@@ -21,7 +21,7 @@ h2 {
 
 .content {
     text-align: center;
-    left: 5vw;
+    padding: 5vw;
 }
 
 .language-select {
@@ -29,9 +29,10 @@ h2 {
     .btn-group {
         .btn {
             background-color: #FFF;
-            color: #333;
-            border-radius: 0;
             text-align: left;
+            border-radius: 0;
+            color: #8C8C8D;
+            border: 2px solid #E3E3E3;
 
             &:focus {
                 outline: none;
@@ -47,7 +48,6 @@ h2 {
     left: 0;
     right: 0;
     bottom: 0;
-    border: 1px solid rgb(204, 204, 204);
     background: rgb(255, 255, 255);
     overflow: auto;
     border-radius: 0px;
@@ -63,6 +63,7 @@ h2 {
         
         .list-group-item {
             text-align: left;
+            color: #8C8C8D;
 
             &:first-child {
                 border-top-left-radius: 0;
@@ -73,9 +74,18 @@ h2 {
                 border-bottom-left-radius: 0;
                 border-bottom-right-radius: 0;
             }
+
+            .selected-lang {
+                color: #F74D31;
+                float: right;
+            }
         }
     }
     
+}
+
+.footer {
+    color: #787878;
 }
 
 
