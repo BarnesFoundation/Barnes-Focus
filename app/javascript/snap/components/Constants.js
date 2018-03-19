@@ -1,0 +1,1 @@
+export const SNAP_LANGUAGE_PREFERENCE = 'barnes.snap.pref.lang';

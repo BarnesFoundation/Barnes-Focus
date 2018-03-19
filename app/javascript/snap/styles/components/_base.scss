@@ -84,6 +84,45 @@ h2 {
     
 }
 
+.snap-btn {
+    border-radius: 0;
+    border: 2px solid #E3E3E3;
+    height: 10vh;
+    width: 100%;
+    padding: 3vh 0;
+
+    &.snap-btn-default {
+        color: #8C8C8D;
+        background-color: #fff;
+    }
+
+    &.snap-btn-danger {
+        color: #FFF;
+        background-color: #D4432A;
+        border: none !important;
+    }
+}
+
+
+.info-dismiss {
+    text-align: left;
+    float: left;
+    line-height: 2.55rem;
+    font-size: 22px;
+}
+
+.info-header {
+    margin-top: 20vh;
+}
+
+.info-message {
+    margin-top: 10vh;
+}
+
+.info-action {
+    margin-top: 20vh;
+}
+
 .footer {
     color: #787878;
 }

@@ -4,7 +4,9 @@ import LanguageSelect from '../components/LanguageSelect';
 import share from 'images/share_icon.svg';
 import bookmark from 'images/bookmark_icon.svg';
 import icon_camera from 'images/camera_icon.svg';
+import Modal from 'react-modal';
 import Footer from './Footer';
+import { SNAP_LANGUAGE_PREFERENCE } from './Constants';
 
 /** 
  * withHeader HOC provides props with location, history and match objects
@@ -15,6 +17,7 @@ class SnapResults extends Component {
         super(props);
         this.state = {
             ...props.location.state,
+            modalIsOpen: false,
             searchResults: []
         }
     }
@@ -44,6 +47,23 @@ class SnapResults extends Component {
         } else {
             this.setState({ error: "No records found!" });
         }
+    }
+
+    componentDidMount() {
+        Modal.setAppElement('#reset-experience');
+    }
+
+    openModal = () => {
+        this.setState({ modalIsOpen: true });
+    }
+
+    closeModal = () => {
+        this.setState({ modalIsOpen: false });
+    }
+
+    resetExperience = () => {
+        localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
+        this.setState({ modalIsOpen: false });
     }
 
     render() {
@@ -84,38 +104,36 @@ class SnapResults extends Component {
                 </div>
                 <div id="reset-experience" className="row mt-5 mb-3">
                     <div className="col-6 offset-3 text-center">
-                        <span className="reset-experience">Reset Experience</span>
+                        <span className="reset-experience" onClick={this.openModal}>Reset Experience</span>
                     </div>
+                    <Modal
+                        isOpen={this.state.modalIsOpen}
+                        onRequestClose={this.closeModal}
+                        contentLabel="Reset Experience Modal"
+                        className="Modal"
+                        overlayClassName="Overlay"
+                    >
+                        <div className="row">
+                            <div className="col-12">
+                                <i className="fa fa-2x fa-angle-left pull-left"></i>
+                                <span className="info-dismiss" onClick={this.closeModal}>
+                                    Cancel</span>
+                            </div>
+                        </div>
+                        <div className="info-header">
+                            <h1>You are about to reset the Snap experience.</h1>
+                        </div>
+                        <div className="info-message">We are using Google to help us automatically translate our text.</div>
+                        <div className="row info-action">
+                            <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
+                                <button className="btn snap-btn snap-btn-danger" onClick={this.resetExperience}>
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </Modal>
                 </div>
                 <Footer />
-
-
-                {/* <div className="row">
-                    {this.state.searchResults.length > 0 &&
-                        <a className="image-url col-sm-12" href={this.state.searchedImageURL} target="_blank">
-                            <img src={this.state.searchResults[0].url} alt="result" className="img-thumbnail" />
-                        </a>
-                    }
-                    {this.state.error &&
-                        <div className="col-sm-12">
-                            <p>No results found!</p>
-                        </div>
-                    }
-                </div>
-                {
-                    this.state.searchResults.length > 0 &&
-                    <div className="row">
-                        <div className="results col-sm-12">
-                            <p><strong>Title:&nbsp;</strong> {this.state.searchResults[0].title}</p>
-                            <p><strong>Short Description:&nbsp;</strong> {this.state.searchResults[0].shortDescription}</p>
-                            <p><strong>Artist:&nbsp;</strong> {this.state.searchResults[0].artist}</p>
-                            <p><strong>Accession No.:&nbsp;</strong> {this.state.searchResults[0].invno}</p>
-                            <p><strong>Classification:&nbsp;</strong> {this.state.searchResults[0].classification}</p>
-                            <p><strong>Medium:&nbsp;</strong> {this.state.searchResults[0].medium}</p>
-                            <p><strong>Location:&nbsp;</strong> {this.state.searchResults[0].locations}</p>
-                        </div>
-                    </div>
-                } */}
             </div>
         );
     }

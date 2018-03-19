@@ -5,6 +5,7 @@ import CameraControls from './CameraControls';
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
+import { SNAP_LANGUAGE_PREFERENCE } from './Constants';
 
 class Camera extends Component {
 
@@ -69,7 +70,7 @@ class Camera extends Component {
     submitPhoto = () => {
         this.toggleImage(false);
         this.setState({ searchInProgress: true });
-        var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
+        var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
         axios.post('/api/snaps/search', {
             image_data: this.state.capturedImage,
             language: prefLang
@@ -129,11 +130,11 @@ class Camera extends Component {
             }
         });
 
-        mc.on("swipe drag", function (event) {
-            if (event.gesture.direction == Hammer.DIRECTION_UP || event.gesture.direction == Hammer.DIRECTION_DOWN) {
-                event.gesture.preventDefault();
-            }
-        });
+        // mc.on("swipe drag", function (event) {
+        //     if (event.gesture.direction == Hammer.DIRECTION_UP || event.gesture.direction == Hammer.DIRECTION_DOWN) {
+        //         event.gesture.preventDefault();
+        //     }
+        // });
     }
 
     componentDidUpdate() {

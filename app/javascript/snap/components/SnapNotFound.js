@@ -9,8 +9,8 @@ const SnapNotFound = (props) => (
         </div >
         <div className="row">
             <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
-                <Link className="btn btn-lg btn-outline-secondary" to="/snap">
-                    Take Photo
+                <Link className="btn snap-btn snap-btn-default" to="/snap">
+                    Take photo
                 </Link>
             </div>
         </div>
