@@ -6,7 +6,7 @@ import bookmark from 'images/bookmark_icon.svg';
 import icon_camera from 'images/camera_icon.svg';
 import Modal from 'react-modal';
 import Footer from './Footer';
-import { SNAP_LANGUAGE_PREFERENCE } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL } from './Constants';
 
 /** 
  * withHeader HOC provides props with location, history and match objects
@@ -18,6 +18,7 @@ class SnapResults extends Component {
         this.state = {
             ...props.location.state,
             modalIsOpen: false,
+            bookmarkModalIsOpen: false,
             searchResults: []
         }
     }
@@ -50,7 +51,25 @@ class SnapResults extends Component {
     }
 
     componentDidMount() {
-        Modal.setAppElement('#reset-experience');
+        Modal.setAppElement('.search-container');
+    }
+
+    bookmarkIt = () => {
+        const email = localStorage.getItem(SNAP_USER_EMAIL);
+
+        if (email) {
+            this.submitBookMark();
+        } else {
+            this.setState({ bookmarkModalIsOpen: true });
+        }
+    }
+
+    closeBookmarkModal = () => {
+        this.setState({ bookmarkModalIsOpen: false });
+    }
+
+    submitBookMark = () => {
+        console.log('submitting bookmark');
     }
 
     openModal = () => {
@@ -83,7 +102,48 @@ class SnapResults extends Component {
                             <div className="card-body">
                                 <div className="d-flex justify-content-around action-icons">
                                     <span><img src={share} alt="share" />Share it</span>
-                                    <span><img src={bookmark} alt="share" />Bookmark it</span>
+                                    <span onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</span>
+                                    <Modal
+                                        isOpen={this.state.bookmarkModalIsOpen}
+                                        onRequestClose={this.closeBookmarkModal}
+                                        contentLabel="Bookmark Modal"
+                                        className="Modal"
+                                        overlayClassName="Overlay"
+                                    >
+                                        <div className="bookmark">
+                                            <div className="row">
+                                                <div className="col-12">
+                                                    <i className="fa fa-2x fa-angle-left pull-left"></i>
+                                                    <span className="dismiss" onClick={this.closeBookmarkModal}>
+                                                        Go back
+                                                </span>
+                                                </div>
+                                            </div>
+                                            <div className="title mt-5">
+                                                <h2>{this.state.searchResults[0].title}</h2>
+                                            </div>
+                                            <div className="picture">
+                                                <img src={this.state.searchResults[0].url} alt="bookmark_img" />
+                                            </div>
+                                            <div className="message">Information about the art you bookmark will be emailed to you after your visit.</div>
+                                            <form onSubmit={this.handleSubmit}>
+                                                <input type="email" placeholder="Email address" className="form-control" name="email" />
+                                                <div className="form-check">
+                                                    <input className="form-check-input" type="checkbox" value="" id="newsletter-chk" />
+                                                    <label className="form-check-label text-muted" htmlFor="newsletter-chk">
+                                                        Sign up for the Barnes newsletter
+                                                        </label>
+                                                </div>
+                                            </form>
+                                            <div className="row">
+                                                <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
+                                                    <button className="btn snap-btn snap-btn-default" onClick={this.submitBookMark}>
+                                                        Submit
+                                                     </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Modal>
                                 </div>
                                 <hr />
                                 <p className="card-text">
@@ -113,26 +173,29 @@ class SnapResults extends Component {
                         className="Modal"
                         overlayClassName="Overlay"
                     >
-                        <div className="row">
-                            <div className="col-12">
-                                <i className="fa fa-2x fa-angle-left pull-left"></i>
-                                <span className="info-dismiss" onClick={this.closeModal}>
-                                    Cancel</span>
+                        <div className="reset">
+                            <div className="row">
+                                <div className="col-12">
+                                    <i className="fa fa-2x fa-angle-left pull-left"></i>
+                                    <span className="dismiss" onClick={this.closeModal}>
+                                        Cancel</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="info-header">
-                            <h1>You are about to reset the Snap experience.</h1>
-                        </div>
-                        <div className="info-message">We are using Google to help us automatically translate our text.</div>
-                        <div className="row info-action">
-                            <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
-                                <button className="btn snap-btn snap-btn-danger" onClick={this.resetExperience}>
-                                    Reset
+                            <div className="title">
+                                <h1>You are about to reset the Snap experience.</h1>
+                            </div>
+                            <div className="message">We are using Google to help us automatically translate our text.</div>
+                            <div className="row action">
+                                <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
+                                    <button className="btn snap-btn snap-btn-danger" onClick={this.resetExperience}>
+                                        Reset
                                 </button>
+                                </div>
                             </div>
                         </div>
                     </Modal>
                 </div>
+
                 <Footer />
             </div>
         );

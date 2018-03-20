@@ -42,7 +42,7 @@
             
             &:nth-child(1) {
                 top: 10vh;
-                left: 2vh;
+                left: 0;
                 z-index: 100;
                 img {
                     width: 35vw;
@@ -50,7 +50,7 @@
             }
 
             &:nth-child(2) {
-                top: 0vh;
+                top: 0;
                 left: 25vw;  
                 img {
                     width: 50vw;
@@ -59,7 +59,7 @@
 
             &:nth-child(3) {
                 top: 20vh;
-                left: 50vw;
+                left: 55vw;
                 img {
                     width: 45vw;
                 }
@@ -73,7 +73,7 @@
 .wifi-screen {
     .img-gallery {
         top: 15vh;
-        height: 50vh;
+        height: 45vh;
         padding: 5vw;
         
         .gallery-item {           
@@ -112,10 +112,10 @@
     text-align: center;
 
     .img-main {
-        height: 45vh;
-        padding: 10vw;
+        height: 40vh;
+        padding: 5vw;
         img {
-            width: 80vw;
+            width: 75vw;
         }
     }
 
