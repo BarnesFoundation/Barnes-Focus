@@ -129,7 +129,7 @@ class WelcomeComponent extends Component {
                                 </div>
                             </div>
                             <div>
-                                <h1>Please select your language</h1>
+                                <h1>Please select your language.</h1>
                                 <LanguageSelect />
                             </div>
                         </div>
