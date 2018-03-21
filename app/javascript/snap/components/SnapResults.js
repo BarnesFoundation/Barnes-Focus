@@ -184,7 +184,7 @@ class SnapResults extends Component {
                             <div className="title">
                                 <h1>You are about to reset the Snap experience.</h1>
                             </div>
-                            <div className="message">We are using Google to help us automatically translate our text.</div>
+                            <div className="message">Warning: This will erase your bookmarked artwork, email address, and language preferences.</div>
                             <div className="row action">
                                 <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
                                     <button className="btn snap-btn snap-btn-danger" onClick={this.resetExperience}>
