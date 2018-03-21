@@ -6,7 +6,7 @@ def process_searched_images_response searched_images
   response["success"] = false
   response["pastec_data"] = []
   case searched_images["type"]
-    when Pastec::RESPONSE_CODES[:SEARCH_RESULTS]
+    when CudaSift::RESPONSE_CODES[:SEARCH_RESULTS]
       response["success"] = true
       get_similar_images(searched_images["image_ids"], response)
       #Add response from pastec to final result
@@ -14,11 +14,11 @@ def process_searched_images_response searched_images
       pastec_result.each do |img|
         response["pastec_data"] << {"image_id" => img.identifier, "image_url" => img.image_url}
       end
-    when Pastec::RESPONSE_CODES[:IMAGE_NOT_DECODED]
+    when CudaSift::RESPONSE_CODES[:IMAGE_NOT_DECODED]
       response["data"]["message"] = "Invalid image data"
-    when Pastec::RESPONSE_CODES[:IMAGE_SIZE_TOO_BIG]
+    when CudaSift::RESPONSE_CODES[:IMAGE_SIZE_TOO_BIG]
       response["data"]["message"] = "Image size is too big"
-    when Pastec::RESPONSE_CODES[:IMAGE_SIZE_TOO_SMALL]
+    when CudaSift::RESPONSE_CODES[:IMAGE_SIZE_TOO_SMALL]
       response["data"]["message"] = "Image size is too small"
   end
   response
