@@ -1,25 +1,21 @@
 .header {
-    padding: 20px 20px;
+    padding: 1rem;
     background:#fff;
     color: #fff;
     height: 10vh;
 
-
-    /* Smartphones (portrait and landscape) ----------- */
-    @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
-    /* Styles */
-        padding: 1rem; 
-        .navbar-brand {
-            img {
-                height: 2.8rem;
-            }
+    .navbar-brand {
+        img {
+            height: 2.8rem;
         }
-
     }
+
 
     /* iPads (portrait and landscape) ----------- */
     @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
     /* Styles */
+        
+        padding: 2rem;
         .navbar-brand {
             img {
                 height: 5.6rem;
