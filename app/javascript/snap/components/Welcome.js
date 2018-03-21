@@ -128,7 +128,7 @@ class WelcomeComponent extends Component {
                                     <img src={img6} alt="img6" />
                                 </div>
                             </div>
-                            <div>
+                            <div className="content">
                                 <h1>Please select your language.</h1>
                                 <LanguageSelect />
                             </div>

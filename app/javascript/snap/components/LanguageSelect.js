@@ -55,7 +55,7 @@ class LanguageSelect extends Component {
         return (
             <div id="language-select" className="language-select text-center">
                 <div className="row">
-                    <div className="col-12 col-md-4 offset-md-4">
+                    <div className="col-12">
                         <div className="btn-group d-flex" role="group">
                             <button className="btn btn-secondary btn-lg w-100" type="button" onClick={this.openModal}>
                                 {this.state.selectedLanguage.name}
@@ -77,7 +77,7 @@ class LanguageSelect extends Component {
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h1>Please select your language.</h1>
-                    <p>We are using Google to help us automatically translate our text.</p>
+                    <span className="snap-muted-text">We are using Google to help us automatically translate our text.</span>
                     <ul className="list-group">
                         {this.state.languageOptions.map((lang, index) => <a className="list-group-item list-group-item-action" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name} {this.state.selectedLanguage.name === lang.name ? <span className="selected-lang">Selected</span> : ''}</a>)}
                     </ul>
