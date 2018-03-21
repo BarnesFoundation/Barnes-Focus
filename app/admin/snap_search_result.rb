@@ -9,15 +9,15 @@ ActiveAdmin.register SnapSearchResult do
     column "Clicked Snap" do |obj|
       image_tag obj.searched_image_url, class: 'pastec_image_size'
     end
-    column "Pastec Image" do |obj|
+    column "Images from API" do |obj|
       table do
-        obj.pastec_response["image_ids"].each do |pastec_image|
+        obj.api_response["image_ids"].each do |image|
           tr do
             td do
-              image_tag TrainingRecord.find_by(identifier: pastec_image).try(:image_url), class: 'pastec_image_size'
+              image_tag TrainingRecord.find_by(identifier: image).try(:image_url), class: 'pastec_image_size'
             end
           end
-        end if obj.pastec_response["image_ids"].present?
+        end if obj.api_response["image_ids"].present?
       end
     end
     column "ES Image" do |obj|
@@ -31,7 +31,7 @@ ActiveAdmin.register SnapSearchResult do
         end if obj.es_response["records"].present?
       end
     end
-    column :pastec_response
+    column :api_response
     column :es_response
     column :created_at
   end
