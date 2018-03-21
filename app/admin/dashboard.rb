@@ -12,9 +12,9 @@ ActiveAdmin.register_page "Dashboard" do
             tr do
               th '#'
               th 'Searched Image'
-              th 'Pastec Images'
+              th 'Images from API'
               th 'ES Images'
-              th 'Pastec Result'
+              th 'API Response'
               th 'Elastic Search Result'
             end
             SnapSearchResult.recent.map do |img|
@@ -23,13 +23,13 @@ ActiveAdmin.register_page "Dashboard" do
                 td image_tag img.searched_image_url, class: 'pastec_image_size'
                 td do
                   table do
-                    img.pastec_response["image_ids"].each do |pastec_image|
+                    img.api_response["image_ids"].each do |image|
                       tr do
                         td do
-                          image_tag TrainingRecord.find_by(identifier: pastec_image).try(:image_url), class: 'pastec_image_size'
+                          image_tag TrainingRecord.find_by(identifier: image).try(:image_url), class: 'pastec_image_size'
                         end
                       end
-                    end if img.pastec_response["image_ids"].present?
+                    end if img.api_response["image_ids"].present?
                   end
 
                 end
@@ -46,7 +46,7 @@ ActiveAdmin.register_page "Dashboard" do
                   end
                 end
 
-                td img.pastec_response.to_s
+                td img.api_response.to_s
                 td img.es_response.to_s
               end
             end
