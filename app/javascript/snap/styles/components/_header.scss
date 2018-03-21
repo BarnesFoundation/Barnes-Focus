@@ -4,12 +4,25 @@
     color: #fff;
     height: 10vh;
 
+
+    /* Smartphones (portrait and landscape) ----------- */
+    @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+    /* Styles */
+        padding: 1rem; 
+        .navbar-brand {
+            img {
+                height: 2.8rem;
+            }
+        }
+
+    }
+
     /* iPads (portrait and landscape) ----------- */
     @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
     /* Styles */
         .navbar-brand {
             img {
-                height: 56px;
+                height: 5.6rem;
             }
         }
     }

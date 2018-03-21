@@ -8,18 +8,18 @@
             position: absolute;
             
             &:nth-child(1) {
-                top: 5vh;
+                top: 0;
                 left: 5vw;  
             }
 
             &:nth-child(2) {
-                top: 25vh;
+                top: 20vh;
                 left: 25vw;
                 z-index: 100;
             }
 
             &:nth-child(3) {
-                top: 10vh;
+                top: 5vh;
                 left: 55vw;
             }
 
@@ -146,3 +146,31 @@
     }
 }
 
+
+
+/* iPads (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+    .welcome-screen {
+        .img-gallery {
+            height: 52vh;          
+        }
+    }
+
+    .lang-dropdown-screen {
+        .img-gallery {
+            height: 52vh;
+        }
+    }
+
+    .wifi-screen {
+        .img-gallery {
+            height: 50vh;
+        }
+    }
+
+    .photo-prompt-screen {
+        .img-main {
+            height: 50vh;
+        }
+    }
+}

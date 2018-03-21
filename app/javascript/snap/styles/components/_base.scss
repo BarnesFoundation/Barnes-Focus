@@ -2,26 +2,36 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html, body {
     height:100%;
-    font-size: 18px;
+    font-size: 62.5%;
     font-weight: 400;
 }
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 20px;
+    font-size: 3.6rem;
+    margin-bottom: 2rem;
 }
 
 h2 {
-    font-size: 25px;
+    font-size: 2.5rem;
+}
+
+p {
+    font-size: 1.8rem;
 }
 
 .content {
     text-align: center;
     padding: 4vw;
+}
+
+.snap-muted-text {
+    color: #8C8C8D;
+    font-size: 1.4rem;
 }
 
 .language-select {
@@ -32,7 +42,7 @@ h2 {
             text-align: left;
             border-radius: 0;
             color: #8C8C8D;
-            border: 2px solid #E3E3E3;
+            border: 0.2rem solid #E3E3E3;
 
             &:focus {
                 outline: none;
@@ -52,14 +62,19 @@ h2 {
     overflow: auto;
     border-radius: 0px;
     outline: none;
-    padding: 20px;
+    padding: 2rem;
     text-align: center;
 
     .close {
-        font-size: 30px;
+        font-size: 3rem;
+        position: absolute;
+        top: 2vh;
+        right:3vh;
     }
 
     .list-group {
+        font-size: 1.6rem;
+        margin-top: 2.5rem;
         
         .list-group-item {
             text-align: left;
@@ -86,7 +101,7 @@ h2 {
         text-align: left;
         float: left;
         line-height: 2.55rem;
-        font-size: 22px;
+        font-size: 2.2rem;
     }
 
     .reset {
@@ -126,9 +141,9 @@ h2 {
             }
     
             .form-check {
-                padding: 20px;
+                padding: 2rem;
                 label {
-                    font-size: 14px;
+                    font-size: 1.4rem;
                 }
             }
         }
@@ -138,7 +153,7 @@ h2 {
 
 .snap-btn {
     border-radius: 0;
-    border: 2px solid #E3E3E3;
+    border: .2rem solid #E3E3E3;
     height: 10vh;
     width: 100%;
     padding: 3vh 0;
@@ -161,31 +176,90 @@ h2 {
 
 
 
-// /* Smartphones (portrait and landscape) ----------- */
-// @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
-// /* Styles */
-// }
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+/* Styles */
+    h1 {
+        font-size: 2.8rem;
+        margin-bottom: 1.6rem;
+    }
 
-// /* Smartphones (landscape) ----------- */
-// @media only screen and (min-width : 321px) {
-// /* Styles */
-// }
+    h2 {
+        font-size: 2rem;
+        margin-bottom: 1.2rem;
+    }
 
-// /* Smartphones (portrait) ----------- */
-// @media only screen and (max-width : 320px) {
-// /* Styles */
-// }
+    p {
+        font-size: 1.6rem;
+    }    
+
+    .Modal {
+        h1 {
+            margin-top:5vh;
+        }
+    }
+    
+}
+
+/* Smartphones (landscape) ----------- */
+@media only screen and (min-width : 321px) {
+/* Styles */
+}
+
+/* Smartphones (portrait) ----------- */
+@media only screen and (max-width : 320px) {
+/* Styles */
+}
 
 /* iPads (portrait and landscape) ----------- */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
 /* Styles */
     h1 {
-        font-size: 45px;
-        margin-bottom: 40px;
+        font-size: 4.2rem;
+        margin-bottom: 4rem;
     }
 
     h2 {
-        font-size: 25px;
+        font-size: 3.2rem;
+    }
+
+    p {
+        font-size: 2.4rem;
+    }
+
+    .content {
+        padding: 0 20vw;
+    }
+
+    .language-select {
+        .btn {
+            height: 4.8rem;
+        }
+    }
+
+    .snap-muted-text {
+        font-size: 1.8rem;
+    }
+
+    .Modal {
+        padding: 15rem;
+
+        .close {
+            font-size: 5rem;
+        }
+
+        .list-group {
+            font-size: 1.6rem;
+            margin-top: 4.5rem;
+            
+            .list-group-item {
+                height: 5.4rem;
+                line-height: 2.25;
+            }
+        }
+
+    
+        
     }
 }
 
