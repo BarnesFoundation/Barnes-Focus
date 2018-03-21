@@ -28,7 +28,8 @@ class WelcomeComponent extends Component {
     checkIndex = () => {
         const $this = $("#snapCarousel");
         if ($("#snapCarousel .carousel-inner .carousel-item:first").hasClass("active")) {
-            $this.children(".carousel-control-prev").hide();
+            $this.children(".carousel-control-prev").addClass('opaque');
+            $this.children(".carousel-control-prev").show();
             $this.children(".carousel-control-next").show();
             $this.children(".carousel-indicators").show();
         } else if ($("#snapCarousel .carousel-inner .carousel-item:last").hasClass("active")) {
@@ -36,6 +37,7 @@ class WelcomeComponent extends Component {
             $this.children(".carousel-control-prev").hide();
             $this.children(".carousel-indicators").hide();
         } else {
+            $this.children(".carousel-control-prev").removeClass('opaque');
             $this.children(".carousel-control-prev").show();
             $this.children(".carousel-control-next").show();
             $this.children(".carousel-indicators").show();
