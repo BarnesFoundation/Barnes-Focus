@@ -130,7 +130,7 @@ class SnapResults extends Component {
                                                 <input type="email" placeholder="Email address" className="form-control" name="email" />
                                                 <div className="form-check">
                                                     <input className="form-check-input" type="checkbox" value="" id="newsletter-chk" />
-                                                    <label className="form-check-label text-muted" htmlFor="newsletter-chk">
+                                                    <label className="form-check-label snap-text-muted" htmlFor="newsletter-chk">
                                                         Sign up for the Barnes newsletter
                                                         </label>
                                                 </div>

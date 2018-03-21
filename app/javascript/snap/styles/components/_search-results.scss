@@ -28,7 +28,10 @@
         .card-footer {
             background-color: #F74D31;
             color: #FFF;
-            font-size: 22px;
+            
+            p {
+                color: #FFF; 
+            }
 
             small {
                 opacity: 0.8;

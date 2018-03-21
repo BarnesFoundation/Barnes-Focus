@@ -77,7 +77,7 @@ class LanguageSelect extends Component {
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h1>Please select your language.</h1>
-                    <span className="snap-muted-text">We are using Google to help us automatically translate our text.</span>
+                    <p>We are using Google to help us automatically translate our text.</p>
                     <ul className="list-group">
                         {this.state.languageOptions.map((lang, index) => <a className="list-group-item list-group-item-action" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name} {this.state.selectedLanguage.name === lang.name ? <span className="selected-lang">Selected</span> : ''}</a>)}
                     </ul>

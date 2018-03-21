@@ -12,27 +12,32 @@ html, body {
 }
 
 h1 {
-    font-size: 1.675rem;
+    font-size: 2.25rem;
     margin-bottom: 1rem;
 }
 
 h2 {
-    font-size: 1.25rem;
+    font-size: 1.3125rem;
     margin-bottom: 0.875rem;
 }
 
 p {
-    font-size: 1rem;
+    font-size: 1.125rem;
+    color: #8C8C8D;
 } 
 
 .content {
     text-align: center;
-    padding: 4vw;
+    padding: 5vw;
 }
 
-.snap-muted-text {
+.snap-text-muted {
     color: #8C8C8D;
-    font-size: 0.875rem;
+    font-size: 0.875rem !important;
+}
+
+.opaque {
+    opacity: 0.2 !important;
 }
 
 .language-select {
@@ -53,12 +58,16 @@ p {
     }
 }
 
+.ReactModal__Body--open {
+    overflow-y: hidden;
+}
+
 .Modal {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: -10vh;
     background: rgb(255, 255, 255);
     overflow: auto;
     border-radius: 0px;
@@ -105,8 +114,8 @@ p {
     .dismiss {
         text-align: left;
         float: left;
-        line-height: 2.55rem;
-        font-size: 2.2rem;
+        line-height: 2rem;
+        font-size: 1.5rem;
     }
 
     .reset {
@@ -179,21 +188,24 @@ p {
     color: #787878;
 }
 
+/* smartphone (landscape) */
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) and (orientation : landscape) {
+    
+    h2 {
+        font-size: 1.5625rem;
+    }
+    
+    p {
+        font-size: 1.625rem;
+    } 
+}
 
 /* iPads (portrait and landscape) ----------- */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
 /* Styles */
     h1 {
-        font-size: 2.6rem;
+        font-size: 2.8125rem;
         margin-bottom: 2.5rem;
-    }
-
-    h2 {
-        font-size: 2rem;
-    }
-
-    p {
-        font-size: 1.5rem;
     }
 
     .content {
@@ -239,6 +251,13 @@ p {
 /* iPads (landscape) ----------- */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
 /* Styles */
+    h2 {
+        font-size: 1.5625rem;
+    }
+
+    p {
+        font-size: 1.625rem;
+    } 
 }
 
 /* iPads (portrait) ----------- */
