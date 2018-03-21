@@ -7,27 +7,25 @@ class Api::SnapsController < Api::BaseController
     searched_result = { success: false }
     #using test image for API testing
 
-    #pastec_obj = Pastec.new
-    pastec_obj = CudaSift.new
+    api = CudaSift.new
     image_data = Base64.decode64(data['data:image/png;base64,'.length .. -1])
     file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
     File.open(file_name, 'wb') do |f|
       f.write image_data
     end
-    # for testing
+    # for development env testing
     #file_name = "#{Rails.root}/public/IMG_4971.jpg"
 
-    file = pastec_obj.loadFileData(file_name)
-    pastec_response = pastec_obj.search_image(file)
+    file = api.loadFileData(file_name)
+    response = api.search_image(file)
 
-    pastec_response["image_ids"] = pastec_response["type"]== Pastec::RESPONSE_CODES[:SEARCH_RESULTS] ? [pastec_response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact : []
+    response["image_ids"] = response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] ? [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact : []
 
-    searched_result = process_searched_images_response(pastec_response)
+    searched_result = process_searched_images_response(response)
 
     # send image to s3 with background job if image is valid and log result to db
     # We can make it asyc with perform_later, on heroku we can not store file in temp for later processing with job
-    ImageUploadJob.perform_now(file.path, {pastec_response: pastec_response, es_response: searched_result["data"]})
-
+    ImageUploadJob.perform_now(file.path, {response: response, es_response: searched_result["data"]})
 
     render json: searched_result
   end
@@ -42,21 +40,20 @@ class Api::SnapsController < Api::BaseController
       response = { }
       response["data"] = {"records" => [], "message" => "No records found"}
       response["success"] = false
-      response["pastec_data"] = []
+      response["api_data"] = []
       case searched_images["type"]
-        when Pastec::RESPONSE_CODES[:SEARCH_RESULTS]
+        when CudaSift::RESPONSE_CODES[:SEARCH_RESULTS]
           response["success"] = true
           get_similar_images(searched_images["image_ids"], response)
-          #Add response from pastec to final result
-          pastec_result = TrainingRecord.where(identifier: searched_images["image_ids"])
-          pastec_result.each do |img|
-            response["pastec_data"] << {"image_id" => img.identifier, "image_url" => img.image_url}
+          results = TrainingRecord.where(identifier: searched_images["image_ids"])
+          results.each do |img|
+            response["api_data"] << {"image_id" => img.identifier, "image_url" => img.image_url}
           end
-        when Pastec::RESPONSE_CODES[:IMAGE_NOT_DECODED]
+        when CudaSift::RESPONSE_CODES[:IMAGE_NOT_DECODED]
           response["data"]["message"] = "Invalid image data"
-        when Pastec::RESPONSE_CODES[:IMAGE_SIZE_TOO_BIG]
+        when CudaSift::RESPONSE_CODES[:IMAGE_SIZE_TOO_BIG]
           response["data"]["message"] = "Image size is too big"
-        when Pastec::RESPONSE_CODES[:IMAGE_SIZE_TOO_SMALL]
+        when CudaSift::RESPONSE_CODES[:IMAGE_SIZE_TOO_SMALL]
           response["data"]["message"] = "Image size is too small"
       end
       response
