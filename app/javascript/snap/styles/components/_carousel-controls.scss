@@ -1,0 +1,45 @@
+.carousel {
+    height : 90vh;
+
+    .carousel-indicators {
+        position: absolute;
+        bottom: 10vh;
+        z-index: 0;
+        text-align: center;
+        list-style: none;
+        margin: 0;
+    
+        li {
+            display: inline-block;
+             zoom: 1;
+             width: 2vw;
+             height: 2vw;
+             margin: 0 2vw;
+             background-color: #6E6E6E;
+             -webkit-border-radius: 50%;
+             -moz-border-radius: 50%;
+             border-radius: 50%;
+             border: 1px solid #6E6E6E;
+             cursor: pointer;
+
+             &.active {
+                width: 2vw;
+                height: 2vw;
+                margin: 0 2vw;
+                background-color: #FFF;
+            }
+        }
+    }
+
+    .carousel-control-prev, .carousel-control-next {
+        position: absolute;
+        bottom: 10vh;
+        top: unset;
+        width: 50%;
+        height: 1.5vh;
+        color: #6E6E6E;
+        text-align: center;
+        opacity: 1;
+    }
+}
+

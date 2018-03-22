@@ -15,7 +15,7 @@ class ImageUploadJob < ApplicationJob
       File.delete(args[0])
 
       #save search result and image captured URL in db for logging
-      SnapSearchResult.create(searched_image_url: url, pastec_response: args[1][:pastec_response], es_response: args[1][:es_response])
+      SnapSearchResult.create(searched_image_url: url, api_response: args[1][:response], es_response: args[1][:es_response])
     end
   end
 end
