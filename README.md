@@ -27,3 +27,21 @@ To do so, the file `SNAP-865144db2e55` lies under: `private` folder
 * Access to Barnes AWS console: [https://barnesfoundation.signin.aws.amazon.com/console](https://barnesfoundation.signin.aws.amazon.com/console)
 * AWS username & Password
 * AWS `access-key-id` and `aws-secret-key`
+* Install Beanstalk toolbelt: `brew install aws-elasticbeanstalk`. After installation: `eb --version` to validate
+
+## Deploying for the first time
+`{PATH_TO_PROJECT}$ eb init`
+
+This will ask few question/s:
+* Select a default region
+* Select an application to use
+* Select the default environment - You can change this later by typing `eb use [environment_name]`
+
+First you'll need to commit and push your changes. Then you can run: `eb deploy [environment_name]`
+
+## Running Rails Console
+
+You can SSH into the web server with: `eb ssh [environment_name]`
+> The Rails application is located at **`/var/app/current`**
+
+## Accessing Database
