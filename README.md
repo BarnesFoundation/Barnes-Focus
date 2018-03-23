@@ -30,24 +30,28 @@ To do so, the file `SNAP-865144db2e55` lies under: `private` folder
 * Install Beanstalk toolbelt: `brew install aws-elasticbeanstalk`. After installation: `eb --version` to validate
 
 ## Deploying for the first time
-`{PATH_TO_PROJECT}$ eb init`
+`{PATH_TO_PROJECT}$ eb init -i`
 
 This will ask few question/s:
 * Select a default region
 * Select an application to use
+* Select Ruby version - We're using 2.4 with Puma
 * Select the default environment - You can change this later by typing `eb use [environment_name]`
-* Select a repository (when running the init for 2nd time). For first time, you'll be asked to enter a repository name
-* Select/Enter branch name
+* Select a repository (when running the init for 2nd time). For first time, you'll be asked to enter a repository name. **NOTE: We have skipped this step as we do not want to use CodeCommit repository that Beanstalk gives. We are using Git here**
+* Select/Enter branch name - This can be skipped too
 
-First you'll need to commit and push your changes. Then you can run: `eb deploy [environment_name]`
+> Tip: First you'll need to commit and push your changes to git. Then you can run: `eb deploy [environment_name] --staged`
+> `staged` option performs a standard deployment, bypassing AWS CodeCommit
 
 Once you enter the required details, console will be prompted with below message:
 
 **Note: Elastic Beanstalk now supports AWS CodeCommit; a fully-managed source control service. To learn more, see Docs: https://aws.amazon.com/codecommit/
-Do you wish to continue with CodeCommit? (y/N) (default is n):**
+Do you wish to continue with CodeCommit? (y/N) (default is n):** As mentioned, choose `n`
 
 ### Troubleshooting
-> If you get `ERROR: ServiceError - User: arn:aws:iam::RAND-ID:user/NAME is not authorized to perform: codecommit:ListRepositories` - That means you do not have sufficient privileges. Please get in touch with the respective person and/or create/update policy by yourself (this needs caution).
+> If you get `ERROR: ServiceError - User: arn:aws:iam::RAND-ID:user/NAME is not authorized to perform: codecommit:ListRepositories` - That means you do not have sufficient privileges. Please get in touch with the respective AWS person and/or create/update policy by yourself (this needs caution).
+
+> If you get `ERROR: InvalidParameterValueError - "Error making request to CodeCommit: Repository names are restricted to alphanumeric characters, plus '.', '_', and '-' (Service: AWSCodeCommit; Status Code: 400; Error Code: InvalidRepositoryNameException; Request ID: b3132904-2e87-11e8-807f-2370ad651bbe)"` OR `ERROR: InvalidParameterValueError - "Error making request to CodeCommit: Could not retrieve e95846ca5ad9ea9572259975ee1e1305ec6bb64f (Service: AWSCodeCommit; Status Code: 400; Error Code: CommitIdDoesNotExistException; Request ID: 57a9b5e8-2e88-11e8-a82e-9d34cd5e2cd7)"` then look for `/.elasticbeanstalk/config.yml`. It could be possible that due to `eb init`, config.yml was changed.
 
 ## Running Rails Console
 
