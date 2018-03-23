@@ -6,12 +6,25 @@ import bookmark from 'images/bookmark_icon.svg';
 import icon_camera from 'images/camera_icon.svg';
 import Modal from 'react-modal';
 import Footer from './Footer';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_GOOGLE } from './Constants';
+
+
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)'
+    }
+};
 
 /** 
  * withHeader HOC provides props with location, history and match objects
 */
 class SnapResults extends Component {
+
 
     constructor(props) {
         super(props);
@@ -19,8 +32,10 @@ class SnapResults extends Component {
             ...props.location.state,
             modalIsOpen: false,
             bookmarkModalIsOpen: false,
+            shareModalIsOpen: false,
             searchResults: []
         }
+
     }
 
     componentWillMount() {
@@ -30,6 +45,7 @@ class SnapResults extends Component {
                 const result = {};
                 const art_obj = search_result["data"]["records"][0];
                 const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
+                result['id'] = art_obj.id;
                 result['title'] = art_obj.title;
                 result['shortDescription'] = art_obj.shortDescription;
                 result['artist'] = art_obj.people;
@@ -54,6 +70,38 @@ class SnapResults extends Component {
         Modal.setAppElement('.search-container');
     }
 
+    nativeAppShareWithWebFallback = (e) => {
+        const socialMediaType = e.currentTarget.dataset.id
+        this.setState({ shareModalIsOpen: false });
+
+        let appUriScheme;
+        let webFallbackURL;
+        let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
+        const hashtag = '#barnesfoundation';
+        switch (socialMediaType) {
+            case SOCIAL_MEDIA_TWITTER: {
+                //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.searchResults[0].id;
+                appUriScheme = 'twitter://post?message=' + urlToShare + '&hashtags=' + hashtag;
+                webFallbackURL = 'https://twitter.com/intent/tweet?url=' + urlToShare + '&hashtags=' + hashtag;
+                break;
+            }
+            case SOCIAL_MEDIA_FACEBOOK: {
+                //urlToShare += '?utm_source=barnes_snap&utm_medium=facebook&utm_term=' + this.state.searchResults[0].id;
+                appUriScheme = 'fb://publish/profile/me?text=' + urlToShare + '&hashtags=' + hashtag;
+                webFallbackURL = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare);
+
+                break;
+            }
+            case SOCIAL_MEDIA_GOOGLE: {
+                //urlToShare += '?utm_source=barnes_snap&utm_medium=google&utm_term=' + this.state.searchResults[0].id;
+                break;
+            }
+        }
+        if (!window.open(appUriScheme)) {
+            window.location = webFallbackURL;
+        }
+    }
+
     bookmarkIt = () => {
         const email = localStorage.getItem(SNAP_USER_EMAIL);
 
@@ -66,6 +114,14 @@ class SnapResults extends Component {
 
     closeBookmarkModal = () => {
         this.setState({ bookmarkModalIsOpen: false });
+    }
+
+    shareIt = () => {
+        this.setState({ shareModalIsOpen: true });
+    }
+
+    closeShareModal = () => {
+        this.setState({ shareModalIsOpen: false });
     }
 
     submitBookMark = () => {
@@ -85,6 +141,15 @@ class SnapResults extends Component {
         this.setState({ modalIsOpen: false });
     }
 
+    fbPost = () => {
+        window.open('fb://publish/profile/me?text=foo');
+
+    }
+
+    twitterShare = () => {
+        window.open('twitter://post?message=hello%20world');
+    }
+
     render() {
         return (
             <div className="container-fluid search-container">
@@ -101,8 +166,32 @@ class SnapResults extends Component {
                             </Link>
                             <div className="card-body">
                                 <div className="d-flex justify-content-around action-icons">
-                                    <span><img src={share} alt="share" />Share it</span>
-                                    <span onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</span>
+                                    <div id="share-it" onClick={this.shareIt}><img src={share} alt="share" />Share it</div>
+                                    <Modal
+                                        isOpen={this.state.shareModalIsOpen}
+                                        onRequestClose={this.closeShareModal}
+                                        contentLabel="Share Modal"
+                                        style={customStyles}
+                                    >
+                                        <div className="share">
+                                            <p>
+                                                <a id="btn-twitter" className="btn btn-block btn-social btn-twitter" data-id={SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                                                    <span className="fa fa-twitter"></span>Twitter
+                                                </a>
+                                            </p>
+                                            <p>
+                                                <a className="btn  btn-block btn-social btn-facebook" data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
+                                                    <span className="fa fa-facebook"></span>Facebook
+                                                </a>
+                                            </p>
+                                            <p>
+                                                <a className="btn  btn-block btn-social btn-google" data-id={SOCIAL_MEDIA_GOOGLE} onClick={this.nativeAppShareWithWebFallback}>
+                                                    <span className="fa fa-google"></span>Google
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </Modal>
+                                    <div onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</div>
                                     <Modal
                                         isOpen={this.state.bookmarkModalIsOpen}
                                         onRequestClose={this.closeBookmarkModal}
