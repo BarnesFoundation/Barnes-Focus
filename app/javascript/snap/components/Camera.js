@@ -36,10 +36,12 @@ class Camera extends Component {
     }
 
     takePhoto = () => {
-        const image = this.capturePhoto();
-        this.img.src = image;
-        this.setState({ capturedImage: image, showVideo: false });
-        this.toggleImage(true);
+        setTimeout(() => {
+            const image = this.capturePhoto();
+            this.img.src = image;
+            this.setState({ capturedImage: image, showVideo: false });
+            this.toggleImage(true);
+        }, 200);
     }
 
     capturePhoto = () => {
