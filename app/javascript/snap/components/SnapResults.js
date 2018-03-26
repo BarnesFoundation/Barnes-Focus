@@ -6,6 +6,7 @@ import bookmark from 'images/bookmark_icon.svg';
 import icon_camera from 'images/camera_icon.svg';
 import Modal from 'react-modal';
 import Footer from './Footer';
+import Popover from 'react-simple-popover';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_GOOGLE } from './Constants';
 
 
@@ -32,7 +33,7 @@ class SnapResults extends Component {
             ...props.location.state,
             modalIsOpen: false,
             bookmarkModalIsOpen: false,
-            shareModalIsOpen: false,
+            sharePopoverIsOpen: false,
             searchResults: []
         }
 
@@ -72,28 +73,36 @@ class SnapResults extends Component {
 
     nativeAppShareWithWebFallback = (e) => {
         const socialMediaType = e.currentTarget.dataset.id
-        this.setState({ shareModalIsOpen: false });
+        this.setState({ sharePopoverIsOpen: false });
 
         let appUriScheme;
         let webFallbackURL;
         let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
-        const hashtag = '#barnesfoundation';
+        let hashtag = 'barnesfoundation';
         switch (socialMediaType) {
             case SOCIAL_MEDIA_TWITTER: {
+                let title_author = this.state.searchResults[0].title;
+                if (this.state.searchResults[0].artist) {
+                    title_author += ' by ' + this.state.searchResults[0].artist;
+                    hashtag += ',' + this.state.searchResults[0].artist.split(' ').join('');
+                }
+                title_author = title_author.split(' ').join('+') + '. ';
                 //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.searchResults[0].id;
-                appUriScheme = 'twitter://post?message=' + urlToShare + '&hashtags=' + hashtag;
-                webFallbackURL = 'https://twitter.com/intent/tweet?url=' + urlToShare + '&hashtags=' + hashtag;
+                appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
+                webFallbackURL = 'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
                 break;
             }
             case SOCIAL_MEDIA_FACEBOOK: {
                 //urlToShare += '?utm_source=barnes_snap&utm_medium=facebook&utm_term=' + this.state.searchResults[0].id;
-                appUriScheme = 'fb://publish/profile/me?text=' + urlToShare + '&hashtags=' + hashtag;
-                webFallbackURL = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare);
+                //appUriScheme = 'fb://publish/profile/me?u=' + urlToShare;
+                appUriScheme = 'http://www.facebook.com/share.php?u=' + encodeURIComponent(urlToShare);
+                webFallbackURL = 'http://www.facebook.com/share.php?u=' + encodeURIComponent(urlToShare);
 
                 break;
             }
             case SOCIAL_MEDIA_GOOGLE: {
-                //urlToShare += '?utm_source=barnes_snap&utm_medium=google&utm_term=' + this.state.searchResults[0].id;
+                appUriScheme = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
+                webFallbackURL = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
                 break;
             }
         }
@@ -117,11 +126,11 @@ class SnapResults extends Component {
     }
 
     shareIt = () => {
-        this.setState({ shareModalIsOpen: true });
+        this.setState({ sharePopoverIsOpen: true });
     }
 
     closeShareModal = () => {
-        this.setState({ shareModalIsOpen: false });
+        this.setState({ sharePopoverIsOpen: false });
     }
 
     submitBookMark = () => {
@@ -166,9 +175,27 @@ class SnapResults extends Component {
                             </Link>
                             <div className="card-body">
                                 <div className="d-flex justify-content-around action-icons">
-                                    <div id="share-it" onClick={this.shareIt}><img src={share} alt="share" />Share it</div>
-                                    <Modal
-                                        isOpen={this.state.shareModalIsOpen}
+                                    <div id="share-it" ref="target" onClick={this.shareIt}><img src={share} alt="share" />Share it</div>
+                                    <Popover
+                                        placement='top'
+                                        container={this}
+                                        target={this.refs.target}
+                                        show={this.state.sharePopoverIsOpen}
+                                        onHide={this.closeShareModal} >
+                                        <div className="share d-flex justify-content-around">
+                                            <a data-id={SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                                                <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
+                                            </a>
+                                            <a data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback} target="_blank">
+                                                <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
+                                            </a>
+                                            <a data-id={SOCIAL_MEDIA_GOOGLE} onClick={this.nativeAppShareWithWebFallback}>
+                                                <i className="fa fa-lg fa-google-plus" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+                                    </Popover>
+                                    {/* <Modal
+                                        isOpen={this.state.sharePopoverIsOpen}
                                         onRequestClose={this.closeShareModal}
                                         contentLabel="Share Modal"
                                         style={customStyles}
@@ -190,7 +217,7 @@ class SnapResults extends Component {
                                                 </a>
                                             </p>
                                         </div>
-                                    </Modal>
+                                    </Modal> */}
                                     <div onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</div>
                                     <Modal
                                         isOpen={this.state.bookmarkModalIsOpen}
