@@ -1,3 +1,4 @@
+
 # Installation Instructions
 * Git clone
 * Install Ruby (using RVM): `rvm install ruby-2.4.3`
@@ -52,6 +53,22 @@ Do you wish to continue with CodeCommit? (y/N) (default is n):** As mentioned, c
 > If you get `ERROR: ServiceError - User: arn:aws:iam::RAND-ID:user/NAME is not authorized to perform: codecommit:ListRepositories` - That means you do not have sufficient privileges. Please get in touch with the respective AWS person and/or create/update policy by yourself (this needs caution).
 
 > If you get `ERROR: InvalidParameterValueError - "Error making request to CodeCommit: Repository names are restricted to alphanumeric characters, plus '.', '_', and '-' (Service: AWSCodeCommit; Status Code: 400; Error Code: InvalidRepositoryNameException; Request ID: b3132904-2e87-11e8-807f-2370ad651bbe)"` OR `ERROR: InvalidParameterValueError - "Error making request to CodeCommit: Could not retrieve e95846ca5ad9ea9572259975ee1e1305ec6bb64f (Service: AWSCodeCommit; Status Code: 400; Error Code: CommitIdDoesNotExistException; Request ID: 57a9b5e8-2e88-11e8-a82e-9d34cd5e2cd7)"` then look for `/.elasticbeanstalk/config.yml`. It could be possible that due to `eb init`, config.yml was changed.
+
+> If deployment fails with reason: `your yarn packages are out of date`, open /.ebextensions/yarn.config file and edit this in below way:
+
+    commands:
+      ##### everything remains same till here #####
+      
+      04_yarn_install:
+        cwd: /tmp
+        test: '[ ! -f /usr/bin/yarn ] && echo "yarn not installed"'
+        command: 'sudo yum -y install yarn'
+
+      05_yarn_upgrade:
+        cwd: /tmp
+        command: 'sudo yum -y yarn upgrade --latest'
+
+> NOTE: commit this file into the source code and re-run `eb deploy --staged` command. Once completed successfully, you'll then have to remove `05_yarn_upgrade` block from this file again and re-commit this file, otherwise every time you deploy, it will try to upgrade yarn, which will increase the deployment time
 
 ## Running Rails Console
 
