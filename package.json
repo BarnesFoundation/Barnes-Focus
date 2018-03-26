@@ -19,6 +19,7 @@
     "react-dom": "^16.2.0",
     "react-modal": "^3.3.2",
     "react-router-dom": "^4.2.2",
+    "react-simple-popover": "^0.2.4",
     "react-spinners": "^0.2.6",
     "throttle-debounce": "^1.0.1"
   },
