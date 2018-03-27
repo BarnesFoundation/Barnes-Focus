@@ -50,6 +50,43 @@ Once you enter the required details, console will be prompted with below message
 **Note: Elastic Beanstalk now supports AWS CodeCommit; a fully-managed source control service. To learn more, see Docs: https://aws.amazon.com/codecommit/
 Do you wish to continue with CodeCommit? (y/N) (default is n):** As mentioned, choose `n`
 
+## Deploying an existing app to Beanstalk
+To deploy an existing app to Beanstalk, from console:
+
+    eb deploy --staged
+
+* This deploys `elastic-beanstalk-setup` branch to `barnes-snap-dev` app. URL: http://barnes-snap-dev-env.us-east-1.elasticbeanstalk.com/
+* To change the branch, open `.elasticbeanstalk/config.yml`
+
+      branch-defaults:
+        elastic-beanstalk-setup:
+          environment: barnes-snap-dev-env
+          group_suffix: null
+      environment-defaults:
+        barnes-snap-dev-env:
+          branch: elastic-beanstalk-setup
+          repository: null
+        barnes-snap-stage-env:
+          branch: elastic-beanstalk-setup
+          repository: null
+      global:
+        application_name: barnes-snap-dev
+        branch: stage
+        default\_ec2\_keyname: barnes-snap-keypair
+        default_platform: Ruby 2.4 (Puma)
+        default_region: us-east-1
+        include\_git\_submodules: true
+        instance_profile: null
+        platform_name: null
+        platform_version: null
+        profile: eb-cli
+        repository: origin
+        sc: git@github.com:BarnesFoundation/barnes-snap.git
+        workspace_type: Application
+  Change the branch-name under `environment-defaults` and re-run `eb deploy --staged`
+
+* You'll need `barnes-snap-keypair` to deploy. The relevant files can be found under `private` folder. Copy this into `~/.ssh` folder (local)
+
 ### Troubleshooting
 > If you get `ERROR: ServiceError - User: arn:aws:iam::RAND-ID:user/NAME is not authorized to perform: codecommit:ListRepositories` - That means you do not have sufficient privileges. Please get in touch with the respective AWS person and/or create/update policy by yourself (this needs caution).
 
@@ -78,6 +115,11 @@ commit this file and re-deploy. OR you can `ssh` into server and run:
 You can SSH into the web server with: `eb ssh [environment_name]`
 > The Rails application is located at **`/var/app/current`**
 
-## Accessing Database (for SQL Queries)
+You'll need `sudo` access and then you'll be able to access console. Below commands shall do that:
 
-## Managing Add-ons
+    current\]$ sudo su
+    \[root@ip-172-31-36-219 current\]# bundle exec rails c production
+    Loading production environment (Rails 5.1.5)
+    irb(main):001:0>
+
+## Accessing Database (for SQL Queries)
