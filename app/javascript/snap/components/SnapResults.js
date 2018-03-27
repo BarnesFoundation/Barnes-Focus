@@ -106,9 +106,29 @@ class SnapResults extends Component {
                 break;
             }
         }
-        if (!window.open(appUriScheme)) {
-            window.location = webFallbackURL;
+        // set up a timer and start it
+        var start = new Date().getTime(),
+            end,
+            elapsed;
+
+        // attempt to redirect to the uri:scheme
+        // the lovely thing about javascript is that it's single threadded.
+        // if this WORKS, it'll stutter for a split second, causing the timer to be off
+        document.location = appUriScheme;
+
+        // end timer
+        end = new Date().getTime();
+
+        elapsed = (end - start);
+
+        // if there's no elapsed time, then the scheme didn't fire, and we head to the url.
+        if (elapsed < 1) {
+            document.location = webFallbackURL;
         }
+        // if (!window.open(appUriScheme)) {
+        //     window.location = webFallbackURL;
+        // }
+        e.preventDefault();
     }
 
     bookmarkIt = () => {
