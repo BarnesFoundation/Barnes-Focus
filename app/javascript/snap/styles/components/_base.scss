@@ -31,6 +31,13 @@ p {
     padding: 5vw;
 }
 
+// .share {
+//     span {
+//         padding: 10px;
+//         //color: #FFF;
+//     }
+// }
+
 .snap-text-muted {
     color: #8C8C8D;
     font-size: 0.875rem !important;
@@ -43,6 +50,7 @@ p {
 .language-select {
     padding: 0 5vw;
     .btn-group {
+        width: 100%;
         .btn {
             background-color: #FFF;
             text-align: left;

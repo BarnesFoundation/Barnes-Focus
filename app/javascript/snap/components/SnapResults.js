@@ -6,12 +6,26 @@ import bookmark from 'images/bookmark_icon.svg';
 import icon_camera from 'images/camera_icon.svg';
 import Modal from 'react-modal';
 import Footer from './Footer';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL } from './Constants';
+import Popover from 'react-simple-popover';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_GOOGLE } from './Constants';
+
+
+const customStyles = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)'
+    }
+};
 
 /** 
  * withHeader HOC provides props with location, history and match objects
 */
 class SnapResults extends Component {
+
 
     constructor(props) {
         super(props);
@@ -19,8 +33,10 @@ class SnapResults extends Component {
             ...props.location.state,
             modalIsOpen: false,
             bookmarkModalIsOpen: false,
+            sharePopoverIsOpen: false,
             searchResults: []
         }
+
     }
 
     componentWillMount() {
@@ -30,6 +46,7 @@ class SnapResults extends Component {
                 const result = {};
                 const art_obj = search_result["data"]["records"][0];
                 const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
+                result['id'] = art_obj.id;
                 result['title'] = art_obj.title;
                 result['shortDescription'] = art_obj.shortDescription;
                 result['artist'] = art_obj.people;
@@ -54,6 +71,66 @@ class SnapResults extends Component {
         Modal.setAppElement('.search-container');
     }
 
+    nativeAppShareWithWebFallback = (e) => {
+        const socialMediaType = e.currentTarget.dataset.id
+        this.setState({ sharePopoverIsOpen: false });
+
+        let appUriScheme;
+        let webFallbackURL;
+        let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
+        let hashtag = 'barnesfoundation';
+        switch (socialMediaType) {
+            case SOCIAL_MEDIA_TWITTER: {
+                let title_author = this.state.searchResults[0].title;
+                if (this.state.searchResults[0].artist) {
+                    title_author += ' by ' + this.state.searchResults[0].artist;
+                    hashtag += ',' + this.state.searchResults[0].artist.split(' ').join('');
+                }
+                title_author = title_author.split(' ').join('+') + '. ';
+                //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.searchResults[0].id;
+                appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
+                webFallbackURL = 'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
+                break;
+            }
+            case SOCIAL_MEDIA_FACEBOOK: {
+                //urlToShare += '?utm_source=barnes_snap&utm_medium=facebook&utm_term=' + this.state.searchResults[0].id;
+                //appUriScheme = 'fb://publish/profile/me?u=' + urlToShare;
+                appUriScheme = 'http://www.facebook.com/share.php?u=' + encodeURIComponent(urlToShare);
+                webFallbackURL = 'http://www.facebook.com/share.php?u=' + encodeURIComponent(urlToShare);
+
+                break;
+            }
+            case SOCIAL_MEDIA_GOOGLE: {
+                appUriScheme = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
+                webFallbackURL = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
+                break;
+            }
+        }
+        // set up a timer and start it
+        var start = new Date().getTime(),
+            end,
+            elapsed;
+
+        // attempt to redirect to the uri:scheme
+        // the lovely thing about javascript is that it's single threadded.
+        // if this WORKS, it'll stutter for a split second, causing the timer to be off
+        document.location = appUriScheme;
+
+        // end timer
+        end = new Date().getTime();
+
+        elapsed = (end - start);
+
+        // if there's no elapsed time, then the scheme didn't fire, and we head to the url.
+        if (elapsed < 1) {
+            document.location = webFallbackURL;
+        }
+        // if (!window.open(appUriScheme)) {
+        //     window.location = webFallbackURL;
+        // }
+        e.preventDefault();
+    }
+
     bookmarkIt = () => {
         const email = localStorage.getItem(SNAP_USER_EMAIL);
 
@@ -66,6 +143,14 @@ class SnapResults extends Component {
 
     closeBookmarkModal = () => {
         this.setState({ bookmarkModalIsOpen: false });
+    }
+
+    shareIt = () => {
+        this.setState({ sharePopoverIsOpen: true });
+    }
+
+    closeShareModal = () => {
+        this.setState({ sharePopoverIsOpen: false });
     }
 
     submitBookMark = () => {
@@ -85,6 +170,15 @@ class SnapResults extends Component {
         this.setState({ modalIsOpen: false });
     }
 
+    fbPost = () => {
+        window.open('fb://publish/profile/me?text=foo');
+
+    }
+
+    twitterShare = () => {
+        window.open('twitter://post?message=hello%20world');
+    }
+
     render() {
         return (
             <div className="container-fluid search-container">
@@ -101,8 +195,50 @@ class SnapResults extends Component {
                             </Link>
                             <div className="card-body">
                                 <div className="d-flex justify-content-around action-icons">
-                                    <span><img src={share} alt="share" />Share it</span>
-                                    <span onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</span>
+                                    <div id="share-it" ref="target" onClick={this.shareIt}><img src={share} alt="share" />Share it</div>
+                                    <Popover
+                                        placement='top'
+                                        container={this}
+                                        target={this.refs.target}
+                                        show={this.state.sharePopoverIsOpen}
+                                        onHide={this.closeShareModal} >
+                                        <div className="share d-flex justify-content-around">
+                                            <a data-id={SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                                                <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
+                                            </a>
+                                            <a data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback} target="_blank">
+                                                <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
+                                            </a>
+                                            <a data-id={SOCIAL_MEDIA_GOOGLE} onClick={this.nativeAppShareWithWebFallback}>
+                                                <i className="fa fa-lg fa-google-plus" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+                                    </Popover>
+                                    {/* <Modal
+                                        isOpen={this.state.sharePopoverIsOpen}
+                                        onRequestClose={this.closeShareModal}
+                                        contentLabel="Share Modal"
+                                        style={customStyles}
+                                    >
+                                        <div className="share">
+                                            <p>
+                                                <a id="btn-twitter" className="btn btn-block btn-social btn-twitter" data-id={SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                                                    <span className="fa fa-twitter"></span>Twitter
+                                                </a>
+                                            </p>
+                                            <p>
+                                                <a className="btn  btn-block btn-social btn-facebook" data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
+                                                    <span className="fa fa-facebook"></span>Facebook
+                                                </a>
+                                            </p>
+                                            <p>
+                                                <a className="btn  btn-block btn-social btn-google" data-id={SOCIAL_MEDIA_GOOGLE} onClick={this.nativeAppShareWithWebFallback}>
+                                                    <span className="fa fa-google"></span>Google
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </Modal> */}
+                                    <div onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</div>
                                     <Modal
                                         isOpen={this.state.bookmarkModalIsOpen}
                                         onRequestClose={this.closeBookmarkModal}
