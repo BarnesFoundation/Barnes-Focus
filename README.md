@@ -1,4 +1,5 @@
 
+
 # Installation Instructions
 * Git clone
 * Install Ruby (using RVM): `rvm install ruby-2.4.3`
@@ -69,7 +70,7 @@ This will initialise .elasticbeanstalk folder and create `config.yml` file
 To change which branch to deploy on Dev server, open `.elasticbeanstalk/config.yml`
 
       branch-defaults:
-        elastic-beanstalk-setup:
+        snap-dev:
           environment: barnes-snap-dev-env
           group_suffix: null
       environment-defaults:
