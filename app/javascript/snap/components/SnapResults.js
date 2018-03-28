@@ -7,7 +7,7 @@ import icon_camera from 'images/camera_icon.svg';
 import Modal from 'react-modal';
 import Footer from './Footer';
 import Popover from 'react-simple-popover';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_GOOGLE } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM } from './Constants';
 
 
 const customStyles = {
@@ -93,16 +93,13 @@ class SnapResults extends Component {
                 break;
             }
             case SOCIAL_MEDIA_FACEBOOK: {
-                //urlToShare += '?utm_source=barnes_snap&utm_medium=facebook&utm_term=' + this.state.searchResults[0].id;
-                //appUriScheme = 'fb://publish/profile/me?u=' + urlToShare;
-                appUriScheme = 'http://www.facebook.com/share.php?u=' + encodeURIComponent(urlToShare);
-                webFallbackURL = 'http://www.facebook.com/share.php?u=' + encodeURIComponent(urlToShare);
-
+                appUriScheme = 'facebook://'
+                webFallbackURL = 'http://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
                 break;
             }
-            case SOCIAL_MEDIA_GOOGLE: {
-                appUriScheme = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
-                webFallbackURL = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
+            case SOCIAL_MEDIA_INSTAGRAM: {
+                //appUriScheme = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
+                //webFallbackURL = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
                 break;
             }
         }
@@ -123,11 +120,8 @@ class SnapResults extends Component {
 
         // if there's no elapsed time, then the scheme didn't fire, and we head to the url.
         if (elapsed < 1) {
-            document.location = webFallbackURL;
+            window.open(webFallbackURL, '_blank');
         }
-        // if (!window.open(appUriScheme)) {
-        //     window.location = webFallbackURL;
-        // }
         e.preventDefault();
     }
 
@@ -170,15 +164,6 @@ class SnapResults extends Component {
         this.setState({ modalIsOpen: false });
     }
 
-    fbPost = () => {
-        window.open('fb://publish/profile/me?text=foo');
-
-    }
-
-    twitterShare = () => {
-        window.open('twitter://post?message=hello%20world');
-    }
-
     render() {
         return (
             <div className="container-fluid search-container">
@@ -206,12 +191,12 @@ class SnapResults extends Component {
                                             <a data-id={SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
                                                 <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
                                             </a>
-                                            <a data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback} target="_blank">
+                                            <a data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
                                                 <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
                                             </a>
-                                            <a data-id={SOCIAL_MEDIA_GOOGLE} onClick={this.nativeAppShareWithWebFallback}>
-                                                <i className="fa fa-lg fa-google-plus" aria-hidden="true"></i>
-                                            </a>
+                                            {/* <a data-id={SOCIAL_MEDIA_INSTAGRAM} onClick={this.nativeAppShareWithWebFallback}>
+                                                <i class="fa fa-instagram" aria-hidden="true"></i>
+                                            </a> */}
                                         </div>
                                     </Popover>
                                     {/* <Modal
