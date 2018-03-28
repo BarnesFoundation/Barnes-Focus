@@ -1,5 +1,4 @@
 
-
 # Installation Instructions
 * Git clone
 * Install Ruby (using RVM): `rvm install ruby-2.4.3`
@@ -32,7 +31,7 @@ To do so, the file `SNAP-865144db2e55` lies under: `private` folder
 * Install Beanstalk toolbelt: `brew install aws-elasticbeanstalk`. After installation: `eb --version` to validate
 
 ## Deploying for the first time
-`{PATH_TO_PROJECT}$ eb init -i`
+`{PATH_TO_PROJECT}$ eb init`
 
 This will ask few question/s:
 * Select a default region
@@ -51,12 +50,23 @@ Once you enter the required details, console will be prompted with below message
 Do you wish to continue with CodeCommit? (y/N) (default is n):** As mentioned, choose `n`
 
 ## Deploying an existing app to Beanstalk
-To deploy an existing app to Beanstalk, from console:
+If you are deploying an existing app to Beanstalk, it is possible that `.elasticbeanstalk` folder is missing from your local repo. In order to deploy, fire your terminal and type:
 
-    eb deploy --staged
+    `eb init -i`
+> NOTE: -i option force setup options to appear
 
-* This deploys `elastic-beanstalk-setup` branch to `barnes-snap-dev` app. URL: http://barnes-snap-dev-env.us-east-1.elasticbeanstalk.com/
-* To change the branch, open `.elasticbeanstalk/config.yml`
+Select these options:
+
+    region: us-east-1 : US East (N. Virginia)
+    application to use: barnes-snap-dev
+    It appears you are using Ruby. Is this correct?: Y
+    platform version: Ruby 2.4 (Puma)
+    Elastic Beanstalk now supports AWS CodeCommit; a fully-managed source control service. Do you wish to continue with CodeCommit?: n
+    Do you want to set up SSH for your instances?: n
+
+This will initialise .elasticbeanstalk folder and create `config.yml` file
+
+To change which branch to deploy on Dev server, open `.elasticbeanstalk/config.yml`
 
       branch-defaults:
         elastic-beanstalk-setup:
@@ -64,10 +74,10 @@ To deploy an existing app to Beanstalk, from console:
           group_suffix: null
       environment-defaults:
         barnes-snap-dev-env:
-          branch: elastic-beanstalk-setup
+          branch: snap-dev
           repository: null
         barnes-snap-stage-env:
-          branch: elastic-beanstalk-setup
+          branch: snap-dev
           repository: null
       global:
         application_name: barnes-snap-dev
@@ -83,9 +93,16 @@ To deploy an existing app to Beanstalk, from console:
         repository: origin
         sc: git@github.com:BarnesFoundation/barnes-snap.git
         workspace_type: Application
-  Change the branch-name under `environment-defaults` and re-run `eb deploy --staged`
+- Change the branch-name under `environment-defaults` and re-run `eb deploy --staged`
+- Replace this file with the one in your local environment and you are all set to deploy `snap-dev` to Dev server
 
-* You'll need `barnes-snap-keypair` to deploy. The relevant files can be found under `private` folder. Copy this into `~/.ssh` folder (local)
+To deploy an existing app to Beanstalk, from console:
+
+    eb deploy --staged
+
+* This deploys `snap-dev` branch to `barnes-snap-dev` app. URL: http://barnes-snap-dev-env.us-east-1.elasticbeanstalk.com/
+
+* You'll need `barnes-snap-keypair` to deploy. The relevant files can be found under `private` folder. Copy this into `~/.ssh` folder (local) and give these 2 files necessary write permission using `chmod`
 
 ### Troubleshooting
 > If you get `ERROR: ServiceError - User: arn:aws:iam::RAND-ID:user/NAME is not authorized to perform: codecommit:ListRepositories` - That means you do not have sufficient privileges. Please get in touch with the respective AWS person and/or create/update policy by yourself (this needs caution).
