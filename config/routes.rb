@@ -10,7 +10,7 @@ Rails.application.routes.draw do
         get 'languages'
       end
     end
-    resources :bookmarks, only: [:index, :new]
+    resources :bookmarks, only: [:index, :create]
   end
 
   get '*path', to:  "pages#home"
