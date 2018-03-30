@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import LanguageSelect from '../components/LanguageSelect';
 import share from 'images/share_icon.svg';
 import bookmark from 'images/bookmark_icon.svg';
@@ -31,7 +32,7 @@ class SnapResults extends Component {
         super(props);
         this.state = {
             ...props.location.state,
-            modalIsOpen: false,
+            resetModalIsOpen: false,
             bookmarkModalIsOpen: false,
             sharePopoverIsOpen: false,
             searchResults: []
@@ -78,9 +79,12 @@ class SnapResults extends Component {
         let appUriScheme;
         let webFallbackURL;
         let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
-        let hashtag = 'barnesfoundation';
+
         switch (socialMediaType) {
             case SOCIAL_MEDIA_TWITTER: {
+
+                let hashtag = 'barnesfoundation';
+
                 let title_author = this.state.searchResults[0].title;
                 if (this.state.searchResults[0].artist) {
                     title_author += ' by ' + this.state.searchResults[0].artist;
@@ -90,38 +94,23 @@ class SnapResults extends Component {
                 //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.searchResults[0].id;
                 appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
                 webFallbackURL = 'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
+
+                var start = new Date().getTime(), end, elapsed;
+                document.location = appUriScheme;
+                end = new Date().getTime();
+                elapsed = (end - start);
+                if (elapsed < 1) {
+                    window.open(webFallbackURL, '_blank');
+                }
                 break;
             }
             case SOCIAL_MEDIA_FACEBOOK: {
-                appUriScheme = 'facebook://'
                 webFallbackURL = 'http://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
-                break;
-            }
-            case SOCIAL_MEDIA_INSTAGRAM: {
-                //appUriScheme = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
-                //webFallbackURL = 'https://plus.google.com/share?url=' + encodeURIComponent(urlToShare);
+                window.open(webFallbackURL, '_blank');
                 break;
             }
         }
-        // set up a timer and start it
-        var start = new Date().getTime(),
-            end,
-            elapsed;
 
-        // attempt to redirect to the uri:scheme
-        // the lovely thing about javascript is that it's single threadded.
-        // if this WORKS, it'll stutter for a split second, causing the timer to be off
-        document.location = appUriScheme;
-
-        // end timer
-        end = new Date().getTime();
-
-        elapsed = (end - start);
-
-        // if there's no elapsed time, then the scheme didn't fire, and we head to the url.
-        if (elapsed < 1) {
-            window.open(webFallbackURL, '_blank');
-        }
         e.preventDefault();
     }
 
@@ -140,28 +129,80 @@ class SnapResults extends Component {
     }
 
     shareIt = () => {
-        this.setState({ sharePopoverIsOpen: true });
+
+        if (navigator.share) {
+            let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
+            let hashtag = '#barnesfoundation';
+
+            let title_author = this.state.searchResults[0].title;
+            if (this.state.searchResults[0].artist) {
+                title_author += ' by ' + this.state.searchResults[0].artist;
+                hashtag += ' #' + this.state.searchResults[0].artist.split(' ').join('');
+            }
+            title_author = title_author + '. ';
+
+            navigator.share({
+                title: 'Barnes Foundation',
+                text: title_author + ' ' + hashtag,
+                url: urlToShare
+            })
+                .then(() => console.log('Successful share'))
+                .catch((error) => console.log('Error sharing', error));
+        } else {
+            this.setState({ sharePopoverIsOpen: true });
+        }
+
     }
 
     closeShareModal = () => {
         this.setState({ sharePopoverIsOpen: false });
     }
 
-    submitBookMark = () => {
+    submitBookMark = (e) => {
         console.log('submitting bookmark');
+        if (this.state.bookmarkModalIsOpen) {
+            this.closeBookmarkModal();
+        }
+        // const payload = {};
+        // payload.email =
+        // payload.image_id =
+
+        //     axios.post('/api/bookmarks', {
+        //         image_data: this.state.capturedImage,
+        //         language: prefLang
+        //     }).then(response => {
+        //         this.setState({ searchInProgress: false });
+        //         // Navigate to search result page or not found page
+        //         const res = response.data;
+        //         if (res.data.records.length === 0) {
+        //             this.props.history.push({ pathname: '/not-found' });
+        //         } else {
+        //             this.props.history.push({
+        //                 pathname: '/results',
+        //                 state: {
+        //                     result: res
+        //                 }
+        //             });
+        //         }
+
+        //     })
+        //         .catch(error => {
+        //             this.setState({ searchInProgress: false });
+        //             this.props.history.push({ pathname: '/not-found' });
+        //         });
     }
 
-    openModal = () => {
-        this.setState({ modalIsOpen: true });
+    openResetModal = () => {
+        this.setState({ resetModalIsOpen: true });
     }
 
-    closeModal = () => {
-        this.setState({ modalIsOpen: false });
+    closeResetModal = () => {
+        this.setState({ resetModalIsOpen: false });
     }
 
     resetExperience = () => {
         localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
-        this.setState({ modalIsOpen: false });
+        this.setState({ resetModalIsOpen: false });
     }
 
     render() {
@@ -253,16 +294,17 @@ class SnapResults extends Component {
                                                     <input className="form-check-input" type="checkbox" value="" id="newsletter-chk" />
                                                     <label className="form-check-label snap-text-muted" htmlFor="newsletter-chk">
                                                         Sign up for the Barnes newsletter
-                                                        </label>
+                                                    </label>
+                                                </div>
+                                                <div className="row">
+                                                    <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
+                                                        <button type="submit" className="btn snap-btn snap-btn-default">
+                                                            Submit
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </form>
-                                            <div className="row">
-                                                <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
-                                                    <button className="btn snap-btn snap-btn-default" onClick={this.submitBookMark}>
-                                                        Submit
-                                                     </button>
-                                                </div>
-                                            </div>
+
                                         </div>
                                     </Modal>
                                 </div>
@@ -285,11 +327,11 @@ class SnapResults extends Component {
                 </div>
                 <div id="reset-experience" className="row mt-5 mb-3">
                     <div className="col-6 offset-3 text-center">
-                        <span className="reset-experience" onClick={this.openModal}>Reset Experience</span>
+                        <span className="reset-experience" onClick={this.openResetModal}>Reset Experience</span>
                     </div>
                     <Modal
-                        isOpen={this.state.modalIsOpen}
-                        onRequestClose={this.closeModal}
+                        isOpen={this.state.resetModalIsOpen}
+                        onRequestClose={this.closeResetModal}
                         contentLabel="Reset Experience Modal"
                         className="Modal"
                         overlayClassName="Overlay"
@@ -298,7 +340,7 @@ class SnapResults extends Component {
                             <div className="row">
                                 <div className="col-12">
                                     <i className="fa fa-2x fa-angle-left pull-left"></i>
-                                    <span className="dismiss" onClick={this.closeModal}>
+                                    <span className="dismiss" onClick={this.closeResetModal}>
                                         Cancel</span>
                                 </div>
                             </div>
