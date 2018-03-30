@@ -164,7 +164,7 @@ class WelcomeComponent extends Component {
                                 <img src={photo_prompt} alt="photo_prompt_main_img" />
                             </div>
                             <div className="content">
-                                <h2>Take a photo to learn more about a work of art in our collection.</h2>
+                                <h1>Take a photo to learn more about a work of art.</h1>
                             </div>
 
                             <Link className="btn take-photo-btn" to="/snap">
