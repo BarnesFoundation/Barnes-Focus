@@ -19,22 +19,25 @@
         .card-body {
             margin-top: -30px;
             padding: 1rem;
+            color: #282828;
             .action-icons {
                 img {
                     padding: 0 10px;
                 }
             }
+
+            .card-text {
+                padding-bottom: 1.25rem;
+            }
         }
 
         .card-footer {
-            background-color: #F74D31;
+            background-color: #D4432A;
             color: #FFF;
+            padding: 2rem;
             
             p {
                 color: #FFF; 
-            }
-
-            small {
                 opacity: 0.8;
             }
         }

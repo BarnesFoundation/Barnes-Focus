@@ -132,11 +132,11 @@ class Camera extends Component {
             }
         });
 
-        // mc.on("swipe drag", function (event) {
-        //     if (event.gesture.direction == Hammer.DIRECTION_UP || event.gesture.direction == Hammer.DIRECTION_DOWN) {
-        //         event.gesture.preventDefault();
-        //     }
-        // });
+        mc.on("swipe drag", function (event) {
+            if (event.gesture.direction == Hammer.DIRECTION_UP || event.gesture.direction == Hammer.DIRECTION_DOWN) {
+                event.gesture.preventDefault();
+            }
+        });
     }
 
     componentDidUpdate() {
