@@ -200,16 +200,35 @@ p {
     color: #787878;
 }
 
-/* smartphone (landscape) */
-@media only screen and (min-device-width : 320px) and (max-device-width : 480px) and (orientation : landscape) {
+// /* smartphone (landscape) */
+// @media only screen and (min-device-width : 320px) and (max-device-width : 480px) and (orientation : landscape) {
     
-    h2 {
-        font-size: 1.5625rem;
-    }
+//     h2 {
+//         font-size: 1.5625rem;
+//     }
     
-    p {
-        font-size: 1.625rem;
-    } 
+//     p {
+//         font-size: 1.625rem;
+//     } 
+// }
+
+/* iPhone 5 and below. Smaller Devices (Portrait) */
+@media only screen and (min-device-width: 320px) and (max-device-height: 568px) and (orientation : portrait) {
+/* Styles */
+
+* {
+    font-size: 1rem;
+}
+ 
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.2rem;
+}
+
+
 }
 
 /* iPads (portrait and landscape) ----------- */
