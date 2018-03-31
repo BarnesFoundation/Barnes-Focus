@@ -309,15 +309,15 @@ class SnapResults extends Component {
                                     </Modal>
                                 </div>
                                 <hr />
-                                <p className="card-text">
+                                <div className="card-text">
                                     <p className="text-muted">{this.state.searchResults[0].artist}. {this.state.searchResults[0].title}, {this.state.searchResults[0].displayDate}. {this.state.searchResults[0].medium}</p>
-                                </p>
-                                <p className="card-text">{this.state.searchResults[0].shortDescription}.</p>
-                                <p>- John House, Renoir in the Barnes Foundation.</p>
+                                </div>
+                                <div className="card-text">{this.state.searchResults[0].shortDescription}.</div>
+                                <div className="card-text">- John House, Renoir in the Barnes Foundation.</div>
                             </div>
                             <div className="card-footer">
                                 <h2>Albert Barnes taught people to look at works of art primarily in terms of their visual relationships.</h2>
-                                <p><small>Swipe for visually similar works</small></p>
+                                <p>Swipe for visually similar works</p>
                             </div>
                         </div>
                     </div>
