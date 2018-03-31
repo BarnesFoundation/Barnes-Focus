@@ -1,10 +1,7 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700');
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-
 
 .camera{
     width: 100%;
-    height: 75vh;
+    height: 80vh;
     background: #fff;
     margin: 0 auto;
     position: relative;
@@ -39,7 +36,7 @@
 
 .camera-controls {
     width: 100%;
-    min-height: 25vh;
+    min-height: 20vh;
     background-color: #000;
     z-index: 300000;
     position: absolute;
