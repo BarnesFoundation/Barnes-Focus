@@ -1,46 +1,39 @@
-// @font-face {
-//     font-family: 'Calibre';
-//     src: url('../../../assets/fonts/CalibreWeb-Medium.woff2') format('woff2');
-//     font-style: normal; 
-//     font-weight: 700;
-//   }
-  
-//   @font-face {
-//     font-family: 'Calibre';
-//     src: url('../../../assets/fonts/CalibreWeb-Regular.woff2') format('woff2');
-//     font-style: normal;
-//     font-weight: 400;
-//   }
-
 * {
-    //font-family: 'Calibre-regular';
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Calibre-Regular', sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-size: 1.125rem;
 }
 
 html, body {
     height:100%;
-    // font-size: 62.5%;
+    font-size: 1rem !important;
+    font-family: 'Calibre-Regular', sans-serif;
     font-weight: 400;
+    font-kerning:normal;
+    font-feature-settings:"kern";
+    text-rendering:optimizeLegibility;
+    font-variant-ligatures:common-ligatures;
 }
 
 h1 {
     font-size: 2.25rem;
     margin-bottom: 1rem;
-    //font-family: 'Calibre-medium';
+    font-family: 'Calibre-Medium';
+    font-weight: normal;
 }
 
 h2 {
     font-size: 1.3125rem;
     margin-bottom: 0.875rem;
-    //font-family: 'Calibre-medium';
+    font-family: 'Calibre-Medium';
+    font-weight: normal;
 }
 
 p {
-    font-size: 1.125rem;
     color: #8C8C8D;
+    font-family: 'Calibre-Regular';
 } 
 
 .content {
