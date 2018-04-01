@@ -196,6 +196,10 @@ p {
     }
 }
 
+input[type=email].error {
+    border-bottom: 2px solid red !important;
+}
+
 .footer {
     color: #787878;
 }
