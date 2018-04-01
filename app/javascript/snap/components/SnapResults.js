@@ -35,7 +35,9 @@ class SnapResults extends Component {
             resetModalIsOpen: false,
             bookmarkModalIsOpen: false,
             sharePopoverIsOpen: false,
-            searchResults: []
+            searchResults: [],
+            email: '',
+            newsletterSubscription: false
         }
 
     }
@@ -205,6 +207,18 @@ class SnapResults extends Component {
         this.setState({ resetModalIsOpen: false });
     }
 
+    handleBookmarkFormInputChange = (event) => {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
+
+        setTimeout(() => { console.log(this.state) });
+    }
+
     render() {
         return (
             <div className="container-fluid search-container">
@@ -288,13 +302,13 @@ class SnapResults extends Component {
                                                 <img src={this.state.searchResults[0].url} alt="bookmark_img" />
                                             </div>
                                             <div className="message">Information about the art you bookmark will be emailed to you after your visit.</div>
-                                            <form onSubmit={this.handleSubmit}>
-                                                <input type="email" placeholder="Email address" className="form-control" name="email" />
-                                                <div className="form-check">
-                                                    <input className="form-check-input" type="checkbox" value="" id="newsletter-chk" />
-                                                    <label className="form-check-label snap-text-muted" htmlFor="newsletter-chk">
+                                            <form onSubmit={this.submitBookMark}>
+                                                <input type="email" placeholder="Email address" className="form-control" name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
+                                                <div className="checkbox">
+                                                    <input id="newsletter-chk" type="checkbox" name="newsletterSubscription" onChange={this.handleBookmarkFormInputChange} />
+                                                    <label htmlFor="newsletter-chk">
                                                         Sign up for the Barnes newsletter
-                                                    </label>
+                                                        </label>
                                                 </div>
                                                 <div className="row">
                                                     <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
