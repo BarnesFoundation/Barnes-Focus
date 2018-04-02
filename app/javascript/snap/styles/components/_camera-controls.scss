@@ -142,6 +142,35 @@
         
 }
 
+/* iPhone X */
+@media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) { 
+    .camera{
+        height: 68vh;
+    } 
+    .camera-controls {
+        min-height: 32vh;
+    }
+    
+}
+/* iPhone 8 Plus */
+@media only screen and (device-width : 414px) and (device-height : 736px) and (-webkit-device-pixel-ratio : 3) { 
+    .camera{
+        height: 70vh;
+    } 
+    .camera-controls {
+        min-height: 30vh;
+    }
+}
+
+@media only screen  and (device-width : 375px) and (device-height : 667px) and (-webkit-device-pixel-ratio : 2) {
+    .camera{
+        height: 68vh;
+    }
+    .camera-controls {
+        min-height: 32vh;
+    }
+}
+
 /* iPads (portrait and landscape) ----------- */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
 /* Styles */
