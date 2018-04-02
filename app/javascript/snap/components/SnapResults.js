@@ -63,7 +63,6 @@ class SnapResults extends Component {
                 result['invno'] = art_obj.invno;
                 result['displayDate'] = art_obj.displayDate;
                 result['shortDescription'] = art_obj.shortDescription;
-                result['imageId'] = art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
                 this.setState({
                     searchResults: this.state.searchResults.concat(result)
                 });
@@ -167,30 +166,30 @@ class SnapResults extends Component {
     submitBookMark = (event) => {
         console.log('submitting bookmark');
         // event is undefined when email is already present in localStorage and no bookmark modal is opened.
-        if(event) {
+        if (event) {
             event.preventDefault();
-            if(!this.validateEmail()){
-                this.setState({errors: {email: true}});
+            if (!this.validateEmail()) {
+                this.setState({ errors: { email: true } });
             } else {
-                this.setState({errors: {email: false}});
+                this.setState({ errors: { email: false } });
                 this.closeBookmarkModal();
                 localStorage.setItem(SNAP_USER_EMAIL, this.state.email);
-                
+
             }
-            
-        } 
-        
+
+        }
+
         const payload = {};
         payload.email = this.state.email;
-        payload.image_id = this.state.searchResults[0].imageId;
+        payload.image_id = this.state.searchResults[0].id;
         payload.newsletter = this.state.newsletterSubscription;
 
-        axios.post('/api/bookmarks', payload ).then(response => {
+        axios.post('/api/bookmarks', payload).then(response => {
             console.log('Successfully submitted bookmark!');
         })
-        .catch(error => {
-            console.log('Successfully submitted bookmark!');
-        });
+            .catch(error => {
+                console.log('Successfully submitted bookmark!');
+            });
     }
 
     openResetModal = () => {
@@ -306,7 +305,7 @@ class SnapResults extends Component {
                                             </div>
                                             <div className="message">Information about the art you bookmark will be emailed to you after your visit.</div>
                                             <form onSubmit={this.submitBookMark}>
-                                                <input type="email" placeholder="Email address" className={this.state.errors.email? 'error form-control': 'form-control'}name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
+                                                <input type="email" placeholder="Email address" className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
                                                 <div className="checkbox">
                                                     <input id="newsletter-chk" type="checkbox" name="newsletterSubscription" onChange={this.handleBookmarkFormInputChange} />
                                                     <label htmlFor="newsletter-chk">
