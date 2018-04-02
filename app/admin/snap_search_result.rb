@@ -14,7 +14,8 @@ ActiveAdmin.register SnapSearchResult do
         obj.api_response["image_ids"].each do |image|
           tr do
             td do
-              image_tag TrainingRecord.find_by(identifier: image).try(:image_url), class: 'pastec_image_size'
+              training_img = TrainingRecord.find_by(identifier: image).try(:image_url)
+              image_tag training_img, class: 'pastec_image_size' unless training_img.nil?
             end
           end
         end if obj.api_response["image_ids"].present?
