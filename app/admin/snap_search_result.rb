@@ -9,7 +9,7 @@ ActiveAdmin.register SnapSearchResult do
     column "Clicked Snap" do |obj|
       image_tag obj.searched_image_url, class: 'pastec_image_size'
     end
-    column "Images from API" do |obj|
+    column "Images from Training Module" do |obj|
       table do
         obj.api_response["image_ids"].each do |image|
           tr do
