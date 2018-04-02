@@ -1,0 +1,34 @@
+<h1>Bookmarked art</h1>
+
+<h3>Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit:</h3>
+
+<table>
+  <% @els_arr.each do | els_elem | %>
+    <tr>
+      <td>
+        <%= image_tag "https://barnes-image-repository.s3.amazonaws.com/images/" + els_elem['id'].to_s + "_" + els_elem['imageSecret'] + "_n.jpg" %>
+      </td>
+      <td>
+        <%= els_elem['title'] %>
+        <br />
+        <%= els_elem['shortDescription'] %>
+        <br />
+        <%= els_elem['medium']  %>
+        <br />
+        <%= els_elem['dimensions'] %>
+        <br />
+        <% if els_elem['objRightsTypeID'].present? %>
+          <% if ['1', '3'].include?(els_elem['objRightsTypeID']) %>
+            <p>In Copyright. <br />
+              <%= els_elem['creditLine'] %>
+            </p>
+          <% elsif ['4', '8', '10'].include?(els_elem['objRightsTypeID']) %>
+            <p>Public domain. </p>
+          <% elsif ['2', '6'].include?(els_elem['objRightsTypeID']) %>
+            <p>Copyright Undetermined</p>
+          <% end %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>
