@@ -12,7 +12,7 @@ ActiveAdmin.register_page "Dashboard" do
             tr do
               th '#'
               th 'Searched Image'
-              th 'Images from API'
+              th 'Images from Training Module'
               th 'ES Images'
               th 'API Response'
               th 'Elastic Search Result'
