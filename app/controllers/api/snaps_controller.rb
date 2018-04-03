@@ -69,7 +69,7 @@ class Api::SnapsController < Api::BaseController
           if preferred_language.present?
             translator = GoogleTranslate.new preferred_language
             #as of now I am sending translated version of title as shortdescription is coming null from elastic search
-            searched_data["title"] = translator.translate(searched_data["title"])
+            #searched_data["title"] = translator.translate(searched_data["title"]) # as per SV-39 there is no need to translate title
             searched_data["shortDescription"] = translator.translate(searched_data["shortDescription"]) if searched_data["shortDescription"]
           end
           response["data"]["records"] << searched_data
