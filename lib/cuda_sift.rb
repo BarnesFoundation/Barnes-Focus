@@ -38,7 +38,9 @@ class CudaSift
         images_found["type"] = res["type"]
       end
     end
-    images_found["results"].sort_by! {|_key, value| value}
+    #images_found["results"].sort_by! {|_key, value| value}
+    #images_found["results"].sort_by! { |x| - x.values.first } # 1 of 2 - solution for sort
+    images_found["results"] = images_found["results"].sort_by(&:values).reverse # 2 of 2 - solution for sort
     images_found
   end
 
