@@ -45,7 +45,7 @@
         .btn-circle {
             width: 70px;
             height: 70px;
-            padding: 17px 17px;
+            padding: 17px !important;
             border-radius: 35px;
             font-size: 24px;
             line-height: 1.33;
@@ -54,6 +54,7 @@
             left: 75vw;
             background-color: #000;
             color: #FFF;
+            -webkit-appearance: none;
         }
     }
 
