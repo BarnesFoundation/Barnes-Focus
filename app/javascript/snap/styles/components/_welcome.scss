@@ -147,30 +147,92 @@
 }
 
 
+/* iPhone 5 and below. Smaller Devices (Portrait) */
+@media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
+/* Styles */
 
-/* iPads (portrait and landscape) ----------- */
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
     .welcome-screen {
         .img-gallery {
-            height: 52vh;          
+            height: 36vh !important;   
+            
+            .gallery-item {  
+                &:nth-child(2) {
+                    top:15vh !important;
+                }
+            }
+
         }
     }
 
     .lang-dropdown-screen {
         .img-gallery {
-            height: 52vh;
+            height: 40vh !important;
+            
+            .gallery-item {           
+                
+                &:nth-child(1) {
+                    top: 10vh !important;
+                    img {
+                        width: 32vw !important;
+                    }
+                }
+    
+                &:nth-child(3) {
+                    top: 15vh !important;
+                    img {
+                        width: 42vw !important;
+                    }
+                }
+    
+                
+            }
+        }
+    }
+
+    .photo-prompt-screen {
+
+        .img-main {
+            img {
+                width: 70vw !important;
+            }
+        }
+    
+        .take-photo-btn {
+            width: 185px !important;
+            height: 60px !important;
+            padding: 10px 0px !important;
+            border-radius: 30px !important;
+        }
+        
+        
+    }   
+    
+}
+
+
+/* iPads (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+    .welcome-screen {
+        .img-gallery {
+            height: 52vh !important;          
+        }
+    }
+
+    .lang-dropdown-screen {
+        .img-gallery {
+            height: 52vh !important;
         }
     }
 
     .wifi-screen {
         .img-gallery {
-            height: 50vh;
+            height: 50vh !important;
         }
     }
 
     .photo-prompt-screen {
         .img-main {
-            height: 50vh;
+            height: 50vh !important;
         }
     }
 }

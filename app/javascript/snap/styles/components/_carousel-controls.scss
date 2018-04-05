@@ -45,20 +45,20 @@
 }
 
 /* iPhone 5 and below. Smaller Devices (Portrait) */
-@media only screen and (min-device-width: 320px) and (max-device-height: 568px) and (orientation : portrait) {
+@media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
 /* Styles */
     
-.carousel-indicators {
-    bottom: 10vh !important;
-}
+    .carousel-indicators {
+        bottom: 20vh !important;
+    }
 
-.carousel-control-prev, .carousel-control-next {
-    bottom: 10vh !important;
-}
+    .carousel-control-prev, .carousel-control-next {
+        bottom: 20vh !important;
+    }
 
-.fa-2x {
-    font-size: 1.5rem !important;
-}
+    .fa-2x {
+        font-size: 1.5rem !important;
+    }
     
 }
 
@@ -77,16 +77,16 @@
 /* iPads (portrait and landscape) ----------- */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
 /* Styles */
-.carousel-indicators {
-    bottom: 10vh !important;
-}
+    .carousel-indicators {
+        bottom: 10vh !important;
+    }
 
-.carousel-control-prev, .carousel-control-next {
-    bottom: 10vh !important;
-}
+    .carousel-control-prev, .carousel-control-next {
+        bottom: 10vh !important;
+    }
 
-.fa-2x {
-    font-size: 2.5rem !important;
-}
+    .fa-2x {
+        font-size: 2.5rem !important;
+    }
 }
 

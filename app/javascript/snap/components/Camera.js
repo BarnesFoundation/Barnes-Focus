@@ -3,9 +3,13 @@ import { withRouter } from 'react-router-dom';
 import Hammer from 'hammerjs';
 import CameraControls from './CameraControls';
 import axios from 'axios';
+import axiosTiming from 'axios-timing'
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
 import { SNAP_LANGUAGE_PREFERENCE } from './Constants';
+
+
+axiosTiming(axios, console.log);
 
 class Camera extends Component {
 
@@ -99,6 +103,7 @@ class Camera extends Component {
     }
 
     componentDidMount() {
+
         navigator.mediaDevices.getUserMedia({
             video: {
                 "facingMode": (this.state.frontCamera) ? "user" : "environment",

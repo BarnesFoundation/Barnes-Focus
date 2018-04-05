@@ -216,8 +216,8 @@ input[type=email].error {
 //     } 
 // }
 
-/* iPhone 5 and below. Smaller Devices (Portrait) */
-@media only screen and (min-device-width: 320px) and (max-device-height: 568px) and (orientation : portrait) {
+/* iPhone 6s and below. Smaller Devices (Portrait) */
+@media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
 /* Styles */
 
 * {
@@ -226,6 +226,7 @@ input[type=email].error {
  
 h1 {
     font-size: 2rem;
+    margin-top: 0;
 }
 
 h2 {

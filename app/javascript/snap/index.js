@@ -4,7 +4,6 @@ import 'bootstrap';
 
 import AppRouter from './routes/AppRouter';
 
-//import 'normalize.css/normalize.css';
 import 'bootstrap/scss/bootstrap.scss'
 import 'font-awesome/scss/font-awesome.scss';
 import './styles/styles.scss';
