@@ -126,8 +126,8 @@
     padding: 30px;
 }
 
-/* iPhone 5 and below. Smaller Devices (Portrait) */
-@media only screen and (min-device-width: 320px) and (max-device-height: 568px) and (orientation : portrait) {
+/* iPhone 6S and below. Smaller Devices (Portrait) */
+@media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
 /* Styles */    
     .camera-shutter{
         .round-button-circle {
@@ -139,35 +139,42 @@
             font-size: 1rem !important;
         }
     }
+
+    .camera{
+        height: 68vh !important;
+    }
+    .camera-controls {
+        min-height: 32vh !important;
+    }
         
 }
 
 /* iPhone X */
 @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) { 
     .camera{
-        height: 68vh;
+        height: 68vh !important;
     } 
     .camera-controls {
-        min-height: 32vh;
+        min-height: 32vh !important;
     }
     
 }
 /* iPhone 8 Plus */
 @media only screen and (device-width : 414px) and (device-height : 736px) and (-webkit-device-pixel-ratio : 3) { 
     .camera{
-        height: 70vh;
+        height: 70vh !important;
     } 
     .camera-controls {
-        min-height: 30vh;
+        min-height: 30vh !important;
     }
 }
 /* iPhone 8  */
 @media only screen  and (device-width : 375px) and (device-height : 667px) and (-webkit-device-pixel-ratio : 2) {
     .camera{
-        height: 68vh;
+        height: 68vh !important;
     }
     .camera-controls {
-        min-height: 32vh;
+        min-height: 32vh !important;
     }
 }
 
