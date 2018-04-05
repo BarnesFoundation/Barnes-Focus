@@ -1,4 +1,4 @@
-class Api::BookmarksController < ApplicationController
+class Api::BookmarksController < Api::BaseController
   def index
   end
 

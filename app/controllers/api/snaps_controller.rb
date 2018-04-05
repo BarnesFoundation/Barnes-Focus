@@ -73,7 +73,9 @@ class Api::SnapsController < Api::BaseController
             #searched_data["title"] = translator.translate(searched_data["title"]) # as per SV-39 there is no need to translate title
             searched_data["shortDescription"] = translator.translate(strip_tags(searched_data["shortDescription"])) if searched_data["shortDescription"]
           end
-          response["data"]["records"] << searched_data
+          response["data"]["records"] << searched_data.slice(
+            'id', 'imageSecret', 'title', 'shortDescription', 'artist', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate'
+          )
         end
       end
       response
