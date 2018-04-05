@@ -141,10 +141,10 @@
     }
 
     .camera{
-        height: 68vh !important;
+        height: 70vh !important;
     }
     .camera-controls {
-        min-height: 32vh !important;
+        min-height: 30vh !important;
     }
         
 }
@@ -171,10 +171,10 @@
 /* iPhone 8  */
 @media only screen  and (device-width : 375px) and (device-height : 667px) and (-webkit-device-pixel-ratio : 2) {
     .camera{
-        height: 68vh !important;
+        height: 70vh !important;
     }
     .camera-controls {
-        min-height: 32vh !important;
+        min-height: 30vh !important;
     }
 }
 
