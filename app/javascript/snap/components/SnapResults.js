@@ -297,7 +297,7 @@ class SnapResults extends Component {
                                                 </span>
                                                 </div>
                                             </div>
-                                            <div className="title mt-5">
+                                            <div className="title mt-3">
                                                 <h2>{this.state.searchResults[0].title}</h2>
                                             </div>
                                             <div className="picture">
@@ -333,7 +333,7 @@ class SnapResults extends Component {
                             </div>
                             <div className="card-footer">
                                 <h2>Albert Barnes taught people to look at works of art primarily in terms of their visual relationships.</h2>
-                                <p>Swipe for visually similar works</p>
+                                {/* <p>Swipe for visually similar works</p> */}
                             </div>
                         </div>
                     </div>
