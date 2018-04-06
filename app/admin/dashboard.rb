@@ -12,29 +12,21 @@ ActiveAdmin.register_page "Dashboard" do
             tr do
               th '#'
               th 'Searched Image'
-              th 'Images from Training Module'
               th 'ES Images'
               th 'API Response'
               th 'Elastic Search Result'
+              th 'Response Time'
             end
             SnapSearchResult.recent.map do |img|
               tr do
                 td img.id
-                td image_tag img.searched_image_url, class: 'pastec_image_size'
                 td do
-                  table do
-                    img.api_response["image_ids"].each do |image|
-                      tr do
-                        td do
-                          training_img = TrainingRecord.find_by(identifier: image).try(:image_url)
-                          image_tag training_img, class: 'pastec_image_size' unless training_img.nil?
-                        end
-                      end
-                    end if img.api_response["image_ids"].present?
+                  unless img.searched_image_url.blank?
+                    image_tag img.searched_image_url, class: 'pastec_image_size'
+                  else
+                    image_tag img.searched_image_data, class: 'pastec_image_size'
                   end
-
                 end
-
                 td do
                   table do
                     img.es_response["records"].each do |es_image|
@@ -49,6 +41,7 @@ ActiveAdmin.register_page "Dashboard" do
 
                 td img.api_response.to_s
                 td img.es_response.to_s
+                td img.response_time
               end
             end
           end

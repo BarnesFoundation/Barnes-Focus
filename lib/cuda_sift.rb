@@ -26,10 +26,15 @@ class CudaSift
   #Answer: "SEARCH_RESULTS" as type field and a list of the the matched image ids from the most to the least relevant one in the "image_ids" field
   #Possible error types: "IMAGE_NOT_DECODED", "IMAGE_SIZE_TOO_BIG", "IMAGE_SIZE_TOO_SMALL"
   def search_image(image_data)
-    all_results = []
-    threads = endpoints.map{|end_point| Thread.new{ find_image(image_data, end_point, all_results) }}
+    all_results, total_time_consumed = [], {}
+    threads = endpoints.map{|end_point|
+      Thread.new {
+        find_image(image_data, end_point, all_results, total_time_consumed)
+      }
+    }
+
     threads.each(&:join)
-    images_found = {"results" => [], "type" => ""}
+    images_found = {"results" => [], "type" => "", "total_time_consumed" => total_time_consumed}
     all_results.each do |res|
       if res["type"] == RESPONSE_CODES[:SEARCH_RESULTS]
         images_found["results"] += res["results"]
@@ -67,7 +72,8 @@ class CudaSift
     "#{end_point_url}/#{path}"
   end
 
-  def find_image(image_data, server_end_point, result)
+  def find_image(image_data, server_end_point, result, total_time_consumed)
+    start_time = Time.now
     #response = RestClient.post(url_search_image(server_end_point), image_data)
     # uri = URI.parse(url_search_image(server_end_point))
     # request = Net::HTTP::Post.new(uri)
@@ -80,5 +86,7 @@ class CudaSift
     # end
     response = `curl -X POST --data-binary @#{image_data.path} #{url_search_image(server_end_point)}`
     result << JSON.parse(response)
+    time_diff = Time.now - start_time
+    total_time_consumed["cuda_sift-#{server_end_point}"] = Time.at(time_diff.to_i.abs).utc.strftime "%H:%M:%S"
   end
 end

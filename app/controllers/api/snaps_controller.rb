@@ -24,9 +24,8 @@ class Api::SnapsController < Api::BaseController
 
     searched_result = process_searched_images_response(response)
 
-    # send image to s3 with background job if image is valid and log result to db
-    # We can make it asyc with perform_later, on heroku we can not store file in temp for later processing with job
-    ImageUploadJob.perform_now(file.path, {response: response, es_response: searched_result["data"]})
+    #ImageUploadJob.perform_now(file.path, {response: response.except("total_time_consumed"), es_response: searched_result["data"], response_time: searched_result['total_time_consumed']})
+    ImageUploadJob.perform_later(data, {response: response.except("total_time_consumed"), es_response: searched_result["data"], response_time: searched_result['total_time_consumed']})
 
     render json: searched_result
   end
@@ -42,14 +41,11 @@ class Api::SnapsController < Api::BaseController
       response["data"] = {"records" => [], "message" => "No records found"}
       response["success"] = false
       response["api_data"] = []
+      response["total_time_consumed"] = searched_images["total_time_consumed"]
       case searched_images["type"]
         when CudaSift::RESPONSE_CODES[:SEARCH_RESULTS]
           response["success"] = true
           get_similar_images(searched_images["image_ids"], response)
-          results = TrainingRecord.where(identifier: searched_images["image_ids"])
-          results.each do |img|
-            response["api_data"] << {"image_id" => img.identifier, "image_url" => img.image_url}
-          end
         when CudaSift::RESPONSE_CODES[:IMAGE_NOT_DECODED]
           response["data"]["message"] = "Invalid image data"
         when CudaSift::RESPONSE_CODES[:IMAGE_SIZE_TOO_BIG]
@@ -66,7 +62,10 @@ class Api::SnapsController < Api::BaseController
         image_ids.uniq!
         #send these image_ids to elastic search to get recommended result and send list to API
         image_ids.each do |img|
+          start_time = Time.now
           searched_data = BarnesElasticSearch.instance.get_object(img)
+          time_diff = Time.now - start_time
+          response['total_time_consumed']['es_endpoint'] = Time.at(time_diff.to_i.abs).utc.strftime "%H:%M:%S"
           if preferred_language.present?
             translator = GoogleTranslate.new preferred_language
             #as of now I am sending translated version of title as shortdescription is coming null from elastic search
