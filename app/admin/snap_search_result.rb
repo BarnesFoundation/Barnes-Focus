@@ -7,7 +7,11 @@ ActiveAdmin.register SnapSearchResult do
     selectable_column
     id_column
     column "Clicked Snap" do |obj|
-      image_tag obj.searched_image_url, class: 'pastec_image_size'
+      unless obj.searched_image_url.blank?
+        image_tag obj.searched_image_url, class: 'pastec_image_size'
+      else
+        image_tag obj.searched_image_data, class: 'pastec_image_size'
+      end
     end
     column "Images from Training Module" do |obj|
       table do
@@ -34,6 +38,7 @@ ActiveAdmin.register SnapSearchResult do
     end
     column :api_response
     column :es_response
+    column :response_time
     column :created_at
   end
 
