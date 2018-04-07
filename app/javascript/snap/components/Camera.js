@@ -6,7 +6,7 @@ import axios from 'axios';
 import axiosTiming from 'axios-timing'
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
-import { SNAP_LANGUAGE_PREFERENCE } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
 
 
 axiosTiming(axios, console.log);
@@ -18,7 +18,8 @@ class Camera extends Component {
         frontCamera: false,
         capturedImage: null,
         showVideo: true,
-        searchInProgress: false
+        searchInProgress: false,
+        snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
     };
 
 
@@ -76,6 +77,7 @@ class Camera extends Component {
     submitPhoto = () => {
         this.toggleImage(false);
         this.setState({ searchInProgress: true });
+        localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
         var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
         axios.post('/api/snaps/search', {
             image_data: this.state.capturedImage,
@@ -90,7 +92,8 @@ class Camera extends Component {
                 this.props.history.push({
                     pathname: '/results',
                     state: {
-                        result: res
+                        result: res,
+                        snapCount: localStorage.getItem(SNAP_ATTEMPTS)
                     }
                 });
             }
