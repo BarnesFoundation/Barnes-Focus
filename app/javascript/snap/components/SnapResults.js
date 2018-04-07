@@ -5,6 +5,7 @@ import LanguageSelect from '../components/LanguageSelect';
 import share from 'images/share_icon.svg';
 import bookmark from 'images/bookmark_icon.svg';
 import icon_camera from 'images/camera_icon.svg';
+import team_picture from 'images/team-alert.jpg';
 import Modal from 'react-modal';
 import Footer from './Footer';
 import Popover from 'react-simple-popover';
@@ -13,13 +14,17 @@ import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL
 
 
 const customStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)'
+  },
   content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
     bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)'
+    margin: '8vw'
   }
 };
 
@@ -32,10 +37,11 @@ class SnapResults extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ...props.location.state,
+      ...props.location.state,  // these properties are passed on from Camera component.
       resetModalIsOpen: false,
       bookmarkModalIsOpen: false,
       sharePopoverIsOpen: false,
+      alertModalIsOpen: false,
       searchResults: [],
       email: localStorage.getItem(SNAP_USER_EMAIL) || '',
       newsletterSubscription: false,
@@ -72,7 +78,12 @@ class SnapResults extends Component {
     } else {
       this.setState({ error: "No records found!" });
     }
+    if (parseInt(this.state.snapCount) === 4) {
+      this.state.alertModalIsOpen = true;
+    }
+
   }
+
 
   _addNotification = ({ success, message }) => {
     event.preventDefault();
@@ -224,6 +235,10 @@ class SnapResults extends Component {
     this.setState({ resetModalIsOpen: false });
   }
 
+  closeAlertModal = () => {
+    this.setState({ alertModalIsOpen: false });
+  }
+
   handleBookmarkFormInputChange = (event) => {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -271,34 +286,10 @@ class SnapResults extends Component {
                         <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
                       </a>
                       {/* <a data-id={SOCIAL_MEDIA_INSTAGRAM} onClick={this.nativeAppShareWithWebFallback}>
-                                                <i class="fa fa-instagram" aria-hidden="true"></i>
-                                            </a> */}
+                            <i class="fa fa-instagram" aria-hidden="true"></i>
+                          </a> */}
                     </div>
                   </Popover>
-                  {/* <Modal
-                                        isOpen={this.state.sharePopoverIsOpen}
-                                        onRequestClose={this.closeShareModal}
-                                        contentLabel="Share Modal"
-                                        style={customStyles}
-                                    >
-                                        <div className="share">
-                                            <p>
-                                                <a id="btn-twitter" className="btn btn-block btn-social btn-twitter" data-id={SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
-                                                    <span className="fa fa-twitter"></span>Twitter
-                                                </a>
-                                            </p>
-                                            <p>
-                                                <a className="btn  btn-block btn-social btn-facebook" data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
-                                                    <span className="fa fa-facebook"></span>Facebook
-                                                </a>
-                                            </p>
-                                            <p>
-                                                <a className="btn  btn-block btn-social btn-google" data-id={SOCIAL_MEDIA_GOOGLE} onClick={this.nativeAppShareWithWebFallback}>
-                                                    <span className="fa fa-google"></span>Google
-                                                </a>
-                                            </p>
-                                        </div>
-                                    </Modal> */}
                   <div onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</div>
                   <Modal
                     isOpen={this.state.bookmarkModalIsOpen}
@@ -396,6 +387,27 @@ class SnapResults extends Component {
 
         <Footer />
         <NotificationSystem ref="notificationSystem" />
+        <Modal
+          isOpen={this.state.alertModalIsOpen}
+          onRequestClose={this.closeAlertModal}
+          contentLabel="Snap Team Alert Modal"
+          style={customStyles}
+          className="Modal"
+          overlayClassName="Overlay"
+        >
+          <div className="team-alert">
+            <button type="button" className="close pull-right offset-11" aria-label="Close" onClick={this.closeAlertModal}>
+              <i className="fa fa-times" aria-hidden="true"></i>
+            </button>
+            <div className="picture">
+              <img className="img-thumbnail" src={team_picture} alt="bookmark_img" />
+            </div>
+            <div className="message">
+              <h1>Want to know even more?</h1>
+              <p>Find a member of our Art team and start a conversation about any work that interests you. Our Art Team is wearing special black T-shirts.</p>
+            </div>
+          </div>
+        </Modal>
       </div>
     );
   }
