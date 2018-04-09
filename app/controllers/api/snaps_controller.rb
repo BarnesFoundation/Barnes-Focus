@@ -25,11 +25,16 @@ class Api::SnapsController < Api::BaseController
 
     searched_result = process_searched_images_response(response)
 
-    blob = Upload.create(blob: data)
     File.delete(file.path)
     overall_processing = Time.at((Time.now - start_time).to_i.abs).utc.strftime "%H:%M:%S"
     searched_result['total_time_consumed']['overall_processing'] = overall_processing if searched_result['total_time_consumed'].present?
-    ImageUploadJob.perform_later(blob.id, {response: response.except("total_time_consumed"), es_response: searched_result["data"], response_time: searched_result['total_time_consumed']})
+    r = SnapSearchResult.create(
+      searched_image_data: data,
+      api_response: response.except("total_time_consumed"),
+      es_response: searched_result["data"],
+      response_time: searched_result['total_time_consumed']
+    )
+    ImageUploadJob.perform_later(r.id)
 
     render json: searched_result
   end
