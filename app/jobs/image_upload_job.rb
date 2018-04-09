@@ -1,7 +1,7 @@
 require 's3_store'
 
 class ImageUploadJob < ApplicationJob
-  queue_as :default
+  queue_as :image_processing_queue
 
   def perform(*args)
     # Save to S3
