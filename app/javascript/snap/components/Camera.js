@@ -194,7 +194,7 @@ class Camera extends Component {
                             <div className="video-frame"></div>
                         </div>
                     }
-                    <img ref={img => this.img = img} width="100%" height="100%" />
+                    <img ref={img => this.img = img} />
 
                     {/* ========= Search in progress screen ============ */}
                     {
