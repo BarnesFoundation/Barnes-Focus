@@ -81,8 +81,9 @@ class Api::SnapsController < Api::BaseController
             #searched_data["title"] = translator.translate(searched_data["title"]) # as per SV-39 there is no need to translate title
             searched_data["shortDescription"] = translator.translate(strip_tags(searched_data["shortDescription"])) if searched_data["shortDescription"]
           end
+          searched_data['art_url'] = Image.imgix_url(searched_data['id'], searched_data['imageSecret']) # for s3 use ~> Image.s3_url(searched_data['id'], searched_data['imageSecret'])
           response["data"]["records"] << searched_data.slice(
-            'id', 'imageSecret', 'title', 'shortDescription', 'artist', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate'
+            'id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate', 'art_url'
           )
         end
       end
