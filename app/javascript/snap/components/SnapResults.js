@@ -10,7 +10,7 @@ import Modal from 'react-modal';
 import Footer from './Footer';
 import Popover from 'react-simple-popover';
 import NotificationSystem from 'react-notification-system';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS } from './Constants';
 
 
 const customStyles = {
@@ -230,6 +230,8 @@ class SnapResults extends Component {
 
   resetExperience = () => {
     localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
+    localStorage.removeItem(SNAP_USER_EMAIL);
+    localStorage.removeItem(SNAP_ATTEMPTS);
     this.setState({ resetModalIsOpen: false });
   }
 
