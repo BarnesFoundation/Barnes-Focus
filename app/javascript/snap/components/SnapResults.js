@@ -58,7 +58,6 @@ class SnapResults extends Component {
       if (search_result["data"]["records"].length > 0) {
         const result = {};
         const art_obj = search_result["data"]["records"][0];
-        const art_url = "https://barnes-image-repository.s3.amazonaws.com/images/" + art_obj['id'] + "_" + art_obj['imageSecret'] + "_n.jpg";
         result['id'] = art_obj.id;
         result['title'] = art_obj.title;
         result['shortDescription'] = art_obj.shortDescription;
@@ -66,10 +65,9 @@ class SnapResults extends Component {
         result['classification'] = art_obj.classification;
         result['locations'] = art_obj.locations;
         result['medium'] = art_obj.medium;
-        result['url'] = art_url
+        result['url'] = art_obj.art_url
         result['invno'] = art_obj.invno;
         result['displayDate'] = art_obj.displayDate;
-        result['shortDescription'] = art_obj.shortDescription;
         this.setState({
           searchResults: this.state.searchResults.concat(result)
         });
