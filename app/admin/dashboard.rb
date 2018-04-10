@@ -13,6 +13,7 @@ ActiveAdmin.register_page "Dashboard" do
               th '#'
               th 'Searched Image'
               th 'ES Images'
+              th 'Imgix Image'
               th 'API Response'
               th 'Elastic Search Result'
               th 'Response Time'
@@ -32,7 +33,19 @@ ActiveAdmin.register_page "Dashboard" do
                     img.es_response["records"].each do |es_image|
                       tr do
                         td do
-                          image_tag "https://barnes-image-repository.s3.amazonaws.com/images/" + es_image['id'].to_s + "_" + es_image['imageSecret'] + "_n.jpg", class: 'es_image_size'
+                          image_tag Image.s3_url(es_image['id'], es_image['imageSecret']), class: 'es_image_size'
+                        end
+                      end
+                    end if img.es_response["records"].present?
+                  end
+                end
+
+                td do
+                  table do
+                    img.es_response["records"].each do |es_image|
+                      tr do
+                        td do
+                          image_tag Image.imgix_url(es_image['id'], es_image['imageSecret']), class: 'es_image_size'
                         end
                       end
                     end if img.es_response["records"].present?
