@@ -120,34 +120,37 @@ class Camera extends Component {
             .catch(err => this.setState({ error: "Error accessing device camera." }));
 
         const el = document.querySelector('.camera-container');
-        const mc = new Hammer.Manager(el, { drag_lock_to_axis: true, preventDefault: true });
+        const mc = new Hammer.Manager(el, { preventDefault: true });
         mc.add(new Hammer.Pinch({ threshold: 0 }));
         mc.on("pinchin pinchout", (e) => {
 
-            const track = this.state.videoStream.getVideoTracks()[0];
-            const camera_capabilities = track.getCapabilities();
-            const camera_settings = track.getSettings();
+            e.preventDefault();
+            let track = this.state.videoStream.getVideoTracks()[0];
+            let camera_capabilities = track.getCapabilities();
+            let camera_settings = track.getSettings();
 
-            const current_zoom = camera_settings.zoom;
+            let current_zoom = camera_settings.zoom;
+
             let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
             zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
-
             // if device supports zoom
             if ('zoom' in camera_capabilities && zoomLevel >= camera_capabilities.zoom.min && zoomLevel <= camera_capabilities.zoom.max) {
                 track.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
             } else {
                 console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
             }
+
         });
 
-        mc.on("swipe drag", function (event) {
-            if (event.gesture.direction == Hammer.DIRECTION_UP || event.gesture.direction == Hammer.DIRECTION_DOWN) {
-                event.gesture.preventDefault();
-            }
-        });
+        // mc.on("swipe drag", function (event) {
+        //     if (event.gesture.direction == Hammer.DIRECTION_UP || event.gesture.direction == Hammer.DIRECTION_DOWN) {
+        //         event.gesture.preventDefault();
+        //     }
+        // });
     }
 
     componentDidUpdate() {
+
         if (this.state.showVideo) {
             console.log('componentDidUpdate : Camera');
             this.video.srcObject = this.state.videoStream;

@@ -8,6 +8,7 @@
 
 html, body {
     height:100%;
+    width:100%;
     font-size: 1rem !important;
     font-family: 'Calibre-Regular', sans-serif;
     font-weight: 400;
@@ -16,6 +17,10 @@ html, body {
     font-feature-settings:"kern";
     text-rendering:optimizeLegibility;
     font-variant-ligatures:common-ligatures;
+    position: fixed;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    overflow-y:scroll;
 }
 
 h1 {
@@ -332,6 +337,19 @@ input[type=email].error {
         
     }
 }
+
+// @media screen and (min-width: 320px) and (max-width: 1024px) and (orientation: landscape) {
+//     html {
+//       transform: rotate(-90deg);
+//       transform-origin: left top;
+//       width: 100vh;
+//       overflow-x: hidden;
+//       position: absolute;
+//       top: 100%;
+//       left: 0;
+//     }
+//   }
+  
 
 /* iPads (landscape) ----------- */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
