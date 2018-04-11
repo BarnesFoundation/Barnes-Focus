@@ -262,9 +262,11 @@ class SnapResults extends Component {
         <div className="row">
           <div className="col-12 col-md-12">
             <div className="card">
-              <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image" />
-              <div className="card-img-overlay">
-                <h5 className="card-title">{this.state.searchResults[0].title}</h5>
+              <div className="card-top-container">
+                <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image" />
+                <div className="card-img-overlay">
+                  <h3 className="card-title">{this.state.searchResults[0].title}</h3>
+                </div>
               </div>
               <Link type="button" className="btn btn-circle" to="/snap">
                 <img src={icon_camera} className="profile-avatar" alt="camera" />

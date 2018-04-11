@@ -170,9 +170,15 @@ p {
 
         .picture {
             margin-top: 2vh;
+            width: 100%;
+            height:25vh;
+            overflow: hidden;
             img {
                 width: 100%;
-                height: 25vh;
+                position: relative;
+                max-width: 100%;
+                transform: translateY(-50%);
+                top: 50%;
             }
         }
     
@@ -198,6 +204,11 @@ p {
     }
 
     .team-alert {
+
+        h1 {
+            line-height: 1;
+            margin-top: 1rem;
+        }
 
         .picture {
             margin-top: 2vh;
@@ -275,11 +286,7 @@ input[type=email].error {
     .Modal {
         .bookmark {
             .picture {
-                margin-top: 2vh;
-                img {
-                    width: 100%;
-                    height: 22vh;
-                }
+                height:22vh;
             }
         
             .message {
