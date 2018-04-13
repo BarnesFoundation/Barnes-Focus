@@ -1,5 +1,3 @@
-require 'barnes_elastic_search'
-
 class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
 
@@ -66,33 +64,17 @@ class Api::SnapsController < Api::BaseController
     end
 
     def get_similar_images image_ids, response
-      image_ids = ["6893"]
       if image_ids.present?
         response["data"]["message"] = 'Result Found'
         image_ids.uniq!
-        #send these image_ids to elastic search to get recommended result and send list to API
         image_ids.each do |img|
           start_time = Time.now
 
-          es_cached_record = EsCachedRecord.find_or_create_by image_id: img
-
-          if es_cached_record.not_expired?
-            searched_data = es_cached_record.es_data
-          else            
-            searched_data = BarnesElasticSearch.instance.get_object(img)
-            searched_data = searched_data.slice(
-              'id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate'
-            )
-            es_cached_record.es_data = searched_data
-            es_cached_record.last_es_fetched_at = DateTime.now
-            es_cached_record.save
-          end
-          
+          searched_data = EsCachedRecord.search(img)
           if preferred_language.present?
             translator = GoogleTranslate.new preferred_language
             searched_data['shortDescription'] = translator.translate(strip_tags(searched_data["shortDescription"])) if searched_data["shortDescription"]
           end
-          searched_data['art_url'] = Image.imgix_url(searched_data['id'], searched_data['imageSecret']) # for s3 use ~> Image.s3_url(searched_data['id'], searched_data['imageSecret'])
           time_diff = Time.now - start_time
           response['total_time_consumed']['es_endpoint'] = Time.at(time_diff.to_i.abs).utc.strftime "%H:%M:%S"
           response["data"]["records"] << searched_data
