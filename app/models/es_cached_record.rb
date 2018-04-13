@@ -21,10 +21,7 @@ class EsCachedRecord < ApplicationRecord
     es_cached_record = new(image_id: img_id) if es_cached_record.nil?
 
     if es_cached_record.new_record? || es_cached_record.es_data.blank?
-      searched_data = BarnesElasticSearch.instance.get_object(img_id)
-      searched_data = searched_data.slice(
-        'id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate'
-      )
+      searched_data = connect_with_es_endpoint(img_id)
       es_cached_record.es_data = searched_data
       es_cached_record.last_es_fetched_at = DateTime.now
       es_cached_record.save
@@ -33,6 +30,14 @@ class EsCachedRecord < ApplicationRecord
     end
     searched_data['art_url'] = Image.imgix_url(searched_data['id'], searched_data['imageSecret']) unless searched_data.nil? # for s3 use ~> Image.s3_url(searched_data['id'], searched_data['imageSecret'])
 
+    searched_data
+  end
+
+  def self.connect_with_es_endpoint image_id
+    searched_data = BarnesElasticSearch.instance.get_object(image_id)
+    searched_data = searched_data.slice(
+      'id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate'
+    )
     searched_data
   end
 end
