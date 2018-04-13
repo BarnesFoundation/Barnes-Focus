@@ -1,5 +1,3 @@
-require 'barnes_elastic_search'
-
 class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
 
@@ -69,22 +67,17 @@ class Api::SnapsController < Api::BaseController
       if image_ids.present?
         response["data"]["message"] = 'Result Found'
         image_ids.uniq!
-        #send these image_ids to elastic search to get recommended result and send list to API
         image_ids.each do |img|
           start_time = Time.now
-          searched_data = BarnesElasticSearch.instance.get_object(img)
-          time_diff = Time.now - start_time
-          response['total_time_consumed']['es_endpoint'] = Time.at(time_diff.to_i.abs).utc.strftime "%H:%M:%S"
+
+          searched_data = EsCachedRecord.search(img)
           if preferred_language.present?
             translator = GoogleTranslate.new preferred_language
-            #as of now I am sending translated version of title as shortdescription is coming null from elastic search
-            #searched_data["title"] = translator.translate(searched_data["title"]) # as per SV-39 there is no need to translate title
-            searched_data["shortDescription"] = translator.translate(strip_tags(searched_data["shortDescription"]).html_safe) if searched_data["shortDescription"]
+            searched_data['shortDescription'] = translator.translate(strip_tags(searched_data["shortDescription"]).html_safe) if searched_data["shortDescription"]
           end
-          searched_data['art_url'] = Image.imgix_url(searched_data['id'], searched_data['imageSecret']) # for s3 use ~> Image.s3_url(searched_data['id'], searched_data['imageSecret'])
-          response["data"]["records"] << searched_data.slice(
-            'id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate', 'art_url'
-          )
+          time_diff = Time.now - start_time
+          response['total_time_consumed']['es_endpoint'] = Time.at(time_diff.to_i.abs).utc.strftime "%H:%M:%S"
+          response["data"]["records"] << searched_data
         end
       end
       response
