@@ -22,3 +22,7 @@
 every 3.hours do
   rake "bookmarks:compose"
 end
+
+every 1.day, at: '5:00 am' do
+  rake "update_es_cache:perform"
+end
