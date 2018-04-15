@@ -1,2 +1,0 @@
-class Upload < ApplicationRecord
-end
