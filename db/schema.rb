@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180409182521) do
+ActiveRecord::Schema.define(version: 20180411131245) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,6 +60,16 @@ ActiveRecord::Schema.define(version: 20180409182521) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
+  create_table "es_cached_records", force: :cascade do |t|
+    t.string "image_id", null: false
+    t.text "es_data"
+    t.datetime "last_es_fetched_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["image_id"], name: "index_es_cached_records_on_image_id"
+    t.index ["last_es_fetched_at"], name: "index_es_cached_records_on_last_es_fetched_at"
+  end
+
   create_table "snap_search_results", force: :cascade do |t|
     t.string "searched_image_url"
     t.text "api_response"
@@ -91,12 +101,6 @@ ActiveRecord::Schema.define(version: 20180409182521) do
     t.datetime "updated_at", null: false
     t.index ["aasm_state"], name: "index_training_records_on_aasm_state"
     t.index ["identifier"], name: "index_training_records_on_identifier", unique: true
-  end
-
-  create_table "uploads", force: :cascade do |t|
-    t.text "blob"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
 end

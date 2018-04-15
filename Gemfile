@@ -23,6 +23,7 @@ gem 'active_elastic_job'
 gem 'elasticsearch'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
+gem "daemons"
 gem 'activeadmin'
 gem 'devise'
 gem 'ffi', '1.9.18'
