@@ -179,7 +179,7 @@ class Camera extends Component {
 
         });
 
-        let properties = ['transform', 'webkitTransform', 'MozTransform', 'msTransform', 'OTransform'];
+        let properties = ['transform', 'WebkitTransform', 'MozTransform', 'msTransform', 'OTransform'];
         this.prop = properties[1];
         for (let i = 0; i < properties.length; i++) {
             if (typeof this.video.style[properties[i]] !== 'undefined') {
