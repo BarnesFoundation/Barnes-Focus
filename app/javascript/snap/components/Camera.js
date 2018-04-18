@@ -13,17 +13,30 @@ import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
 
 class Camera extends Component {
 
-    state = {
-        videoStream: null,
-        frontCamera: false,
-        capturedImage: null,
-        showVideo: true,
-        searchInProgress: false,
-        snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
-    };
+    constructor(props) {
+        super(props);
 
-    ticking = false; prop;
-    track; camera_capabilities; camera_settings; initZoom; zoomLevel;
+        this.state = {
+            ...props.location.state,  //{image, captureDone} passed from welcome page for iOS/ Safari.
+            videoStream: null,
+            frontCamera: false,
+            capturedImage: null,
+            showVideo: true,
+            searchInProgress: false,
+            snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
+        };
+
+        this.ticking = false;
+        this.prop;
+        this.track;
+        this.camera_capabilities;
+        this.camera_settings;
+        this.initZoom;
+        this.zoomLevel;
+
+        console.log('Capture Done :: ' + this.state.captureDone);
+        console.log(this.state.image);
+    }
 
     // switchCamera() {
     //     this.setState({ frontCamera: !this.state.frontCamera });
@@ -41,12 +54,16 @@ class Camera extends Component {
         }
     }
 
-    takePhoto = () => {
+    takePhoto = (e) => {
         setTimeout(() => {
-            const image = this.capturePhoto();
-            this.img.src = image;
-            this.setState({ capturedImage: image, showVideo: false });
-            this.toggleImage(true);
+            let file = e.target.files[0];
+            let fileReader = new FileReader();
+            fileReader.onloadend = (ev) => {
+                this.img.src = ev.target.result;
+                this.setState({ capturedImage: ev.target.result, showVideo: false });
+                this.toggleImage(true);
+            }
+            fileReader.readAsDataURL(file);
         }, 200);
     }
 

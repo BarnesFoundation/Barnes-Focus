@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 import LanguageSelect from '../components/LanguageSelect';
 import Hammer from 'hammerjs';
@@ -18,6 +19,8 @@ import img9 from 'images/wifi-img3.jpg';
 import photo_prompt from 'images/photo-prompt.jpg';
 import icon_camera from 'images/camera_icon.svg';
 import axios from 'axios';
+
+import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 class WelcomeComponent extends Component {
 
@@ -45,6 +48,10 @@ class WelcomeComponent extends Component {
     };
 
     componentDidMount() {
+
+        console.log('isAndroid = ' + isAndroid);
+        console.log('isChrome = ' + isChrome);
+        console.log('isFirefox = ' + isFirefox);
 
         this.checkIndex();
 
@@ -84,6 +91,29 @@ class WelcomeComponent extends Component {
         $('#snapCarousel').on('slid.bs.carousel', () => {
             this.checkIndex();
         })
+    }
+
+    takePhoto = (e) => {
+        e.persist();
+        setTimeout(() => {
+            let file = e.target.files[0];
+            let fileReader = new FileReader();
+            fileReader.onloadend = (ev) => {
+                console.log('Base64 image data has been captured!');
+                //console.log(ev.target.result);
+                //this.img.src = ev.target.result;
+                this.setState({ capturedImage: ev.target.result, showVideo: false });
+
+                this.props.history.push({
+                    pathname: '/snap',
+                    state: {
+                        image: ev.target.result,
+                        captureDone: true
+                    }
+                });
+            }
+            fileReader.readAsDataURL(file);
+        }, 200);
     }
 
     render() {
@@ -167,12 +197,42 @@ class WelcomeComponent extends Component {
                                 <h1>Take a photo to learn more about a work of art.</h1>
                             </div>
 
-                            <Link className="btn take-photo-btn" to="/snap">
-                                Take Photo
+                            {
+                                (isIOS && isSafari) &&
+                                <label className="btn take-photo-btn">
+                                    <input id="capture-option" type="file" accept="image/*" capture="environment" onChange={this.takePhoto} />
+                                    Take Photo
+                                     <span className="icon">
+                                        <img src={icon_camera} alt="camera_icon" />
+                                    </span>
+                                </label>
+
+                            }
+
+                            {
+                                (isAndroid && isChrome) &&
+                                <label className="btn take-photo-btn">
+                                    <input id="capture-option" type="file" accept="image/*" capture="environment" onChange={this.takePhoto} />
+                                    Take Photo
+                                     <span className="icon">
+                                        <img src={icon_camera} alt="camera_icon" />
+                                    </span>
+                                </label>
+
+                            }
+
+                            {
+                                (isAndroid && !isChrome) &&
+                                <p> You are using Chrome on Android</p> &&
+                                <Link className="btn take-photo-btn" to="/snap">
+                                    Take Photo
                                 <span className="icon">
-                                    <img src={icon_camera} alt="camera_icon" />
-                                </span>
-                            </Link>
+                                        <img src={icon_camera} alt="camera_icon" />
+                                    </span>
+                                </Link>
+                            }
+
+
                         </div>
 
                     </div>
