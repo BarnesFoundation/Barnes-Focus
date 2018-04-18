@@ -29,6 +29,9 @@ gem 'devise'
 gem 'ffi', '1.9.18'
 gem 'google-cloud-translate'
 gem 'whenever', require: false
+gem 'silverpop'
+gem 'mandrill-api'
+gem 'oauth2'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
