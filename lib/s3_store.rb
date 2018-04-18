@@ -1,4 +1,4 @@
-require 'aws-sdk-s3'
+require 'aws-sdk'
 
 class S3Store
   def initialize file

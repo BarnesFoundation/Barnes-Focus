@@ -3,8 +3,13 @@ import { withRouter } from 'react-router-dom';
 import Hammer from 'hammerjs';
 import CameraControls from './CameraControls';
 import axios from 'axios';
+import axiosTiming from 'axios-timing'
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
+
+
+//axiosTiming(axios, console.log);
 
 class Camera extends Component {
 
@@ -13,10 +18,12 @@ class Camera extends Component {
         frontCamera: false,
         capturedImage: null,
         showVideo: true,
-        searchInProgress: false
+        searchInProgress: false,
+        snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
     };
 
-
+    ticking = false; prop;
+    track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
     // switchCamera() {
     //     this.setState({ frontCamera: !this.state.frontCamera });
@@ -35,24 +42,40 @@ class Camera extends Component {
     }
 
     takePhoto = () => {
-        const image = this.capturePhoto();
-        this.img.src = image;
-        this.setState({ capturedImage: image, showVideo: false });
-        this.toggleImage(true);
+        setTimeout(() => {
+            const image = this.capturePhoto();
+            this.img.src = image;
+            this.setState({ capturedImage: image, showVideo: false });
+            this.toggleImage(true);
+        }, 200);
     }
 
     capturePhoto = () => {
         console.log('capture photo clicked!');
-        var canvas = this.getCanvas();
+        let canvas = this.getCanvas();
         const context = canvas.getContext("2d");
-        console.log('canvas.width, canvas.height', canvas.width, canvas.height);
-        context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+
+        //console.log(rect);
+        //console.log('x, y', Math.floor(x) + ', ' + Math.floor(y));
+        //console.log('canvas.width, canvas.height', canvas.width, canvas.height);
+        if (!this.camera_capabilities) {
+            let rect = this.video.getBoundingClientRect();
+            let x = (rect.x < 0) ? -(rect.x) : rect.x;
+            let y = (rect.y < 0) ? -(rect.y) : rect.y;
+            if (x > 0 && y > 0) {
+                context.drawImage(this.video, Math.floor(x), Math.floor(y), canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+            } else {
+                context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+            }
+        } else {
+            context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+        }
+
         const image = canvas.toDataURL('image/jpeg', 1.0);
         return image;
     }
 
     clearPhoto = (ev) => {
-        //ev.preventDefault();
         console.log('Clear taken photo');
         this.toggleImage(false);
         this.setState((prevState, props) => {
@@ -64,12 +87,18 @@ class Camera extends Component {
                 error: ''
             };
         });
+
+        setTimeout(() => {
+            this.video.style['transform'] = 'none;';
+            this.zoomLevel = 1;
+        }, 0);
     }
 
     submitPhoto = () => {
         this.toggleImage(false);
         this.setState({ searchInProgress: true });
-        var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
+        localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+        var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
         axios.post('/api/snaps/search', {
             image_data: this.state.capturedImage,
             language: prefLang
@@ -83,7 +112,8 @@ class Camera extends Component {
                 this.props.history.push({
                     pathname: '/results',
                     state: {
-                        result: res
+                        result: res,
+                        snapCount: localStorage.getItem(SNAP_ATTEMPTS)
                     }
                 });
             }
@@ -93,6 +123,23 @@ class Camera extends Component {
                 this.setState({ searchInProgress: false });
                 this.props.history.push({ pathname: '/not-found' });
             });
+    }
+
+    updateZoom = () => {
+        if ('zoom' in this.camera_capabilities) {
+            this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+        }
+        else {
+            console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
+        }
+        this.ticking = false;
+    }
+
+    requestZoom = () => {
+        if (!this.ticking) {
+            requestAnimationFrame(this.updateZoom);
+            this.ticking = true;
+        }
     }
 
     componentDidMount() {
@@ -109,39 +156,50 @@ class Camera extends Component {
             .catch(err => this.setState({ error: "Error accessing device camera." }));
 
         const el = document.querySelector('.camera-container');
-        const mc = new Hammer.Manager(el, { drag_lock_to_axis: true, preventDefault: true });
+        const mc = new Hammer.Manager(el, { preventDefault: true });
         mc.add(new Hammer.Pinch({ threshold: 0 }));
-        mc.on("pinchin pinchout", (e) => {
+        mc.on("pinchstart pinchin pinchout", (e) => {
 
-            const track = this.state.videoStream.getVideoTracks()[0];
-            const camera_capabilities = track.getCapabilities();
-            const camera_settings = track.getSettings();
-
-            const current_zoom = camera_settings.zoom;
-            let zoomLevel = (e.type === 'pinchout') ? Math.floor(current_zoom + e.scale) : Math.floor(current_zoom - e.scale);
-            zoomLevel = (zoomLevel <= 0) ? 1 : zoomLevel;
-
-            // if device supports zoom
-            if ('zoom' in camera_capabilities && zoomLevel >= camera_capabilities.zoom.min && zoomLevel <= camera_capabilities.zoom.max) {
-                track.applyConstraints({ advanced: [{ zoom: zoomLevel }] });
+            //alert('received pinch event');
+            if (e.type == 'pinchstart') {
+                this.initZoom = this.zoomLevel || 1;
+            }
+            //console.log('e.scale ' + e.scale);
+            this.zoomLevel = (this.initZoom * e.scale).toFixed(1);
+            this.zoomLevel = (this.zoomLevel < 1) ? 1 : this.zoomLevel;
+            //If zoom not supported by browser, fallback to scale transform
+            if (!this.camera_capabilities) {
+                //alert('zoom not supported, fallback to scale transform!');
+                this.video.style[this.prop] = 'scale(' + this.zoomLevel + ')';
             } else {
-                console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
+                if (this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
+                    this.requestZoom();
+                }
             }
+
         });
 
-        mc.on("swipe drag", function (event) {
-            if (event.gesture.direction == Hammer.DIRECTION_UP || event.gesture.direction == Hammer.DIRECTION_DOWN) {
-                event.gesture.preventDefault();
+        let properties = ['transform', 'WebkitTransform', 'MozTransform', 'msTransform', 'OTransform'];
+        this.prop = properties[1];
+        for (let i = 0; i < properties.length; i++) {
+            if (typeof this.video.style[properties[i]] !== 'undefined') {
+                this.prop = properties[i];
+                break;
             }
-        });
+        }
+        //alert('this.prop = ' + this.prop);
     }
 
     componentDidUpdate() {
+
         if (this.state.showVideo) {
             console.log('componentDidUpdate : Camera');
             this.video.srcObject = this.state.videoStream;
             this.video.play().then(() => {
                 console.log('Camera is up and running!');
+                this.track = this.state.videoStream.getVideoTracks()[0];
+                this.camera_capabilities = this.track.getCapabilities();
+                this.camera_settings = this.track.getSettings();
             }).catch((error) => {
                 console.log('Not allowed to access camera. Please check settings!');
             });
@@ -161,7 +219,7 @@ class Camera extends Component {
             const aspectRatio = video.videoWidth / video.videoHeight;
 
             canvas.width = video.clientWidth;
-            canvas.height = video.clientWidth;
+            canvas.height = video.clientWidth / aspectRatio;
 
             this.canvas = canvas;
             this.ctx = canvas.getContext('2d');
@@ -183,7 +241,7 @@ class Camera extends Component {
                             <div className="video-frame"></div>
                         </div>
                     }
-                    <img ref={img => this.img = img} width="100%" height="100%" />
+                    <img ref={img => this.img = img} />
 
                     {/* ========= Search in progress screen ============ */}
                     {

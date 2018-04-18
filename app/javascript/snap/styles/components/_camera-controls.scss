@@ -1,25 +1,8 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700');
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-
-*{
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+.camera-container {
+    position: fixed;
+    width: 100%;
+    top: 0;
 }
-
-html{
-    background-color: #fff;
-    font:normal 16px/1.5 sans-serif;
-    color: #333;
-}
-
-h3{
-    font: normal 32px/1.5 'Open Sans', sans-serif;
-    color: #2c3e50;
-    margin: 50px 0;
-    text-align: center;
-}
-
 
 .camera{
     width: 100%;
@@ -71,7 +54,7 @@ h3{
             left:10vw;
             top:7vh;
             color: #fff;
-            font-size: 22px;
+            font-size: 1.45rem;
         }
 
         .control-right {
@@ -79,7 +62,7 @@ h3{
             right:10vw;
             top:7vh;
             color: #fff;
-            font-size: 22px;
+            font-size: 1.45rem;
         }
 
         .camera-shutter{
@@ -92,6 +75,7 @@ h3{
             .round-button-circle {
                 width: 100%;
                 height:100%;
+                margin: 0 auto;
                 border-radius: 50%;
                 border:10px solid #fff;
                 overflow:hidden;
@@ -106,6 +90,7 @@ h3{
             }
 
             span {
+                font-size: 1.2rem;
                 color: #EAC759;
             }
           }
@@ -146,42 +131,76 @@ h3{
     padding: 30px;
 }
 
+/* iPhone 6S and below. Smaller Devices (Portrait) */
+@media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
+/* Styles */    
+    .camera-shutter{
+        .round-button-circle {
+            width: 90% !important;
+            height:90% !important;
+        }
 
-// @media(max-width: 1000px){
-//     .container{
-//         margin: 40px;
-//     }
+        span {
+            font-size: 1rem !important;
+        }
+    }
 
-//     .camera #start-camera.visible{
-//         display: block;
-//     }
+    .camera{
+        height: 70vh !important;
+    }
+    .camera-controls {
+        min-height: 30vh !important;
+    }
+        
+}
 
-//     .camera .controls a i{
-//         font-size: 16px;
-//     }
+/* iPhone X */
+@media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) { 
+    .camera{
+        height: 68vh !important;
+    } 
+    .camera-controls {
+        min-height: 32vh !important;
+    }
+    
+}
+/* iPhone 8 Plus */
+@media only screen and (device-width : 414px) and (device-height : 736px) and (-webkit-device-pixel-ratio : 3) { 
+    .camera{
+        height: 70vh !important;
+    } 
+    .camera-controls {
+        min-height: 30vh !important;
+    }
+}
+/* iPhone 8  */
+@media only screen  and (device-width : 375px) and (device-height : 667px) and (-webkit-device-pixel-ratio : 2) {
+    .camera{
+        height: 70vh !important;
+    }
+    .camera-controls {
+        min-height: 30vh !important;
+    }
+}
 
-//     .camera .controls #take-photo i{
-//         font-size: 24px;
-//     }
-// }
+/* iPads (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+/* Styles */
+    .control-left, .control-right {
+        top:8vh !important;
+        font-size: 2rem !important;
+    }
 
+    .camera-shutter{
+        .round-button-circle {
+            width: 80% !important;
+            height:80% !important;
+        }
 
-// @media(max-width: 600px){
-//     .container{
-//         margin: 10px;
-//     }
+        span {
+            font-size: 1.5rem !important;
+        }
+    }
+}
 
-//     .camera #error-message{
-//         padding: 80px 50px;
-//         font-size: 18px;
-//     }
-
-//     .camera .controls a i{
-//         font-size: 12px;
-//     }
-
-//     .camera .controls #take-photo i{
-//         font-size: 18px;
-//     }
-// }
 
