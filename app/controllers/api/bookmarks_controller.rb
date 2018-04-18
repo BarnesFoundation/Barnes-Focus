@@ -25,6 +25,7 @@ class Api::BookmarksController < Api::BaseController
       subscription.is_subscribed = true if bookmark_params[:newsletter] == 'true'
       subscription.is_subscribed = false if bookmark_params[:newsletter] == 'false'
       subscription.save
+      SubscribeToNewsletterJob.perform_later(subscription.id)
     end
   end
 
