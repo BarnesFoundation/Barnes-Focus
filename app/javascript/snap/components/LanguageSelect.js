@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Modal from 'react-modal';
+import { SNAP_LANGUAGE_PREFERENCE } from './Constants';
 
 /** 
  * withLanguageSelect HOC provides props with location, history and match objects
@@ -21,7 +22,7 @@ class LanguageSelect extends Component {
             { name: 'Español', code: 'es' }
         ];
 
-        const lang = localStorage.getItem('barnes.snap.pref.lang') || 'en';
+        const lang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || 'en';
         const langObj = langOptions.filter(obj => obj.code === lang);
 
         this.state = {
@@ -46,7 +47,7 @@ class LanguageSelect extends Component {
     selectLanguage = (e) => {
         var selectedLang = { code: e.currentTarget.dataset.id, name: e.currentTarget.dataset.lang };
         this.setState({ selectedLanguage: selectedLang });
-        localStorage.setItem('barnes.snap.pref.lang', selectedLang.code);
+        localStorage.setItem(SNAP_LANGUAGE_PREFERENCE, selectedLang.code);
         this.closeModal();
     }
 
@@ -54,7 +55,7 @@ class LanguageSelect extends Component {
         return (
             <div id="language-select" className="language-select text-center">
                 <div className="row">
-                    <div className="col-12 col-md-4 offset-md-4">
+                    <div className="col-12">
                         <div className="btn-group d-flex" role="group">
                             <button className="btn btn-secondary btn-lg w-100" type="button" onClick={this.openModal}>
                                 {this.state.selectedLanguage.name}
@@ -73,7 +74,7 @@ class LanguageSelect extends Component {
                     overlayClassName="Overlay"
                 >
                     <button type="button" className="close pull-right offset-11" aria-label="Close" onClick={this.closeModal}>
-                        <span aria-hidden="true">&times;</span>
+                        <i className="fa fa-times" aria-hidden="true"></i>
                     </button>
                     <h1>Please select your language.</h1>
                     <p>We are using Google to help us automatically translate our text.</p>

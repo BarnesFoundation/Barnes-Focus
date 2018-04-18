@@ -28,7 +28,8 @@ class WelcomeComponent extends Component {
     checkIndex = () => {
         const $this = $("#snapCarousel");
         if ($("#snapCarousel .carousel-inner .carousel-item:first").hasClass("active")) {
-            $this.children(".carousel-control-prev").hide();
+            $this.children(".carousel-control-prev").addClass('opaque');
+            $this.children(".carousel-control-prev").show();
             $this.children(".carousel-control-next").show();
             $this.children(".carousel-indicators").show();
         } else if ($("#snapCarousel .carousel-inner .carousel-item:last").hasClass("active")) {
@@ -36,6 +37,7 @@ class WelcomeComponent extends Component {
             $this.children(".carousel-control-prev").hide();
             $this.children(".carousel-indicators").hide();
         } else {
+            $this.children(".carousel-control-prev").removeClass('opaque');
             $this.children(".carousel-control-prev").show();
             $this.children(".carousel-control-next").show();
             $this.children(".carousel-indicators").show();
@@ -128,8 +130,8 @@ class WelcomeComponent extends Component {
                                     <img src={img6} alt="img6" />
                                 </div>
                             </div>
-                            <div>
-                                <h1>Please select your language</h1>
+                            <div className="content">
+                                <h1>Please select your language.</h1>
                                 <LanguageSelect />
                             </div>
                         </div>
@@ -162,7 +164,7 @@ class WelcomeComponent extends Component {
                                 <img src={photo_prompt} alt="photo_prompt_main_img" />
                             </div>
                             <div className="content">
-                                <h1>Take a photo to learn more about a work of art in our collection.</h1>
+                                <h1>Take a photo to learn more about a work of art.</h1>
                             </div>
 
                             <Link className="btn take-photo-btn" to="/snap">

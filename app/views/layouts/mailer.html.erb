@@ -4,10 +4,33 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style>
       /* Email styles need to be inline */
+      a {
+        text-decoration: none;
+      }
+
+      .bookmarks-table a {
+        color: #282828 !important;
+      }
+
+      .footer-action a {
+        color: #282828 !important;
+      }
+
+      .footer-info {
+        color: #B8B8B8;
+        font-size: 14px;
+      }
+
+      .footer-info a {
+        color: #B8B8B8 !important;
+      }
+
     </style>
   </head>
 
   <body>
+    <!-- Mailer header goes here -->
     <%= yield %>
+    <!-- Mailer footer goes here -->
   </body>
 </html>

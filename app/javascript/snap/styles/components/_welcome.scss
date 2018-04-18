@@ -8,18 +8,18 @@
             position: absolute;
             
             &:nth-child(1) {
-                top: 5vh;
+                top: 0;
                 left: 5vw;  
             }
 
             &:nth-child(2) {
-                top: 25vh;
+                top: 20vh;
                 left: 25vw;
                 z-index: 100;
             }
 
             &:nth-child(3) {
-                top: 10vh;
+                top: 5vh;
                 left: 55vw;
             }
 
@@ -34,7 +34,7 @@
     text-align: center;
     .img-gallery {
         top: 5vh;
-        height: 45vh;
+        height: 42vh;
         padding: 5vw;
         
         .gallery-item {           
@@ -42,7 +42,7 @@
             
             &:nth-child(1) {
                 top: 10vh;
-                left: 2vh;
+                left: 0;
                 z-index: 100;
                 img {
                     width: 35vw;
@@ -50,7 +50,7 @@
             }
 
             &:nth-child(2) {
-                top: 0vh;
+                top: 0;
                 left: 25vw;  
                 img {
                     width: 50vw;
@@ -59,7 +59,7 @@
 
             &:nth-child(3) {
                 top: 20vh;
-                left: 50vw;
+                left: 55vw;
                 img {
                     width: 45vw;
                 }
@@ -73,7 +73,7 @@
 .wifi-screen {
     .img-gallery {
         top: 15vh;
-        height: 50vh;
+        height: 45vh;
         padding: 5vw;
         
         .gallery-item {           
@@ -112,17 +112,17 @@
     text-align: center;
 
     .img-main {
-        height: 45vh;
-        padding: 10vw;
+        height: 35vh;
+        padding: 5vw;
         img {
-            width: 80vw;
+            width: 75vw;
         }
     }
 
     .take-photo-btn {
         text-align: center;
         font-size: 20px;
-        line-height: 1.6;
+        line-height: 1.75;
         width: 200px;
         height: 65px;
         padding: 10px 16px;
@@ -146,3 +146,97 @@
     }
 }
 
+
+/* iPhone 5 and below. Smaller Devices (Portrait) */
+@media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
+/* Styles */
+
+    .welcome-screen {
+        .img-gallery {
+            height: 36vh !important;   
+            
+            .gallery-item {  
+                &:nth-child(2) {
+                    top:15vh !important;
+                }
+            }
+
+        }
+    }
+
+    .lang-dropdown-screen {
+        .img-gallery {
+            height: 38vh !important;
+            
+            .gallery-item {           
+                
+                &:nth-child(1) {
+                    top: 10vh !important;
+                    img {
+                        width: 32vw !important;
+                    }
+                }
+    
+                &:nth-child(3) {
+                    top: 15vh !important;
+                    img {
+                        width: 42vw !important;
+                    }
+                }
+    
+                
+            }
+        }
+
+        .btn {
+            line-height: 1.2;
+        }
+    }
+
+    .photo-prompt-screen {
+
+        .img-main {
+            img {
+                width: 70vw !important;
+            }
+        }
+    
+        .take-photo-btn {
+            width: 185px !important;
+            height: 60px !important;
+            padding: 10px 0px !important;
+            border-radius: 30px !important;
+        }
+        
+        
+    }   
+    
+}
+
+
+/* iPads (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+    .welcome-screen {
+        .img-gallery {
+            height: 52vh !important;          
+        }
+    }
+
+    .lang-dropdown-screen {
+        .img-gallery {
+            height: 52vh !important;
+        }
+    }
+
+    .wifi-screen {
+        .img-gallery {
+            height: 50vh !important;
+        }
+    }
+
+    .photo-prompt-screen {
+        .img-main {
+            height: 50vh !important;
+        }
+    }
+}

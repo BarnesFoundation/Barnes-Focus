@@ -12,26 +12,32 @@ ActiveAdmin.register_page "Dashboard" do
             tr do
               th '#'
               th 'Searched Image'
-              th 'Pastec Images'
               th 'ES Images'
-              th 'Pastec Result'
+              th 'Imgix Image'
+              th 'API Response'
               th 'Elastic Search Result'
+              th 'Response Time'
             end
             SnapSearchResult.recent.map do |img|
               tr do
                 td img.id
-                td image_tag img.searched_image_url, class: 'pastec_image_size'
+                td do
+                  unless img.searched_image_url.blank?
+                    image_tag img.searched_image_url, class: 'pastec_image_size'
+                  else
+                    image_tag img.searched_image_data, class: 'pastec_image_size'
+                  end
+                end
                 td do
                   table do
-                    img.pastec_response["image_ids"].each do |pastec_image|
+                    img.es_response["records"].each do |es_image|
                       tr do
                         td do
-                          image_tag TrainingRecord.find_by(identifier: pastec_image).try(:image_url), class: 'pastec_image_size'
+                          image_tag Image.s3_url(es_image['id'], es_image['imageSecret']), class: 'es_image_size'
                         end
                       end
-                    end if img.pastec_response["image_ids"].present?
+                    end if img.es_response["records"].present?
                   end
-
                 end
 
                 td do
@@ -39,15 +45,16 @@ ActiveAdmin.register_page "Dashboard" do
                     img.es_response["records"].each do |es_image|
                       tr do
                         td do
-                          image_tag "https://barnes-image-repository.s3.amazonaws.com/images/" + es_image['id'].to_s + "_" + es_image['imageSecret'] + "_n.jpg", class: 'es_image_size'
+                          image_tag Image.imgix_url(es_image['id'], es_image['imageSecret']), class: 'es_image_size'
                         end
                       end
                     end if img.es_response["records"].present?
                   end
                 end
 
-                td img.pastec_response.to_s
+                td img.api_response.to_s
                 td img.es_response.to_s
+                td img.response_time
               end
             end
           end

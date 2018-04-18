@@ -10,24 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180216192405) do
+ActiveRecord::Schema.define(version: 20180411131245) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "active_admin_comments", force: :cascade do |t|
-    t.string "namespace"
-    t.text "body"
-    t.string "resource_type"
-    t.bigint "resource_id"
-    t.string "author_type"
-    t.bigint "author_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id"
-    t.index ["namespace"], name: "index_active_admin_comments_on_namespace"
-    t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
-  end
 
   create_table "admin_users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -46,6 +32,19 @@ ActiveRecord::Schema.define(version: 20180216192405) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
+  create_table "bookmarks", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "image_id", default: "", null: false
+    t.datetime "received_on"
+    t.boolean "mail_sent", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_bookmarks_on_email"
+    t.index ["image_id"], name: "index_bookmarks_on_image_id"
+    t.index ["mail_sent"], name: "index_bookmarks_on_mail_sent"
+    t.index ["received_on"], name: "index_bookmarks_on_received_on"
+  end
+
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
@@ -61,12 +60,33 @@ ActiveRecord::Schema.define(version: 20180216192405) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
+  create_table "es_cached_records", force: :cascade do |t|
+    t.string "image_id", null: false
+    t.text "es_data"
+    t.datetime "last_es_fetched_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["image_id"], name: "index_es_cached_records_on_image_id"
+    t.index ["last_es_fetched_at"], name: "index_es_cached_records_on_last_es_fetched_at"
+  end
+
   create_table "snap_search_results", force: :cascade do |t|
     t.string "searched_image_url"
-    t.text "pastec_response"
+    t.text "api_response"
     t.text "es_response"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "response_time"
+    t.text "searched_image_data"
+  end
+
+  create_table "subscriptions", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.boolean "is_subscribed", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_subscriptions_on_email"
+    t.index ["is_subscribed"], name: "index_subscriptions_on_is_subscribed"
   end
 
   create_table "training_records", force: :cascade do |t|
