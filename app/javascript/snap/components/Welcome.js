@@ -114,10 +114,11 @@ class WelcomeComponent extends Component {
 
             fileReader.onloadend = (ev) => {
 
+                const base64EncodedImage = ev.target.result;
                 localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
                 var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
                 axios.post('/api/snaps/search', {
-                    image_data: ev.target.result,
+                    image_data: base64EncodedImage,
                     language: prefLang
                 }).then(response => {
                     this.setState({ searchInProgress: false });
