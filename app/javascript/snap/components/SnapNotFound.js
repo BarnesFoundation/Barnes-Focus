@@ -13,7 +13,7 @@ class SnapNotFound extends Component {
         super(props);
     }
 
-    handleClick = () => {
+    handleBackToCamera = () => {
         if(isAndroid && isChrome) {
             this.props.history.push({
                 pathname: '/',
@@ -40,7 +40,7 @@ class SnapNotFound extends Component {
                 </div >
                 <div className="row">
                     <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
-                        <button className="btn snap-btn snap-btn-default" to="/snap" onClick={this.handleClick}>
+                        <button className="btn snap-btn snap-btn-default" onClick={this.handleBackToCamera}>
                             Take photo
                         </button>
                     </div>
