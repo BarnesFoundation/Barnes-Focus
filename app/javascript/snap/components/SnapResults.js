@@ -103,6 +103,21 @@ class SnapResults extends Component {
     Modal.setAppElement('.search-container');
   }
 
+  handleBackToCamera = () => {
+    if(isAndroid && isChrome) {
+        this.props.history.push({
+            pathname: '/snap'
+        });
+    } else if (isIOS || (isAndroid && isFirefox)) {
+        this.props.history.push({
+            pathname: '/',
+            state: {
+                launchCamera: true
+            }
+        });
+    }
+  } 
+
   nativeAppShareWithWebFallback = (e) => {
     const socialMediaType = e.currentTarget.dataset.id
     this.setState({ sharePopoverIsOpen: false });
@@ -268,9 +283,9 @@ class SnapResults extends Component {
                   <h3 className="card-title">{this.state.searchResults[0].title}</h3>
                 </div>
               </div>
-              <Link type="button" className="btn btn-circle" to="/snap">
+              <button type="button" className="btn btn-circle" onClick={this.handleBackToCamera}>
                 <img src={icon_camera} className="profile-avatar" alt="camera" />
-              </Link>
+              </button>
               <div className="card-body">
                 <div className="d-flex justify-content-around action-icons">
                   <div id="share-it" ref="target" onClick={this.shareIt}><img src={share} alt="share" />Share it</div>
