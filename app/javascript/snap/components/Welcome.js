@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
+import { PulseLoader } from 'react-spinners';
 
 import LanguageSelect from '../components/LanguageSelect';
 import Hammer from 'hammerjs';
@@ -20,12 +21,18 @@ import photo_prompt from 'images/photo-prompt.jpg';
 import icon_camera from 'images/camera_icon.svg';
 import axios from 'axios';
 
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 class WelcomeComponent extends Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            searchInProgress: false,
+            snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
+        }
     }
 
     checkIndex = () => {
@@ -93,159 +100,201 @@ class WelcomeComponent extends Component {
         })
     }
 
-    takePhoto = (e) => {
+    submitPhoto = (e) => {
         e.persist();
+        this.setState({ searchInProgress: true });
+
         setTimeout(() => {
             let file = e.target.files[0];
             let fileReader = new FileReader();
             fileReader.onloadend = (ev) => {
-                console.log('Base64 image data has been captured!');
-                //console.log(ev.target.result);
-                //this.img.src = ev.target.result;
-                this.setState({ capturedImage: ev.target.result, showVideo: false });
-
-                this.props.history.push({
-                    pathname: '/snap',
-                    state: {
-                        image: ev.target.result,
-                        captureDone: true
+  
+                localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+                var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+                axios.post('/api/snaps/search', {
+                    image_data: ev.target.result,
+                    language: prefLang
+                }).then(response => {
+                    this.setState({ searchInProgress: false });
+                    // Navigate to search result page or not found page
+                    const res = response.data;
+                    if (res.data.records.length === 0) {
+                        this.props.history.push({ pathname: '/not-found' });
+                    } else {
+                        this.props.history.push({
+                            pathname: '/results',
+                            state: {
+                                result: res,
+                                snapCount: localStorage.getItem(SNAP_ATTEMPTS)
+                            }
+                        });
                     }
+
+                })
+                .catch(error => {
+                        this.setState({ searchInProgress: false });
+                        this.props.history.push({ pathname: '/not-found' });
                 });
+
             }
             fileReader.readAsDataURL(file);
-        }, 200);
+        }, 0);
     }
 
     render() {
         return (
-            <div id="snapCarousel" className="carousel slide">
-                <ol className="carousel-indicators">
-                    <li data-target="#snapCarousel" data-slide-to="0" className="active"></li>
-                    <li data-target="#snapCarousel" data-slide-to="1"></li>
-                    <li data-target="#snapCarousel" data-slide-to="2"></li>
-                    <li data-target="#snapCarousel" data-slide-to="3"></li>
-                </ol>
-                <div className="carousel-inner">
-                    <div className="carousel-item active">
-                        <div className="welcome-screen">
-                            <div className="img-gallery">
-                                <div className="gallery-item">
-                                    <img src={img1} alt="img1" />
+            <div>
+            {
+                !this.state.searchInProgress &&
+                <div id="snapCarousel" className="carousel slide">
+                    <ol className="carousel-indicators">
+                        <li data-target="#snapCarousel" data-slide-to="0" className="active"></li>
+                        <li data-target="#snapCarousel" data-slide-to="1"></li>
+                        <li data-target="#snapCarousel" data-slide-to="2"></li>
+                        <li data-target="#snapCarousel" data-slide-to="3"></li>
+                    </ol>
+                    <div className="carousel-inner">
+                        <div className="carousel-item active">
+                            <div className="welcome-screen">
+                                <div className="img-gallery">
+                                    <div className="gallery-item">
+                                        <img src={img1} alt="img1" />
+                                    </div>
+                                    <div className="gallery-item">
+                                        <img src={img2} alt="img2" />
+                                    </div>
+                                    <div className="gallery-item">
+                                        <img src={img3} alt="img3" />
+                                    </div>
                                 </div>
-                                <div className="gallery-item">
-                                    <img src={img2} alt="img2" />
-                                </div>
-                                <div className="gallery-item">
-                                    <img src={img3} alt="img3" />
+                                <div className="content">
+
+                                    <h1>It's a snap!</h1>
+
+                                    <p>Take a photo of any work of art to get information about it.</p>
                                 </div>
                             </div>
-                            <div className="content">
-
-                                <h1>It's a snap!</h1>
-
-                                <p>Take a photo of any work of art to get information about it.</p>
+                        </div>
+                        <div className="carousel-item">
+                            <div className="lang-dropdown-screen">
+                                <div className="img-gallery">
+                                    <div className="gallery-item">
+                                        <img src={img4} alt="img4" />
+                                    </div>
+                                    <div className="gallery-item">
+                                        <img src={img5} alt="img5" />
+                                    </div>
+                                    <div className="gallery-item">
+                                        <img src={img6} alt="img6" />
+                                    </div>
+                                </div>
+                                <div className="content">
+                                    <h1>Please select your language.</h1>
+                                    <LanguageSelect />
+                                </div>
                             </div>
+                        </div>
+                        <div className="carousel-item">
+                            <div className="wifi-screen">
+                                <div className="img-gallery">
+                                    <div className="gallery-item">
+                                        <img src={img7} alt="wifi-img1" />
+                                    </div>
+                                    <div className="gallery-item">
+                                        <img src={img8} alt="wifi-img2" />
+                                    </div>
+                                    <div className="gallery-item">
+                                        <img src={img9} alt="wifi-img3" />
+                                    </div>
+                                </div>
+                                <div className="content">
+
+                                    <h1>Get connected.</h1>
+
+                                    <p>For best connectivity, please connect to our free wifi: BarnesPublic.</p>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div className="carousel-item">
+                            <div className="photo-prompt-screen">
+                                <div className="img-main">
+                                    <img src={photo_prompt} alt="photo_prompt_main_img" />
+                                </div>
+                                <div className="content">
+                                    <h1>Take a photo to learn more about a work of art.</h1>
+                                </div>
+
+                                {
+                                    (isIOS && isSafari) &&
+                                    <label className="btn take-photo-btn">
+                                        <input id="capture-option" type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
+                                        Take Photo
+                                        <span className="icon">
+                                            <img src={icon_camera} alt="camera_icon" />
+                                        </span>
+                                    </label>
+
+                                }
+
+                                {
+                                    (isAndroid && isChrome) &&
+                                    <label className="btn take-photo-btn">
+                                        <input id="capture-option" type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
+                                        Take Photo
+                                        <span className="icon">
+                                            <img src={icon_camera} alt="camera_icon" />
+                                        </span>
+                                    </label>
+
+                                }
+
+                                {
+                                    (isAndroid && !isChrome) &&
+                                    <p> You are using Chrome on Android</p> &&
+                                    <Link className="btn take-photo-btn" to="/snap">
+                                        Take Photo
+                                    <span className="icon">
+                                            <img src={icon_camera} alt="camera_icon" />
+                                        </span>
+                                    </Link>
+                                }
+
+                            </div>
+
                         </div>
                     </div>
-                    <div className="carousel-item">
-                        <div className="lang-dropdown-screen">
-                            <div className="img-gallery">
-                                <div className="gallery-item">
-                                    <img src={img4} alt="img4" />
-                                </div>
-                                <div className="gallery-item">
-                                    <img src={img5} alt="img5" />
-                                </div>
-                                <div className="gallery-item">
-                                    <img src={img6} alt="img6" />
-                                </div>
-                            </div>
-                            <div className="content">
-                                <h1>Please select your language.</h1>
-                                <LanguageSelect />
-                            </div>
+                    <a className="carousel-control-prev" href="#snapCarousel" role="button" data-slide="prev">
+                        <i className="fa fa-2x fa-angle-left"></i>
+                        <span className="sr-only">Previous</span>
+                    </a>
+                    <a className="carousel-control-next" href="#snapCarousel" role="button" data-slide="next">
+                        <i className="fa fa-2x fa-angle-right"></i>
+                        <span className="sr-only">Next</span>
+                    </a>
+                </div >
+            }
+            {/* ========= Search in progress screen ============ */}
+            {
+                this.state.searchInProgress &&
+                <div>
+                    <div className="search-progress-container">
+                        <div className="snap-spinner">
+                            <PulseLoader
+                                color={'#999999'}
+                                size={20}
+                                margin={'5px'}
+                                loading={this.state.searchInProgress}
+                            />
                         </div>
-                    </div>
-                    <div className="carousel-item">
-                        <div className="wifi-screen">
-                            <div className="img-gallery">
-                                <div className="gallery-item">
-                                    <img src={img7} alt="wifi-img1" />
-                                </div>
-                                <div className="gallery-item">
-                                    <img src={img8} alt="wifi-img2" />
-                                </div>
-                                <div className="gallery-item">
-                                    <img src={img9} alt="wifi-img3" />
-                                </div>
-                            </div>
-                            <div className="content">
-
-                                <h1>Get connected.</h1>
-
-                                <p>For best connectivity, please connect to our free wifi: BarnesPublic.</p>
-
-                            </div>
+                        <div className="content">
+                            <h1>Searching</h1>
+                            <p>Please wait while we search our database.</p>
                         </div>
-                    </div>
-                    <div className="carousel-item">
-                        <div className="photo-prompt-screen">
-                            <div className="img-main">
-                                <img src={photo_prompt} alt="photo_prompt_main_img" />
-                            </div>
-                            <div className="content">
-                                <h1>Take a photo to learn more about a work of art.</h1>
-                            </div>
-
-                            {
-                                (isIOS && isSafari) &&
-                                <label className="btn take-photo-btn">
-                                    <input id="capture-option" type="file" accept="image/*" capture="environment" onChange={this.takePhoto} />
-                                    Take Photo
-                                     <span className="icon">
-                                        <img src={icon_camera} alt="camera_icon" />
-                                    </span>
-                                </label>
-
-                            }
-
-                            {
-                                (isAndroid && isChrome) &&
-                                <label className="btn take-photo-btn">
-                                    <input id="capture-option" type="file" accept="image/*" capture="environment" onChange={this.takePhoto} />
-                                    Take Photo
-                                     <span className="icon">
-                                        <img src={icon_camera} alt="camera_icon" />
-                                    </span>
-                                </label>
-
-                            }
-
-                            {
-                                (isAndroid && !isChrome) &&
-                                <p> You are using Chrome on Android</p> &&
-                                <Link className="btn take-photo-btn" to="/snap">
-                                    Take Photo
-                                <span className="icon">
-                                        <img src={icon_camera} alt="camera_icon" />
-                                    </span>
-                                </Link>
-                            }
-
-
-                        </div>
-
                     </div>
                 </div>
-                <a className="carousel-control-prev" href="#snapCarousel" role="button" data-slide="prev">
-                    <i className="fa fa-2x fa-angle-left"></i>
-                    <span className="sr-only">Previous</span>
-                </a>
-                <a className="carousel-control-next" href="#snapCarousel" role="button" data-slide="next">
-                    <i className="fa fa-2x fa-angle-right"></i>
-                    <span className="sr-only">Next</span>
-                </a>
-            </div >
+            }
+            </div>
         );
     }
 }
