@@ -30,6 +30,7 @@ class WelcomeComponent extends Component {
         super(props);
 
         this.state = {
+            ...props.location.state, // when "Take Photo" button is clicked in /not-found or /results page in (iOS, Android/Firefox), we pass {launchCamera: true} property
             searchInProgress: false,
             snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
         }
@@ -59,6 +60,7 @@ class WelcomeComponent extends Component {
         console.log('isAndroid = ' + isAndroid);
         console.log('isChrome = ' + isChrome);
         console.log('isFirefox = ' + isFirefox);
+
 
         this.checkIndex();
 
@@ -98,6 +100,10 @@ class WelcomeComponent extends Component {
         $('#snapCarousel').on('slid.bs.carousel', () => {
             this.checkIndex();
         })
+
+        if(this.state.launchCamera) {
+            this.input.click();
+        }
     }
 
     submitPhoto = (e) => {
@@ -226,9 +232,9 @@ class WelcomeComponent extends Component {
                                 </div>
 
                                 {
-                                    (isIOS && isSafari) &&
+                                    (isIOS) &&
                                     <label className="btn take-photo-btn">
-                                        <input id="capture-option" type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
+                                        <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
                                         Take Photo
                                         <span className="icon">
                                             <img src={icon_camera} alt="camera_icon" />
@@ -240,7 +246,7 @@ class WelcomeComponent extends Component {
                                 {
                                     (isAndroid && isChrome) &&
                                     <label className="btn take-photo-btn">
-                                        <input id="capture-option" type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
+                                        <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
                                         Take Photo
                                         <span className="icon">
                                             <img src={icon_camera} alt="camera_icon" />
