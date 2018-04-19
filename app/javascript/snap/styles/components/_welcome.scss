@@ -143,6 +143,10 @@
         &:hover {
             opacity: 0.7;
         }
+
+        input[type="file"] {
+            display: none;
+        }
     }
 }
 
