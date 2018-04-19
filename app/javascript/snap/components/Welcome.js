@@ -96,7 +96,7 @@ class WelcomeComponent extends Component {
             this.checkIndex();
         })
 
-        if (this.state.launchCamera) {
+        if (this.state.launchCamera && (isIOS || (isAndroid && isFirefox))) {
             this.input.click();
         }
     }
