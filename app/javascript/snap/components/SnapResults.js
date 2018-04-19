@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router'
 import axios from 'axios';
 import LanguageSelect from '../components/LanguageSelect';
 import share from 'images/share_icon.svg';
@@ -104,19 +105,19 @@ class SnapResults extends Component {
   }
 
   handleBackToCamera = () => {
-    if(isAndroid && isChrome) {
-        this.props.history.push({
-            pathname: '/snap'
-        });
+    if (isAndroid && isChrome) {
+      this.props.history.push({
+        pathname: '/snap'
+      });
     } else if (isIOS || (isAndroid && isFirefox)) {
-        this.props.history.push({
-            pathname: '/',
-            state: {
-                launchCamera: true
-            }
-        });
+      this.props.history.push({
+        pathname: '/',
+        state: {
+          launchCamera: true
+        }
+      });
     }
-  } 
+  }
 
   nativeAppShareWithWebFallback = (e) => {
     const socialMediaType = e.currentTarget.dataset.id
@@ -430,4 +431,4 @@ class SnapResults extends Component {
   }
 }
 
-export default SnapResults;
+export default withRouter(SnapResults);
