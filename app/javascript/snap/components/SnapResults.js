@@ -12,7 +12,7 @@ import Footer from './Footer';
 import Popover from 'react-simple-popover';
 import NotificationSystem from 'react-notification-system';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS } from './Constants';
-
+import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 const customStyles = {
   overlay: {
