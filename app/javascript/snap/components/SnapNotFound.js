@@ -16,10 +16,7 @@ class SnapNotFound extends Component {
     handleBackToCamera = () => {
         if(isAndroid && isChrome) {
             this.props.history.push({
-                pathname: '/',
-                state: {
-                    launchCamera: true
-                }
+                pathname: '/snap'
             });
         } else if (isIOS || (isAndroid && isFirefox)) {
             this.props.history.push({

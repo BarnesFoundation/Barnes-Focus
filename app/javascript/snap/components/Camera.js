@@ -19,7 +19,7 @@ class Camera extends Component {
         snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
     };
 
-    ticking = false; prop;
+    ticking = false;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
     // switchCamera() {
@@ -51,23 +51,8 @@ class Camera extends Component {
         console.log('capture photo clicked!');
         let canvas = this.getCanvas();
         const context = canvas.getContext("2d");
-
-        //console.log(rect);
-        //console.log('x, y', Math.floor(x) + ', ' + Math.floor(y));
-        //console.log('canvas.width, canvas.height', canvas.width, canvas.height);
-        if (!this.camera_capabilities) {
-            let rect = this.video.getBoundingClientRect();
-            let x = (rect.x < 0) ? -(rect.x) : rect.x;
-            let y = (rect.y < 0) ? -(rect.y) : rect.y;
-            if (x > 0 && y > 0) {
-                context.drawImage(this.video, Math.floor(x), Math.floor(y), canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
-            } else {
-                context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
-            }
-        } else {
-            context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
-        }
-
+        //console.log('canvas.width, canvas.height', canvas.width, canvas.height);        
+        context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
         const image = canvas.toDataURL('image/jpeg', 1.0);
         return image;
     }
@@ -86,7 +71,6 @@ class Camera extends Component {
         });
 
         setTimeout(() => {
-            this.video.style['transform'] = 'none;';
             this.zoomLevel = 1;
         }, 0);
     }
@@ -164,27 +148,13 @@ class Camera extends Component {
             //console.log('e.scale ' + e.scale);
             this.zoomLevel = (this.initZoom * e.scale).toFixed(1);
             this.zoomLevel = (this.zoomLevel < 1) ? 1 : this.zoomLevel;
-            //If zoom not supported by browser, fallback to scale transform
-            if (!this.camera_capabilities) {
-                //alert('zoom not supported, fallback to scale transform!');
-                this.video.style[this.prop] = 'scale(' + this.zoomLevel + ')';
-            } else {
-                if (this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
-                    this.requestZoom();
-                }
+            
+            if (this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
+                this.requestZoom();
             }
 
         });
 
-        let properties = ['transform', 'WebkitTransform', 'MozTransform', 'msTransform', 'OTransform'];
-        this.prop = properties[1];
-        for (let i = 0; i < properties.length; i++) {
-            if (typeof this.video.style[properties[i]] !== 'undefined') {
-                this.prop = properties[i];
-                break;
-            }
-        }
-        //alert('this.prop = ' + this.prop);
     }
 
     componentDidUpdate() {

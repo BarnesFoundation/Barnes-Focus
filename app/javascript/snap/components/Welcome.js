@@ -242,11 +242,11 @@ class WelcomeComponent extends Component {
                                     }
 
                                     {
-                                        (isAndroid && isChrome) &&
+                                        (isAndroid && isFirefox) &&
                                         <label className="btn take-photo-btn">
                                             <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
                                             Take Photo
-                                        <span className="icon">
+                                            <span className="icon">
                                                 <img src={icon_camera} alt="camera_icon" />
                                             </span>
                                         </label>
@@ -254,11 +254,11 @@ class WelcomeComponent extends Component {
                                     }
 
                                     {
-                                        (isAndroid && !isChrome) &&
+                                        (isAndroid && isChrome) &&
                                         <p> You are using Chrome on Android</p> &&
                                         <Link className="btn take-photo-btn" to="/snap">
                                             Take Photo
-                                    <span className="icon">
+                                            <span className="icon">
                                                 <img src={icon_camera} alt="camera_icon" />
                                             </span>
                                         </Link>
