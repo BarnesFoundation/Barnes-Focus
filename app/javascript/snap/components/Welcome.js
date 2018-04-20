@@ -127,34 +127,36 @@ class WelcomeComponent extends Component {
 
             fileReader.onloadend = (ev) => {
 
-                img.src = ev.target.result
-                const resizedImage = this.resizeCapturedImage(img);
-
-                localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-                var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
-                axios.post('/api/snaps/search', {
-                    image_data: resizedImage,
-                    language: prefLang
-                }).then(response => {
-                    this.setState({ searchInProgress: false });
-                    // Navigate to search result page or not found page
-                    const res = response.data;
-                    if (res.data.records.length === 0) {
-                        this.props.history.push({ pathname: '/not-found' });
-                    } else {
-                        this.props.history.push({
-                            pathname: '/results',
-                            state: {
-                                result: res,
-                                snapCount: localStorage.getItem(SNAP_ATTEMPTS)
-                            }
-                        });
-                    }
-                })
+                img.src = fileReader.result;
+                img.onload = () => {
+                    const resizedImage = this.resizeCapturedImage(img);
+                    localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+                    var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+                    axios.post('/api/snaps/search', {
+                        image_data: resizedImage,
+                        language: prefLang
+                    }).then(response => {
+                        this.setState({ searchInProgress: false });
+                        // Navigate to search result page or not found page
+                        const res = response.data;
+                        if (res.data.records.length === 0) {
+                            this.props.history.push({ pathname: '/not-found' });
+                        } else {
+                            this.props.history.push({
+                                pathname: '/results',
+                                state: {
+                                    result: res,
+                                    snapCount: localStorage.getItem(SNAP_ATTEMPTS)
+                                }
+                            });
+                        }
+                    })
                     .catch(error => {
                         this.setState({ searchInProgress: false });
                         this.props.history.push({ pathname: '/not-found' });
                     });
+                }
+                        
             }
 
             fileReader.readAsDataURL(file);
