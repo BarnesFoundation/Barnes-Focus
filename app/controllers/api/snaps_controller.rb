@@ -8,7 +8,7 @@ class Api::SnapsController < Api::BaseController
     #using test image for API testing
 
     api = CudaSift.new
-    image_data = Base64.decode64(data['data:image/png;base64,'.length .. -1])
+    image_data = Base64.decode64(data['data:image/jpeg;base64,'.length .. -1])
     file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
     File.open(file_name, 'wb') do |f|
       f.write image_data
