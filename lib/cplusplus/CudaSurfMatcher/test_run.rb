@@ -43,19 +43,21 @@ def run_image_test(image_name)
   final = final.collect{|obj| obj.to_a.flatten }
   final = final.sort{|x, y| y[1] <=> x[1] }
   log "final => #{final}"
-  top = final.first
-  log "top => #{top}"
-  filename = top.first
-  base_name = File.basename(filename, ".*")
-  id_on_top_result = base_name.split("_")[0]
-  id_on_test_image = File.basename(image_name, ".*").split("-")[1]
-  log "id_on_top_result => #{id_on_top_result}; id_on_test_image => #{id_on_test_image}"
-  if id_on_top_result == id_on_test_image
-    print "\e[32mP\e[39m"
-    return { passed: true }
-  else
-    print "\e[31mF\e[39m"
-    return { failed: true }
+  unless final.nil?
+    top = final.first
+    log "top => #{top}"
+    filename = top.first
+    base_name = File.basename(filename, ".*")
+    id_on_top_result = base_name.split("_")[0]
+    id_on_test_image = File.basename(image_name, ".*").split("-")[1]
+    log "id_on_top_result => #{id_on_top_result}; id_on_test_image => #{id_on_test_image}"
+    if id_on_top_result == id_on_test_image
+      print "\e[32mP\e[39m"
+      return { passed: true }
+    else
+      print "\e[31mF\e[39m"
+      return { failed: true }
+    end
   end
 end
 
