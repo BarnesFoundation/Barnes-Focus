@@ -105,51 +105,13 @@ class WelcomeComponent extends Component {
      * Original image captured from camera is of high resolution and size ~ 4MB.
      * Resize this image as per device screen width/ height before sending to server.
      */
-    resizeCapturedImage = (img, orientation) => {
+    resizeCapturedImage = (img) => {
         let canvas = this.getCanvas();
         const ctx = canvas.getContext("2d");
 
-        switch (orientation) {
-
-            case 2:
-                // horizontal flip
-                ctx.translate(canvas.width, 0);
-                ctx.scale(-1, 1);
-                break;
-            case 3:
-                // 180° rotate left
-                ctx.translate(canvas.width, canvas.height);
-                ctx.rotate(Math.PI);
-                break;
-            case 4:
-                // vertical flip
-                ctx.translate(0, canvas.height);
-                ctx.scale(1, -1);
-                break;
-            case 5:
-                // vertical flip + 90 rotate right
-                ctx.rotate(0.5 * Math.PI);
-                ctx.scale(1, -1);
-                break;
-            case 6:
-                // 90° rotate right
-                ctx.rotate(0.5 * Math.PI);
-                ctx.translate(0, -canvas.height);
-                break;
-            case 7:
-                // horizontal flip + 90 rotate right
-                ctx.rotate(0.5 * Math.PI);
-                ctx.translate(canvas.width, -canvas.height);
-                ctx.scale(-1, 1);
-                break;
-            case 8:
-                // 90° rotate left
-                ctx.rotate(-0.5 * Math.PI);
-                ctx.translate(-canvas.width, 0);
-                break;
-        }
-
-
+        // images in iOS are rotated +90 deg. Componsate that with below transformation
+        ctx.rotate(0.5 * Math.PI);
+        ctx.scale(1, -1);
 
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const image = canvas.toDataURL('image/jpeg', 1.0);
@@ -170,13 +132,10 @@ class WelcomeComponent extends Component {
 
             fileReader.onloadend = (ev) => {
 
-                const imageData = ev.target.result;
-                let exif = EXIF.readFromBinaryFile(new BinaryFile(imageData));
-
-                img.src = imageData;
+                img.src = ev.target.result;
 
                 img.onload = () => {
-                    const resizedImage = this.resizeCapturedImage(img, exif.Orientation);
+                    const resizedImage = this.resizeCapturedImage(img);
                     localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
                     var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
                     axios.post('/api/snaps/search', {
@@ -214,8 +173,8 @@ class WelcomeComponent extends Component {
 
         if (!this.ctx) {
             const canvas = document.createElement('canvas');
-            canvas.width = screen.width;
-            canvas.height = screen.height;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
             this.canvas = canvas;
             this.ctx = canvas.getContext('2d');
         }
