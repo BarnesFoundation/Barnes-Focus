@@ -7,7 +7,7 @@ class ImageUploadJob < ApplicationJob
     # Save to S3
     snap_search_result = SnapSearchResult.find_by id: snap_id
     if snap_search_result
-      image_data = Base64.decode64(snap_search_result.searched_image_data['data:image/png;base64,'.length .. -1])
+      image_data = Base64.decode64(snap_search_result.searched_image_data['data:image/jpeg;base64,'.length .. -1])
       file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
       File.open(file_name, 'wb') do |f|
         f.write image_data

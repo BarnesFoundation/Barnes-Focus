@@ -24,9 +24,7 @@ class SubscribeToNewsletterJob < ApplicationJob
         resp = @client.add_recipient(
           {
             email: subscription.email,
-            customFields: [
-              {name: "CRM Lead Source", value: "snap-bookmark-consent"}
-            ]
+            name: "CRM Lead Source"
           },
           Rails.application.secrets[:silverpop_config][:list_id],
           []

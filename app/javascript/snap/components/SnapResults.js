@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router'
 import axios from 'axios';
 import LanguageSelect from '../components/LanguageSelect';
 import share from 'images/share_icon.svg';
@@ -11,7 +12,7 @@ import Footer from './Footer';
 import Popover from 'react-simple-popover';
 import NotificationSystem from 'react-notification-system';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS } from './Constants';
-
+import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 const customStyles = {
   overlay: {
@@ -104,19 +105,19 @@ class SnapResults extends Component {
   }
 
   handleBackToCamera = () => {
-    if(isAndroid && isChrome) {
-        this.props.history.push({
-            pathname: '/snap'
-        });
+    if (isAndroid && isChrome) {
+      this.props.history.push({
+        pathname: '/snap'
+      });
     } else if (isIOS || (isAndroid && isFirefox)) {
-        this.props.history.push({
-            pathname: '/',
-            state: {
-                launchCamera: true
-            }
-        });
+      this.props.history.push({
+        pathname: '/',
+        state: {
+          launchCamera: true
+        }
+      });
     }
-  } 
+  }
 
   nativeAppShareWithWebFallback = (e) => {
     const socialMediaType = e.currentTarget.dataset.id
@@ -430,4 +431,4 @@ class SnapResults extends Component {
   }
 }
 
-export default SnapResults;
+export default withRouter(SnapResults);
