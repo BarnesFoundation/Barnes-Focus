@@ -107,7 +107,7 @@ class WelcomeComponent extends Component {
      */
     resizeCapturedImage = (img) => {
         let canvas = this.getCanvas();
-        const context = canvas.getContext("2d");        
+        const context = canvas.getContext("2d");
         context.drawImage(img, 0, 0, canvas.width, canvas.height);
         const image = canvas.toDataURL('image/jpeg', 1.0);
         return image;
@@ -127,7 +127,8 @@ class WelcomeComponent extends Component {
 
             fileReader.onloadend = (ev) => {
 
-                img.src = fileReader.result;
+                img.src = ev.target.result;
+
                 img.onload = () => {
                     const resizedImage = this.resizeCapturedImage(img);
                     localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
@@ -151,12 +152,12 @@ class WelcomeComponent extends Component {
                             });
                         }
                     })
-                    .catch(error => {
-                        this.setState({ searchInProgress: false });
-                        this.props.history.push({ pathname: '/not-found' });
-                    });
+                        .catch(error => {
+                            this.setState({ searchInProgress: false });
+                            this.props.history.push({ pathname: '/not-found' });
+                        });
                 }
-                        
+
             }
 
             fileReader.readAsDataURL(file);
@@ -167,16 +168,12 @@ class WelcomeComponent extends Component {
 
         if (!this.ctx) {
             const canvas = document.createElement('canvas');
-
             canvas.width = screen.width;
             canvas.height = screen.height;
-
             this.canvas = canvas;
             this.ctx = canvas.getContext('2d');
         }
-
         const { ctx, canvas } = this;
-
         return canvas;
     }
 
@@ -277,7 +274,7 @@ class WelcomeComponent extends Component {
                                     }
 
                                     {
-                                        (isAndroid && isChrome) &&
+                                        (isAndroid && isFirefox) &&
                                         <label className="btn take-photo-btn">
                                             <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
                                             Take Photo
@@ -289,7 +286,7 @@ class WelcomeComponent extends Component {
                                     }
 
                                     {
-                                        (isAndroid && !isChrome) &&
+                                        (isAndroid && isChrome) &&
                                         <p> You are using Chrome on Android</p> &&
                                         <Link className="btn take-photo-btn" to="/snap">
                                             Take Photo
