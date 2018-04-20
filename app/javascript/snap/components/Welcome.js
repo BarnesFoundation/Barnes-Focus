@@ -110,9 +110,9 @@ class WelcomeComponent extends Component {
         const ctx = canvas.getContext("2d");
 
         // images in iOS are rotated +90 deg. Componsate that with below transformation
-        // if (isIOS) {
-        ctx.transform(0, 1, 1, 0, 0, 0);
-        //}
+        if (isIOS) {
+            ctx.transform(0, 1, 1, 0, 0, 0);
+        }
 
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const image = canvas.toDataURL('image/jpeg', 1.0);
