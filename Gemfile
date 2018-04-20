@@ -32,6 +32,7 @@ gem 'whenever', require: false
 gem 'silverpop'
 gem 'mandrill-api'
 gem 'oauth2'
+gem 'exception_notification'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
