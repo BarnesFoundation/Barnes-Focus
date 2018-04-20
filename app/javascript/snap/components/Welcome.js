@@ -168,8 +168,8 @@ class WelcomeComponent extends Component {
 
         if (!this.ctx) {
             const canvas = document.createElement('canvas');
-            canvas.width = screen.width;
-            canvas.height = screen.height;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
             this.canvas = canvas;
             this.ctx = canvas.getContext('2d');
         }
