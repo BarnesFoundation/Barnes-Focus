@@ -111,7 +111,11 @@ class WelcomeComponent extends Component {
 
         // images in iOS are rotated +90 deg. Componsate that with below transformation
         if (isIOS) {
-            ctx.transform(0, 1, 1, 0, 0, 0);
+            ctx.transform(0, 1, -1, 0, canvas.height, 0);
+
+            // 90° rotate right
+            //ctx.rotate(0.5 * Math.PI);
+            //ctx.translate(0, -canvas.height);
         }
 
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
