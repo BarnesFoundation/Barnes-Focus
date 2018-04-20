@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'json'
 LOG_LEVEL = ENV['LOG_LEVEL'] || 'info' #debug, info
-TEST_IMAGES_ROOT = "/home/vivek/source/cplusplus/CudaSurfMatcher/test-images"
+TEST_IMAGES_ROOT = "#{Rails.root}/lib/cplusplus/CudaSurfMatcher/test-images"
 
 SEARCH_ENDP_A = "http://ec2-34-207-152-196.compute-1.amazonaws.com:42129/index/searcher"
 SEARCH_ENDP_B = "http://ec2-52-201-253-112.compute-1.amazonaws.com:42129/index/searcher"
