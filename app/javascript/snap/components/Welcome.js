@@ -101,6 +101,18 @@ class WelcomeComponent extends Component {
         }
     }
 
+    /**
+     * Original image captured from camera is of high resolution and size ~ 4MB.
+     * Resize this image as per device screen width/ height before sending to server.
+     */
+    resizeCapturedImage = (img) => {
+        let canvas = this.getCanvas();
+        const context = canvas.getContext("2d");        
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const image = canvas.toDataURL('image/jpeg', 1.0);
+        return image;
+    }
+
     submitPhoto = (e) => {
         //e.persist();
         this.setState({ searchInProgress: true });
@@ -111,14 +123,17 @@ class WelcomeComponent extends Component {
         else {
             let file = e.target.files[0];
             let fileReader = new FileReader();
+            let img = document.createElement('img');
 
             fileReader.onloadend = (ev) => {
 
-                const base64EncodedImage = ev.target.result;
+                img.src = ev.target.result
+                const resizedImage = this.resizeCapturedImage(img);
+
                 localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
                 var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
                 axios.post('/api/snaps/search', {
-                    image_data: base64EncodedImage,
+                    image_data: resizedImage,
                     language: prefLang
                 }).then(response => {
                     this.setState({ searchInProgress: false });
@@ -144,6 +159,23 @@ class WelcomeComponent extends Component {
 
             fileReader.readAsDataURL(file);
         }
+    }
+
+    getCanvas = () => {
+
+        if (!this.ctx) {
+            const canvas = document.createElement('canvas');
+
+            canvas.width = screen.width;
+            canvas.height = screen.height;
+
+            this.canvas = canvas;
+            this.ctx = canvas.getContext('2d');
+        }
+
+        const { ctx, canvas } = this;
+
+        return canvas;
     }
 
     render() {
