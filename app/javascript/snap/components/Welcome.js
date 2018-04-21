@@ -115,19 +115,15 @@ class WelcomeComponent extends Component {
 
             h = img.width;
             w = img.height;
-            console.log('image width and height are = ' + h + ' & ' + w);
-            console.log('screen size is ' + screen.width + ' x ' + screen.height);
+            alert('image width and height are = ' + h + ' & ' + w);
+            alert('screen size is ' + screen.width + ' x ' + screen.height);
 
-            ctx.transform(0, 1, -1, 0, w, 0);
-            ctx.drawImage(img, 0, 0, h, w);
+            ctx.rotate(-90 * Math.PI / 180);
             // 90° rotate right
             //ctx.rotate(0.5 * Math.PI);
             //ctx.translate(0, -canvas.height);
         }
-        else {
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        }
-
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const image = canvas.toDataURL('image/jpeg', 1.0);
         return image;
     }
