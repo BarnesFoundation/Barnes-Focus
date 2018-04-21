@@ -115,9 +115,11 @@ class WelcomeComponent extends Component {
 
             h = img.width;
             w = img.height;
+            console.log('image width and height are = ' + h + ' & ' + w);
+            console.log('screen size is ' + screen.width + ' x ' + screen.height);
 
             ctx.transform(0, 1, -1, 0, w, 0);
-            ctx.drawImage(img, 0, 0, screen.height, screen.width);
+            ctx.drawImage(img, 0, 0, h, w);
             // 90° rotate right
             //ctx.rotate(0.5 * Math.PI);
             //ctx.translate(0, -canvas.height);
