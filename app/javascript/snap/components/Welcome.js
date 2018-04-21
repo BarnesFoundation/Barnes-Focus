@@ -111,19 +111,105 @@ class WelcomeComponent extends Component {
 
         // images in iOS are rotated +90 deg. Componsate that with below transformation
         if (isIOS) {
-            let tempWidth = canvas.width;
-            canvas.width = canvas.height;
-            canvas.height = tempWidth;
-            ctx.transform(0, 1, -1, 0, canvas.height, 0);
+            let w, h;
 
+            h = img.width;
+            w = img.height;
+
+            ctx.transform(0, 1, -1, 0, w, 0);
+            ctx.drawImage(img, 0, 0, screen.height, screen.width);
             // 90° rotate right
             //ctx.rotate(0.5 * Math.PI);
             //ctx.translate(0, -canvas.height);
         }
+        else {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        }
 
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const image = canvas.toDataURL('image/jpeg', 1.0);
         return image;
+    }
+
+    getOrientation = (file) => {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+
+            var view = new DataView(e.target.result);
+            if (view.getUint16(0, false) != 0xFFD8) return -2;
+            var length = view.byteLength;
+            var offset = 2;
+            while (offset < length) {
+                var marker = view.getUint16(offset, false);
+                offset += 2;
+                if (marker == 0xFFE1) {
+                    var little = view.getUint16(offset += 8, false) == 0x4949;
+                    offset += view.getUint32(offset + 4, little);
+                    var tags = view.getUint16(offset, little);
+                    offset += 2;
+                    for (var i = 0; i < tags; i++)
+                        if (view.getUint16(offset + (i * 12), little) == 0x0112)
+                            return view.getUint16(offset + (i * 12) + 8, little);
+                }
+                else if ((marker & 0xFF00) != 0xFF00) break;
+                else offset += view.getUint16(offset, false);
+            }
+            return 0; // +- edit
+        };
+        reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
+    }
+
+    processFile = (file, orientation) => {
+
+        return new Promise((resolve, reject) => {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                let img = new Image();
+                img.onload = function () {
+                    let w, h;
+                    if (orientation === 1 || orientation === 3) {
+                        w = this.width;
+                        h = this.height;
+                    } else {
+                        h = this.width;
+                        w = this.height;
+                    }
+
+                    // const aspectRatio = w / h;
+
+                    // let deviceWidth = screen.width;
+                    // let deviceHeight = deviceWidth / aspectRatio;
+
+                    let canvas = document.createElement('canvas'); // 3. canvas
+                    let ctx = canvas.getContext('2d');
+                    canvas.width = w; // ++ added
+                    canvas.height = h; // ++ added
+
+                    if (orientation === 1) { // ++ added
+                        ctx.drawImage(img, 0, 0, w, h); // ++ added
+                    } else if (orientation === 3) { // 4. transform, drawImage
+                        ctx.transform(-1, 0, 0, -1, w, h);
+                        ctx.drawImage(img, 0, 0, w, h);
+                    } else if (orientation === 6) {
+                        ctx.transform(0, 1, -1, 0, w, 0);
+                        ctx.drawImage(img, 0, 0, h, w);
+                    } else {
+                        ctx.transform(0, -1, 1, 0, 0, h);
+                        ctx.drawImage(img, 0, 0, h, w);
+                    }
+
+                    let resizedImage = canvas.toDataURL();
+                    resolve(resizedImage);
+
+                }
+                img.onerror = function () {
+                    reject('error');
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        });
+
     }
 
     submitPhoto = (e) => {
@@ -135,8 +221,49 @@ class WelcomeComponent extends Component {
         }
         else {
             let file = e.target.files[0];
+
+            // let orientation = this.getOrientation(file);
+            // orientation = orientation ? orientation : 1
+            // this.processFile(file, orientation).then(
+            //     response => {
+            //         localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+            //         let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+            //         axios.post('/api/snaps/search', {
+            //             image_data: response,
+            //             language: prefLang
+            //         }).then(response => {
+            //             this.setState({ searchInProgress: false });
+            //             // Navigate to search result page or not found page
+            //             const res = response.data;
+            //             if (res.data.records.length === 0) {
+            //                 this.props.history.push({ pathname: '/not-found' });
+            //             } else {
+            //                 this.props.history.push({
+            //                     pathname: '/results',
+            //                     state: {
+            //                         result: res,
+            //                         snapCount: localStorage.getItem(SNAP_ATTEMPTS)
+            //                     }
+            //                 });
+            //             }
+            //         })
+            //             .catch(error => {
+            //                 this.setState({ searchInProgress: false });
+            //                 this.props.history.push({ pathname: '/not-found' });
+            //             });
+            //     })
+            //     .catch(err => {
+            //         console.log('Error loading image.');
+            //     });
+
+
+
+
+
+
+
             let fileReader = new FileReader();
-            let img = document.createElement('img');
+            let img = new Image();
 
             fileReader.onloadend = (ev) => {
 
