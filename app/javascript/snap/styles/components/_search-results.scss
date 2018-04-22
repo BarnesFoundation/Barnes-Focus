@@ -54,10 +54,9 @@
         .btn-circle {
             width: 70px;
             height: 70px;
-            padding: 17px !important;
             border-radius: 35px;
             font-size: 24px;
-            line-height: 1.33;
+            line-height: 0.33;
             position: relative;
             top: -35px;
             left: 75vw;
@@ -90,4 +89,14 @@
     color: #fff !important;
     box-shadow: rgba(0, 0, 0, .9) 0px 0px 1px !important;
     text-align: center;
+}
+
+/* iPhone 6,7,8  */
+@media only screen  and (device-width : 320px) and (device-height : 667px) and (-webkit-device-pixel-ratio : 2) {
+    .btn-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 30px;
+        top: -30px;
+    }
 }
