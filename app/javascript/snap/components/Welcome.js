@@ -111,19 +111,11 @@ class WelcomeComponent extends Component {
 
         // images in iOS are rotated +90 deg. Componsate that with below transformation
         if (isIOS) {
-            var width = canvas.width
-            var height = canvas.height
-            var styleWidth = canvas.style.width
-            var styleHeight = canvas.style.height
-
-            canvas.width = height
-            canvas.height = width
-            canvas.style.width = styleHeight
-            canvas.style.height = styleWidth
+            let w = canvas.width
 
             // 90° rotate right
             ctx.rotate(0.5 * Math.PI);
-            ctx.translate(0, -canvas.height);
+            ctx.translate(0, -w);
         }
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const image = canvas.toDataURL('image/jpeg', 1);
