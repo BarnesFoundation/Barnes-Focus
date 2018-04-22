@@ -103,62 +103,6 @@ class WelcomeComponent extends Component {
         }
     }
 
-    /**
-     * Original image captured from camera is of high resolution and size ~ 4MB.
-     * Resize this image as per device screen width/ height before sending to server.
-     */
-    resizeCapturedImage = (img) => {
-        let canvas = this.getCanvas();
-        const ctx = canvas.getContext("2d");
-
-        // images in iOS are rotated -90 deg. Componsate that with below transformation
-        if (isIOS) {
-            var width = canvas.width;
-            var height = canvas.height;
-            var styleWidth = canvas.style.width;
-            var styleHeight = canvas.style.height;
-
-            canvas.width = height;
-            canvas.height = width;
-            canvas.style.width = styleHeight;
-            canvas.style.height = styleWidth;
-
-            // 90° rotate right
-            ctx.rotate(0.5 * Math.PI);
-            ctx.translate(0, -canvas.width);
-        }
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const image = canvas.toDataURL('image/jpeg', 1);
-        return image;
-    }
-
-    getOrientation = (file) => {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-
-            var view = new DataView(e.target.result);
-            if (view.getUint16(0, false) != 0xFFD8) return -2;
-            var length = view.byteLength;
-            var offset = 2;
-            while (offset < length) {
-                var marker = view.getUint16(offset, false);
-                offset += 2;
-                if (marker == 0xFFE1) {
-                    var little = view.getUint16(offset += 8, false) == 0x4949;
-                    offset += view.getUint32(offset + 4, little);
-                    var tags = view.getUint16(offset, little);
-                    offset += 2;
-                    for (var i = 0; i < tags; i++)
-                        if (view.getUint16(offset + (i * 12), little) == 0x0112)
-                            return view.getUint16(offset + (i * 12) + 8, little);
-                }
-                else if ((marker & 0xFF00) != 0xFF00) break;
-                else offset += view.getUint16(offset, false);
-            }
-            return 0; // +- edit
-        };
-        reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
-    }
 
     submitPhoto = (canvas) => {
         let processedImage = canvas.toDataURL('image/jpeg');
@@ -192,7 +136,7 @@ class WelcomeComponent extends Component {
     }
 
     processFile = (e) => {
-        //e.persist();
+
         this.setState({ searchInProgress: true });
         // photo was cancelled by the user, fire camera again
         if (e.target.files.length === 0) {
@@ -200,11 +144,9 @@ class WelcomeComponent extends Component {
         }
         else {
             let file = e.target.files[0];
-
-            var options = {
+            let options = {
                 maxWidth: screen.width,
                 canvas: true,
-                pixelRatio: window.devicePixelRatio,
                 downsamplingRatio: 0.5,
                 orientation: true
             }
@@ -215,99 +157,7 @@ class WelcomeComponent extends Component {
                 options
             );
 
-            // let orientation = this.getOrientation(file);
-            // orientation = orientation ? orientation : 1
-            // this.processFile(file, orientation).then(
-            //     response => {
-            //         localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-            //         let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
-            //         axios.post('/api/snaps/search', {
-            //             image_data: response,
-            //             language: prefLang
-            //         }).then(response => {
-            //             this.setState({ searchInProgress: false });
-            //             // Navigate to search result page or not found page
-            //             const res = response.data;
-            //             if (res.data.records.length === 0) {
-            //                 this.props.history.push({ pathname: '/not-found' });
-            //             } else {
-            //                 this.props.history.push({
-            //                     pathname: '/results',
-            //                     state: {
-            //                         result: res,
-            //                         snapCount: localStorage.getItem(SNAP_ATTEMPTS)
-            //                     }
-            //                 });
-            //             }
-            //         })
-            //             .catch(error => {
-            //                 this.setState({ searchInProgress: false });
-            //                 this.props.history.push({ pathname: '/not-found' });
-            //             });
-            //     })
-            //     .catch(err => {
-            //         console.log('Error loading image.');
-            //     });
-
-
-
-
-
-
-
-            //     let fileReader = new FileReader();
-            //     let img = new Image();
-
-            //     fileReader.onloadend = (ev) => {
-
-            //         img.src = ev.target.result;
-
-            //         img.onload = () => {
-            //             const resizedImage = this.resizeCapturedImage(img);
-            //             localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-            //             var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
-            //             axios.post('/api/snaps/search', {
-            //                 image_data: resizedImage,
-            //                 language: prefLang
-            //             }).then(response => {
-            //                 this.setState({ searchInProgress: false });
-            //                 // Navigate to search result page or not found page
-            //                 const res = response.data;
-            //                 if (res.data.records.length === 0) {
-            //                     this.props.history.push({ pathname: '/not-found' });
-            //                 } else {
-            //                     this.props.history.push({
-            //                         pathname: '/results',
-            //                         state: {
-            //                             result: res,
-            //                             snapCount: localStorage.getItem(SNAP_ATTEMPTS)
-            //                         }
-            //                     });
-            //                 }
-            //             })
-            //                 .catch(error => {
-            //                     this.setState({ searchInProgress: false });
-            //                     this.props.history.push({ pathname: '/not-found' });
-            //                 });
-            //         }
-
-            //     }
-
-            //     fileReader.readAsDataURL(file);
         }
-    }
-
-    getCanvas = () => {
-
-        if (!this.ctx) {
-            const canvas = document.createElement('canvas');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            this.canvas = canvas;
-            this.ctx = canvas.getContext('2d');
-        }
-        const { ctx, canvas } = this;
-        return canvas;
     }
 
     render() {
