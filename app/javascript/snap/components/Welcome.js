@@ -24,6 +24,8 @@ import axios from 'axios';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
+import loadImage from 'blueimp-load-image/js';
+
 class WelcomeComponent extends Component {
 
     constructor(props) {
@@ -109,13 +111,21 @@ class WelcomeComponent extends Component {
         let canvas = this.getCanvas();
         const ctx = canvas.getContext("2d");
 
-        // images in iOS are rotated +90 deg. Componsate that with below transformation
+        // images in iOS are rotated -90 deg. Componsate that with below transformation
         if (isIOS) {
-            let w = canvas.width
+            var width = canvas.width;
+            var height = canvas.height;
+            var styleWidth = canvas.style.width;
+            var styleHeight = canvas.style.height;
+
+            canvas.width = height;
+            canvas.height = width;
+            canvas.style.width = styleHeight;
+            canvas.style.height = styleWidth;
 
             // 90° rotate right
             ctx.rotate(0.5 * Math.PI);
-            ctx.translate(0, -w);
+            ctx.translate(0, -canvas.width);
         }
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const image = canvas.toDataURL('image/jpeg', 1);
@@ -150,61 +160,38 @@ class WelcomeComponent extends Component {
         reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
     }
 
-    processFile = (file, orientation) => {
+    submitPhoto = (canvas) => {
+        let processedImage = canvas.toDataURL('image/jpeg');
 
-        return new Promise((resolve, reject) => {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                let img = new Image();
-                img.onload = function () {
-                    let w, h;
-                    if (orientation === 1 || orientation === 3) {
-                        w = this.width;
-                        h = this.height;
-                    } else {
-                        h = this.width;
-                        w = this.height;
+        localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+        let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+        axios.post('/api/snaps/search', {
+            image_data: processedImage,
+            language: prefLang
+        }).then(response => {
+            this.setState({ searchInProgress: false });
+            // Navigate to search result page or not found page
+            const res = response.data;
+            if (res.data.records.length === 0) {
+                this.props.history.push({ pathname: '/not-found' });
+            } else {
+                this.props.history.push({
+                    pathname: '/results',
+                    state: {
+                        result: res,
+                        snapCount: localStorage.getItem(SNAP_ATTEMPTS)
                     }
-
-                    // const aspectRatio = w / h;
-
-                    // let deviceWidth = screen.width;
-                    // let deviceHeight = deviceWidth / aspectRatio;
-
-                    let canvas = document.createElement('canvas'); // 3. canvas
-                    let ctx = canvas.getContext('2d');
-                    canvas.width = w; // ++ added
-                    canvas.height = h; // ++ added
-
-                    if (orientation === 1) { // ++ added
-                        ctx.drawImage(img, 0, 0, w, h); // ++ added
-                    } else if (orientation === 3) { // 4. transform, drawImage
-                        ctx.transform(-1, 0, 0, -1, w, h);
-                        ctx.drawImage(img, 0, 0, w, h);
-                    } else if (orientation === 6) {
-                        ctx.transform(0, 1, -1, 0, w, 0);
-                        ctx.drawImage(img, 0, 0, h, w);
-                    } else {
-                        ctx.transform(0, -1, 1, 0, 0, h);
-                        ctx.drawImage(img, 0, 0, h, w);
-                    }
-
-                    let resizedImage = canvas.toDataURL();
-                    resolve(resizedImage);
-
-                }
-                img.onerror = function () {
-                    reject('error');
-                }
-                img.src = e.target.result;
+                });
             }
-            reader.readAsDataURL(file);
-        });
+        })
+            .catch(error => {
+                this.setState({ searchInProgress: false });
+                this.props.history.push({ pathname: '/not-found' });
+            });
 
     }
 
-    submitPhoto = (e) => {
+    processFile = (e) => {
         //e.persist();
         this.setState({ searchInProgress: true });
         // photo was cancelled by the user, fire camera again
@@ -213,6 +200,20 @@ class WelcomeComponent extends Component {
         }
         else {
             let file = e.target.files[0];
+
+            var options = {
+                maxWidth: screen.width,
+                canvas: true,
+                pixelRatio: window.devicePixelRatio,
+                downsamplingRatio: 0.5,
+                orientation: true
+            }
+
+            loadImage(
+                file,
+                this.submitPhoto,
+                options
+            );
 
             // let orientation = this.getOrientation(file);
             // orientation = orientation ? orientation : 1
@@ -254,45 +255,45 @@ class WelcomeComponent extends Component {
 
 
 
-            let fileReader = new FileReader();
-            let img = new Image();
+            //     let fileReader = new FileReader();
+            //     let img = new Image();
 
-            fileReader.onloadend = (ev) => {
+            //     fileReader.onloadend = (ev) => {
 
-                img.src = ev.target.result;
+            //         img.src = ev.target.result;
 
-                img.onload = () => {
-                    const resizedImage = this.resizeCapturedImage(img);
-                    localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-                    var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
-                    axios.post('/api/snaps/search', {
-                        image_data: resizedImage,
-                        language: prefLang
-                    }).then(response => {
-                        this.setState({ searchInProgress: false });
-                        // Navigate to search result page or not found page
-                        const res = response.data;
-                        if (res.data.records.length === 0) {
-                            this.props.history.push({ pathname: '/not-found' });
-                        } else {
-                            this.props.history.push({
-                                pathname: '/results',
-                                state: {
-                                    result: res,
-                                    snapCount: localStorage.getItem(SNAP_ATTEMPTS)
-                                }
-                            });
-                        }
-                    })
-                        .catch(error => {
-                            this.setState({ searchInProgress: false });
-                            this.props.history.push({ pathname: '/not-found' });
-                        });
-                }
+            //         img.onload = () => {
+            //             const resizedImage = this.resizeCapturedImage(img);
+            //             localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+            //             var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+            //             axios.post('/api/snaps/search', {
+            //                 image_data: resizedImage,
+            //                 language: prefLang
+            //             }).then(response => {
+            //                 this.setState({ searchInProgress: false });
+            //                 // Navigate to search result page or not found page
+            //                 const res = response.data;
+            //                 if (res.data.records.length === 0) {
+            //                     this.props.history.push({ pathname: '/not-found' });
+            //                 } else {
+            //                     this.props.history.push({
+            //                         pathname: '/results',
+            //                         state: {
+            //                             result: res,
+            //                             snapCount: localStorage.getItem(SNAP_ATTEMPTS)
+            //                         }
+            //                     });
+            //                 }
+            //             })
+            //                 .catch(error => {
+            //                     this.setState({ searchInProgress: false });
+            //                     this.props.history.push({ pathname: '/not-found' });
+            //                 });
+            //         }
 
-            }
+            //     }
 
-            fileReader.readAsDataURL(file);
+            //     fileReader.readAsDataURL(file);
         }
     }
 
@@ -396,7 +397,7 @@ class WelcomeComponent extends Component {
                                     {
                                         (isIOS) &&
                                         <label className="btn take-photo-btn">
-                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
+                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.processFile} />
                                             Take Photo
                                         <span className="icon">
                                                 <img src={icon_camera} alt="camera_icon" />
@@ -408,7 +409,7 @@ class WelcomeComponent extends Component {
                                     {
                                         (isAndroid && isFirefox) &&
                                         <label className="btn take-photo-btn">
-                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
+                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.processFile} />
                                             Take Photo
                                             <span className="icon">
                                                 <img src={icon_camera} alt="camera_icon" />
