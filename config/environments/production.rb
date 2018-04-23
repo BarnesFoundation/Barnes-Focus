@@ -96,7 +96,7 @@ Rails.application.configure do
     #:deliver_with => :deliver, # Rails >= 4.2.1 do not need this option since it defaults to :deliver_now
     :email_prefix => "#{ENV['EXCEPTION_NOTIFIER_PREFIX']} ",
     :sender_address => %{"notifier" <info@barnesfoundation.org>},
-    :exception_recipients => %w{puneet@happyfuncorp.com rajnikant@happyfuncorp.com}
+    :exception_recipients => %w{puneet@happyfuncorp.com rajnikant@happyfuncorp.com support@barnesfoundation.org}
   },
   :error_grouping => true,
   :error_grouping_period => 10.minutes,    # the time before an error is regarded as fixed
