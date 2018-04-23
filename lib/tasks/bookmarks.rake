@@ -9,9 +9,15 @@ namespace :bookmarks do
       bookmarks.group_by(&:email).each do | mail, bukmarks |
         els_arr = Array.new
         bukmarks.each { | obj |
-          els_obj = BarnesElasticSearch.instance.get_object(obj.image_id)
-          next if els_obj.nil?
-          els_arr.push els_obj
+          es_cached_record = EsCachedRecord.find_by image_id: obj.image_id
+
+          if es_cached_record.nil?
+            els_obj = BarnesElasticSearch.instance.get_object(obj.image_id)
+            next if els_obj.nil?
+            els_arr.push els_obj
+          else
+            els_arr.push es_cached_record.es_data
+          end
         }
 
         begin
