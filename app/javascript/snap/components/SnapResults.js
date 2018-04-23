@@ -57,6 +57,11 @@ class SnapResults extends Component {
     const search_result = this.state.result;
     if (search_result["success"]) {
       if (search_result["data"]["records"].length > 0) {
+
+        let h = Math.floor(0.6 * screen.height);
+        let w = screen.width;
+        let cropParams = '?crop=entropy&fit=crop&h=' + h + '&w=' + w;
+
         const result = {};
         const art_obj = search_result["data"]["records"][0];
         result['id'] = art_obj.id;
@@ -66,7 +71,7 @@ class SnapResults extends Component {
         result['classification'] = art_obj.classification;
         result['locations'] = art_obj.locations;
         result['medium'] = art_obj.medium;
-        result['url'] = art_obj.art_url
+        result['url'] = art_obj.art_url + cropParams
         result['invno'] = art_obj.invno;
         result['displayDate'] = art_obj.displayDate;
         this.setState({

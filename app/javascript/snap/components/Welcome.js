@@ -24,6 +24,8 @@ import axios from 'axios';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
+import loadImage from 'blueimp-load-image/js';
+
 class WelcomeComponent extends Component {
 
     constructor(props) {
@@ -101,20 +103,40 @@ class WelcomeComponent extends Component {
         }
     }
 
-    /**
-     * Original image captured from camera is of high resolution and size ~ 4MB.
-     * Resize this image as per device screen width/ height before sending to server.
-     */
-    resizeCapturedImage = (img) => {
-        let canvas = this.getCanvas();
-        const context = canvas.getContext("2d");        
-        context.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const image = canvas.toDataURL('image/jpeg', 1.0);
-        return image;
+
+    submitPhoto = (canvas) => {
+        let processedImage = canvas.toDataURL('image/jpeg');
+
+        localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+        let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+        axios.post('/api/snaps/search', {
+            image_data: processedImage,
+            language: prefLang
+        }).then(response => {
+            this.setState({ searchInProgress: false });
+            // Navigate to search result page or not found page
+            const res = response.data;
+            if (res.data.records.length === 0) {
+                this.props.history.push({ pathname: '/not-found' });
+            } else {
+                this.props.history.push({
+                    pathname: '/results',
+                    state: {
+                        result: res,
+                        snapCount: localStorage.getItem(SNAP_ATTEMPTS)
+                    }
+                });
+            }
+        })
+            .catch(error => {
+                this.setState({ searchInProgress: false });
+                this.props.history.push({ pathname: '/not-found' });
+            });
+
     }
 
-    submitPhoto = (e) => {
-        //e.persist();
+    processFile = (e) => {
+
         this.setState({ searchInProgress: true });
         // photo was cancelled by the user, fire camera again
         if (e.target.files.length === 0) {
@@ -122,62 +144,20 @@ class WelcomeComponent extends Component {
         }
         else {
             let file = e.target.files[0];
-            let fileReader = new FileReader();
-            let img = document.createElement('img');
-
-            fileReader.onloadend = (ev) => {
-
-                img.src = fileReader.result;
-                img.onload = () => {
-                    const resizedImage = this.resizeCapturedImage(img);
-                    localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-                    var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
-                    axios.post('/api/snaps/search', {
-                        image_data: resizedImage,
-                        language: prefLang
-                    }).then(response => {
-                        this.setState({ searchInProgress: false });
-                        // Navigate to search result page or not found page
-                        const res = response.data;
-                        if (res.data.records.length === 0) {
-                            this.props.history.push({ pathname: '/not-found' });
-                        } else {
-                            this.props.history.push({
-                                pathname: '/results',
-                                state: {
-                                    result: res,
-                                    snapCount: localStorage.getItem(SNAP_ATTEMPTS)
-                                }
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        this.setState({ searchInProgress: false });
-                        this.props.history.push({ pathname: '/not-found' });
-                    });
-                }
-                        
+            let options = {
+                maxWidth: screen.width,
+                canvas: true,
+                downsamplingRatio: 0.5,
+                orientation: true
             }
 
-            fileReader.readAsDataURL(file);
+            loadImage(
+                file,
+                this.submitPhoto,
+                options
+            );
+
         }
-    }
-
-    getCanvas = () => {
-
-        if (!this.ctx) {
-            const canvas = document.createElement('canvas');
-
-            canvas.width = screen.width;
-            canvas.height = screen.height;
-
-            this.canvas = canvas;
-            this.ctx = canvas.getContext('2d');
-        }
-
-        const { ctx, canvas } = this;
-
-        return canvas;
     }
 
     render() {
@@ -267,7 +247,7 @@ class WelcomeComponent extends Component {
                                     {
                                         (isIOS) &&
                                         <label className="btn take-photo-btn">
-                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
+                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.processFile} />
                                             Take Photo
                                         <span className="icon">
                                                 <img src={icon_camera} alt="camera_icon" />
@@ -277,9 +257,9 @@ class WelcomeComponent extends Component {
                                     }
 
                                     {
-                                        (isAndroid && isChrome) &&
+                                        (isAndroid && isFirefox) &&
                                         <label className="btn take-photo-btn">
-                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.submitPhoto} />
+                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.processFile} />
                                             Take Photo
                                             <span className="icon">
                                                 <img src={icon_camera} alt="camera_icon" />
@@ -289,7 +269,7 @@ class WelcomeComponent extends Component {
                                     }
 
                                     {
-                                        (isAndroid && !isChrome) &&
+                                        (isAndroid && isChrome) &&
                                         <p> You are using Chrome on Android</p> &&
                                         <Link className="btn take-photo-btn" to="/snap">
                                             Take Photo
