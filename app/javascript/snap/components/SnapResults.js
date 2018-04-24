@@ -60,7 +60,7 @@ class SnapResults extends Component {
 
         let h = Math.floor(0.6 * screen.height);
         let w = screen.width;
-        let cropParams = '?crop=entropy&fit=crop&h=' + h + '&w=' + w;
+        let cropParams = '?crop=faces,entropy&fit=crop&h=' + h + '&w=' + w;
 
         const result = {};
         const art_obj = search_result["data"]["records"][0];
@@ -142,7 +142,7 @@ class SnapResults extends Component {
           title_author += ' by ' + this.state.searchResults[0].artist;
           hashtag += ',' + this.state.searchResults[0].artist.split(' ').join('');
         }
-        title_author = title_author.split(' ').join('+') + '. ';
+        title_author = title_author.split(' ').join('+');
         //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.searchResults[0].id;
         appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
         webFallbackURL = 'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
