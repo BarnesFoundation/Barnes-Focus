@@ -1,5 +1,3 @@
-
-
 # Installation Instructions
 * Git clone
 * Install Ruby (using RVM): `rvm install ruby-2.4.3`
@@ -38,7 +36,7 @@ This will ask few question/s:
 * Select a default region
 * Select an application to use
 * Select Ruby version - We're using 2.4 with Puma
-* Select the default environment - You can change this later by typing `eb use [environment_name]`
+* Select the default environment
 * Select a repository (when running the init for 2nd time). For first time, you'll be asked to enter a repository name. **NOTE: We have skipped this step as we do not want to use CodeCommit repository that Beanstalk gives. We are using Git here**
 * Select/Enter branch name - This can be skipped too
 
@@ -67,43 +65,71 @@ Select these options:
 
 This will initialise .elasticbeanstalk folder and create `config.yml` file
 
-To change which branch to deploy on Dev server, open `.elasticbeanstalk/config.yml`
+We have 2 applications hosted on ElasticBeanstalk
+* barnes-snap-dev
+	* barnes-snap-dev-env, and
+	* barnes-snap-dev-worker-env
+* barnes-snap
+	* barnes-snap-production, and
+	* barnes-snap-production-worker-env
 
-      branch-defaults:
-        snap-dev:
-          environment: barnes-snap-dev-env
-          group_suffix: null
-      environment-defaults:
-        barnes-snap-dev-env:
-          branch: snap-dev
-          repository: null
-        barnes-snap-stage-env:
-          branch: snap-dev
-          repository: null
-      global:
-        application_name: barnes-snap-dev
-        branch: stage
-        default\_ec2\_keyname: barnes-snap-keypair
-        default_platform: Ruby 2.4 (Puma)
-        default_region: us-east-1
-        include\_git\_submodules: true
-        instance_profile: null
-        platform_name: null
-        platform_version: null
-        profile: eb-cli
-        repository: origin
-        sc: git@github.com:BarnesFoundation/barnes-snap.git
-        workspace_type: Application
-- Change the branch-name under `environment-defaults` and re-run `eb deploy --staged`
-- Replace this file with the one in your local environment and you are all set to deploy `snap-dev` to Dev server
+To deploy to these applications and environments following things needs to be taken care of:
+* You must be on the same git branch to deploy. We are using `snap-dev` to deploy on `barnes-snap-dev` and `master` to deploy on `barnes-snap`
+* Both your web and worker env should use the latest code
 
-To deploy an existing app to Beanstalk, from console:
+We will use `.elasticbeanstalk/config.yml` to deploy. If this file is not present, then copy the contents of below into that file (**DO NOT COMMIT THIS FILE INTO SOURCE CODE**)
 
-    eb deploy --staged
+    branch-defaults:
+      master:
+        environment: barnes-snap-production
+        group_suffix: null
+      snap-dev:
+        environment: barnes-snap-dev-env
+        group_suffix: null
+    environment-defaults:
+      barnes-snap-dev-env:
+        branch: snap-dev
+        repository: null
+      barnes-snap-dev-worker-env:
+        branch: snap-dev
+        repository: null
+      barnes-snap-production:
+        branch: master
+        repository: null
+      barnes-snap-production-worker-env:
+        branch: master
+        repository: null
+    global:
+      application_name: barnes-snap
+      default_ec2_keyname: barnes-snap-keypair
+      default_platform: Ruby 2.4 (Puma)
+      default_region: us-east-1
+      include_git_submodules: true
+      instance_profile: null
+      platform_name: null
+      platform_version: null
+      profile: eb-cli
+      repository: origin
+      sc: git@github.com:BarnesFoundation/barnes-snap.git
+      workspace_type: Application
 
-* This deploys `snap-dev` branch to `barnes-snap-dev` app. URL: http://barnes-snap-dev-env.us-east-1.elasticbeanstalk.com/
+Before we run `eb deploy`, let's configure this file for our purpose
+- Assuming, you are on `snap-dev` and want to deploy to dev app (web environment). To do so, change:
+	* `environment` under `branch-defaults ~> snap-dev` and use `barnes-snap-dev-env`
+	* `application_name` under `global` and use `barnes-snap-dev`
+* Assuming, you are on `snap-dev` and want to deploy to dev app (worker environment). To do so, change:
+	* `environment` under `branch-defaults ~> snap-dev` and use `barnes-snap-dev-worker-env`
+	* `application_name` under `global` and use `barnes-snap-dev`
+* Assuming, you are on `master` and want to deploy to production app (web environment). To do so, change:
+	* `environment` under `branch-defaults ~> master` and use `barnes-snap-dev-production`
+	* `application_name` under `global` and use `barnes-snap`
+* Assuming, you are on `master` and want to deploy to production app (worker environment). To do so, change:
+	* `environment` under `branch-defaults ~> master` and use `barnes-snap-dev-production-worker-env`
+	* `application_name` under `global` and use `barnes-snap`
 
-* You'll need `barnes-snap-keypair` to deploy. The relevant files can be found under `private` folder. Copy this into `~/.ssh` folder (local) and give these 2 files necessary write permission using `chmod`
+Save changes as per deployment needs and run `eb deploy --staged`
+
+**NOTE**: You'll need `barnes-snap-keypair` to deploy. The relevant files can be found under `private` folder. Copy this into `~/.ssh` folder (local) and give these 2 files necessary write permission using `chmod`
 
 ### Troubleshooting
 > If you get `ERROR: ServiceError - User: arn:aws:iam::RAND-ID:user/NAME is not authorized to perform: codecommit:ListRepositories` - That means you do not have sufficient privileges. Please get in touch with the respective AWS person and/or create/update policy by yourself (this needs caution).
@@ -131,6 +157,8 @@ commit this file and re-deploy. OR you can `ssh` into server and run:
 ## Running Rails Console
 
 You can SSH into the web server with: `eb ssh [environment_name]`
+**NOTE**: `eb ssh` always ssh on the selected environment (based on Current Working Git Branch). So, if you would like to ssh into Production App (Web Environment), switch git branch to `master`, refer to the `.elasticbeanstalk/config.yml`
+
 > The Rails application is located at **`/var/app/current`**
 
 You'll need `sudo` access and then you'll be able to access console. Below commands shall do that:
@@ -139,5 +167,3 @@ You'll need `sudo` access and then you'll be able to access console. Below comma
     \[root@ip-172-31-36-219 current\]# bundle exec rails c production
     Loading production environment (Rails 5.1.5)
     irb(main):001:0>
-
-## Accessing Database (for SQL Queries)
