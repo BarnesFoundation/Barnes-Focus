@@ -2,7 +2,7 @@ require 'silverpop'
 require 'oauth2'
 
 class SubscribeToNewsletterJob < ApplicationJob
-  queue_as :image_processing_queue
+  queue_as ENV['SQS_QUEUE'].to_sym
 
   def perform(subscription_id)
     subscription = Subscription.find_by id: subscription_id

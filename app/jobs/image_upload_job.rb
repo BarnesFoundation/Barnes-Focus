@@ -1,7 +1,7 @@
 require 's3_store'
 
 class ImageUploadJob < ApplicationJob
-  queue_as :image_processing_queue
+  queue_as ENV['SQS_QUEUE'].to_sym
 
   def perform(snap_id)
     # Save to S3
