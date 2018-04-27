@@ -59,6 +59,11 @@ class WelcomeComponent extends Component {
 
     componentDidMount() {
 
+        if (this.state.cameraCancelled) {
+            $("#snapCarousel .carousel-inner .carousel-item:first").removeClass("active");
+            $("#snapCarousel .carousel-inner .carousel-item:last").addClass("active");
+        }
+
         this.checkIndex();
 
         const settings = {
@@ -102,10 +107,6 @@ class WelcomeComponent extends Component {
             this.input.click();
         }
 
-        if(this.state.cameraCancelled) {
-            $("#snapCarousel .carousel-inner .carousel-item:first").removeClass("active");
-            $("#snapCarousel .carousel-inner .carousel-item:last").addClass("active");
-        }
     }
 
 
