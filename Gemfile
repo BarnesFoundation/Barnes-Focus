@@ -18,7 +18,7 @@ gem 'jbuilder', '~> 2.5'
 
 gem 'rest-client', require: false
 gem 'aasm'
-#gem 'aws-sdk-s3'
+gem 'aws-sdk',  '~> 2'
 gem 'active_elastic_job'
 gem 'elasticsearch'
 gem 'delayed_job'
