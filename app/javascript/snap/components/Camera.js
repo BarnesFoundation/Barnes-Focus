@@ -22,10 +22,15 @@ class Camera extends Component {
     ticking = false;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
-    // switchCamera() {
-    //     this.setState({ frontCamera: !this.state.frontCamera });
-    //     console.log('front camera = ' + this.state.frontCamera);
-    // }
+
+    cancelCamera = () => {
+        this.props.history.push({
+            pathname: '/',
+            state: {
+                cameraCancelled: true
+            }
+        });
+    }
 
     toggleImage = (show) => {
         if (show) {
@@ -148,7 +153,7 @@ class Camera extends Component {
             //console.log('e.scale ' + e.scale);
             this.zoomLevel = (this.initZoom * e.scale).toFixed(1);
             this.zoomLevel = (this.zoomLevel < 1) ? 1 : this.zoomLevel;
-            
+
             if (this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
                 this.requestZoom();
             }
@@ -236,7 +241,7 @@ class Camera extends Component {
                         </div>
                     }
                 </div>
-                <CameraControls searchInProgress={this.state.searchInProgress} showVideo={this.state.showVideo} takePhoto={this.takePhoto} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />
+                <CameraControls searchInProgress={this.state.searchInProgress} showVideo={this.state.showVideo} cancelCamera={this.cancelCamera} takePhoto={this.takePhoto} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />
             </div>
         );
     }

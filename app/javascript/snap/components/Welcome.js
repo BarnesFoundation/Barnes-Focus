@@ -101,6 +101,11 @@ class WelcomeComponent extends Component {
         if (this.state.launchCamera && (isIOS || (isAndroid && isFirefox))) {
             this.input.click();
         }
+
+        if(this.state.cameraCancelled) {
+            $("#snapCarousel .carousel-inner .carousel-item:first").removeClass("active");
+            $("#snapCarousel .carousel-inner .carousel-item:last").addClass("active");
+        }
     }
 
 
