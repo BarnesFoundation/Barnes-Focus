@@ -140,7 +140,7 @@ class SnapResults extends Component {
         let title_author = this.state.searchResults[0].title;
         if (this.state.searchResults[0].artist) {
           title_author += ' by ' + this.state.searchResults[0].artist;
-          hashtag += ',' + this.state.searchResults[0].artist.split(' ').join('');
+          hashtag += ',' + this.state.searchResults[0].artist.split(' ').join('').split('-').join('');
         }
         title_author = title_author.split(' ').join('+');
         //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.searchResults[0].id;
