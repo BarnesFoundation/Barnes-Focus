@@ -11,7 +11,7 @@ const CameraControls = (props) => (
                     {
                         props.showVideo &&
                         <div>
-                            <Link className="control-left" to="/">Cancel</Link>
+                            <a className="control-left" onClick={props.cancelCamera}>Cancel</a>
                             <div className="camera-shutter">
                                 <span>PHOTO</span>
                                 <a className="round-button-circle" onClick={props.takePhoto}></a>
