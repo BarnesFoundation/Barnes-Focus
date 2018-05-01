@@ -1,12 +1,26 @@
-
-<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #eeeeee;" height="100%">
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+<tr>
+<td align="center" valign="top" width="500">
+<![endif]-->   
+<table border="0" cellpadding="0" cellspacing="0" width="80%" style="border: 1px solid #eeeeee;" height="100%" class="wrapper">
   <tr>
     <td>
       <div align="center">
+        <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+        <tr>
+        <td align="center" valign="top" width="500">
+        <![endif]-->      
         <table border="0" cellpadding="0" cellspacing="0" width="80%" height="100%" class="main-container">
           <tr>
             <td>
               <!-- top spacer -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->
               <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
                 <tr>
                   <td>
@@ -15,8 +29,18 @@
                 </tr>
                 <tr><td style="border-top: 1px solid #eeeeee;"></td></tr>
               </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
 
               <!-- logo and social icons  -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->
               <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
                 <tr>
                   <td align="left" style="text-align: left; padding: 20px 0;">
@@ -35,8 +59,18 @@
                 </tr>
                 <tr><td colspan="2" style="border-top: 1px solid #eeeeee;"></td></tr>
               </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
 
               <!-- Welcome and bookmark message -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->
               <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
                 <tr>
                   <td align="left" style="text-align: left; padding: 20px 0;">
@@ -52,33 +86,44 @@
                 </tr>
                 <tr><td style="border-top: 1px solid #eeeeee;"></td></tr>
               </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
 
               <!-- Bookmarks -->
-              <table cellpadding="0" cellspacing="0" border="0" style="width:100%; color: #282828;" class="bookmarks-table">
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->
+              <table dir="ltr" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:800px; color: #282828;font-size: 18px;" class="bookmarks-table">
                 <% @els_arr.each do | els_elem | %>
                 
-                  <tr style="padding: 40px 0;">
-                    <td width="25%">
-                      <%= image_tag "https://barnes-image-repository.s3.amazonaws.com/images/" + els_elem['id'].to_s + "_" + els_elem['imageSecret'] + "_n.jpg", alt: els_elem['id'].to_s, style:"height: 175px; width: 75%; padding: 40px 0;"%>
+                  <tr>
+                    <td width="30%" dir="ltr" class="full spacer" style="color: #282828; vertical-align: top; padding: 40px 0;">
+                       <%= image_tag "https://barnes-image-repository.imgix.net/images/" + els_elem['id'].to_s + "_" + els_elem['imageSecret'] + "_n.jpg?crop=faces,entropy&fit=crop&w=200&h=200", alt: els_elem['id'].to_s%>
                     </td>
-                    <td width="75%" style="color: #282828; vertical-align: top; padding-top: 40px;">
-                      <p>
-                      <%= link_to 'https://collection.barnesfoundation.org/objects/'+ els_elem['id'].to_s, :title => "barnes collection" do %>
-                        <h3><%= els_elem['title'] %></h3>
-                      <% end %>
-                      </p>
                     
-                      <%= els_elem['people']%>. <%= els_elem['title']%>, <%=els_elem['displayDate']%>. <%=els_elem['medium']%>, <%=els_elem['dimensions'] %>. <%=els_elem['invno'] %>
-                     
+                    <td width="65%" dir="ltr" class="full" style="color: #282828; vertical-align: top; padding: 18px 0 40px 0;">
+                      <p>
+                        <%= link_to 'https://collection.barnesfoundation.org/objects/'+ els_elem['id'].to_s, :title => "barnes collection" do %>
+                          <h3><%= els_elem['title'] %></h3>
+                        <% end %>
+                      </p>
+                                      
+                      <%= els_elem['people']%>. <%= els_elem['title']%>, <%=els_elem['displayDate']%>. <%=els_elem['medium']%>, <%=els_elem['dimensions'] %>. <%=els_elem['invno']%>
+                              
                       <% if els_elem['objRightsTypeID'].present? %>
                         <% if ['1', '3'].include?(els_elem['objRightsTypeID']) %>
                           <p>In Copyright. <br />
                             <%= els_elem['creditLine'] %>
                           </p>
                         <% elsif ['4', '8', '10'].include?(els_elem['objRightsTypeID']) %>
-                          <p>Public domain. </p>
+                            <p>Public domain. </p>
                         <% elsif ['2', '6'].include?(els_elem['objRightsTypeID']) %>
-                          <p>Copyright Undetermined</p>
+                            <p>Copyright Undetermined.</p>
                         <% end %>
                       <% end %>
                     </td>
@@ -86,8 +131,18 @@
                   <tr><td colspan="2" style="border-top: 1px solid #eeeeee;"></td></tr>
                 <% end %>
               </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
 
               <!-- footer spacer-->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->              
               <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
                 <tr>
                   <td>
@@ -95,8 +150,18 @@
                   </td>
                 </tr>
               </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
 
               <!-- footer social icons -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->             
               <table cellpadding="0" cellspacing="0" border="0" style="width:100%" class="footer-social">
                 <tr>
                   <td>
@@ -115,8 +180,18 @@
                   </td>
                 </tr>
               </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
 
               <!-- footer links -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->                
               <div align="center">
                 <table cellpadding="0" cellspacing="0" border="0" style="width: 60%; table-layout: fixed;" class="footer-action">
                   <tr style="padding: 0 40px;">
@@ -138,7 +213,11 @@
                   </tr>
                 </table>
               </div>
-
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
               <!-- footer address | contact etc -->
               <div align="center">
                 <table cellpadding="0" cellspacing="0" border="0" style="width: 50%; table-layout: fixed;" class="footer-info">
@@ -163,8 +242,18 @@
                   </tr>
                 </table>
               </div>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
 
-               <!-- footer spacer-->
+              <!-- footer spacer-->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->  
               <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
                 <tr>
                   <td>
@@ -173,8 +262,18 @@
                 </tr>
                 <tr><td style="border-top: 1px solid #eeeeee;"></td></tr>
               </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
 
                <!-- footer spacer-->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->                
               <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
                 <tr>
                   <td>
@@ -182,12 +281,26 @@
                   </td>
                 </tr>
               </table>
-
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->   
 
             </td>
           </tr>
         </table>
+        <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+        <tr>
+        <td align="center" valign="top" width="500">
+        <![endif]-->           
       </div>
     </td>
   </tr>  
 </table>
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+<tr>
+<td align="center" valign="top" width="500">
+<![endif]-->   
