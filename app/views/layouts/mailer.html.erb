@@ -2,12 +2,65 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <style>
+    <style type="text/css">
       /* Email styles need to be inline */
       a {
         text-decoration: none;
       }
 
+      @media only screen and (max-width:480px){
+        .wrapper, .footer-info, .footer-action {
+          width: 100% !important; 
+        }
+
+        .main-container {
+          width: 90% !important;
+        }
+
+        .footer-info, .footer-action {
+          font-size: 12px !important;
+        }
+        
+        .bookmarks-table td img{
+          width: 100% !important;
+        }
+
+        .w100 {
+          display:block !important;
+          width: 100% !important;
+        }
+
+        .w50 {
+          display:block !important;
+          flex: 50% !important;
+        }
+
+        .p20 {
+          padding-top: 20px !important;
+        }
+
+        .text-center{
+          text-align: center !important;
+        }
+
+        .logos__barnes-logo {
+          padding: 40px 0 0 0 !important;
+        }
+
+        .logos__social-icons {
+          padding: 20px 0 20px 0 !important;
+        }
+
+        .spacer {
+          padding-bottom: 0 !important;
+        }
+
+        .header {
+          font-size: 32px !important;
+        }
+
+      }
+      
       .bookmarks-table a {
         color: #282828 !important;
       }
