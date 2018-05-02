@@ -276,7 +276,6 @@ class WelcomeComponent extends Component {
 
                                     {
                                         (isAndroid && isChrome) &&
-                                        <p> You are using Chrome on Android</p> &&
                                         <Link className="btn take-photo-btn" to="/snap">
                                             Take Photo
                                             <span className="icon">
