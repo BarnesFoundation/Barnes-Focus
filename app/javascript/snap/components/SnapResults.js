@@ -60,7 +60,12 @@ class SnapResults extends Component {
 
         let h = Math.floor(0.6 * screen.height);
         let w = screen.width;
+
+        let bh = Math.floor(0.25 * screen.height);
+        let bw = Math.floor(screen.width - 32);
+
         let cropParams = '?crop=faces,entropy&fit=crop&h=' + h + '&w=' + w;
+        let bookmarkCropParams = '?crop=faces,entropy&fit=crop&h=' + bh + '&w=' + bw;
 
         const result = {};
         const art_obj = search_result["data"]["records"][0];
@@ -71,7 +76,8 @@ class SnapResults extends Component {
         result['classification'] = art_obj.classification;
         result['locations'] = art_obj.locations;
         result['medium'] = art_obj.medium;
-        result['url'] = art_obj.art_url + cropParams
+        result['url'] = art_obj.art_url + cropParams;
+        result['bookmarkImageUrl'] = art_obj.art_url + bookmarkCropParams;
         result['invno'] = art_obj.invno;
         result['displayDate'] = art_obj.displayDate;
         this.setState({
@@ -328,14 +334,14 @@ class SnapResults extends Component {
                           <i className="fa fa-2x fa-angle-left pull-left"></i>
                           <span className="dismiss" onClick={this.closeBookmarkModal}>
                             Go back
-                                                </span>
+                          </span>
                         </div>
                       </div>
                       <div className="title mt-3">
                         <h2>{this.state.searchResults[0].title}</h2>
                       </div>
                       <div className="picture">
-                        <img src={this.state.searchResults[0].url} alt="bookmark_img" />
+                        <img src={this.state.searchResults[0].bookmarkImageUrl} alt="bookmark_img" />
                       </div>
                       <div className="message">Information about the art you bookmark will be emailed to you after your visit.</div>
                       <form onSubmit={this.submitBookMark}>
@@ -344,13 +350,13 @@ class SnapResults extends Component {
                           <input id="newsletter-chk" type="checkbox" name="newsletterSubscription" onChange={this.handleBookmarkFormInputChange} />
                           <label htmlFor="newsletter-chk">
                             Sign up for the Barnes newsletter
-                                                        </label>
+                          </label>
                         </div>
                         <div className="row">
-                          <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
+                          <div className="col-6 offset-3 text-center">
                             <button type="submit" className="btn snap-btn snap-btn-default">
                               Submit
-                                                        </button>
+                           </button>
                           </div>
                         </div>
                       </form>
@@ -363,16 +369,16 @@ class SnapResults extends Component {
                   <p className="text-muted">{this.state.searchResults[0].artist}. {this.state.searchResults[0].title}, {this.state.searchResults[0].displayDate}. {this.state.searchResults[0].medium}</p>
                 </div>
                 <div className="card-text">{this.state.searchResults[0].shortDescription}.</div>
-                <div className="card-text">- John House, Renoir in the Barnes Foundation.</div>
+                {/* <div className="card-text">- John House, Renoir in the Barnes Foundation.</div> */}
               </div>
-              <div className="card-footer">
+              {/* <div className="card-footer">
                 <h2>Albert Barnes taught people to look at works of art primarily in terms of their visual relationships.</h2>
-                {/* <p>Swipe for visually similar works</p> */}
-              </div>
+                <p>Swipe for visually similar works</p>
+              </div> */}
             </div>
           </div>
         </div>
-        <div className="mt-5">
+        <div className="content mt-5">
           <LanguageSelect />
         </div>
         <div id="reset-experience" className="row mt-5 mb-3">
@@ -399,7 +405,7 @@ class SnapResults extends Component {
               </div>
               <div className="message">Warning: This will erase your bookmarked artwork, email address, and language preferences.</div>
               <div className="row action">
-                <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
+                <div className="col-6 offset-3 text-center">
                   <button className="btn snap-btn snap-btn-danger" onClick={this.resetExperience}>
                     Reset
                   </button>
