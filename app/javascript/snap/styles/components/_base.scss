@@ -331,6 +331,10 @@ input[type=email].error {
             margin-top:0;
         }
 
+        .dismiss {
+            line-height: 3rem !important;
+        }
+
         .list-group {
             font-size: 1rem;
             margin-top: 2.875rem;
@@ -340,9 +344,11 @@ input[type=email].error {
                 line-height: 2rem;
             }
         }
+    }
 
-    
-        
+    .snap-btn {
+        height: 8vh;
+        font-size: 1.3125rem;
     }
 }
 
