@@ -1,4 +1,6 @@
-require 'silverpop'
+require 'uri'
+require 'net/https'
+require 'json'
 require 'oauth2'
 
 class SubscribeToNewsletterJob < ApplicationJob
@@ -17,22 +19,31 @@ class SubscribeToNewsletterJob < ApplicationJob
 
       access_token = OAuth2::AccessToken.from_hash(client, refresh_token: Rails.application.secrets[:silverpop_config][:refresh]).refresh!
 
-      @client = SilverPop.new({access_token: access_token.token, url: Rails.application.secrets[:silverpop_config][:endpoint]})
-
       #add_recipeint
+      uri = URI.parse('https://api3.silverpop.com:443/rest/databases/'+Rails.application.secrets[:silverpop_config][:list_id].to_s+'/contacts')
+
+      req = Net::HTTP::Post.new(uri.to_s)
+      req.body = {
+        "email" => subscription.email,
+        "leadSource" => "snap-bookmark-consent"
+      }.to_json
+      req['Authorization'] = "Bearer #{access_token.token}"
+      req['Content-Type'] = 'application/json'
+
       begin
-        resp = @client.add_recipient(
-          {
-            email: subscription.email,
-            name: "CRM Lead Source"
-          },
-          Rails.application.secrets[:silverpop_config][:list_id],
-          []
-        )
-        p resp.Envelope.Body.RESULT.SUCCESS
-      rescue Exception => err
-        p "unable to add recipient due to: #{err.to_s}"
+        response = https(uri).request(req)
+        subscription.update_column( :is_subscribed, true )
+        p response.body
+      rescue Exception => e
+        p 'request failed to execute because of: ' + e.to_s
       end
+    end
+  end
+
+  def https(uri)
+    Net::HTTP.new(uri.host, uri.port).tap do |http|
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
   end
 end
