@@ -250,7 +250,7 @@ class WelcomeComponent extends Component {
                                         <h1>Take a photo to learn more about a work of art.</h1>
                                     </div>
 
-                                    {
+                                    {/* {
                                         (isIOS) &&
                                         <label className="btn take-photo-btn">
                                             <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.processFile} />
@@ -260,7 +260,7 @@ class WelcomeComponent extends Component {
                                             </span>
                                         </label>
 
-                                    }
+                                    } */}
 
                                     {
                                         (isAndroid && isFirefox) &&
@@ -275,7 +275,7 @@ class WelcomeComponent extends Component {
                                     }
 
                                     {
-                                        (isAndroid && isChrome) &&
+                                        (isIOS || (isAndroid && isChrome)) &&
                                         <Link className="btn take-photo-btn" to="/snap">
                                             Take Photo
                                             <span className="icon">
