@@ -8,26 +8,28 @@ class ImageUploadJob < ApplicationJob
     snap_search_result = SnapSearchResult.find_by id: snap_id
     if snap_search_result
       image_data = Base64.decode64(snap_search_result.searched_image_data['data:image/jpeg;base64,'.length .. -1])
-      file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
-      File.open(file_name, 'wb') do |f|
-        f.write image_data
-      end
-      file = CudaSift.new.loadFileData(file_name)
-
-      if File.exists?(file.path)
-        url = ''
-        File.open(file.path) do |f|
-         obj = S3Store.new(f).store
-         url = obj.url
+      unless image_data.blank?
+        file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
+        File.open(file_name, 'wb') do |f|
+          f.write image_data
         end
+        file = CudaSift.new.loadFileData(file_name)
 
-        File.delete(file.path)
+        if File.exists?(file.path)
+          url = ''
+          File.open(file.path) do |f|
+           obj = S3Store.new(f).store
+           url = obj.url
+          end
 
-        #save search result and image captured URL in db for logging
-        snap_search_result.searched_image_data = nil
-        snap_search_result.searched_image_url = url
+          File.delete(file.path)
+
+          #save search result and image captured URL in db for logging
+          snap_search_result.searched_image_data = nil
+          snap_search_result.searched_image_url = url
+        end
+        snap_search_result.save
       end
-      snap_search_result.save
     end
 
     #SnapSearchResult.create(searched_image_data: args[0], api_response: args[1][:response], es_response: args[1][:es_response], response_time: args[1][:response_time])
