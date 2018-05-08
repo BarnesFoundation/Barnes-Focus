@@ -103,9 +103,10 @@ class WelcomeComponent extends Component {
             this.checkIndex();
         })
 
-        if (this.state.launchCamera && (isIOS || (isAndroid && isFirefox))) {
-            this.input.click();
-        }
+        // NOTE: below code is to be used only when native camera capture is enabled using <input type="file".../>
+        // if (this.state.launchCamera && (isIOS || (isAndroid && isFirefox))) {
+        //     this.input.click();
+        // }
 
     }
 
@@ -250,7 +251,7 @@ class WelcomeComponent extends Component {
                                         <h1>Take a photo to learn more about a work of art.</h1>
                                     </div>
 
-                                    {
+                                    {/* {
                                         (isIOS) &&
                                         <label className="btn take-photo-btn">
                                             <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.processFile} />
@@ -272,17 +273,17 @@ class WelcomeComponent extends Component {
                                             </span>
                                         </label>
 
-                                    }
+                                    } */}
 
-                                    {
-                                        (isAndroid && isChrome) &&
-                                        <Link className="btn take-photo-btn" to="/snap">
-                                            Take Photo
+
+
+                                    <Link className="btn take-photo-btn" to="/snap">
+                                        Take Photo
                                             <span className="icon">
-                                                <img src={icon_camera} alt="camera_icon" />
-                                            </span>
-                                        </Link>
-                                    }
+                                            <img src={icon_camera} alt="camera_icon" />
+                                        </span>
+                                    </Link>
+
 
                                 </div>
 
