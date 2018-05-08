@@ -136,8 +136,9 @@
 /* Styles */    
     .camera-shutter{
         .round-button-circle {
-            width: 90% !important;
-            height:90% !important;
+            width: 98% !important;
+            height:98% !important;
+            border: 7px solid #fff;
         }
 
         span {
@@ -146,10 +147,10 @@
     }
 
     .camera{
-        height: 70vh !important;
+        height: 66vh !important;
     }
     .camera-controls {
-        min-height: 30vh !important;
+        min-height: 34vh !important;
     }
         
 }
