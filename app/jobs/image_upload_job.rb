@@ -7,8 +7,6 @@ class ImageUploadJob < ApplicationJob
     # Save to S3
     snap_search_result = SnapSearchResult.find_by id: snap_id
     if snap_search_result
-      p "******testing snap_search_result**********"
-      p snap_search_result.inspect
       image_data = Base64.decode64(snap_search_result.searched_image_data['data:image/jpeg;base64,'.length .. -1])
       file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
       File.open(file_name, 'wb') do |f|
@@ -24,9 +22,6 @@ class ImageUploadJob < ApplicationJob
         end
 
         File.delete(file.path)
-
-        p "******testing the url********"
-        p url
 
         #save search result and image captured URL in db for logging
         snap_search_result.searched_image_data = nil
