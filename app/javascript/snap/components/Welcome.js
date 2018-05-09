@@ -278,7 +278,7 @@ class WelcomeComponent extends Component {
 
 
                                     <Link className="btn take-photo-btn" to="/snap">
-                                        Take Photo
+                                        Take photo
                                             <span className="icon">
                                             <img src={icon_camera} alt="camera_icon" />
                                         </span>
