@@ -93,7 +93,7 @@ p {
     overflow: auto;
     border-radius: 0px;
     outline: none;
-    padding: 2rem;
+    padding: 1.6rem 1.6rem 2.2rem;
     text-align: center;
 
     .close {
@@ -135,8 +135,8 @@ p {
     .dismiss {
         text-align: left;
         float: left;
-        line-height: 2rem;
-        font-size: 1.5rem;
+        line-height: 2.25rem;
+        font-size: 1.25rem;
     }
 
     .reset {
@@ -183,7 +183,7 @@ p {
         }
     
         .message {
-            margin: 2vh 3vh;
+            margin: 1.25rem 1rem 1.6rem;
         }
     
         form {
@@ -229,9 +229,9 @@ p {
 .snap-btn {
     border-radius: 0;
     border: .125rem solid #E3E3E3;
-    height: 10vh;
+    height: 55px;
     width: 100%;
-    padding: 3vh 0;
+    //padding: 3vh 0;
     line-height: 1rem;
 
     &.snap-btn-default {
@@ -298,6 +298,10 @@ input[type=email].error {
             .title {
                 margin-top: 8vh !important;
             }
+        }
+
+        .dismiss {
+            font-size: 1rem;
         }
     }
 
