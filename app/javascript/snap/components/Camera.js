@@ -56,8 +56,19 @@ class Camera extends Component {
         console.log('capture photo clicked!');
         let canvas = this.getCanvas();
         const context = canvas.getContext("2d");
-        //console.log('canvas.width, canvas.height', canvas.width, canvas.height);        
-        context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+
+        if (!this.camera_capabilities) {
+            let rect = this.video.getBoundingClientRect();
+            let x = (rect.x < 0) ? -(rect.x) : rect.x;
+            let y = (rect.y < 0) ? -(rect.y) : rect.y;
+            if (x > 0 && y > 0) {
+                context.drawImage(this.video, Math.floor(x), Math.floor(y), canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+            } else {
+                context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+            }
+        } else {
+            context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+        }
         const image = canvas.toDataURL('image/jpeg', 1.0);
         return image;
     }
@@ -112,12 +123,17 @@ class Camera extends Component {
     }
 
     updateZoom = () => {
-        if ('zoom' in this.camera_capabilities) {
-            this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+        if (!this.camera_capabilities) {
+            this.video.style[this.prop] = 'scale(' + this.zoomLevel + ')';
+        } else {
+            if ('zoom' in this.camera_capabilities) {
+                this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+            }
+            else {
+                console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
+            }
         }
-        else {
-            console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
-        }
+
         this.ticking = false;
     }
 
