@@ -29,6 +29,8 @@ const customStyles = {
   }
 };
 
+const fb_app_id = '349407548905454';
+
 /** 
  * withHeader HOC provides props with location, history and match objects
 */
@@ -157,17 +159,11 @@ class SnapResults extends Component {
         //appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
         webFallbackURL = 'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
 
-        // var start = new Date().getTime(), end, elapsed;
-        // document.location = appUriScheme;
-        // end = new Date().getTime();
-        // elapsed = (end - start);
-        // if (elapsed < 1) {
-        //   window.open(webFallbackURL, '_blank');
-        // }
         window.open(webFallbackURL, '_blank');
         break;
       }
       case SOCIAL_MEDIA_FACEBOOK: {
+        //webFallbackURL = 'https://www.facebook.com/dialog/share?app_id=' + fb_app_id + '&display=popup&href=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
         webFallbackURL = 'http://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
         window.open(webFallbackURL, '_blank');
         break;
