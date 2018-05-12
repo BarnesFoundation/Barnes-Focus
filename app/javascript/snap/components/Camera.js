@@ -138,7 +138,7 @@ class Camera extends Component {
             console.log('Setting scale to = ' + Math.floor(this.zoomLevel));
             this.video.style.webkitTransform = 'scale(' + Math.floor(this.zoomLevel) + ')';
         } else {
-            if ('zoom' in this.camera_capabilities) {
+            if ('zoom' in this.camera_capabilities && this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
                 this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
             }
             else {
@@ -182,9 +182,8 @@ class Camera extends Component {
             this.zoomLevel = (this.initZoom * e.scale).toFixed(1);
             this.zoomLevel = (this.zoomLevel < 1) ? 1 : this.zoomLevel;
 
-            if (this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
-                this.requestZoom();
-            }
+            this.requestZoom();
+
 
         });
 
