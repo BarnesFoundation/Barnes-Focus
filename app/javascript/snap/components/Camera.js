@@ -56,8 +56,30 @@ class Camera extends Component {
         console.log('capture photo clicked!');
         let canvas = this.getCanvas();
         const context = canvas.getContext("2d");
-        //console.log('canvas.width, canvas.height', canvas.width, canvas.height);        
-        context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+
+        if (!this.camera_capabilities) {
+            let rect = this.video.getBoundingClientRect();
+            let tempCanvas = document.createElement('canvas');
+            let tempCtx = tempCanvas.getContext('2d');
+
+            //first draw the scaled video in a temp canvas.
+            tempCanvas.width = rect.width;
+            tempCanvas.height = rect.height;
+            tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
+
+            // Now copy image that is visible within the viewport into our original canvas.
+
+            let x = (rect.x < 0) ? -(rect.x) : rect.x;
+            let y = (rect.y < 0) ? -(rect.y) : rect.y;
+            console.log('Drawing viewport area x:y ' + x + ' : ' + y + ' and width:heignt ' + canvas.width + ' : ' + canvas.height);
+            if (x > 0 && y > 0) {
+                context.drawImage(tempCanvas, Math.floor(x), Math.floor(y), canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+            } else {
+                context.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+            }
+        } else {
+            context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+        }
         const image = canvas.toDataURL('image/jpeg', 1.0);
         return image;
     }
@@ -112,12 +134,18 @@ class Camera extends Component {
     }
 
     updateZoom = () => {
-        if ('zoom' in this.camera_capabilities) {
-            this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+        if (!this.camera_capabilities) {
+            console.log('Setting scale to = ' + Math.floor(this.zoomLevel));
+            this.video.style.webkitTransform = 'scale(' + Math.floor(this.zoomLevel) + ')';
+        } else {
+            if ('zoom' in this.camera_capabilities) {
+                this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+            }
+            else {
+                console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
+            }
         }
-        else {
-            console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
-        }
+
         this.ticking = false;
     }
 
