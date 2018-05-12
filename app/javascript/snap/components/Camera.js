@@ -6,6 +6,7 @@ import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
+import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 
 class Camera extends Component {
@@ -57,7 +58,7 @@ class Camera extends Component {
         let canvas = this.getCanvas();
         const context = canvas.getContext("2d");
 
-        if (!this.camera_capabilities) {
+        if (isIOS || !this.camera_capabilities) {
             let rect = this.video.getBoundingClientRect();
             let tempCanvas = document.createElement('canvas');
             let tempCtx = tempCanvas.getContext('2d');
@@ -134,14 +135,13 @@ class Camera extends Component {
     }
 
     updateZoom = () => {
-        if (!this.camera_capabilities) {
-            console.log('Setting scale to = ' + Math.floor(this.zoomLevel));
-            this.video.style.webkitTransform = 'scale(' + Math.floor(this.zoomLevel) + ')';
+        if ('zoom' in this.camera_capabilities && this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
+            this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
         } else {
-            if ('zoom' in this.camera_capabilities && this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
-                this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
-            }
-            else {
+            if (isIOS) {
+                console.log('Setting scale to = ' + Math.floor(this.zoomLevel));
+                this.video.style.webkitTransform = 'scale(' + Math.floor(this.zoomLevel) + ')';
+            } else {
                 console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
             }
         }
