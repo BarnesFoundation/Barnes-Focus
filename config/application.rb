@@ -30,6 +30,7 @@ module BarnesSnap
     #config.autoload_paths << Rails.root.join('lib')
     config.eager_load_paths << Rails.root.join('lib')
     #config.active_job.queue_adapter = :delayed_job
+    config.active_job.queue_adapter     = :active_elastic_job
 
     Aws.config.update({
       region: Rails.application.secrets[:aws][:region],

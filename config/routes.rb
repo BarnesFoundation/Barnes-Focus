@@ -14,6 +14,8 @@ Rails.application.routes.draw do
     resources :bookmarks, only: [:index, :create]
   end
 
+  post 'background_jobs/bookmarks'        => 'background_jobs/bookmarks'
+  post 'background_jobs/update_es_cache'  => 'background_jobs/update_es_cache'
   get '*path', to:  "pages#home"
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
