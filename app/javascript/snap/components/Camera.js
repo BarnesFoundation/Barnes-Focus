@@ -169,11 +169,10 @@ class Camera extends Component {
             })
             .catch(err => this.setState({ error: "Error accessing device camera." }));
 
-        const el = document.querySelector('.camera-container');
+        const el = document.querySelector('.camera');
         const mc = new Hammer.Manager(el, { preventDefault: true });
         mc.add(new Hammer.Pinch({ threshold: 0 }));
         mc.on("pinchstart pinchin pinchout", (e) => {
-
             //alert('received pinch event');
             if (e.type == 'pinchstart') {
                 this.initZoom = this.zoomLevel || 1;
@@ -183,9 +182,14 @@ class Camera extends Component {
             this.zoomLevel = (this.zoomLevel < 1) ? 1 : this.zoomLevel;
 
             this.requestZoom();
-
-
         });
+
+        // Since iOS 10, it no longer support "user-scalable=no" attribute. 
+        // Adding this, to disable page zoom on pinch in camera-control buttons section
+        const camera_controls = document.querySelector('.camera-controls');
+        camera_controls.addEventListener('touchmove', function (event) {
+            event.preventDefault();
+        }, false);
 
     }
 
