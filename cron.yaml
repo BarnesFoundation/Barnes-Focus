@@ -1,8 +1,0 @@
-version: 1
-cron:
-- name: "Every 3 Hours: send bookmarks email"
-  url: "/background_jobs/bookmarks"
-  schedule: "0 */1 * * *"
-- name: "Every morning at 5 AM: force update image cache"
-  url: "/background_jobs/update_es_cache"
-  schedule: "0 5 * * *"
