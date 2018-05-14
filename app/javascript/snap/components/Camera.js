@@ -6,6 +6,7 @@ import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
+import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 
 class Camera extends Component {
@@ -56,8 +57,30 @@ class Camera extends Component {
         console.log('capture photo clicked!');
         let canvas = this.getCanvas();
         const context = canvas.getContext("2d");
-        //console.log('canvas.width, canvas.height', canvas.width, canvas.height);        
-        context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+
+        if (isIOS || !this.camera_capabilities) {
+            let rect = this.video.getBoundingClientRect();
+            let tempCanvas = document.createElement('canvas');
+            let tempCtx = tempCanvas.getContext('2d');
+
+            //first draw the scaled video in a temp canvas.
+            tempCanvas.width = rect.width;
+            tempCanvas.height = rect.height;
+            tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
+
+            // Now copy image that is visible within the viewport into our original canvas.
+
+            let x = (rect.x < 0) ? -(rect.x) : rect.x;
+            let y = (rect.y < 0) ? -(rect.y) : rect.y;
+            console.log('Drawing viewport area x:y ' + x + ' : ' + y + ' and width:heignt ' + canvas.width + ' : ' + canvas.height);
+            if (x > 0 && y > 0) {
+                context.drawImage(tempCanvas, Math.floor(x), Math.floor(y), canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+            } else {
+                context.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+            }
+        } else {
+            context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+        }
         const image = canvas.toDataURL('image/jpeg', 1.0);
         return image;
     }
@@ -112,12 +135,17 @@ class Camera extends Component {
     }
 
     updateZoom = () => {
-        if ('zoom' in this.camera_capabilities) {
+        if ('zoom' in this.camera_capabilities && this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
             this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+        } else {
+            if (isIOS) {
+                console.log('Setting scale to = ' + Math.floor(this.zoomLevel));
+                this.video.style.webkitTransform = 'scale(' + Math.floor(this.zoomLevel) + ')';
+            } else {
+                console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
+            }
         }
-        else {
-            console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
-        }
+
         this.ticking = false;
     }
 
@@ -154,9 +182,8 @@ class Camera extends Component {
             this.zoomLevel = (this.initZoom * e.scale).toFixed(1);
             this.zoomLevel = (this.zoomLevel < 1) ? 1 : this.zoomLevel;
 
-            if (this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
-                this.requestZoom();
-            }
+            this.requestZoom();
+
 
         });
 
