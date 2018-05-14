@@ -1,7 +1,7 @@
 require 'barnes_elastic_search'
 
 class BackgroundJobsController < ApplicationController
-  skip_before_action :verify_authenticity_token
+  protect_from_forgery with: :null_session
 
   def bookmarks
     bookmarks = Bookmark.recent_bookmarks.ready_to_deliver
