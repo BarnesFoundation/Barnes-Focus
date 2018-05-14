@@ -16,7 +16,7 @@ files:
       . $EB_SUPPORT_DIR/envvars
       . $EB_SCRIPT_DIR/use-app-ruby.sh
 
-      cd $EB_APP_CURRENT_DIR
+      # cd $EB_APP_CURRENT_DIR
 
       # Switch to the webapp user.  Worker shouldn't be run as root.
-      su -s /bin/bash -c "bundle exec bin/delayed_job --pid-dir=$EB_APP_PIDS_DIR restart" $EB_APP_USER
+      # su -s /bin/bash -c "bundle exec bin/delayed_job --pid-dir=$EB_APP_PIDS_DIR restart" $EB_APP_USER
