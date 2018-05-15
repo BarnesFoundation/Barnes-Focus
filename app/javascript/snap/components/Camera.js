@@ -139,8 +139,8 @@ class Camera extends Component {
             this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
         } else {
             if (isIOS) {
-                console.log('Setting scale to = ' + Math.floor(this.zoomLevel));
-                this.video.style.webkitTransform = 'scale(' + Math.floor(this.zoomLevel) + ')';
+                console.log('Setting scale to = ' + this.zoomLevel);
+                this.video.style.webkitTransform = 'scale(' + this.zoomLevel + ')';
             } else {
                 console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
             }
