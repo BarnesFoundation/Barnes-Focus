@@ -19,7 +19,11 @@ class Api::SnapsController < Api::BaseController
     file = api.loadFileData(file_name)
     response = api.search_image(file)
 
-    response["image_ids"] = response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] ? [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact : []
+    if response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && is_response_accepted?(response["results"].first)
+      response["image_ids"] = [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact
+    else
+      response["image_ids"] = []
+    end
 
     searched_result = process_searched_images_response(response)
 
@@ -85,5 +89,11 @@ class Api::SnapsController < Api::BaseController
 
     def preferred_language
       params["language"]
+    end
+
+    def is_response_accepted? first_response
+      resp_val = nil
+      first_response.select { |k, v| resp_val = v }
+      return resp_val >= ENV.fetch('RESPONSE_THRESHOLD').to_f
     end
 end
