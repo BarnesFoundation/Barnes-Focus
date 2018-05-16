@@ -169,7 +169,7 @@ class Camera extends Component {
             })
             .catch(err => this.setState({ error: "Error accessing device camera." }));
 
-        const el = document.querySelector('.camera');
+        const el = document.querySelector('.camera-container');
         const mc = new Hammer.Manager(el, { preventDefault: true });
         mc.add(new Hammer.Pinch({ threshold: 0 }));
         mc.on("pinchstart pinchin pinchout", (e) => {
