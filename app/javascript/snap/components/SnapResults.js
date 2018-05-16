@@ -285,7 +285,7 @@ class SnapResults extends Component {
 
   render() {
     return (
-      <div className="container-fluid search-container" style="-webkit-overflow-scrolling: touch;">
+      <div className="container-fluid search-container" style="{{-webkit-overflow-scrolling: touch}}">
 
         <div className="row">
           <div className="col-12 col-md-12">
