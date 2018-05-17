@@ -134,6 +134,13 @@ class Camera extends Component {
             });
     }
 
+    // reset zoom to initial state when back to camera page.
+    resetZoom = () => {
+        if (this.camera_capabilities && 'zoom' in this.camera_capabilities) {
+            this.track.applyConstraints({ advanced: [{ zoom: 1 }] });
+        }
+    }
+
     updateZoom = () => {
         if ('zoom' in this.camera_capabilities && this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
             this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
@@ -203,6 +210,7 @@ class Camera extends Component {
                 this.track = this.state.videoStream.getVideoTracks()[0];
                 this.camera_capabilities = this.track.getCapabilities();
                 this.camera_settings = this.track.getSettings();
+                requestAnimationFrame(this.resetZoom);
             }).catch((error) => {
                 console.log('Not allowed to access camera. Please check settings!');
             });

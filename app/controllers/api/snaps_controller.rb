@@ -19,7 +19,7 @@ class Api::SnapsController < Api::BaseController
     file = api.loadFileData(file_name)
     response = api.search_image(file)
 
-    if response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && is_response_accepted?(response["results"].first)
+    if response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && response["results"].any? && is_response_accepted?(response["results"].first)
       response["image_ids"] = [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact
     else
       response["image_ids"] = []
