@@ -37,5 +37,6 @@ class AssetsDownloader
   end
 
 end
-
+=begin
 AssetsDownloader.new.run(asset_root: ARGV[0], csv_path: ARGV[1])
+=end

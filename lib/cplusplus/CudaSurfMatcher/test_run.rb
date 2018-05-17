@@ -62,7 +62,7 @@ def run_image_test(image_name)
     end
   end
 end
-
+=begin
 if ARGV.length > 0
   filename = "#{ARGV[0]}"
   filename << ".jpeg" if !filename.include?(".") # add extention if not provided
@@ -86,3 +86,4 @@ else
   end
   puts "\n total: #{total_tests}; passed: #{passed_count} (#{((passed_count.to_f/total_tests.to_f)*100.0).round}%)"  
 end
+=end
