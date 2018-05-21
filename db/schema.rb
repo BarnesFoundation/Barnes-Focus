@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180411131245) do
+ActiveRecord::Schema.define(version: 20180518115007) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -101,6 +101,23 @@ ActiveRecord::Schema.define(version: 20180411131245) do
     t.datetime "updated_at", null: false
     t.index ["aasm_state"], name: "index_training_records_on_aasm_state"
     t.index ["identifier"], name: "index_training_records_on_identifier", unique: true
+  end
+
+  create_table "translations", force: :cascade do |t|
+    t.integer "parent_id"
+    t.text "screen_text", default: ""
+    t.text "english_translation"
+    t.text "chinese_translation"
+    t.text "french_translation"
+    t.text "german_translation"
+    t.text "italian_translation"
+    t.text "japanese_translation"
+    t.text "korean_translation"
+    t.text "russian_translation"
+    t.text "spanish_translation"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_translations_on_parent_id"
   end
 
 end
