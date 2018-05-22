@@ -11,8 +11,9 @@ import Modal from 'react-modal';
 import Footer from './Footer';
 import Popover from 'react-simple-popover';
 import NotificationSystem from 'react-notification-system';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
+import * as analytics from './Analytics';
 
 const customStyles = {
   overlay: {
@@ -205,7 +206,10 @@ class SnapResults extends Component {
         text: title_author + ' ' + hashtag,
         url: urlToShare
       })
-        .then(() => console.log('Successful share'))
+        .then(() => {
+          console.log('Successful share');
+          analytics.track({ eventCategory: GA_EVENT_CATEGORY.SOCIAL, eventAction: GA_EVENT_ACTION.SOCIAL_SHARE_NAVIGATOR, eventLabel: GA_EVENT_LABEL.SOCIAL_SHARE_NAVIGATOR });
+        })
         .catch((error) => console.log('Error sharing', error));
     } else {
       this.setState({ sharePopoverIsOpen: true });
@@ -219,6 +223,7 @@ class SnapResults extends Component {
 
   submitBookMark = (event) => {
     console.log('submitting bookmark');
+    analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.BOOKMARK, eventLabel: GA_EVENT_LABEL.BOOKMARK });
     // event is undefined when email is already present in localStorage and no bookmark modal is opened.
     if (event) {
       event.preventDefault();
