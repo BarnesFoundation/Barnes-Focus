@@ -5,8 +5,9 @@ import CameraControls from './CameraControls';
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
+import * as analytics from './Analytics';
 
 
 class Camera extends Component {
@@ -45,6 +46,7 @@ class Camera extends Component {
     }
 
     takePhoto = () => {
+        analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.TAKE_PHOTO, eventLabel: GA_EVENT_LABEL.SNAP_BUTTON });
         setTimeout(() => {
             const image = this.capturePhoto();
             this.img.src = image;
@@ -116,8 +118,10 @@ class Camera extends Component {
             // Navigate to search result page or not found page
             const res = response.data;
             if (res.data.records.length === 0) {
+                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 this.props.history.push({ pathname: '/not-found' });
             } else {
+                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_SUCCESS, eventLabel: GA_EVENT_LABEL.SNAP_SUCCESS });
                 this.props.history.push({
                     pathname: '/results',
                     state: {
@@ -129,6 +133,7 @@ class Camera extends Component {
 
         })
             .catch(error => {
+                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 this.setState({ searchInProgress: false });
                 this.props.history.push({ pathname: '/not-found' });
             });
