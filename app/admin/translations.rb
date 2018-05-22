@@ -1,6 +1,8 @@
 ActiveAdmin.register Translation do
   filter :screen_text
 
+  config.per_page = [10, 50, 100]
+
   permit_params :parent_id, :screen_text, :english_translation, :chinese_translation, :french_translation, :german_translation, :italian_translation,
     :japanese_translation, :korean_translation, :russian_translation, :spanish_translation
 
@@ -10,22 +12,24 @@ ActiveAdmin.register Translation do
     column :screen_text
     column :created_at
     column :updated_at
+    actions
   end
 
   form do |f|
     f.semantic_errors # shows errors on :base
     f.inputs do
-      f.input :parent_id, :label => 'Sub text of', :as => :select, :collection => Translation.all_parents.all.map{ |t| [ t.screen_text, t.id ] }
-      f.input :screen_text
-      f.input :english_translation
-      f.input :chinese_translation
-      f.input :french_translation
-      f.input :german_translation
-      f.input :italian_translation
-      f.input :japanese_translation
-      f.input :korean_translation
-      f.input :russian_translation
-      f.input :spanish_translation
+      f.input :parent_id, label: 'Sub text of', as: :select,
+        collection: Translation.all_parents.all.map{ |t| [ t.screen_text, t.id ] }, prompt: 'Choose the screen'
+      f.input :screen_text, input_html: { class: 'autogrow', rows: 10 }
+      f.input :english_translation, input_html: { class: 'autogrow', rows: 10 }
+      f.input :chinese_translation, label: "Chinese Translation<br />(中文)".html_safe, input_html: { class: 'autogrow', rows: 10 }
+      f.input :french_translation, label: "French Translation<br />(Français)".html_safe, input_html: { class: 'autogrow', rows: 10 }
+      f.input :german_translation, label: "German Translation<br />(Deutsch)".html_safe, input_html: { class: 'autogrow', rows: 10 }
+      f.input :italian_translation, label: "Italian Translation<br />(Italiano)".html_safe, input_html: { class: 'autogrow', rows: 10 }
+      f.input :japanese_translation, label: "Japanese Translation<br />(日本語)".html_safe, input_html: { class: 'autogrow', rows: 10 }
+      f.input :korean_translation, label: "Korean Translation<br />(한국어)".html_safe, input_html: { class: 'autogrow', rows: 10 }
+      f.input :russian_translation, label: "Russian Translation<br />(Русский)".html_safe, input_html: { class: 'autogrow', rows: 10 }
+      f.input :spanish_translation, label: "Spanish Translation<br />(Español)".html_safe, input_html: { class: 'autogrow', rows: 10 }
     end
     f.actions         # adds the 'Submit' and 'Cancel' buttons
   end
@@ -84,6 +88,12 @@ ActiveAdmin.register Translation do
           end
         end
       end
+    end
+  end
+
+  controller do
+    def scoped_collection
+      Translation.all_parents
     end
   end
 end
