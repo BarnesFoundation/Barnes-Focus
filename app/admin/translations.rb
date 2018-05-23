@@ -1,25 +1,33 @@
 ActiveAdmin.register Translation do
-  filter :screen_text
+  actions :all, except: [:new, :destroy]
 
-  config.per_page = [10, 50, 100]
+  config.filters = false
+  config.per_page = 50
+  config.sort_order = 'id_asc'
+  config.action_items.delete_if { |item| item.display_on?(:show) }
+
+  scope :all_parents, default: true
 
   permit_params :parent_id, :screen_text, :english_translation, :chinese_translation, :french_translation, :german_translation, :italian_translation,
     :japanese_translation, :korean_translation, :russian_translation, :spanish_translation
 
-  index as: :table do |translation|
+  index as: :table do
     selectable_column
-    id_column
-    column :screen_text
+    column "Page", :screen_text
     column :created_at
     column :updated_at
-    actions
+    column "" do |resource|
+      link_to 'View', resource_path(resource), :class => "member_link edit_link"
+    end
   end
 
   form do |f|
     f.semantic_errors # shows errors on :base
     f.inputs do
-      f.input :parent_id, label: 'Sub text of', as: :select,
-        collection: Translation.all_parents.all.map{ |t| [ t.screen_text, t.id ] }, prompt: 'Choose the screen'
+      unless f.object.new_record?
+        f.input :parent_id, label: 'Sub text of', as: :select,
+          collection: Translation.all_parents.all.map{ |t| [ t.screen_text, t.id ] }, prompt: 'Choose the screen', input_html: { disabled: true }
+      end
       f.input :screen_text, input_html: { class: 'autogrow', rows: 10 }
       f.input :english_translation, input_html: { class: 'autogrow', rows: 10 }
       f.input :chinese_translation, label: "Chinese Translation<br />(中文)".html_safe, input_html: { class: 'autogrow', rows: 10 }
@@ -37,18 +45,18 @@ ActiveAdmin.register Translation do
   show do
     attributes_table do
       row :id
-      row :screen_text
-      row :english_translation
-      row :chinese_translation
-      row :french_translation
-      row :german_translation
-      row :italian_translation
-      row :japanese_translation
-      row :korean_translation
-      row :russian_translation
-      row :spanish_translation
-      row :created_at
-      row :updated_at
+      row(translation.parent_id.nil? ? 'Page' : 'Screen text'){ |t| t.screen_text }
+      unless translation.parent_id.nil?
+        row :english_translation
+        row :chinese_translation
+        row :french_translation
+        row :german_translation
+        row :italian_translation
+        row :japanese_translation
+        row :korean_translation
+        row :russian_translation
+        row :spanish_translation
+      end
     end
 
     if translation.parent_id.nil?
@@ -83,17 +91,11 @@ ActiveAdmin.register Translation do
               sub_text.spanish_translation
             end
             row "actions" do
-              link_to "Edit", [:admin, sub_text]
+              link_to "Edit", [:edit, :admin, sub_text]
             end
           end
         end
       end
-    end
-  end
-
-  controller do
-    def scoped_collection
-      Translation.all_parents
     end
   end
 end

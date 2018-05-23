@@ -12,6 +12,7 @@ Rails.application.routes.draw do
       end
     end
     resources :bookmarks, only: [:index, :create]
+    resources :translations, only: [:index]
   end
 
   post 'background_jobs/bookmarks'        => 'background_jobs/bookmarks'
