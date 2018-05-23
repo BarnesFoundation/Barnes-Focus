@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180518115007) do
+ActiveRecord::Schema.define(version: 20180522152131) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -117,7 +117,11 @@ ActiveRecord::Schema.define(version: 20180518115007) do
     t.text "spanish_translation"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "display_order"
+    t.string "unique_identifier"
+    t.index ["display_order"], name: "index_translations_on_display_order"
     t.index ["parent_id"], name: "index_translations_on_parent_id"
+    t.index ["unique_identifier"], name: "index_translations_on_unique_identifier"
   end
 
 end
