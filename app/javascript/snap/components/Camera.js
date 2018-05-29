@@ -5,8 +5,9 @@ import CameraControls from './CameraControls';
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LAST_TIMESTAMP, SNAP_COUNT_RESET_INTERVAL, SNAP_APP_RESET_INTERVAL, SNAP_USER_EMAIL } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
+import * as analytics from './Analytics';
 
 
 class Camera extends Component {
@@ -23,6 +24,16 @@ class Camera extends Component {
     ticking = false;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
+    resetSnapCounter = () => {
+        let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
+        if (last_snap_timestamp) {
+            let ttl = (last_snap_timestamp + parseInt(SNAP_COUNT_RESET_INTERVAL)) - Date.now();
+            if (ttl <= 0 && this.state.snapAttempts > 0) {
+                localStorage.removeItem(SNAP_ATTEMPTS);
+                this.setState({ snapAttempts: 0 });
+            }
+        }
+    }
 
     cancelCamera = () => {
         this.props.history.push({
@@ -45,6 +56,7 @@ class Camera extends Component {
     }
 
     takePhoto = () => {
+        analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.TAKE_PHOTO, eventLabel: GA_EVENT_LABEL.SNAP_BUTTON });
         setTimeout(() => {
             const image = this.capturePhoto();
             this.img.src = image;
@@ -107,6 +119,7 @@ class Camera extends Component {
         this.toggleImage(false);
         this.setState({ searchInProgress: true });
         localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+        localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
         var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
         axios.post('/api/snaps/search', {
             image_data: this.state.capturedImage,
@@ -116,8 +129,10 @@ class Camera extends Component {
             // Navigate to search result page or not found page
             const res = response.data;
             if (res.data.records.length === 0) {
+                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 this.props.history.push({ pathname: '/not-found' });
             } else {
+                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_SUCCESS, eventLabel: GA_EVENT_LABEL.SNAP_SUCCESS });
                 this.props.history.push({
                     pathname: '/results',
                     state: {
@@ -129,6 +144,7 @@ class Camera extends Component {
 
         })
             .catch(error => {
+                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 this.setState({ searchInProgress: false });
                 this.props.history.push({ pathname: '/not-found' });
             });
@@ -216,6 +232,10 @@ class Camera extends Component {
             });
 
             this.img.style.display = 'none';
+
+            // Reset snap attemps count if last_snap_timestamp is 12 hours or before.
+            this.resetSnapCounter();
+
         }
 
     }
