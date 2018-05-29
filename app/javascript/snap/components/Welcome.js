@@ -139,7 +139,8 @@ class WelcomeComponent extends Component {
         this.setState({ selectedLanguage: lang });
 
         axios.get('/api/translations?language=' + lang.code)
-            .then((response) => {
+            .then(response => {
+                console.log('successfully fetched translations.')
                 if (response.data.translations) {
                     let translation;
                     try {
@@ -151,13 +152,9 @@ class WelcomeComponent extends Component {
                     }
 
                 }
-
-                var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
-                var savedLanguage = response.data.find(function (obj) { return obj.code === prefLang; });
-                this.setState({ languageOptions: response.data, selectedLanguage: savedLanguage });
             })
-            .catch((e) => {
-                console.error(e);
+            .catch(error => {
+                console.log('Error while fetching translations!');
             });
     }
 
