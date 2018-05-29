@@ -35,18 +35,6 @@ class Camera extends Component {
         }
     }
 
-    resetSnapApp = () => {
-        let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
-        if (last_snap_timestamp) {
-            let ttl = (last_snap_timestamp + parseInt(SNAP_APP_RESET_INTERVAL)) - Date.now();
-            if (ttl <= 0) {
-                localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
-                localStorage.removeItem(SNAP_USER_EMAIL);
-                localStorage.removeItem(SNAP_ATTEMPTS);
-            }
-        }
-    }
-
     cancelCamera = () => {
         this.props.history.push({
             pathname: '/',
@@ -247,8 +235,7 @@ class Camera extends Component {
 
             // Reset snap attemps count if last_snap_timestamp is 12 hours or before.
             this.resetSnapCounter();
-            // Reset snap application if last_snap_timestamp is more than 
-            this.resetSnapApp();
+
         }
 
     }
