@@ -21,7 +21,7 @@ import photo_prompt from 'images/photo-prompt.jpg';
 import icon_camera from 'images/camera_icon.svg';
 import axios from 'axios';
 
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, SNAP_LAST_TIMESTAMP, SNAP_USER_EMAIL, SNAP_APP_RESET_INTERVAL } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 import loadImage from 'blueimp-load-image/js';
@@ -35,6 +35,23 @@ class WelcomeComponent extends Component {
             ...props.location.state, // when "Take Photo" button is clicked in /not-found or /results page in (iOS, Android/Firefox), we pass {launchCamera: true} property
             searchInProgress: false,
             snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
+        }
+    }
+
+    /**
+     * Check if last_snap_timestamp is more than 24 hrs. If true, reset all user preferences.
+     * 
+     * @memberof WelcomeComponent
+     */
+    resetSnapApp = () => {
+        let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
+        if (last_snap_timestamp) {
+            let ttl = (last_snap_timestamp + parseInt(SNAP_APP_RESET_INTERVAL)) - Date.now();
+            if (ttl <= 0) {
+                localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
+                localStorage.removeItem(SNAP_USER_EMAIL);
+                localStorage.removeItem(SNAP_ATTEMPTS);
+            }
         }
     }
 
@@ -56,6 +73,11 @@ class WelcomeComponent extends Component {
             $this.children(".carousel-indicators").show();
         }
     };
+
+    componentWillMount() {
+        // Reset snap application if last_snap_timestamp is more than 24 hrs
+        this.resetSnapApp();
+    }
 
     componentDidMount() {
 
