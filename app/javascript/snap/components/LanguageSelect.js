@@ -34,6 +34,9 @@ class LanguageSelect extends Component {
 
     componentDidMount() {
         Modal.setAppElement('#language-select');
+        if (this.props.onSelectLanguage) {
+            this.props.onSelectLanguage(this.state.selectedLanguage);
+        }
     }
 
     openModal = () => {
@@ -48,6 +51,9 @@ class LanguageSelect extends Component {
         var selectedLang = { code: e.currentTarget.dataset.id, name: e.currentTarget.dataset.lang };
         this.setState({ selectedLanguage: selectedLang });
         localStorage.setItem(SNAP_LANGUAGE_PREFERENCE, selectedLang.code);
+        if (this.props.onSelectLanguage) {
+            this.props.onSelectLanguage(selectedLang);
+        }
         this.closeModal();
     }
 
