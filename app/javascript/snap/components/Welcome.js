@@ -35,9 +35,10 @@ class WelcomeComponent extends Component {
             ...props.location.state, // when "Take Photo" button is clicked in /not-found or /results page in (iOS, Android/Firefox), we pass {launchCamera: true} property
             searchInProgress: false,
             snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
-            selectedLanguage: '',
-            translation: null
+            selectedLanguage: ''
         }
+
+        this.translation = null;
     }
 
     /**
@@ -140,13 +141,14 @@ class WelcomeComponent extends Component {
 
         axios.get('/api/translations?language=' + lang.code)
             .then(response => {
-                console.log('successfully fetched translations.')
-                if (response.data.translations) {
+                console.log('successfully fetched translations.');
+                let res = response.data;
+                if (res.data.translations) {
                     let translation;
                     try {
-                        translation = JSON.parse(response.data.translations);
-                        this.setState({ translation: translation });
-                        localStorage.setItem(SNAP_LANGUAGE_TRANSLATION, response.data.translations);
+                        this.setTranslation(JSON.parse(res.data.translations));
+                        //this.setState({ translation: translation });
+                        localStorage.setItem(SNAP_LANGUAGE_TRANSLATION, res.data.translations);
                     } catch (err) {
                         console.log('Error while parsing translations object to JSON.');
                     }
@@ -156,6 +158,10 @@ class WelcomeComponent extends Component {
             .catch(error => {
                 console.log('Error while fetching translations!');
             });
+    }
+
+    setTranslation = (transl) => {
+        this.translation = transl;
     }
 
 
@@ -243,9 +249,9 @@ class WelcomeComponent extends Component {
                                     </div>
                                     <div className="content">
 
-                                        <h1>{(this.state.translation) ? this.state.translation.Welcome_screen.text_1.translated_content : `It's a snap!`}</h1>
+                                        <h1>{(this.translation) ? this.state.translation.Welcome_screen.text_1.translated_content : `It's a snap!`}</h1>
 
-                                        <p>{(this.state.translation) ? this.state.translation.Welcome_screen.text_2.translated_content : `Take a photo of any work of art to get information about it.`}</p>
+                                        <p>{(this.translation) ? this.state.translation.Welcome_screen.text_2.translated_content : `Take a photo of any work of art to get information about it.`}</p>
                                     </div>
                                 </div>
                             </div>
@@ -263,7 +269,7 @@ class WelcomeComponent extends Component {
                                         </div>
                                     </div>
                                     <div className="content">
-                                        <h1>{(this.state.translation) ? this.state.translation.Language_choice.text_1.translated_content : `Please select your language.`}</h1>
+                                        <h1>{(this.translation) ? this.state.translation.Language_choice.text_1.translated_content : `Please select your language.`}</h1>
                                         <LanguageSelect onSelectLanguage={this.onSelectLanguage} />
                                     </div>
                                 </div>
