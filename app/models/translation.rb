@@ -11,14 +11,15 @@ class Translation < ApplicationRecord
       translations = {}
 
       all_parents.order( 'display_order ASC' ).each do | main_text |
-        translations[ format(main_text.screen_text) ] = []
+        header = format(main_text.screen_text)
+        translations[ header ] = []
         all_childrens( main_text.id ).each do | content |
           all_contents = {}
           all_contents[ content.unique_identifier ] = {
             screen_text: format(content.screen_text),
             translated_content: content.send(column_name).blank? ? format(content.english_translation) : format(content.send(column_name))
           }
-          translations[ main_text.screen_text ] << all_contents
+          translations[ header ] << all_contents
         end
       end
 
