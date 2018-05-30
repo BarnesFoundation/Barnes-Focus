@@ -11,7 +11,7 @@ class Translation < ApplicationRecord
       translations = {}
 
       all_parents.order( 'display_order ASC' ).each do | main_text |
-        translations[ main_text.screen_text ] = []
+        translations[ format(main_text.screen_text) ] = []
         all_childrens( main_text.id ).each do | content |
           all_contents = {}
           all_contents[ content.unique_identifier ] = {
