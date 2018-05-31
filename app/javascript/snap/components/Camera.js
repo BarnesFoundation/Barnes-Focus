@@ -5,12 +5,14 @@ import CameraControls from './CameraControls';
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LAST_TIMESTAMP, SNAP_COUNT_RESET_INTERVAL, SNAP_APP_RESET_INTERVAL, SNAP_USER_EMAIL } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LAST_TIMESTAMP, SNAP_COUNT_RESET_INTERVAL, SNAP_APP_RESET_INTERVAL, SNAP_USER_EMAIL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import * as analytics from './Analytics';
 
 
 class Camera extends Component {
+
+    translationObj = localStorage.getItem(SNAP_LANGUAGE_TRANSLATION);
 
     state = {
         videoStream: null,
@@ -18,7 +20,8 @@ class Camera extends Component {
         capturedImage: null,
         showVideo: true,
         searchInProgress: false,
-        snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
+        snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
+        translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
     ticking = false;
@@ -293,8 +296,8 @@ class Camera extends Component {
                                     />
                                 </div>
                                 <div className="content">
-                                    <h1>Searching</h1>
-                                    <p>Please wait while we search our database.</p>
+                                    <h1>{(this.state.translation) ? this.state.translation.Snap_searching.text_1.translated_content : `Searching`}</h1>
+                                    <p>{(this.state.translation) ? this.state.translation.Snap_searching.text_2.translated_content : `Please wait while we search our database.`}</p>
                                 </div>
                             </div>
                         </div>
