@@ -330,7 +330,7 @@ class SnapResults extends Component {
                           </a> */}
                     </div>
                   </Popover>
-                  <div onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />
+                  <div id="bookmark-it" onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />
                     {(this.state.translation) ? this.state.translation['Share / Bookmark icons'].text_2.translated_content : `Bookmark it`}
                   </div>
                   <Modal
