@@ -21,6 +21,7 @@ default: &default
   # http://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("DB_POOL") { 5 } %>
   timeout: 5000
+  host: localhost
 
 development:
   <<: *default
