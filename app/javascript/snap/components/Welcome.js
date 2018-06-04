@@ -134,7 +134,6 @@ class WelcomeComponent extends Component {
 
     }
 
-
     submitPhoto = (canvas) => {
         let processedImage = canvas.toDataURL('image/jpeg');
 
