@@ -48,6 +48,8 @@ class WelcomeComponent extends Component {
         if (last_snap_timestamp) {
             let ttl = (last_snap_timestamp + parseInt(SNAP_APP_RESET_INTERVAL)) - Date.now();
             if (ttl <= 0) {
+                localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
+
                 localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
                 localStorage.removeItem(SNAP_USER_EMAIL);
                 localStorage.removeItem(SNAP_ATTEMPTS);

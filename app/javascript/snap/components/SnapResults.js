@@ -325,7 +325,7 @@ class SnapResults extends Component {
                           </a> */}
                     </div>
                   </Popover>
-                  <div onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</div>
+                  <div id="bookmark-it" onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</div>
                   <Modal
                     isOpen={this.state.bookmarkModalIsOpen}
                     onRequestClose={this.closeBookmarkModal}
