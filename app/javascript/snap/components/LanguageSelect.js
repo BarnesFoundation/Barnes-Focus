@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Modal from 'react-modal';
-import { SNAP_LANGUAGE_PREFERENCE } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_LANGUAGE_TRANSLATION } from './Constants';
 
 /** 
  * withLanguageSelect HOC provides props with location, history and match objects
@@ -25,10 +25,13 @@ class LanguageSelect extends Component {
         const lang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || 'en';
         const langObj = langOptions.filter(obj => obj.code === lang);
 
+        let translationObj = localStorage.getItem(SNAP_LANGUAGE_TRANSLATION);
+
         this.state = {
             selectedLanguage: langObj[0],
             modalIsOpen: false,
-            languageOptions: langOptions
+            languageOptions: langOptions,
+            translation: (translationObj) ? JSON.parse(translationObj) : null
         }
     }
 
@@ -82,8 +85,8 @@ class LanguageSelect extends Component {
                     <button type="button" className="close pull-right offset-11" aria-label="Close" onClick={this.closeModal}>
                         <i className="fa fa-times" aria-hidden="true"></i>
                     </button>
-                    <h1>Please select your language.</h1>
-                    <p>We are using Google to help us automatically translate our text.</p>
+                    <h1>{(this.state.translation) ? this.state.translation.Language_selector.text_1.translated_content : `Please select your language.`}</h1>
+                    <p>{(this.state.translation) ? this.state.translation.Language_selector.text_2.translated_content : `We are using Google to help us automatically translate our text.`}</p>
                     <ul className="list-group">
                         {this.state.languageOptions.map((lang, index) => <a className="list-group-item list-group-item-action" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name} {this.state.selectedLanguage.name === lang.name ? <span className="selected-lang">Selected</span> : ''}</a>)}
                     </ul>
