@@ -33,7 +33,7 @@ const customStyles = {
 const fb_app_id = '349407548905454';
 
 /** 
- * withHeader HOC provides props with location, history and match objects
+ * withRouter HOC provides props with location, history and match objects
 */
 class SnapResults extends Component {
 
@@ -116,6 +116,15 @@ class SnapResults extends Component {
   componentDidMount() {
     this._notificationSystem = this.refs.notificationSystem;
     Modal.setAppElement('.search-container');
+
+    $("#result-card").attr("data-title", this.state.searchResults[0].title);
+    $("#result-card").attr("data-artist", this.state.searchResults[0].artist);
+    $("#result-card").attr("data-id", this.state.searchResults[0].id);
+    $("#result-card").attr("data-invno", this.state.searchResults[0].invno);
+
+    if (!this.state.searchResults[0].shortDescription) {
+      $("#result-card").attr("data-nodesc-invno", this.state.searchResults[0].invno);
+    }
   }
 
   handleBackToCamera = () => {
@@ -294,7 +303,7 @@ class SnapResults extends Component {
 
         <div className="row">
           <div className="col-12 col-md-12">
-            <div className="card">
+            <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
               <div className="card-top-container">
                 <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image" />
                 <div className="card-img-overlay">
