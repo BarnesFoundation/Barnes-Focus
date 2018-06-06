@@ -382,7 +382,7 @@ class SnapResults extends Component {
                 <div className="card-text">
                   <p className="text-muted">{this.state.searchResults[0].artist}. {this.state.searchResults[0].title}, {this.state.searchResults[0].displayDate}. {this.state.searchResults[0].medium}</p>
                 </div>
-                <div className="card-text">{this.state.searchResults[0].shortDescription}.</div>
+                {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
                 {/* <div className="card-text">- John House, Renoir in the Barnes Foundation.</div> */}
               </div>
               {/* <div className="card-footer">

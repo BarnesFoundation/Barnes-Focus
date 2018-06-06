@@ -9,7 +9,8 @@ export const SOCIAL_MEDIA_INSTAGRAM = 'instagram';
 
 export const SNAP_LAST_TIMESTAMP = 'barnes.snap.timestamp';
 export const SNAP_COUNT_RESET_INTERVAL = 43200000;
-export const SNAP_APP_RESET_INTERVAL = 86400000;
+//export const SNAP_APP_RESET_INTERVAL = 86400000;
+export const SNAP_APP_RESET_INTERVAL = 3600000; // keep it an hour for now, for testing
 
 export const GA_EVENT_CATEGORY = {
     SNAP: 'snap',
