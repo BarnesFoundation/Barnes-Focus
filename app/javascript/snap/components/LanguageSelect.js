@@ -74,7 +74,6 @@ class LanguageSelect extends Component {
                     overlayClassName="Overlay"
                 >
                     <button type="button" className="close pull-right offset-11" aria-label="Close" onClick={this.closeModal}>
-                        <i className="fa fa-times" aria-hidden="true"></i>
                     </button>
                     <h1>Please select your language.</h1>
                     <p>We are using Google to help us automatically translate our text.</p>
