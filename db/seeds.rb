@@ -257,3 +257,18 @@ Translation.create(
   english_translation: "Reset Experience",
   unique_identifier: 'text_1'
 )
+
+email_header = Translation.find_or_create_by(screen_text: "Email", display_order: 101)
+Translation.create(
+  screen_text: 'Bookmarked art',
+  parent_id: email_header.id,
+  english_translation: 'Bookmarked art',
+  unique_identifier: 'text_1'
+)
+
+Translation.create(
+  screen_text: 'Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit',
+  parent_id: email_header.id,
+  english_translation: 'Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit',
+  unique_identifier: 'text_2'
+)

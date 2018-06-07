@@ -57,6 +57,8 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
+    apipie-rails (0.5.8)
+      rails (>= 4.1)
     arbre (1.1.1)
       activesupport (>= 3.0.0)
     arel (8.0.0)
@@ -356,6 +358,7 @@ DEPENDENCIES
   aasm
   active_elastic_job
   activeadmin
+  apipie-rails
   aws-sdk (~> 2)
   byebug
   coffee-rails (~> 4.2)
