@@ -99,8 +99,12 @@ p {
     .close {
         font-size: 1.875rem;
         position: absolute;
-        top: 2vh;
+        height: 20px;
+        width: 20px;
+        top: 3vh;
         right:3vh;
+        content: '';
+        background : url(../../../assets/images/cross_page.svg) no-repeat;
     }
 
     h1 {

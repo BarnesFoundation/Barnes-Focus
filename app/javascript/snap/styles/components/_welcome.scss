@@ -68,6 +68,16 @@
             
         }
     }
+
+    .dropdown-toggle::after{
+        content: '';
+        background : url(../../../assets/images/arrow_dropdown.svg) no-repeat;
+        position: relative;
+        top: 5px;
+        border: 0 !important;
+        width: 18px;
+        height: 10px;
+    }
 }
 
 .wifi-screen {
