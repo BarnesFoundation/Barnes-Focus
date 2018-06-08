@@ -254,6 +254,7 @@ class SnapResults extends Component {
     payload.email = this.state.email;
     payload.image_id = this.state.searchResults[0].id;
     payload.newsletter = this.state.newsletterSubscription;
+    payload.language = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || 'en';
 
     axios.post('/api/bookmarks', payload).then(response => {
       this._addNotification({ success: true, message: 'Bookmark created successfully.' });
