@@ -77,7 +77,12 @@ class Api::SnapsController < Api::BaseController
           searched_data = EsCachedRecord.search(img)
           if preferred_language.present?
             translator = GoogleTranslate.new preferred_language
-            searched_data['shortDescription'] = translator.translate(strip_tags(searched_data["shortDescription"]).html_safe) if searched_data["shortDescription"]
+            begin
+              searched_data['shortDescription'] = translator.translate(strip_tags(searched_data["shortDescription"]).html_safe) if searched_data["shortDescription"]
+            rescue Exception => err
+              p err
+              searched_data['shortDescription'] = strip_tags(searched_data["shortDescription"]).html_safe if searched_data["shortDescription"]
+            end
           end
           time_diff = Time.now - start_time
           response['total_time_consumed']['es_endpoint'] = Time.at(time_diff.to_i.abs).utc.strftime "%H:%M:%S"
