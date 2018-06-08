@@ -27,14 +27,14 @@ class Translation < ApplicationRecord
     def db_column_for?(language)
       h = {
         'en' => :english_translation,
-        'ch' => :chinese_translation,
+        'zh' => :chinese_translation,
         'fr' => :french_translation,
-        'gr' => :german_translation,
+        'de' => :german_translation,
         'it' => :italian_translation,
         'ja' => :japanese_translation,
-        'kr' => :korean_translation,
-        'rs' => :russian_translation,
-        'sp' => :spanish_translation
+        'ko' => :korean_translation,
+        'ru' => :russian_translation,
+        'es' => :spanish_translation
       }
       return h[language]
     end

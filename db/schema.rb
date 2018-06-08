@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180522152131) do
+ActiveRecord::Schema.define(version: 20180607132527) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,14 +35,14 @@ ActiveRecord::Schema.define(version: 20180522152131) do
   create_table "bookmarks", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "image_id", default: "", null: false
-    t.datetime "received_on"
     t.boolean "mail_sent", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "language"
     t.index ["email"], name: "index_bookmarks_on_email"
     t.index ["image_id"], name: "index_bookmarks_on_image_id"
+    t.index ["language"], name: "index_bookmarks_on_language"
     t.index ["mail_sent"], name: "index_bookmarks_on_mail_sent"
-    t.index ["received_on"], name: "index_bookmarks_on_received_on"
   end
 
   create_table "delayed_jobs", force: :cascade do |t|
