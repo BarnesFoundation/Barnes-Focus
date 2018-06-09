@@ -359,7 +359,7 @@ class SnapResults extends Component {
                       </div>
                       <div className="message">Information about the art you bookmark will be emailed to you after your visit.</div>
                       <form onSubmit={this.submitBookMark}>
-                        <input type="email" placeholder="Email address" className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
+                        <input id="bookmark-email" type="email" placeholder="Email address" className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
                         <div className="checkbox">
                           <input id="newsletter-chk" type="checkbox" name="newsletterSubscription" onChange={this.handleBookmarkFormInputChange} />
                           <label htmlFor="newsletter-chk">
@@ -368,7 +368,7 @@ class SnapResults extends Component {
                         </div>
                         <div className="row">
                           <div className="col-6 offset-3 text-center">
-                            <button type="submit" className="btn snap-btn snap-btn-default">
+                            <button id="bookmark-submit" type="submit" className="btn snap-btn snap-btn-default">
                               Submit
                            </button>
                           </div>
