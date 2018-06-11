@@ -24,6 +24,25 @@ class Translation < ApplicationRecord
       translations
     end
 
+    def find_by_header_text_and_language header_text, language='en'
+      column_name = db_column_for?(language)
+      translations = {}
+
+      where(screen_text: header_text).each do | main_text |
+        header = format(main_text.screen_text)
+        translations[ header ] = {}
+
+        all_childrens( main_text.id ).each do | content |
+          translations[ header ][ content.unique_identifier ] = {
+            screen_text: format(content.screen_text),
+            translated_content: content.send(column_name).blank? ? format(content.english_translation) : format(content.send(column_name))
+          }
+        end
+      end
+
+      translations
+    end
+
     def db_column_for?(language)
       h = {
         'en' => :english_translation,
