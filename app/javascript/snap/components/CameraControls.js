@@ -11,10 +11,10 @@ const CameraControls = (props) => (
                     {
                         props.showVideo &&
                         <div>
-                            <Link className="control-left" to="/">Cancel</Link>
-                            <div className="camera-shutter">
+                            <div id="snap-cancel" className="control-left" onClick={props.cancelCamera}>Cancel</div>
+                            <div id="snap-click" className="camera-shutter">
                                 <span>PHOTO</span>
-                                <a className="round-button-circle" onClick={props.takePhoto}></a>
+                                <div className="round-button-circle" onClick={props.takePhoto}></div>
                             </div>
                         </div>
                     }
@@ -22,8 +22,8 @@ const CameraControls = (props) => (
                     {
                         !props.showVideo &&
                         <div>
-                            <a className="control-left" onClick={props.clearPhoto}>Retake</a>
-                            <a className="control-right" onClick={props.submitPhoto}>Use Photo</a>
+                            <div id="snap-retake" className="control-left" onClick={props.clearPhoto}>Retake</div>
+                            <div id="snap-submit" className="control-right" onClick={props.submitPhoto}>Use Photo</div>
                         </div>
                     }
                 </div>

@@ -1,5 +1,5 @@
 Rails.application.configure do
-    config.webpacker.check_yarn_integrity = true  # Settings specified here will take precedence over those in config/application.rb.
+  config.webpacker.check_yarn_integrity = true # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
@@ -27,6 +27,9 @@ Rails.application.configure do
   end
 
   # Don't care if the mailer can't send.
+  config.action_mailer.perform_deliveries = false
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
   config.action_mailer.raise_delivery_errors = false
 
   config.action_mailer.perform_caching = false
@@ -50,5 +53,5 @@ Rails.application.configure do
 
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
-  config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+  # config.file_watcher = ActiveSupport::EventedFileUpdateChecker if ENV['RACK_ENV'] == 'development'
 end

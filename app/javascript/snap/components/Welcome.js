@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
+import { PulseLoader } from 'react-spinners';
 
 import LanguageSelect from '../components/LanguageSelect';
 import Hammer from 'hammerjs';
@@ -19,16 +21,47 @@ import photo_prompt from 'images/photo-prompt.jpg';
 import icon_camera from 'images/camera_icon.svg';
 import axios from 'axios';
 
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, SNAP_LAST_TIMESTAMP, SNAP_USER_EMAIL, SNAP_APP_RESET_INTERVAL } from './Constants';
+import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
+
+import loadImage from 'blueimp-load-image/js';
+
 class WelcomeComponent extends Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            ...props.location.state, // when "Take Photo" button is clicked in /not-found or /results page in (iOS, Android/Firefox), we pass {launchCamera: true} property
+            searchInProgress: false,
+            snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
+        }
+    }
+
+    /**
+     * Check if last_snap_timestamp is more than 24 hrs. If true, reset all user preferences.
+     * 
+     * @memberof WelcomeComponent
+     */
+    resetSnapApp = () => {
+        let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
+        if (last_snap_timestamp) {
+            let ttl = (last_snap_timestamp + parseInt(SNAP_APP_RESET_INTERVAL)) - Date.now();
+            if (ttl <= 0) {
+                localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
+
+                localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
+                localStorage.removeItem(SNAP_USER_EMAIL);
+                localStorage.removeItem(SNAP_ATTEMPTS);
+            }
+        }
     }
 
     checkIndex = () => {
         const $this = $("#snapCarousel");
         if ($("#snapCarousel .carousel-inner .carousel-item:first").hasClass("active")) {
-            $this.children(".carousel-control-prev").hide();
+            $this.children(".carousel-control-prev").addClass('opaque');
+            $this.children(".carousel-control-prev").show();
             $this.children(".carousel-control-next").show();
             $this.children(".carousel-indicators").show();
         } else if ($("#snapCarousel .carousel-inner .carousel-item:last").hasClass("active")) {
@@ -36,13 +69,24 @@ class WelcomeComponent extends Component {
             $this.children(".carousel-control-prev").hide();
             $this.children(".carousel-indicators").hide();
         } else {
+            $this.children(".carousel-control-prev").removeClass('opaque');
             $this.children(".carousel-control-prev").show();
             $this.children(".carousel-control-next").show();
             $this.children(".carousel-indicators").show();
         }
     };
 
+    componentWillMount() {
+        // Reset snap application if last_snap_timestamp is more than 24 hrs
+        this.resetSnapApp();
+    }
+
     componentDidMount() {
+
+        if (this.state.cameraCancelled) {
+            $("#snapCarousel .carousel-inner .carousel-item:first").removeClass("active");
+            $("#snapCarousel .carousel-inner .carousel-item:last").addClass("active");
+        }
 
         this.checkIndex();
 
@@ -82,108 +126,223 @@ class WelcomeComponent extends Component {
         $('#snapCarousel').on('slid.bs.carousel', () => {
             this.checkIndex();
         })
+
+        // NOTE: below code is to be used only when native camera capture is enabled using <input type="file".../>
+        // if (this.state.launchCamera && (isIOS || (isAndroid && isFirefox))) {
+        //     this.input.click();
+        // }
+
+    }
+
+    submitPhoto = (canvas) => {
+        let processedImage = canvas.toDataURL('image/jpeg');
+
+        localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+        let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+        axios.post('/api/snaps/search', {
+            image_data: processedImage,
+            language: prefLang
+        }).then(response => {
+            this.setState({ searchInProgress: false });
+            // Navigate to search result page or not found page
+            const res = response.data;
+            if (res.data.records.length === 0) {
+                this.props.history.push({ pathname: '/not-found' });
+            } else {
+                this.props.history.push({
+                    pathname: '/results',
+                    state: {
+                        result: res,
+                        snapCount: localStorage.getItem(SNAP_ATTEMPTS)
+                    }
+                });
+            }
+        })
+            .catch(error => {
+                this.setState({ searchInProgress: false });
+                this.props.history.push({ pathname: '/not-found' });
+            });
+
+    }
+
+    processFile = (e) => {
+
+        this.setState({ searchInProgress: true });
+        // photo was cancelled by the user, fire camera again
+        if (e.target.files.length === 0) {
+            this.input.click();
+        }
+        else {
+            let file = e.target.files[0];
+            let options = {
+                maxWidth: screen.width,
+                canvas: true,
+                downsamplingRatio: 0.5,
+                orientation: true
+            }
+
+            loadImage(
+                file,
+                this.submitPhoto,
+                options
+            );
+
+        }
     }
 
     render() {
         return (
-            <div id="snapCarousel" className="carousel slide">
-                <ol className="carousel-indicators">
-                    <li data-target="#snapCarousel" data-slide-to="0" className="active"></li>
-                    <li data-target="#snapCarousel" data-slide-to="1"></li>
-                    <li data-target="#snapCarousel" data-slide-to="2"></li>
-                    <li data-target="#snapCarousel" data-slide-to="3"></li>
-                </ol>
-                <div className="carousel-inner">
-                    <div className="carousel-item active">
-                        <div className="welcome-screen">
-                            <div className="img-gallery">
-                                <div className="gallery-item">
-                                    <img src={img1} alt="img1" />
+            <div>
+                {
+                    !this.state.searchInProgress &&
+                    <div id="snapCarousel" className="carousel slide">
+                        <ol className="carousel-indicators">
+                            <li data-target="#snapCarousel" data-slide-to="0" className="active"></li>
+                            <li data-target="#snapCarousel" data-slide-to="1"></li>
+                            <li data-target="#snapCarousel" data-slide-to="2"></li>
+                            <li data-target="#snapCarousel" data-slide-to="3"></li>
+                        </ol>
+                        <div className="carousel-inner">
+                            <div className="carousel-item active">
+                                <div className="welcome-screen">
+                                    <div className="img-gallery">
+                                        <div className="gallery-item">
+                                            <img src={img1} alt="img1" />
+                                        </div>
+                                        <div className="gallery-item">
+                                            <img src={img2} alt="img2" />
+                                        </div>
+                                        <div className="gallery-item">
+                                            <img src={img3} alt="img3" />
+                                        </div>
+                                    </div>
+                                    <div className="content">
+
+                                        <h1>It's a snap!</h1>
+
+                                        <p>Take a photo of any work of art to get information about it.</p>
+                                    </div>
                                 </div>
-                                <div className="gallery-item">
-                                    <img src={img2} alt="img2" />
+                            </div>
+                            <div className="carousel-item">
+                                <div className="lang-dropdown-screen">
+                                    <div className="img-gallery">
+                                        <div className="gallery-item">
+                                            <img src={img4} alt="img4" />
+                                        </div>
+                                        <div className="gallery-item">
+                                            <img src={img5} alt="img5" />
+                                        </div>
+                                        <div className="gallery-item">
+                                            <img src={img6} alt="img6" />
+                                        </div>
+                                    </div>
+                                    <div className="content">
+                                        <h1>Please select your language.</h1>
+                                        <LanguageSelect />
+                                    </div>
                                 </div>
-                                <div className="gallery-item">
-                                    <img src={img3} alt="img3" />
+                            </div>
+                            <div className="carousel-item">
+                                <div className="wifi-screen">
+                                    <div className="img-gallery">
+                                        <div className="gallery-item">
+                                            <img src={img7} alt="wifi-img1" />
+                                        </div>
+                                        <div className="gallery-item">
+                                            <img src={img8} alt="wifi-img2" />
+                                        </div>
+                                        <div className="gallery-item">
+                                            <img src={img9} alt="wifi-img3" />
+                                        </div>
+                                    </div>
+                                    <div className="content">
+
+                                        <h1>Get connected.</h1>
+
+                                        <p>For best connectivity, please connect to our free wifi: BarnesPublic.</p>
+
+                                    </div>
                                 </div>
+                            </div>
+                            <div className="carousel-item">
+                                <div className="photo-prompt-screen">
+                                    <div className="img-main">
+                                        <img src={photo_prompt} alt="photo_prompt_main_img" />
+                                    </div>
+                                    <div className="content">
+                                        <h1>Take a photo to learn more about a work of art.</h1>
+                                    </div>
+
+                                    {/* {
+                                        (isIOS) &&
+                                        <label className="btn take-photo-btn">
+                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.processFile} />
+                                            Take Photo
+                                        <span className="icon">
+                                                <img src={icon_camera} alt="camera_icon" />
+                                            </span>
+                                        </label>
+
+                                    }
+
+                                    {
+                                        (isAndroid && isFirefox) &&
+                                        <label className="btn take-photo-btn">
+                                            <input id="capture-option" ref={i => this.input = i} type="file" accept="image/*" capture="environment" onChange={this.processFile} />
+                                            Take Photo
+                                            <span className="icon">
+                                                <img src={icon_camera} alt="camera_icon" />
+                                            </span>
+                                        </label>
+
+                                    } */}
+
+
+
+                                    <Link className="btn take-photo-btn" to="/snap">
+                                        Take photo
+                                            <span className="icon">
+                                            <img src={icon_camera} alt="camera_icon" />
+                                        </span>
+                                    </Link>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <a className="carousel-control-prev" href="#snapCarousel" role="button" data-slide="prev">
+                            <i className="fa fa-2x fa-angle-left"></i>
+                            <span className="sr-only">Previous</span>
+                        </a>
+                        <a className="carousel-control-next" href="#snapCarousel" role="button" data-slide="next">
+                            <i className="fa fa-2x fa-angle-right"></i>
+                            <span className="sr-only">Next</span>
+                        </a>
+                    </div >
+                }
+                {/* ========= Search in progress screen ============ */}
+                {
+                    this.state.searchInProgress &&
+                    <div>
+                        <div className="search-progress-container">
+                            <div className="snap-spinner">
+                                <PulseLoader
+                                    color={'#999999'}
+                                    size={20}
+                                    margin={'5px'}
+                                    loading={this.state.searchInProgress}
+                                />
                             </div>
                             <div className="content">
-
-                                <h1>It's a snap!</h1>
-
-                                <p>Take a photo of any work of art to get information about it.</p>
+                                <h1>Searching</h1>
+                                <p>Please wait while we search our database.</p>
                             </div>
                         </div>
                     </div>
-                    <div className="carousel-item">
-                        <div className="lang-dropdown-screen">
-                            <div className="img-gallery">
-                                <div className="gallery-item">
-                                    <img src={img4} alt="img4" />
-                                </div>
-                                <div className="gallery-item">
-                                    <img src={img5} alt="img5" />
-                                </div>
-                                <div className="gallery-item">
-                                    <img src={img6} alt="img6" />
-                                </div>
-                            </div>
-                            <div>
-                                <h1>Please select your language</h1>
-                                <LanguageSelect />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="carousel-item">
-                        <div className="wifi-screen">
-                            <div className="img-gallery">
-                                <div className="gallery-item">
-                                    <img src={img7} alt="wifi-img1" />
-                                </div>
-                                <div className="gallery-item">
-                                    <img src={img8} alt="wifi-img2" />
-                                </div>
-                                <div className="gallery-item">
-                                    <img src={img9} alt="wifi-img3" />
-                                </div>
-                            </div>
-                            <div className="content">
-
-                                <h1>Get connected.</h1>
-
-                                <p>For best connectivity, please connect to our free wifi: BarnesPublic.</p>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div className="carousel-item">
-                        <div className="photo-prompt-screen">
-                            <div className="img-main">
-                                <img src={photo_prompt} alt="photo_prompt_main_img" />
-                            </div>
-                            <div className="content">
-                                <h1>Take a photo to learn more about a work of art in our collection.</h1>
-                            </div>
-
-                            <Link className="btn take-photo-btn" to="/snap">
-                                Take Photo
-                                <span className="icon">
-                                    <img src={icon_camera} alt="camera_icon" />
-                                </span>
-                            </Link>
-                        </div>
-
-                    </div>
-                </div>
-                <a className="carousel-control-prev" href="#snapCarousel" role="button" data-slide="prev">
-                    <i className="fa fa-2x fa-angle-left"></i>
-                    <span className="sr-only">Previous</span>
-                </a>
-                <a className="carousel-control-next" href="#snapCarousel" role="button" data-slide="next">
-                    <i className="fa fa-2x fa-angle-right"></i>
-                    <span className="sr-only">Next</span>
-                </a>
-            </div >
+                }
+            </div>
         );
     }
 }

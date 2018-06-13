@@ -29,11 +29,23 @@ module BarnesSnap
     config.generators.system_tests = nil
     #config.autoload_paths << Rails.root.join('lib')
     config.eager_load_paths << Rails.root.join('lib')
-    config.active_job.queue_adapter = :delayed_job
+    #config.active_job.queue_adapter = :delayed_job
 
     Aws.config.update({
-                          region: Rails.application.secrets[:aws][:region],
-                          credentials: Aws::Credentials.new(Rails.application.secrets[:aws][:access_key_id], Rails.application.secrets[:aws][:secret_access_key])
-                      })
+      region: Rails.application.secrets[:aws][:region],
+      credentials: Aws::Credentials.new(
+        Rails.application.secrets[:aws][:access_key_id], Rails.application.secrets[:aws][:secret_access_key]
+      )
+    })
+
+    ActionMailer::Base.smtp_settings = {
+      :user_name => "barnesfoundation",
+      :password => "mQxeS1jlb93lVR4pg#",
+      :domain => 'barnesfoundation.org',
+      :address => 'smtp.sendgrid.net',
+      :port => 587,
+      :authentication => :plain,
+      :enable_starttls_auto => true
+    }
   end
 end

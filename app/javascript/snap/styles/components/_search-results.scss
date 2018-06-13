@@ -1,51 +1,70 @@
 .search-container {
     padding-left: 0;
     padding-right: 0;
+    overflow-x: hidden;
+    -webkit-transform: translate3d(0,0,0);
 
     .card {
         border: none;
         border-radius: 0;
         text-align: center;
 
+        .card-top-container {
+            position: relative;
+            height: auto !important;
+        }
+
         .card-img-overlay {
             .card-title {
                 color: #fff;
-                padding: 24vh 24vw 0;
-                font-size: 25px;
+                font-size: 2rem;
+                position: absolute;
+                bottom: 10vh;
+                padding: 0 20vw;
+                width: 100%;
+                left: 0;
+                line-height: 1.2;
             }
         }
 
         .card-body {
             margin-top: -30px;
+            padding: 1rem;
+            color: #282828;
             .action-icons {
                 img {
                     padding: 0 10px;
                 }
             }
+
+            .card-text {
+                padding-bottom: 1.25rem;
+            }
         }
 
         .card-footer {
-            background-color: #F74D31;
+            background-color: #D4432A;
             color: #FFF;
-            font-size: 22px;
-
-            small {
+            padding: 2rem;
+            
+            p {
+                color: #FFF; 
                 opacity: 0.8;
             }
         }
         
         .btn-circle {
-            width: 60px;
-            height: 60px;
-            padding: 10px 16px;
+            width: 70px;
+            height: 70px;
             border-radius: 35px;
             font-size: 24px;
-            line-height: 1.33;
+            line-height: 0.33;
             position: relative;
-            top: -30px;
+            top: -35px;
             left: 75vw;
             background-color: #000;
             color: #FFF;
+            -webkit-appearance: none;
         }
     }
 
@@ -64,11 +83,22 @@
         height: 60vh;
         text-align: center;
     }
+}
 
+.notification {
+    border-top: 2px solid rgb(255, 0, 0) !important;
+    background-color: #000 !important;
+    color: #fff !important;
+    box-shadow: rgba(0, 0, 0, .9) 0px 0px 1px !important;
+    text-align: center;
+}
 
-    .btn {
-        border-radius: 0;
-        color: #8C8C8D;
-        border: 2px solid #E3E3E3;
+/* iPhone 6,7,8  */
+@media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
+    .btn-circle {
+        width: 60px !important;
+        height: 60px !important;
+        border-radius: 30px !important;
+        top: -30px !important;
     }
 }

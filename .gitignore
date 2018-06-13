@@ -7,12 +7,19 @@
 # Ignore bundler config.
 /.bundle
 
+.vscode/*
+*.dump
+
 # Ignore all logfiles and tempfiles.
 /.idea/*
 /log/*
 /tmp/*
 !/log/.keep
 !/tmp/.keep
+
+# nb files
+/nbproject
+/nbproject/private/
 
 /node_modules
 /yarn-error.log

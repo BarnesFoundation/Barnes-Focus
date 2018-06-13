@@ -3,7 +3,7 @@ import { withRouter } from 'react-router'
 import barnes_logo from 'images/logo.svg';
 
 /** 
- * withHeader HOC provides props with location, history and match objects
+ * withRouter HOC provides props with location, history and match objects
 */
 class Header extends Component {
 

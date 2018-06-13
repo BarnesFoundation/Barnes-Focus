@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'json'
 LOG_LEVEL = ENV['LOG_LEVEL'] || 'info' #debug, info
-TEST_IMAGES_ROOT = "/home/vivek/source/cplusplus/CudaSurfMatcher/test-images"
+TEST_IMAGES_ROOT = "#{Rails.root}/lib/cplusplus/CudaSurfMatcher/test-images"
 
 SEARCH_ENDP_A = "http://ec2-34-207-152-196.compute-1.amazonaws.com:42129/index/searcher"
 SEARCH_ENDP_B = "http://ec2-52-201-253-112.compute-1.amazonaws.com:42129/index/searcher"
@@ -43,19 +43,23 @@ def run_image_test(image_name)
   final = final.collect{|obj| obj.to_a.flatten }
   final = final.sort{|x, y| y[1] <=> x[1] }
   log "final => #{final}"
-  top = final.first
-  log "top => #{top}"
-  filename = top.first
-  base_name = File.basename(filename, ".*")
-  id_on_top_result = base_name.split("_")[0]
-  id_on_test_image = File.basename(image_name, ".*").split("-")[1]
-  log "id_on_top_result => #{id_on_top_result}; id_on_test_image => #{id_on_test_image}"
-  if id_on_top_result == id_on_test_image
-    print "\e[32mP\e[39m"
-    return { passed: true }
-  else
-    print "\e[31mF\e[39m"
-    return { failed: true }
+  unless final.nil?
+    top = final.first
+    log "top => #{top}"
+    unless top.nil?
+      filename = top.first
+      base_name = File.basename(filename, ".*")
+      id_on_top_result = base_name.split("_")[0]
+      id_on_test_image = File.basename(image_name, ".*").split("-")[1]
+      log "id_on_top_result => #{id_on_top_result}; id_on_test_image => #{id_on_test_image}"
+      if id_on_top_result == id_on_test_image
+        print "\e[32mP\e[39m"
+        return { passed: true }
+      else
+        print "\e[31mF\e[39m"
+        return { failed: true }
+      end
+    end
   end
 end
 

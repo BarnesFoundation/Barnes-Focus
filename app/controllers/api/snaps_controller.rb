@@ -1,32 +1,42 @@
-require 'barnes_elastic_search'
-
 class Api::SnapsController < Api::BaseController
+  include ActionView::Helpers::SanitizeHelper
 
   def search
     data = params[:image_data]
+    start_time = Time.now
     searched_result = { success: false }
     #using test image for API testing
 
-    pastec_obj = CudaSift.new
-    image_data = Base64.decode64(data['data:image/png;base64,'.length .. -1])
+    api = CudaSift.new
+    image_data = Base64.decode64(data['data:image/jpeg;base64,'.length .. -1])
     file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
     File.open(file_name, 'wb') do |f|
       f.write image_data
     end
-    # for testing
+    # for development env testing
     #file_name = "#{Rails.root}/public/IMG_4971.jpg"
 
-    file = pastec_obj.loadFileData(file_name)
-    pastec_response = pastec_obj.search_image(file)
+    file = api.loadFileData(file_name)
+    response = api.search_image(file)
 
-    pastec_response["image_ids"] = pastec_response["type"]== CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] ? [pastec_response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact : []
+    if response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && response["results"].any? && is_response_accepted?(response["results"].first)
+      response["image_ids"] = [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact
+    else
+      response["image_ids"] = []
+    end
 
-    searched_result = process_searched_images_response(pastec_response)
+    searched_result = process_searched_images_response(response)
 
-    # send image to s3 with background job if image is valid and log result to db
-    # We can make it asyc with perform_later, on heroku we can not store file in temp for later processing with job
-    ImageUploadJob.perform_now(file.path, {pastec_response: pastec_response, es_response: searched_result["data"]})
-
+    File.delete(file.path)
+    overall_processing = Time.at((Time.now - start_time).to_i.abs).utc.strftime "%H:%M:%S"
+    searched_result['total_time_consumed']['overall_processing'] = overall_processing if searched_result['total_time_consumed'].present?
+    r = SnapSearchResult.create(
+      searched_image_data: data,
+      api_response: response.except("total_time_consumed"),
+      es_response: searched_result["data"],
+      response_time: searched_result['total_time_consumed']
+    )
+    ImageUploadJob.perform_later(r.id)
 
     render json: searched_result
   end
@@ -41,16 +51,12 @@ class Api::SnapsController < Api::BaseController
       response = { }
       response["data"] = {"records" => [], "message" => "No records found"}
       response["success"] = false
-      response["pastec_data"] = []
+      response["api_data"] = []
+      response["total_time_consumed"] = searched_images["total_time_consumed"]
       case searched_images["type"]
         when CudaSift::RESPONSE_CODES[:SEARCH_RESULTS]
           response["success"] = true
           get_similar_images(searched_images["image_ids"], response)
-          #Add response from pastec to final result
-          pastec_result = TrainingRecord.where(identifier: searched_images["image_ids"])
-          pastec_result.each do |img|
-            response["pastec_data"] << {"image_id" => img.identifier, "image_url" => img.image_url}
-          end
         when CudaSift::RESPONSE_CODES[:IMAGE_NOT_DECODED]
           response["data"]["message"] = "Invalid image data"
         when CudaSift::RESPONSE_CODES[:IMAGE_SIZE_TOO_BIG]
@@ -65,15 +71,21 @@ class Api::SnapsController < Api::BaseController
       if image_ids.present?
         response["data"]["message"] = 'Result Found'
         image_ids.uniq!
-        #send these image_ids to elastic search to get recommended result and send list to API
         image_ids.each do |img|
-          searched_data = BarnesElasticSearch.instance.get_object(img)
+          start_time = Time.now
+
+          searched_data = EsCachedRecord.search(img)
           if preferred_language.present?
             translator = GoogleTranslate.new preferred_language
-            #as of now I am sending translated version of title as shortdescription is coming null from elastic search
-            searched_data["title"] = translator.translate(searched_data["title"])
-            searched_data["shortDescription"] = translator.translate(searched_data["shortDescription"]) if searched_data["shortDescription"]
+            begin
+              searched_data['shortDescription'] = translator.translate(strip_tags(searched_data["shortDescription"]).html_safe) if searched_data["shortDescription"]
+            rescue Exception => err
+              p err
+              searched_data['shortDescription'] = strip_tags(searched_data["shortDescription"]).html_safe if searched_data["shortDescription"]
+            end
           end
+          time_diff = Time.now - start_time
+          response['total_time_consumed']['es_endpoint'] = Time.at(time_diff.to_i.abs).utc.strftime "%H:%M:%S"
           response["data"]["records"] << searched_data
         end
       end
@@ -82,5 +94,11 @@ class Api::SnapsController < Api::BaseController
 
     def preferred_language
       params["language"]
+    end
+
+    def is_response_accepted? first_response
+      resp_val = nil
+      first_response.select { |k, v| resp_val = v }
+      return resp_val >= ENV.fetch('RESPONSE_THRESHOLD').to_f
     end
 end
