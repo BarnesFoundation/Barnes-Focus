@@ -1,5 +1,5 @@
 Rails.application.configure do
-   config.webpacker.check_yarn_integrity = false  # Settings specified here will take precedence over those in config/application.rb.
+  config.webpacker.check_yarn_integrity = false  # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
   config.cache_classes = true
@@ -45,7 +45,7 @@ Rails.application.configure do
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  config.force_ssl = 'web'.eql?(ENV.fetch('AWS_ENV', 'web'))
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
@@ -58,7 +58,8 @@ Rails.application.configure do
   # config.cache_store = :mem_cache_store
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
-  # config.active_job.queue_adapter     = :resque
+  config.active_job.queue_adapter     = :active_elastic_job
+  #config.active_elastic_job.periodic_tasks_route = '/background_jobs'.freeze
   # config.active_job.queue_name_prefix = "barnes-snap_#{Rails.env}"
   config.action_mailer.perform_caching = false
 
@@ -88,4 +89,15 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  Rails.application.config.middleware.use ExceptionNotification::Rack,
+  :email => {
+    #:deliver_with => :deliver, # Rails >= 4.2.1 do not need this option since it defaults to :deliver_now
+    :email_prefix => "#{ENV['EXCEPTION_NOTIFIER_PREFIX']} ",
+    :sender_address => %{"notifier" <info@barnesfoundation.org>},
+    :exception_recipients => %w{puneet@happyfuncorp.com rajnikant@happyfuncorp.com support@barnesfoundation.org}
+  },
+  :error_grouping => true,
+  :error_grouping_period => 10.minutes,    # the time before an error is regarded as fixed
+  :error_grouping_cache => Rails.cache
 end

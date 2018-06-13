@@ -2,14 +2,14 @@
     .img-gallery {
         top: 15vh;
         height: 46vh;
-        padding: 5vw;
+        padding: 1.375rem 0;
         
         .gallery-item {           
             position: absolute;
             
             &:nth-child(1) {
-                top: 5vh;
-                left: 5vw;  
+                top: 0;
+                left: 0;  
             }
 
             &:nth-child(2) {
@@ -20,7 +20,7 @@
 
             &:nth-child(3) {
                 top: 10vh;
-                left: 55vw;
+                left: 52vw;
             }
 
             img {
@@ -34,15 +34,15 @@
     text-align: center;
     .img-gallery {
         top: 5vh;
-        height: 45vh;
-        padding: 5vw;
+        height: 46vh;
+        padding: 1.375rem 0;
         
         .gallery-item {           
             position: absolute;
             
             &:nth-child(1) {
                 top: 10vh;
-                left: 2vh;
+                left: 0;
                 z-index: 100;
                 img {
                     width: 35vw;
@@ -50,16 +50,16 @@
             }
 
             &:nth-child(2) {
-                top: 0vh;
-                left: 25vw;  
+                top: 2vh;
+                left: 25vw;
                 img {
                     width: 50vw;
                 }
             }
 
             &:nth-child(3) {
-                top: 20vh;
-                left: 50vw;
+                top: 23.65vh;
+                left: 47vw;
                 img {
                     width: 45vw;
                 }
@@ -73,32 +73,32 @@
 .wifi-screen {
     .img-gallery {
         top: 15vh;
-        height: 50vh;
-        padding: 5vw;
+        height: 46vh;
+        padding: 1.375rem 0;
         
         .gallery-item {           
             position: absolute;
             
             &:nth-child(1) {
-                top: 10vh;
+                top: 12vh;
                 left: 0vw; 
                 img {
-                    width: 50vw;
+                    width: 45vw;
                 } 
             }
 
             &:nth-child(2) {
-                top: 25vh;
-                left: 25vw;
+                top: 25.5vh;
+                left: 18vw;
                 z-index: 100;
                 img {
-                    width: 50vw;
+                    width: 58vw;
                 }
             }
 
             &:nth-child(3) {
                 top: 5vh;
-                left: 55vw;
+                left: 52vw;
                 img {
                     width: 40vw;
                 }
@@ -112,8 +112,8 @@
     text-align: center;
 
     .img-main {
-        height: 45vh;
-        padding: 10vw;
+        height: 46vh;
+        padding: 3rem 0 1.375rem 0;
         img {
             width: 80vw;
         }
@@ -122,7 +122,7 @@
     .take-photo-btn {
         text-align: center;
         font-size: 20px;
-        line-height: 1.6;
+        line-height: 1.75;
         width: 200px;
         height: 65px;
         padding: 10px 16px;
@@ -143,6 +143,145 @@
         &:hover {
             opacity: 0.7;
         }
+
+        input[type="file"] {
+            display: none;
+        }
     }
 }
 
+
+/* iPhone 5 and below. Smaller Devices (Portrait) */
+@media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
+/* Styles */
+
+    .welcome-screen {
+        .img-gallery {
+            height: 36vh !important;   
+            
+            .gallery-item {  
+                &:nth-child(2) {
+                    top:12vh !important;
+                }
+
+                &:nth-child(3) {
+                    top: 5vh;
+                    left: 50vw;
+                }
+            }
+
+        }
+    }
+
+    .lang-dropdown-screen {
+        .img-gallery {
+            height: 36vh !important;
+            
+            .gallery-item {           
+                
+                &:nth-child(1) {
+                    top: 5vh !important;
+                    img {
+                        width: 32vw !important;
+                    }
+                }
+    
+                &:nth-child(3) {
+                    top: 12vh !important;
+                    left: 48vw !important;
+                    img {
+                        width: 42vw !important;
+                    }
+                }
+    
+                
+            }
+        }
+
+        .btn {
+            line-height: 1.2;
+        }
+    }
+
+    .wifi-screen {
+        .img-gallery {
+            height: 36vh !important;
+            
+            .gallery-item {           
+                
+                &:nth-child(1) {
+                    top: 5vh !important;
+                    left: 0 !important; 
+                    img {
+                        width: 45vw !important;
+                    } 
+                }
+    
+                &:nth-child(2) {
+                    top: 12vh !important;
+                    left: 18vw !important;
+                    img {
+                        width: 58vw !important;
+                    }
+                }
+    
+                &:nth-child(3) {
+                    top: 0 !important;
+                    left: 55vw !important;
+                    img {
+                        width: 35vw !important;
+                    }
+                }
+            }
+        }
+    }
+
+    .photo-prompt-screen {
+
+        .img-main {
+            height: 36vh !important;
+            padding: 1rem 0 1.375rem;
+            img {
+                width: 70vw !important;
+            }
+        }
+    
+        .take-photo-btn {
+            width: 185px !important;
+            height: 60px !important;
+            padding: 10px 0px !important;
+            border-radius: 30px !important;
+        }
+        
+        
+    }   
+    
+}
+
+
+/* iPads (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+    .welcome-screen {
+        .img-gallery {
+            height: 52vh !important;          
+        }
+    }
+
+    .lang-dropdown-screen {
+        .img-gallery {
+            height: 52vh !important;
+        }
+    }
+
+    .wifi-screen {
+        .img-gallery {
+            height: 50vh !important;
+        }
+    }
+
+    .photo-prompt-screen {
+        .img-main {
+            height: 50vh !important;
+        }
+    }
+}

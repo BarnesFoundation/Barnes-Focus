@@ -1,0 +1,306 @@
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+<tr>
+<td align="center" valign="top" width="500">
+<![endif]-->   
+<table border="0" cellpadding="0" cellspacing="0" width="80%" style="border: 1px solid #eeeeee;" height="100%" class="wrapper">
+  <tr>
+    <td>
+      <div align="center">
+        <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+        <tr>
+        <td align="center" valign="top" width="500">
+        <![endif]-->      
+        <table border="0" cellpadding="0" cellspacing="0" width="80%" height="100%" class="main-container">
+          <tr>
+            <td>
+              <!-- top spacer -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->
+              <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+                <tr>
+                  <td>
+                    <p style="padding: 20px 0">&nbsp;</p>
+                  </td>
+                </tr>
+                <tr><td style="border-top: 1px solid #eeeeee;"></td></tr>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
+
+              <!-- logo and social icons  -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->
+              <table dir="ltr" cellpadding="0" cellspacing="0" border="0" style="width:100%" class="logos">
+                <tr>
+                  <td width="50%" dir="ltr" class="w100 text-center logos__barnes-logo" style="text-align: left; padding: 20px 0;">
+                    <a href="https://collection.barnesfoundation.org" target="_blank">
+                      <img alt="Barnes" src="https://s3.amazonaws.com/barnes-assets/Barnes_lockup_Promotional_web_orange.png" width="200px" />
+                    </a>
+                  </td>
+                  <td width="50%" dir="ltr" class="w100 text-center logos__social-icons" style="text-align: right;">
+                    <a href="https://twitter.com/the_barnes" target="_blank">
+                      <img alt="twitter" src="https://www.gstatic.com/youtube/img/email/twitter_email_icon_grey.png" width="20px" height="20px" style="padding: 20px 10px; opacity: 0.8;" />
+                    </a>
+                    <a href="https://www.youtube.com/user/BarnesFoundation" target="_blank">
+                      <img alt="youtube" src="https://www.gstatic.com/youtube/img/email/youtube_email_icon_grey.png" width="20px" height="15px" style="padding: 20px 10px; opacity: 0.8;" />
+                    </a>
+                  </td>
+                </tr>
+                <tr><td colspan="2" style="border-top: 1px solid #eeeeee;"></td></tr>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
+
+              <!-- Welcome and bookmark message -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->
+              <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+                <tr>
+                  <td align="left" style="text-align: left; padding: 20px 0;">
+                    <p class="header" style="font-size: 40px;  margin: 10px 0; color: #282828;">Bookmarked art</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="text-align: left; padding: 20px 0;">
+                    <p style="font-size: 22px; color:#B6B6B6; margin: 10px 0;">
+                      Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit:
+                    </p>
+                  </td>
+                </tr>
+                <tr><td style="border-top: 1px solid #eeeeee;"></td></tr>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
+
+              <!-- Bookmarks -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->
+              <table dir="ltr" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:800px; color: #282828;font-size: 18px;" class="bookmarks-table">
+                <% @els_arr.each do | els_elem | %>
+                
+                  <tr>
+                    <td width="30%" dir="ltr" class="w100 spacer" style="color: #282828; vertical-align: top; padding: 40px 0;">
+                       <%= image_tag "https://barnes-image-repository.imgix.net/images/" + els_elem['id'].to_s + "_" + els_elem['imageSecret'] + "_n.jpg?crop=faces,entropy&fit=crop&w=200&h=200", alt: els_elem['id'].to_s%>
+                    </td>
+                    
+                    <td width="65%" dir="ltr" class="w100" style="color: #282828; vertical-align: top; padding: 18px 0 40px 0;">
+                      <p>
+                        <%= link_to 'https://collection.barnesfoundation.org/objects/'+ els_elem['id'].to_s, :title => "barnes collection" do %>
+                          <h3><%= els_elem['title'] %></h3>
+                        <% end %>
+                      </p>
+                                      
+                      <%= els_elem['people']%>. <%= els_elem['title']%>, <%=els_elem['displayDate']%>. <%=els_elem['medium']%>, <%=els_elem['dimensions'] %>. <%=els_elem['invno']%>
+                              
+                      <% if els_elem['objRightsTypeID'].present? %>
+                        <% if ['1', '3'].include?(els_elem['objRightsTypeID']) %>
+                          <p>In Copyright. <br />
+                            <%= els_elem['creditLine'] %>
+                          </p>
+                        <% elsif ['4', '8', '10'].include?(els_elem['objRightsTypeID']) %>
+                            <p>Public domain. </p>
+                        <% elsif ['2', '6'].include?(els_elem['objRightsTypeID']) %>
+                            <p>Copyright Undetermined.</p>
+                        <% end %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr><td colspan="2" style="border-top: 1px solid #eeeeee;"></td></tr>
+                <% end %>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
+
+              <!-- footer spacer-->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->              
+              <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+                <tr>
+                  <td>
+                    <p>&nbsp;</p>
+                  </td>
+                </tr>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
+
+              <!-- footer social icons -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->             
+              <table cellpadding="0" cellspacing="0" border="0" style="width:100%" class="footer-social">
+                <tr>
+                  <td>
+                    <p style="padding: 20px 0">&nbsp;</p>
+                  </td>
+                  <td align="center">
+                    <a href="https://twitter.com/the_barnes" target="_blank">
+                      <img alt="twitter" src="https://www.gstatic.com/youtube/img/email/twitter_email_icon_grey.png" width="20px" height="20px" style="padding: 20px 10px; opacity: 0.8;"/>
+                    </a>
+                    <a href="https://www.youtube.com/user/BarnesFoundation" target="_blank">
+                      <img alt="youtube" src="https://www.gstatic.com/youtube/img/email/youtube_email_icon_grey.png" width="20px" height="15px" style="padding: 20px 10px; opacity: 0.8;"/>
+                    </a>
+                  </td>
+                  <td>
+                    <p style="padding: 20px 0">&nbsp;</p>
+                  </td>
+                </tr>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
+
+              <!-- footer links -->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->                
+              <div align="center">
+                <table dir="ltr" cellpadding="0" cellspacing="0" border="0" style="width: 60%; table-layout: fixed;" class="footer-action">
+                  <tr style="padding: 0 40px;">
+                    <td dir="ltr" class="w100" style="width:20%; text-align: center; vertical-align: middle;">
+                      <h3><a href="https://www.barnesfoundation.org/whats-on/collection" target="_blank">Tickets</a></h3>
+                    </td>
+                    <td dir="ltr" class="w100 p20" style="width:20%; text-align: center; vertical-align: middle;">
+                      <h3><a href="https://www.barnesfoundation.org/whats-on/talks" target="_blank">Tours</a></h3>
+                    </td>
+                    <td dir="ltr" class="w100 p20" style="width:20%; text-align: center; vertical-align: middle;">
+                      <h3><a href="https://www.barnesfoundation.org/support" target="_blank">Join</a></h3>
+                    </td>
+                    <td dir="ltr" class="w100 p20" style="width:20%; text-align: center; vertical-align: middle;">
+                      <h3><a href="https://shop.barnesfoundation.org/" target="_blank">Shop</a></h3>
+                    </td>
+                    <td dir="ltr" class="w100 p20" style="width:20%; text-align: center; vertical-align: middle;">
+                      <h3><a href="https://www.barnesfoundation.org/support" target="_blank">Membership</a></h3>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
+              <!-- footer address | contact etc -->
+              <div align="center">
+                <table cellpadding="0" cellspacing="0" border="0" style="width: 60%; table-layout: fixed;" class="footer-info">
+                  <tr>
+                    <td style="text-align: center; vertical-align: middle; padding-top: 10px;">
+                      <div style="height:28px; color: #b8b8b8;">2025 Benjamin Franklin Parkway, Philadelphia, PA 19130</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: center; vertical-align: middle; padding-top: 10px;">
+                      <div style="height:28px; color: #b8b8b8;"><a href="tel:215-278-7000">Call : 215.278.7000</a> &nbsp;&nbsp;&nbsp;mailto: info@barnesfoundation.org</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: center; vertical-align: middle; padding-top: 10px;" class="footer-info-actions">
+                      <div style="height:28px; color: #b8b8b8;">
+                        <a href="https://www.barnesfoundation.org/privacy-policy" style="text-decoration: underline;">Privacy Policy</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                        <a href="http://www.pages03.net/thebarnesfoundation/EmailPreferences/curate_your_inbox" style="text-decoration: underline;"> Email Preferences</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                        <a href="http://www.pages03.net/thebarnesfoundation/EmailPreferences/opt-out" style="text-decoration: underline;"> Unsubscribe</a>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
+
+              <!-- footer spacer-->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->  
+              <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+                <tr>
+                  <td>
+                    <p>&nbsp;</p>
+                  </td>
+                </tr>
+                <tr><td style="border-top: 1px solid #eeeeee;"></td></tr>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
+              </tr>
+              </table>
+              <![endif]-->
+
+               <!-- footer spacer-->
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->                
+              <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+                <tr>
+                  <td>
+                    <p>&nbsp;</p>
+                  </td>
+                </tr>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+              <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+              <tr>
+              <td align="center" valign="top" width="500">
+              <![endif]-->   
+
+            </td>
+          </tr>
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+        <tr>
+        <td align="center" valign="top" width="500">
+        <![endif]-->           
+      </div>
+    </td>
+  </tr>  
+</table>
+<!--[if (gte mso 9)|(IE)]>
+<table align="center" border="0" cellspacing="0" cellpadding="0" width="500">
+<tr>
+<td align="center" valign="top" width="500">
+<![endif]-->   

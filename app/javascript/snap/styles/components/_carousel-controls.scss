@@ -1,5 +1,6 @@
 .carousel {
     height : 90vh;
+    padding: 1rem;
 
     .carousel-indicators {
         position: absolute;
@@ -34,12 +35,58 @@
     .carousel-control-prev, .carousel-control-next {
         position: absolute;
         bottom: 15vh;
-        top: unset;
+        top: initial;
         width: 50%;
         height: 1.5vh;
         color: #6E6E6E;
         text-align: center;
-        opacity: 0.5;
+        opacity: 1;
+    }
+}
+
+/* iPhone 5 and below. Smaller Devices (Portrait) */
+@media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
+/* Styles */
+    
+    .carousel-indicators {
+        bottom: 20vh !important;
+    }
+
+    .carousel-control-prev, .carousel-control-next {
+        bottom: 20vh !important;
+    }
+
+    // .fa-2x {
+    //     font-size: 1.5rem !important;
+    // }
+    
+}
+
+/* iPhone X */
+@media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) { 
+    .carousel-indicators {
+        bottom: 20vh !important;
+    }
+    
+    .carousel-control-prev, .carousel-control-next {
+        bottom: 20vh !important;
+    }
+    
+}
+
+/* iPads (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+/* Styles */
+    .carousel-indicators {
+        bottom: 10vh !important;
+    }
+
+    .carousel-control-prev, .carousel-control-next {
+        bottom: 10vh !important;
+    }
+
+    .fa-2x {
+        font-size: 2.5rem !important;
     }
 }
 
