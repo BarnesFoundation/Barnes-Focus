@@ -272,3 +272,32 @@ Translation.create(
   english_translation: 'Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit',
   unique_identifier: 'text_2'
 )
+
+camera = Translation.find_or_create_by(screen_text: "Camera", display_order: 17)
+Translation.create(
+  screen_text: 'PHOTO',
+  parent_id: camera.id,
+  english_translation: 'PHOTO',
+  unique_identifier: 'text_1'
+)
+
+Translation.create(
+  screen_text: 'Cancel',
+  parent_id: camera.id,
+  english_translation: 'Cancel',
+  unique_identifier: 'text_2'
+)
+
+Translation.create(
+  screen_text: 'Retake',
+  parent_id: camera.id,
+  english_translation: 'Retake',
+  unique_identifier: 'text_3'
+)
+
+Translation.create(
+  screen_text: 'Use Photo',
+  parent_id: camera.id,
+  english_translation: 'Use Photo',
+  unique_identifier: 'text_4'
+)
