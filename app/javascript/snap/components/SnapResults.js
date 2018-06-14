@@ -378,7 +378,7 @@ class SnapResults extends Component {
                         </div>
                         <div className="row">
                           <div className="col-6 offset-3 text-center">
-                            <button type="submit" className="btn snap-btn snap-btn-default">
+                            <button id="bookmark-submit" type="submit" className="btn snap-btn snap-btn-default">
                               Submit
                            </button>
                           </div>
