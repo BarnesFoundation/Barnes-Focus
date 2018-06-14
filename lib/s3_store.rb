@@ -4,11 +4,7 @@ class S3Store
   def initialize file
     @file     = file
     @aws_data = Rails.application.secrets[:aws]
-    @s3       = Aws::S3::Resource.new(
-      region: @aws_data[:region],
-      access_key_id: @aws_data[:access_key_id],
-      secret_access_key: @aws_data[:secret_access_key]
-    )
+    @s3       = Aws::S3::Resource.new(region:@aws_data[:region])
     @bucket   = @s3.bucket(@aws_data[:s3_bucket_name])
   end
 
