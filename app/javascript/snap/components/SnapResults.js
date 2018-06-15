@@ -441,7 +441,6 @@ class SnapResults extends Component {
         >
           <div className="team-alert">
             <button type="button" className="close pull-right offset-11" aria-label="Close" onClick={this.closeAlertModal}>
-              <i className="fa fa-times" aria-hidden="true"></i>
             </button>
             <div className="picture">
               <img className="img-thumbnail" src={team_picture} alt="bookmark_img" />
