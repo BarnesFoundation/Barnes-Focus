@@ -17,10 +17,15 @@ html, body {
     font-feature-settings:"kern";
     text-rendering:optimizeLegibility;
     font-variant-ligatures:common-ligatures;
-    position: static;
-    overflow: hidden;
+    position: absolute;
+    //overflow: hidden;
     -webkit-overflow-scrolling: touch;
     overflow-y:scroll;
+}
+
+.app-container {
+    position: relative;
+    -webkit-transform: translate3d(0,0,0);
 }
 
 h1 {
@@ -221,11 +226,11 @@ p {
 
         h1 {
             line-height: 1;
-            margin-top: 1rem;
+            margin-top: 0;
         }
 
         .picture {
-            margin-top: 2vh;
+            margin-top: 0;
             img {
                 border: 0;
             }
