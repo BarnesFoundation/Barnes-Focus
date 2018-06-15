@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180411131245) do
+ActiveRecord::Schema.define(version: 20180607132527) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,14 +35,14 @@ ActiveRecord::Schema.define(version: 20180411131245) do
   create_table "bookmarks", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "image_id", default: "", null: false
-    t.datetime "received_on"
     t.boolean "mail_sent", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "language"
     t.index ["email"], name: "index_bookmarks_on_email"
     t.index ["image_id"], name: "index_bookmarks_on_image_id"
+    t.index ["language"], name: "index_bookmarks_on_language"
     t.index ["mail_sent"], name: "index_bookmarks_on_mail_sent"
-    t.index ["received_on"], name: "index_bookmarks_on_received_on"
   end
 
   create_table "delayed_jobs", force: :cascade do |t|
@@ -101,6 +101,27 @@ ActiveRecord::Schema.define(version: 20180411131245) do
     t.datetime "updated_at", null: false
     t.index ["aasm_state"], name: "index_training_records_on_aasm_state"
     t.index ["identifier"], name: "index_training_records_on_identifier", unique: true
+  end
+
+  create_table "translations", force: :cascade do |t|
+    t.integer "parent_id"
+    t.text "screen_text", default: ""
+    t.text "english_translation"
+    t.text "chinese_translation"
+    t.text "french_translation"
+    t.text "german_translation"
+    t.text "italian_translation"
+    t.text "japanese_translation"
+    t.text "korean_translation"
+    t.text "russian_translation"
+    t.text "spanish_translation"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "display_order"
+    t.string "unique_identifier"
+    t.index ["display_order"], name: "index_translations_on_display_order"
+    t.index ["parent_id"], name: "index_translations_on_parent_id"
+    t.index ["unique_identifier"], name: "index_translations_on_unique_identifier"
   end
 
 end

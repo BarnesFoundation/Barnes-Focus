@@ -224,9 +224,9 @@ void CudaSurfMatcher::getMatchPercentForIdx(int tr_i, cv::cuda::GpuMat &descript
 void CudaSurfMatcher::searchForMatches(cv::cuda::GpuMat &descriptorsOriginalImageGPU, int originalImageNumKeyPoints, std::map<std::string, double> &results){
   std::vector<std::thread> vec_thr;
   for(int tr_i = 0; tr_i < trainingImageDescriptorsGPU.size(); ++tr_i){
-    // std::thread t_compare(&CudaSurfMatcher::getMatchPercentForIdx, this, tr_i, std::ref(descriptorsOriginalImageGPU), std::ref(results));
-    // vec_thr.push_back(std::move(t_compare));
-    getMatchPercentForIdx(tr_i, std::ref(descriptorsOriginalImageGPU), originalImageNumKeyPoints, std::ref(results));
+    std::thread t_compare(&CudaSurfMatcher::getMatchPercentForIdx, this, tr_i, std::ref(descriptorsOriginalImageGPU), originalImageNumKeyPoints, std::ref(results));
+    vec_thr.push_back(std::move(t_compare));
+    // getMatchPercentForIdx(tr_i, std::ref(descriptorsOriginalImageGPU), originalImageNumKeyPoints, std::ref(results));
   }
 
   for (unsigned int i=0; i<vec_thr.size(); ++i){

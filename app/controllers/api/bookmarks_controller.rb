@@ -2,6 +2,12 @@ class Api::BookmarksController < Api::BaseController
   def index
   end
 
+  api :POST, '/v1/bookmarks', 'Create bookmark entry'
+  param :email, String, desc: "Email of user", required: true
+  param :image_id, String, desc: "Image Id", required: true
+  param :newsletter, String, desc: "Would like to subscribe to newsletter yes/no. Boolean field"
+  param :language, String, desc: "Which language user is currently accessing to"
+  example "bookmark[:email]='somone@example.com', bookmark[:image_id]='2072'"
   def create
     @bookmark = Bookmark.new bookmark_params
 
@@ -31,6 +37,6 @@ class Api::BookmarksController < Api::BaseController
 
 private
   def bookmark_params
-    params.require(:bookmark).permit(:email, :image_id, :newsletter)
+    params.require(:bookmark).permit(:email, :image_id, :newsletter, :language)
   end
 end

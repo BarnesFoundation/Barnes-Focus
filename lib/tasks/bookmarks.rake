@@ -7,6 +7,8 @@ namespace :bookmarks do
 
     if bookmarks.any?
       bookmarks.group_by(&:email).each do | mail, bukmarks |
+        language = bukmarks.last.language
+        language = language || 'en'
         els_arr = Array.new
         bukmarks.each { | obj |
           els_obj = BarnesElasticSearch.instance.get_object(obj.image_id)
@@ -16,7 +18,7 @@ namespace :bookmarks do
         }
 
         begin
-          BookmarkNotifierMailer.send_activity_email(mail, els_arr).deliver_now
+          BookmarkNotifierMailer.send_activity_email(mail, els_arr, language).deliver_now
           bukmarks.each {|b| b.update_attributes(mail_sent: true)}
         rescue Exception => ex
           p "Unable to send email due to #{ex.to_s}"

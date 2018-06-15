@@ -11,7 +11,7 @@ import Modal from 'react-modal';
 import Footer from './Footer';
 import Popover from 'react-simple-popover';
 import NotificationSystem from 'react-notification-system';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import * as analytics from './Analytics';
 
@@ -40,6 +40,8 @@ class SnapResults extends Component {
 
   constructor(props) {
     super(props);
+    let translationObj = localStorage.getItem(SNAP_LANGUAGE_TRANSLATION);
+
     this.state = {
       ...props.location.state,  // these properties are passed on from Camera component.
       resetModalIsOpen: false,
@@ -51,7 +53,8 @@ class SnapResults extends Component {
       newsletterSubscription: false,
       errors: {
         email: false
-      }
+      },
+      translation: (translationObj) ? JSON.parse(translationObj) : null
     }
 
   }
@@ -251,6 +254,7 @@ class SnapResults extends Component {
     payload.email = this.state.email;
     payload.image_id = this.state.searchResults[0].id;
     payload.newsletter = this.state.newsletterSubscription;
+    payload.language = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || 'en';
 
     axios.post('/api/bookmarks', payload).then(response => {
       this._addNotification({ success: true, message: 'Bookmark created successfully.' });
@@ -315,7 +319,9 @@ class SnapResults extends Component {
               </button>
               <div className="card-body">
                 <div className="d-flex justify-content-around action-icons">
-                  <div id="share-it" ref="target" onClick={this.shareIt}><img src={share} alt="share" />Share it</div>
+                  <div id="share-it" ref="target" onClick={this.shareIt}><img src={share} alt="share" />
+                    {(this.state.translation) ? this.state.translation['Share / Bookmark icons'].text_1.translated_content : `Share it`}
+                  </div>
                   <Popover
                     placement='top'
                     container={this}
@@ -334,7 +340,9 @@ class SnapResults extends Component {
                           </a> */}
                     </div>
                   </Popover>
-                  <div id="bookmark-it" onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />Bookmark it</div>
+                  <div id="bookmark-it" onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />
+                    {(this.state.translation) ? this.state.translation['Share / Bookmark icons'].text_2.translated_content : `Bookmark it`}
+                  </div>
                   <Modal
                     isOpen={this.state.bookmarkModalIsOpen}
                     onRequestClose={this.closeBookmarkModal}
@@ -357,13 +365,15 @@ class SnapResults extends Component {
                       <div className="picture">
                         <img src={this.state.searchResults[0].bookmarkImageUrl} alt="bookmark_img" />
                       </div>
-                      <div className="message">Information about the art you bookmark will be emailed to you after your visit.</div>
+                      <div className="message">
+                        {(this.state.translation) ? this.state.translation.Bookmark_capture.text_1.translated_content : `Information about the art you bookmark will be emailed to you after your visit.`}
+                      </div>
                       <form onSubmit={this.submitBookMark}>
-                        <input id="bookmark-email" type="email" placeholder="Email address" className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
+                        <input type="email" placeholder={(this.state.translation) ? this.state.translation.Bookmark_capture.text_2.translated_content : `Email address`} className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
                         <div className="checkbox">
                           <input id="newsletter-chk" type="checkbox" name="newsletterSubscription" onChange={this.handleBookmarkFormInputChange} />
                           <label htmlFor="newsletter-chk">
-                            Sign up for the Barnes newsletter
+                            {(this.state.translation) ? this.state.translation.Bookmark_capture.text_3.translated_content : `Sign up for the Barnes newsletter`}
                           </label>
                         </div>
                         <div className="row">
@@ -397,7 +407,9 @@ class SnapResults extends Component {
         </div>
         <div id="reset-experience" className="row mt-5 mb-3">
           <div className="col-6 offset-3 text-center">
-            <span className="reset-experience" onClick={this.openResetModal}>Reset Experience</span>
+            <span className="reset-experience" onClick={this.openResetModal}>
+              {(this.state.translation) ? this.state.translation.Footer.text_1.translated_content : `Reset Experience`}
+            </span>
           </div>
           <Modal
             isOpen={this.state.resetModalIsOpen}
@@ -415,9 +427,11 @@ class SnapResults extends Component {
                 </div>
               </div>
               <div className="title">
-                <h1>You are about to reset the Snap experience.</h1>
+                <h1>{(this.state.translation) ? this.state.translation.Manual_reset.text_1.translated_content : `You are about to reset the Snap experience.`}</h1>
               </div>
-              <div className="message">Warning: This will erase your bookmarked artwork, email address, and language preferences.</div>
+              <div className="message">
+                {(this.state.translation) ? this.state.translation.Manual_reset.text_2.translated_content : `Warning: This will erase your bookmarked artwork, email address, and language preferences.`}
+              </div>
               <div className="row action">
                 <div className="col-6 offset-3 text-center">
                   <button className="btn snap-btn snap-btn-danger" onClick={this.resetExperience}>
@@ -446,8 +460,8 @@ class SnapResults extends Component {
               <img className="img-thumbnail" src={team_picture} alt="bookmark_img" />
             </div>
             <div className="message">
-              <h1>Want to know even more?</h1>
-              <p>Find a member of our Art team and start a conversation about any work that interests you. Our Art Team is wearing special black T-shirts.</p>
+              <h1>{(this.state.translation) ? this.state.translation.Art_team_alert.text_1.translated_content : `Want to know even more?`}</h1>
+              <p>{(this.state.translation) ? this.state.translation.Art_team_alert.text_2.translated_content : `Find a member of our Art team and start a conversation about any work that interests you. Our Art Team is wearing special black T-shirts.`}</p>
             </div>
           </div>
         </Modal>

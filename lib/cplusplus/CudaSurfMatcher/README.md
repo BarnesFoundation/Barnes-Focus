@@ -124,8 +124,12 @@ https://www.pyimagesearch.com/2016/07/11/compiling-opencv-with-cuda-support/
 
 Use above mentioned processes to boot 2 p2 instances.
 
-# uploading code & setting up training assets 
+# uploading/building code & setting up training assets 
 * upload this code folder into /home/ubuntu/ on both instances
+* build code
+  ```
+      rm -rf /home/ubuntu/CudaSurfMatcher/build; mkdir /home/ubuntu/CudaSurfMatcher/build; cd /home/ubuntu/CudaSurfMatcher/build; cmake ..; make;
+  ```
 * run following on both instances to download assets into /home/asset-sets
   ```
     cd /home/ubuntu/CudaSurfMatcher

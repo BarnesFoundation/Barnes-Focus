@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  apipie
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   health_check_routes
@@ -12,6 +13,7 @@ Rails.application.routes.draw do
       end
     end
     resources :bookmarks, only: [:index, :create]
+    resources :translations, only: [:index]
   end
 
   post 'background_jobs/bookmarks'        => 'background_jobs/bookmarks'
