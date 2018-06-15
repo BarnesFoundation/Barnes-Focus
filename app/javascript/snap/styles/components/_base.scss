@@ -17,7 +17,7 @@ html, body {
     font-feature-settings:"kern";
     text-rendering:optimizeLegibility;
     font-variant-ligatures:common-ligatures;
-    position: absolute;
+    position: static;
     overflow: hidden;
     -webkit-overflow-scrolling: touch;
     overflow-y:scroll;
