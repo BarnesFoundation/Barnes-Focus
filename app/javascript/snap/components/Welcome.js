@@ -21,7 +21,7 @@ import photo_prompt from 'images/photo-prompt.jpg';
 import icon_camera from 'images/camera_icon.svg';
 import axios from 'axios';
 
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, SNAP_LAST_TIMESTAMP, SNAP_USER_EMAIL, SNAP_APP_RESET_INTERVAL } from './Constants';
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, SNAP_LAST_TIMESTAMP, SNAP_USER_EMAIL, SNAP_APP_RESET_INTERVAL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 import loadImage from 'blueimp-load-image/js';
@@ -34,8 +34,11 @@ class WelcomeComponent extends Component {
         this.state = {
             ...props.location.state, // when "Take Photo" button is clicked in /not-found or /results page in (iOS, Android/Firefox), we pass {launchCamera: true} property
             searchInProgress: false,
-            snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0
+            snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
+            selectedLanguage: '',
+            translation: null
         }
+
     }
 
     /**
@@ -134,6 +137,30 @@ class WelcomeComponent extends Component {
 
     }
 
+    onSelectLanguage = (lang) => {
+        console.log('Selected lang changed in Welcome component : ' + JSON.stringify(lang));
+        this.setState({ selectedLanguage: lang });
+
+        axios.get('/api/translations?language=' + lang.code)
+            .then(response => {
+                console.log('successfully fetched translations.');
+                let res = response.data;
+                if (res.data.translations) {
+                    let translation;
+                    try {
+                        this.setState({ translation: res.data.translations });
+                        localStorage.setItem(SNAP_LANGUAGE_TRANSLATION, JSON.stringify(res.data.translations));
+                    } catch (err) {
+                        console.log('Error while parsing translations object to JSON.');
+                    }
+
+                }
+            })
+            .catch(error => {
+                console.log('Error while fetching translations!');
+            });
+    }
+
     submitPhoto = (canvas) => {
         let processedImage = canvas.toDataURL('image/jpeg');
 
@@ -218,9 +245,9 @@ class WelcomeComponent extends Component {
                                     </div>
                                     <div className="content">
 
-                                        <h1>It's a snap!</h1>
+                                        <h1>{(this.state.translation) ? this.state.translation.Welcome_screen.text_1.translated_content : `It's a snap!`}</h1>
 
-                                        <p>Take a photo of any work of art to get information about it.</p>
+                                        <p>{(this.state.translation) ? this.state.translation.Welcome_screen.text_2.translated_content : `Take a photo of any work of art to get information about it.`}</p>
                                     </div>
                                 </div>
                             </div>
@@ -238,8 +265,8 @@ class WelcomeComponent extends Component {
                                         </div>
                                     </div>
                                     <div className="content">
-                                        <h1>Please select your language.</h1>
-                                        <LanguageSelect />
+                                        <h1>{(this.state.translation) ? this.state.translation.Language_choice.text_1.translated_content : `Please select your language.`}</h1>
+                                        <LanguageSelect onSelectLanguage={this.onSelectLanguage} />
                                     </div>
                                 </div>
                             </div>
@@ -258,9 +285,9 @@ class WelcomeComponent extends Component {
                                     </div>
                                     <div className="content">
 
-                                        <h1>Get connected.</h1>
+                                        <h1>{(this.state.translation) ? this.state.translation.Connect_wireless.text_1.translated_content : `Get connected.`}</h1>
 
-                                        <p>For best connectivity, please connect to our free wifi: BarnesPublic.</p>
+                                        <p>{(this.state.translation) ? this.state.translation.Connect_wireless.text_2.translated_content : `For best connectivity, please connect to our free wifi: BarnesPublic.`}</p>
 
                                     </div>
                                 </div>
@@ -271,7 +298,7 @@ class WelcomeComponent extends Component {
                                         <img src={photo_prompt} alt="photo_prompt_main_img" />
                                     </div>
                                     <div className="content">
-                                        <h1>Take a photo to learn more about a work of art.</h1>
+                                        <h1>{(this.state.translation) ? this.state.translation.Instruction_snap.text_1.translated_content : `Take a photo to learn more about a work of art.`}</h1>
                                     </div>
 
                                     {/* {
@@ -301,8 +328,8 @@ class WelcomeComponent extends Component {
 
 
                                     <Link className="btn take-photo-btn" to="/snap">
-                                        Take photo
-                                            <span className="icon">
+                                        {(this.state.translation) ? this.state.translation.Photo_Button_Label.text_1.translated_content : `Take photo`}
+                                        <span className="icon">
                                             <img src={icon_camera} alt="camera_icon" />
                                         </span>
                                     </Link>
@@ -336,8 +363,8 @@ class WelcomeComponent extends Component {
                                 />
                             </div>
                             <div className="content">
-                                <h1>Searching</h1>
-                                <p>Please wait while we search our database.</p>
+                                <h1>{(this.state.translation) ? this.state.translation.Snap_searching.text_1.translated_content : `Searching`}</h1>
+                                <p>{(this.state.translation) ? this.state.translation.Snap_searching.text_2.translated_content : `Please wait while we search our database.`}</p>
                             </div>
                         </div>
                     </div>
