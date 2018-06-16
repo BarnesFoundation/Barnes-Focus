@@ -34,7 +34,13 @@ h1 {
     font-family: 'Calibre-Medium';
     font-weight: normal;
     margin-top: 0;
+
+    &.small {
+        font-size: 1.4rem;
+    }
 }
+
+
 
 h2 {
     font-size: 1.3125rem;
