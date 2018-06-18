@@ -19,14 +19,15 @@ html, body {
     font-variant-ligatures:common-ligatures;
     position: absolute;
     //overflow: hidden;
-    -webkit-overflow-scrolling: touch;
+    //-webkit-overflow-scrolling: touch;
     overflow-y:scroll;
 }
 
-.app-container {
-    position: relative;
-    -webkit-transform: translate3d(0,0,0);
-}
+// .app-container {
+//     position: relative;
+//     -webkit-transform: translate3d(0,0,0);
+//     height: calc(100% + 1px);
+// }
 
 h1 {
     font-size: 2.25rem;
