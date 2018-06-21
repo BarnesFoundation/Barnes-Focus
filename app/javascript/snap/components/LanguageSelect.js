@@ -67,7 +67,7 @@ class LanguageSelect extends Component {
                     <div className="col-12">
                         <div className="btn-group d-flex" role="group">
                             <button className="btn btn-secondary btn-lg w-100" type="button" onClick={this.openModal}>
-                                {this.state.selectedLanguage.name}
+                                {(this.props.reset) ? this.state.languageOptions[0].name : this.state.selectedLanguage.name}
                             </button>
                             <button type="button" className="btn btn-lg btn-secondary dropdown-toggle dropdown-toggle-split" onClick={this.openModal}>
                                 <span className="sr-only">Toggle Dropdown</span>

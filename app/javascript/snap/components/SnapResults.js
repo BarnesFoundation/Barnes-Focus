@@ -51,9 +51,11 @@ class SnapResults extends Component {
       searchResults: [],
       email: localStorage.getItem(SNAP_USER_EMAIL) || '',
       newsletterSubscription: false,
+      resetLanguageBox: false,
       errors: {
         email: false
       },
+      selectedLanguage: '',
       translation: (translationObj) ? JSON.parse(translationObj) : null
     }
 
@@ -115,6 +117,31 @@ class SnapResults extends Component {
         dismissible: "none"
       });
   };
+
+  onSelectLanguage = (lang) => {
+    console.log('Selected lang changed in SnapResults component : ' + JSON.stringify(lang));
+    this.setState({ selectedLanguage: lang });
+    this.setState({ resetLanguageBox: false });
+
+    axios.get('/api/translations?language=' + lang.code)
+      .then(response => {
+        console.log('successfully fetched translations.');
+        let res = response.data;
+        if (res.data.translations) {
+          let translation;
+          try {
+            this.setState({ translation: res.data.translations });
+            localStorage.setItem(SNAP_LANGUAGE_TRANSLATION, JSON.stringify(res.data.translations));
+          } catch (err) {
+            console.log('Error while parsing translations object to JSON.');
+          }
+
+        }
+      })
+      .catch(error => {
+        console.log('Error while fetching translations!');
+      });
+  }
 
   componentDidMount() {
     this._notificationSystem = this.refs.notificationSystem;
@@ -278,7 +305,10 @@ class SnapResults extends Component {
     localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
     localStorage.removeItem(SNAP_USER_EMAIL);
     localStorage.removeItem(SNAP_ATTEMPTS);
+    localStorage.removeItem(SNAP_LANGUAGE_TRANSLATION);
     this.setState({ resetModalIsOpen: false });
+    this.setState({ translation: null });
+    this.setState({ resetLanguageBox: true });
   }
 
   closeAlertModal = () => {
@@ -403,7 +433,7 @@ class SnapResults extends Component {
           </div>
         </div>
         <div className="content mt-5">
-          <LanguageSelect />
+          <LanguageSelect reset={this.state.resetLanguageBox} onSelectLanguage={this.onSelectLanguage} />
         </div>
         <div id="reset-experience" className="row mt-5 mb-3">
           <div className="col-6 offset-3 text-center">
