@@ -6,7 +6,7 @@ const Footer = (props) => (
             <hr />
             <div className="pt-2 pb-4 d-flex justify-content-around">
                 <span>&copy; 2018 Barnes Foundation</span>
-                <span>Terms & Conditions</span>
+                <a href="https://www.barnesfoundation.org/terms"><span>Terms & Conditions</span></a>
             </div >
         </div>
     </div>
