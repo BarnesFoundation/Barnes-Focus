@@ -124,12 +124,16 @@ https://www.pyimagesearch.com/2016/07/11/compiling-opencv-with-cuda-support/
 
 Use above mentioned processes to boot 2 p2 instances.
 
-# uploading/building code & setting up training assets 
+# uploading/building code 
+
 * upload this code folder into /home/ubuntu/ on both instances
 * build code
   ```
       rm -rf /home/ubuntu/CudaSurfMatcher/build; mkdir /home/ubuntu/CudaSurfMatcher/build; cd /home/ubuntu/CudaSurfMatcher/build; cmake ..; make;
   ```
+
+# Setting up training assets using CSV (this assmues that 2D-Paintings-Small.csv.gz file is up-to-date with asset links)
+* Please ensure that file name of each asset must begin with unique image ID which is further used by rails app to serve results.
 * run following on both instances to download assets into /home/asset-sets
   ```
     cd /home/ubuntu/CudaSurfMatcher
@@ -202,3 +206,48 @@ To add more assets, just stop the server and add more images to either set1 or s
 # Running tests
   * cd CudaSurfMatcher
   * ./run_tests.rb
+
+# Updating training assets using S3 sync
+* This assmues that assets are on S3 bucket
+* Please ensure that assets are divided into 2 folders namely set1 and set2 (half files in each) and asset size is not too big (< 200 KB ideally).
+* SSH commands here are meant for both Cuda instances. So, ssh into both instances and run following steps
+
+* configureing AWS tool 
+  ```
+    # Configure aws command line tool (if not done already)
+
+    aws configure
+  ```
+* run following on both instances to download assets into /home/ubuntu/asset-sets
+  
+  ```
+    # remove old assets and re-create directory
+    rm -rf /home/ubuntu/asset-sets
+    mkdir /home/ubuntu/asset-sets
+
+    #Download sets using s3 sync
+    cd /home/ubuntu/asset-sets
+    aws s3 sync s3://barnes-snap-prod/cuda/asset-sets-26-june-18 .
+
+    # repeat above steps on second cuda instance as well.
+    # We should have both folders set1 and set2 downloaded into /home/ubuntu/asset-sets on bothe instances at this point.
+  ```
+* Ensure that symlink /home/ubuntu/assets is pointing to set1 on InstanceA and and set2 on InstanceB. If not, then re-create sym-link as outlined below:
+
+  ## Symlink assets folder
+    * Instance A
+      ```
+        ln -fs /home/ubuntu/asset-sets/set1 /home/ubuntu/assets
+      ``` 
+
+    * Instance B
+      ```
+        ln -fs /home/ubuntu/asset-sets/set2 /home/ubuntu/assets
+      ``` 
+* Restart Cuda server
+
+  ```
+    sudo monit stop CudaSurfMatcher
+    sudo monit start CudaSurfMatcher
+  ```
+ 
