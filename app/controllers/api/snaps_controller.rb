@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
 
@@ -78,7 +80,12 @@ class Api::SnapsController < Api::BaseController
           if preferred_language.present?
             translator = GoogleTranslate.new preferred_language
             begin
-              searched_data['shortDescription'] = translator.translate(strip_tags(searched_data["shortDescription"]).html_safe) if searched_data["shortDescription"]
+              if searched_data["shortDescription"]
+                doc = Nokogiri::HTML(translator.translate(searched_data["shortDescription"]))
+                doc.remove_namespaces!
+                searched_data['shortDescription'] = doc.xpath("//p")[0].content
+                searched_data['shortDescription'] = translator.translate(strip_tags(searched_data["shortDescription"]).html_safe) if searched_data['shortDescription'].nil?
+              end
             rescue Exception => err
               p err
               searched_data['shortDescription'] = strip_tags(searched_data["shortDescription"]).html_safe if searched_data["shortDescription"]
