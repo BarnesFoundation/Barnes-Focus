@@ -25,17 +25,6 @@ ActiveAdmin.register SnapSearchResult do
         end if obj.api_response["image_ids"].present?
       end
     end
-    column "ES Image" do |obj|
-      table do
-        obj.es_response["records"].each do |es_image|
-          tr do
-            td do
-              image_tag Image.s3_url(es_image['id'], es_image['imageSecret']), class: 'es_image_size'
-            end
-          end
-        end if obj.es_response["records"].present?
-      end
-    end
     column "Imgix Image" do |obj|
       table do
         obj.es_response["records"].each do |es_image|
