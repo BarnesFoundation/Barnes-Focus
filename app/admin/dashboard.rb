@@ -12,7 +12,6 @@ ActiveAdmin.register_page "Dashboard" do
             tr do
               th '#'
               th 'Searched Image'
-              th 'ES Images'
               th 'Imgix Image'
               th 'API Response'
               th 'Elastic Search Result'
@@ -26,17 +25,6 @@ ActiveAdmin.register_page "Dashboard" do
                     image_tag img.searched_image_url, class: 'pastec_image_size'
                   else
                     image_tag img.searched_image_data, class: 'pastec_image_size'
-                  end
-                end
-                td do
-                  table do
-                    img.es_response["records"].each do |es_image|
-                      tr do
-                        td do
-                          image_tag Image.s3_url(es_image['id'], es_image['imageSecret']), class: 'es_image_size'
-                        end
-                      end
-                    end if img.es_response["records"].present?
                   end
                 end
 
