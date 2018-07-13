@@ -36,7 +36,7 @@ class EsCachedRecord < ApplicationRecord
   def self.connect_with_es_endpoint image_id
     searched_data = BarnesElasticSearch.instance.get_object(image_id)
     searched_data = searched_data.slice(
-      'id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate', 'dimensions', 'objRightsTypeID', 'creditLine'
+      'id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate'
     )
     searched_data
   end
