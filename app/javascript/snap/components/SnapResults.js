@@ -419,9 +419,31 @@ class SnapResults extends Component {
                   </Modal>
                 </div>
                 <hr />
-                <div className="card-text">
+                {this.state.searchResults[0].shortDescription && <div className="card-text">
                   <p className="text-muted">{this.state.searchResults[0].artist}. {this.state.searchResults[0].title}, {this.state.searchResults[0].displayDate}. {this.state.searchResults[0].medium}</p>
-                </div>
+                </div>}
+                {!this.state.searchResults[0].shortDescription && <div className="center-section">
+                  <table className="detail-table">
+                    <tbody>
+                      <tr>
+                        <td className="text-left">Artist:</td>
+                        <td className="text-muted text-right">{this.state.searchResults[0].artist}</td>
+                      </tr>
+                      <tr>
+                        <td className="text-left">Title:</td>
+                        <td className="text-muted text-right">{this.state.searchResults[0].title}</td>
+                      </tr>
+                      <tr>
+                        <td className="text-left">Date:</td>
+                        <td className="text-muted text-right">{this.state.searchResults[0].displayDate}</td>
+                      </tr>
+                      <tr>
+                        <td className="text-left">Medium:</td>
+                        <td className="text-muted text-right">{this.state.searchResults[0].medium}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>}
                 {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
                 {/* <div className="card-text">- John House, Renoir in the Barnes Foundation.</div> */}
               </div>
