@@ -30,6 +30,48 @@
     }
 }
 
+.Modal {
+    position: absolute;
+    top: 30%;
+    left: 8%;
+    right: 8%;
+    bottom: 30%;
+    border: solid 1px rgb(204, 204, 204);
+}
+
+
+.browser-modal {
+    
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    div {
+        display: flex;
+        flex-grow: 1;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    button {
+        height: 50px;
+        margin: 0 auto;
+        font-weight: normal;
+        background-color: rgb(214, 66, 32);
+        width: 100%;
+    }
+
+    .safari-link {
+        color: white;
+    }
+
+    .safari-text {
+        color: black;
+    }
+}
+
+
+
 .lang-dropdown-screen {
     text-align: center;
     .img-gallery {

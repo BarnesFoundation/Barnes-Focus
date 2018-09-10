@@ -6,7 +6,7 @@ import { PulseLoader } from 'react-spinners';
 
 import LanguageSelect from '../components/LanguageSelect';
 import Hammer from 'hammerjs';
-import Modal from 'react-modal';
+import ReactModal from 'react-modal';
 
 import img1 from 'images/welcome-img1.jpg';
 import img2 from 'images/welcome-img2.jpg';
@@ -36,9 +36,9 @@ class WelcomeComponent extends Component {
             searchInProgress: false,
             snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
             selectedLanguage: '',
-            translation: null
+            translation: null,
+            showBrowserModal: false
         }
-
     }
 
     /**
@@ -57,6 +57,39 @@ class WelcomeComponent extends Component {
                 localStorage.removeItem(SNAP_USER_EMAIL);
                 localStorage.removeItem(SNAP_ATTEMPTS);
             }
+        }
+    }
+
+    checkForBrowser = () => {
+
+        ReactModal.setAppElement('#app');
+
+
+        /* const customStyles = {
+            content: {
+                top: '50%',
+                left: '50%',
+                right: 'auto',
+                bottom: 'auto',
+                marginRight: '-50%',
+                transform: 'translate(-50%, -50%)',
+                height: '40%',
+                width: '70%'
+            }
+        }; */
+
+        if (isIOS && window.chrome) {
+            return <ReactModal isOpen={true} className="Modal">
+                <div className="browser-modal">
+                    <p className="safari-text">The Barnes Snap app only works in Safari on iOS.</p>
+                    <p className="safari-text">Click below to open it in Safari.</p>
+                    <div>
+                        <button>
+                            <a className="safari-link" href="safari://https:///www.snap.barnesfoundation.org">Open the app in Safari</a>
+                        </button>
+                    </div>
+                </div>
+            </ReactModal>
         }
     }
 
@@ -232,6 +265,9 @@ class WelcomeComponent extends Component {
                         <div className="carousel-inner">
                             <div className="carousel-item active">
                                 <div className="welcome-screen">
+                                    <div>
+                                        {this.checkForBrowser()}
+                                    </div>
                                     <div className="img-gallery">
                                         <div className="gallery-item">
                                             <img src={img1} alt="img1" />
