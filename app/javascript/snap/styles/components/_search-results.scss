@@ -40,6 +40,24 @@
             .card-text {
                 padding-bottom: 1.25rem;
             }
+
+            .center-section {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 23px;
+            }
+
+            .detail-table {
+                width: 95%;
+            }
+
+            .text-left {
+                text-align: left;
+            }
+
+            .text-right {
+                text-align: right;
+            }
         }
 
         .card-footer {
