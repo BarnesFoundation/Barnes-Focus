@@ -274,7 +274,7 @@ class Camera extends Component {
                             <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline />
                             <div className="video-frame">
                             {/* Hint text */}
-                            <p className="hint-text">Hint: Zoom in on the painting to snap a better picture</p>
+                            <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p>
                             </div>
                         </div>
                     }
