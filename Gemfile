@@ -28,7 +28,7 @@ gem 'activeadmin'
 gem 'devise'
 gem 'ffi', '1.9.18'
 gem 'google-cloud-translate'
-gem 'whenever', require: false
+#gem 'whenever', require: false
 gem 'silverpop'
 gem 'mandrill-api'
 gem 'oauth2'
