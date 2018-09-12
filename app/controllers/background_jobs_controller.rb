@@ -28,7 +28,7 @@ class BackgroundJobsController < ApplicationController
   end
 
   def update_es_cache
-    EsCachedRecord.find_in_batches(batch_size: 500) do | es_records |
+    EsCachedRecord.find_in_batches(batch_size: EsCachedRecord.count) do | es_records |
       es_records.each { |es_record|
         es_record.es_data = EsCachedRecord.connect_with_es_endpoint(es_record.image_id)
         es_record.last_es_fetched_at = DateTime.now
