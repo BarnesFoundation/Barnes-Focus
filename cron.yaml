@@ -2,7 +2,7 @@ version: 1
 cron:
  - name: "Update ES Cache Every morning at 5 AM"
    url: "/jobs/update_es_cache"
-   schedule: "15 20 * * *"
+   schedule: "0 9 * * *"
  - name: "Send bookmark snaps in every 3 hours"
    url: "/jobs/compose_bookmarks"
    schedule: "0 */3 * * *"
