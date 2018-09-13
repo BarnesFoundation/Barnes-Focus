@@ -8,6 +8,7 @@
 * `$ yarn install`
 * Create Schema: `rake db:create`
 * Migration: `rake db:migrate`
+* Note: You must have a PSQL server running for the above rake commands to run successfully
 
 # To Start Server in background
 `foreman start -f Procfile.dev -p 3000`
