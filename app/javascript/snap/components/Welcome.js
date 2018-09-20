@@ -25,6 +25,7 @@ import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, SNAP_LAST_TIMESTAMP, SNAP_USER
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 import loadImage from 'blueimp-load-image/js';
+import clipboard from 'clipboard-polyfill';
 
 class WelcomeComponent extends Component {
 
@@ -60,23 +61,31 @@ class WelcomeComponent extends Component {
         }
     }
 
-    checkForBrowser = () => {
+    checkForGetUserMedia = () => {
 
         ReactModal.setAppElement('#app');
 
-        if (isIOS && (isChrome || window.chrome)) {
+        // if (isIOS && (isChrome || window.chrome)) 
+        if (typeof navigator.mediaDevices.getUserMedia === 'undefined') {
             return <ReactModal isOpen={true} className="Modal">
                 <div className="browser-modal">
-                    <p className="safari-text">Please use Safari while we work on Google Chrome compatibility.</p>
+                    <p className="safari-text">Please use Safari while we work on compatibility with other mobile browsers.</p>
+                    <p className="safari-text">Copy the Snap website address and head to Safari to open it</p>
                     <div>
-                        <button>
-                            <a className="safari-link" href="safari://https:///www.snap.barnesfoundation.org">Open the app in Safari</a>
+                        <button onClick={this.copyUrlToClipboard}>
+                            <span className="safari-link">Tap to copy the website address</span>
                         </button>
                     </div>
                 </div>
             </ReactModal>
         }
     }
+
+    copyUrlToClipboard = () => {
+        clipboard.writeText('https://snap.barnesfoundation.org');
+        clipboard.readText().then(console.log, console.error);
+    }
+
 
     checkIndex = () => {
         const $this = $("#snapCarousel");
@@ -251,7 +260,7 @@ class WelcomeComponent extends Component {
                             <div className="carousel-item active">
                                 <div className="welcome-screen">
                                     <div>
-                                        {this.checkForBrowser()}
+                                        {this.checkForGetUserMedia()}
                                     </div>
                                     <div className="img-gallery">
                                         <div className="gallery-item">
