@@ -66,6 +66,7 @@ class WelcomeComponent extends Component {
         ReactModal.setAppElement('#app');
 
         // if (isIOS && (isChrome || window.chrome)) 
+        console.log(navigator.mediaDevices.getUserMedia);
         if (typeof navigator.mediaDevices.getUserMedia === 'undefined') {
             return <ReactModal isOpen={true} className="Modal">
                 <div className="browser-modal">
@@ -95,6 +96,7 @@ class WelcomeComponent extends Component {
             $this.children(".carousel-control-next").show();
             $this.children(".carousel-indicators").show();
         } else if ($("#snapCarousel .carousel-inner .carousel-item:last").hasClass("active")) {
+
             $this.children(".carousel-control-next").hide();
             $this.children(".carousel-control-prev").hide();
             $this.children(".carousel-indicators").hide();
