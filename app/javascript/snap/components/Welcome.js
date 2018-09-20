@@ -64,25 +64,10 @@ class WelcomeComponent extends Component {
 
         ReactModal.setAppElement('#app');
 
-
-        /* const customStyles = {
-            content: {
-                top: '50%',
-                left: '50%',
-                right: 'auto',
-                bottom: 'auto',
-                marginRight: '-50%',
-                transform: 'translate(-50%, -50%)',
-                height: '40%',
-                width: '70%'
-            }
-        }; */
-
-        if (isIOS && window.chrome) {
+        if (isIOS && (isChrome || window.chrome)) {
             return <ReactModal isOpen={true} className="Modal">
                 <div className="browser-modal">
-                    <p className="safari-text">The Barnes Snap app only works in Safari on iOS.</p>
-                    <p className="safari-text">Click below to open it in Safari.</p>
+                    <p className="safari-text">Please use Safari while we work on Google Chrome compatibility.</p>
                     <div>
                         <button>
                             <a className="safari-link" href="safari://https:///www.snap.barnesfoundation.org">Open the app in Safari</a>
