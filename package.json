@@ -11,6 +11,7 @@
     "babel-preset-react": "^6.24.1",
     "blueimp-load-image": "^2.19.0",
     "bootstrap": "4.0.0",
+    "clipboard-polyfill": "^2.5.4",
     "css-loader": "^0.28.9",
     "font-awesome": "^4.7.0",
     "hammerjs": "^2.0.8",
