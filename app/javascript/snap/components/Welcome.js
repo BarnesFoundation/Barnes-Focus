@@ -87,13 +87,13 @@ class WelcomeComponent extends Component {
         }
 
         // If they're not on iOS 11, it doesn't matter what browser they're using, navigator.mediaDevices.getUserMedia() will return undefined
-        else {
+        /* else {
             return <ReactModal isOpen={true} className="Modal">
                 <div className="browser-modal">
                     {<p className="safari-text">Please upgrade to iOS 11 to use the Snap app with Safari</p>}
                 </div>
             </ReactModal>
-        }
+        } */
     }
 
     copyUrlToClipboard = () => {
