@@ -35,6 +35,19 @@
             background-repeat: no-repeat;
             background-size: 10vw 10vw;
         }
+
+        .hint-text {
+            position: absolute;
+            left: 12%;
+            bottom: 0%;
+            text-align: center;
+            
+            line-height: 20px;
+            width: 75%;
+            font-size: 18px;
+            color: red;
+            margin-bottom: 0;
+        }
     }
 
 }

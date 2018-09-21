@@ -6,7 +6,7 @@ import { PulseLoader } from 'react-spinners';
 
 import LanguageSelect from '../components/LanguageSelect';
 import Hammer from 'hammerjs';
-import Modal from 'react-modal';
+import ReactModal from 'react-modal';
 
 import img1 from 'images/welcome-img1.jpg';
 import img2 from 'images/welcome-img2.jpg';
@@ -22,9 +22,10 @@ import icon_camera from 'images/camera_icon.svg';
 import axios from 'axios';
 
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, SNAP_LAST_TIMESTAMP, SNAP_USER_EMAIL, SNAP_APP_RESET_INTERVAL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
-import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
+import { isIOS, isAndroid, isSafari, isFirefox, isChrome, osVersion } from 'react-device-detect';
 
 import loadImage from 'blueimp-load-image/js';
+import clipboard from 'clipboard-polyfill';
 
 class WelcomeComponent extends Component {
 
@@ -36,9 +37,9 @@ class WelcomeComponent extends Component {
             searchInProgress: false,
             snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
             selectedLanguage: '',
-            translation: null
+            translation: null,
+            showBrowserModal: false
         }
-
     }
 
     /**
@@ -60,6 +61,61 @@ class WelcomeComponent extends Component {
         }
     }
 
+    checkForGetUserMedia = () => {
+        console.log('iOS was detected');
+        ReactModal.setAppElement('#app');
+
+        // navigator.mediaDevices.getUserMedia() is only supported on iOS > 11.0 and only on Safari (not Chrome, Firefox, etc.)
+        if (isIOS && (osVersion >= 11.0)) {
+            return <ReactModal isOpen={true} className="Modal">
+                <div className="browser-modal">
+                    {!isSafari ||
+                        <div>
+                            <p className="safari-text">Please use Safari while we work on compatibility with other browsers.</p>
+                            <p className="safari-text">Copy the Snap website address and head to Safari to open it</p>
+                            <button onClick={this.copyUrlToClipboard}>
+                                <span className="safari-link">Tap to copy the website address</span>
+                                <input type="text" value="https://snap.barnesfoundation.org" id="link-text" style={{
+                                    position: 'absolute',
+                                    left: '-999em'
+                                }} readOnly={false} contentEditable={true} />
+                            </button>
+                        </div>}
+                    }
+                </div>
+            </ReactModal>
+        }
+
+        // If they're not on iOS 11, it doesn't matter what browser they're using, navigator.mediaDevices.getUserMedia() will return undefined
+        else {
+            return <ReactModal isOpen={true} className="Modal">
+                <div className="browser-modal">
+                    {<p className="safari-text">Please upgrade to iOS 11 to use the Snap app with Safari</p>}
+                </div>
+            </ReactModal>
+        }
+    }
+
+    copyUrlToClipboard = () => {
+        console.log('Copy clicked');
+        let copyText = document.getElementById("link-text");
+        let range = document.createRange();
+
+        copyText.readOnly = false;
+        copyText.contentEditable = true;
+        range.selectNodeContents(copyText);
+
+        let s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(range);
+
+        copyText.setSelectionRange(0, 999999);
+        document.execCommand('copy');
+
+        // clipboard.writeText('https://snap.barnesfoundation.org');
+    }
+
+
     checkIndex = () => {
         const $this = $("#snapCarousel");
         if ($("#snapCarousel .carousel-inner .carousel-item:first").hasClass("active")) {
@@ -68,6 +124,7 @@ class WelcomeComponent extends Component {
             $this.children(".carousel-control-next").show();
             $this.children(".carousel-indicators").show();
         } else if ($("#snapCarousel .carousel-inner .carousel-item:last").hasClass("active")) {
+
             $this.children(".carousel-control-next").hide();
             $this.children(".carousel-control-prev").hide();
             $this.children(".carousel-indicators").hide();
@@ -232,6 +289,9 @@ class WelcomeComponent extends Component {
                         <div className="carousel-inner">
                             <div className="carousel-item active">
                                 <div className="welcome-screen">
+                                    <div>
+                                        {isIOS && this.checkForGetUserMedia()}
+                                    </div>
                                     <div className="img-gallery">
                                         <div className="gallery-item">
                                             <img src={img1} alt="img1" />
