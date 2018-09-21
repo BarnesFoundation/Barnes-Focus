@@ -1355,6 +1355,10 @@ clean-css@4.1.x:
   dependencies:
     source-map "0.5.x"
 
+clipboard-polyfill@^2.5.4:
+  version "2.5.4"
+  resolved "https://registry.yarnpkg.com/clipboard-polyfill/-/clipboard-polyfill-2.5.4.tgz#45e799a2ecf729177a0807709feb41dc1be75ed7"
+
 cliui@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cliui/-/cliui-2.1.0.tgz#4b475760ff80264c762c3a1719032e91c7fea0d1"

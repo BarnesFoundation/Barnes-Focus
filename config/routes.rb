@@ -18,6 +18,8 @@ Rails.application.routes.draw do
 
   post 'background_jobs/bookmarks'        => 'background_jobs/bookmarks'
   post 'background_jobs/update_es_cache'  => 'background_jobs/update_es_cache'
+  post 'jobs/update_es_cache'             => 'jobs/update_es_cache'
+  post 'jobs/compose_bookmarks'           => 'jobs/compose_bookmarks'
   get '*path', to:  "pages#home"
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
