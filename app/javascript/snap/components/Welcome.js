@@ -72,7 +72,7 @@ class WelcomeComponent extends Component {
                     <div className="browser-modal">
                         <div>
                             <p className="safari-text">Please use Safari while we work on compatibility with other browsers.</p>
-                            <p className="safari-text">Copy the Snap website address and head to Safari to open it</p>
+                            <p className="safari-text">Copy the address and open it in Safari</p>
                             <button onClick={this.copyUrlToClipboard}>
                                 <span className="safari-link">Tap to copy the website address</span>
                                 <input type="text" value="https://snap.barnesfoundation.org" id="link-text" style={{
@@ -81,7 +81,6 @@ class WelcomeComponent extends Component {
                                 }} readOnly={false} contentEditable={true} />
                             </button>
                         </div>
-                        }
                 </div>
                 </ReactModal>
             }
