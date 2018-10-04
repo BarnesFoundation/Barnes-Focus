@@ -1,6 +1,6 @@
 module Image
   def s3_url(id, secret)
-    "https://barnes-image-repository.s3.amazonaws.com/images/" + id.to_s + "_" + secret + "_n.jpg"
+    "https://barnes-data-processing-production.s3.amazonaws.com/" + id.to_s + "_" + secret + "_n.jpg"
   end
   module_function :s3_url
 
