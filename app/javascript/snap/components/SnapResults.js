@@ -96,10 +96,11 @@ class SnapResults extends Component {
     } else {
       this.setState({ error: "No records found!" });
     }
+    /* Disable the art team pop-up modal entirely
     if (parseInt(this.state.snapCount) === 4) {
       this.state.alertModalIsOpen = true;
     }
-
+    */
   }
 
 
