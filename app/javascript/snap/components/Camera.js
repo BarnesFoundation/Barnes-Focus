@@ -74,12 +74,11 @@ class Camera extends Component {
         }, 200);
     }
 
+    /** Crops an image after being passed its data uri and returns the uri of the cropped image */
     cropPhoto = (imageUri) => {
-
         return new Promise(resolve => {
 
             let image = new Image();
-
             image.onload = function (event) {
 
                 // Create temporary canvas
@@ -98,7 +97,7 @@ class Camera extends Component {
                 let x = xCenter - (1.5 * widthSeg);
                 let y = yCenter - (1.5 * heightSeg);
 
-                // Set the cropped width and height to equal 2.5 of their respective segments
+                // Set the width and height of the cropped image to equal 2.5 of their respective segments
                 let cWidth = 2.5 * widthSeg;
                 let cHeight = 2.5 * heightSeg;
 
@@ -113,6 +112,7 @@ class Camera extends Component {
 
                 resolve(image);
             }
+            // Trigger loading of the image
             image.src = imageUri;
         });
     }
@@ -330,9 +330,7 @@ class Camera extends Component {
                         </div>
                     }
                     <img ref={img => this.img = img} />
-
-                    {/* ========= Search in progress screen ============ */}
-                    {
+                    {/* ========= Search in progress screen ============ */
                         this.state.searchInProgress &&
                         <div>
                             <nav className="narbar header">
@@ -357,7 +355,7 @@ class Camera extends Component {
                         </div>
                     }
                 </div>
-                <CameraControls searchInProgress={this.state.searchInProgress} showVideo={this.state.showVideo} cancelCamera={this.cancelCamera} takePhoto={this.takePhoto} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />
+                { <CameraControls searchInProgress={this.state.searchInProgress} showVideo={this.state.showVideo} cancelCamera={this.cancelCamera} takePhoto={this.takePhoto} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} /> }
             </div>
         );
     }
