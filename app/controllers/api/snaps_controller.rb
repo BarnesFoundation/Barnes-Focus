@@ -43,10 +43,47 @@ class Api::SnapsController < Api::BaseController
     render json: searched_result
   end
 
+
   def languages
     translator = GoogleTranslate.new preferred_language
     render json: translator.supported_languages(preferred_language)
   end
+
+  ## Endpoint for matching a image from a search
+  def searcher
+
+    # Get parameters from the request
+    images = params[:images]
+    submissionId = params[:submissionId]
+
+    # Iterate through each image
+    images.each do |image|
+
+      # Get the image data and generate a file name for it
+      imageData = Base64.decode64(image['data:image/jpeg;base64,'.length .. -1])
+      fileName = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
+
+      # Write the image file
+      File.open(fileName, 'wb') do |file|
+        file.write imageData
+      end
+
+      puts "Wrote to file " + fileName
+
+    end
+
+    render json: { text: 'Images: ' + images.length.to_s + ' Submission Id: ' + submissionId.to_s }
+
+  end
+
+  ## Provides a unique 4-digit id 
+  def submissionId 
+
+    # Generate the unique id for the submission and return it 
+    submissionId = rand(10 ** 4)
+    render json: { submissionId: submissionId }
+  end
+
 
   private
     def process_searched_images_response searched_images
@@ -68,6 +105,7 @@ class Api::SnapsController < Api::BaseController
       end
       response
     end
+
 
     def get_similar_images image_ids, response
       if image_ids.present?
@@ -99,13 +137,16 @@ class Api::SnapsController < Api::BaseController
       response
     end
 
+
     def preferred_language
       params["language"]
     end
+
 
     def is_response_accepted? first_response
       resp_val = nil
       first_response.select { |k, v| resp_val = v }
       return resp_val >= ENV.fetch('RESPONSE_THRESHOLD').to_f
     end
+
 end
