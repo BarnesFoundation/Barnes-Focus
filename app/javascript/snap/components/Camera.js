@@ -126,7 +126,6 @@ class Camera extends Component {
     /** Captures photo over a 3-second duration */
     capturePhotoShots = () => {
 
-        let photoCounter = 1;
         let images = [];
 
         // Capture a photo scan every third of a second
@@ -137,12 +136,9 @@ class Camera extends Component {
             let imageUri = canvas.toDataURL();
             let croppedImageUri;
 
-            this.cropPhoto(imageUri)
+            this.cropPhoto(sampleImage/*imageUri*/)
                 .then((result) => {
-
                     croppedImageUri = result;
-                    console.log('Second: ' + new Date().getTime() + ' Photo: ' + photoCounter + ' URI length: ' + croppedImageUri.length);
-                    photoCounter++;
                     images.push(croppedImageUri);
                 });
         }, 1000 / 3);
@@ -195,16 +191,13 @@ class Camera extends Component {
     /** Submit a photo scan to the server */
     submitRequest = (images) => {
 
-        if (!this.submissionId) {
-            this.getSubmissionId()
-                .then((result) => {
-                    this.submissionId = result.data.submissionId;
-                    console.log('The number of images are ' + images.length + ' and the submissionId is ' + this.submissionId);
-                    this.sendPhotoScan(images);
-                });
-        } 
+        this.getSubmissionId()
+            .then((result) => {
+                this.submissionId = result.data.submissionId;
+                this.sendPhotoScan(images);
+            });
 
-        
+
 
 
         // this.toggleImage(false);
@@ -218,14 +211,18 @@ class Camera extends Component {
 
     sendPhotoScan = (images) => {
 
+        this.toggleImage(false);
+        this.setState({ searchInProgress: true });
+
         axios.post('/api/snaps/searcher', {
             submissionId: this.submissionId,
             images: images,
         })
             .then(response => {
-                // this.setState({ searchInProgress: false });
+                this.setState({ searchInProgress: false });
                 // Navigate to search result page or not found page
                 const res = response.data;
+                console.log(res);
                 /* if (res.data.records.length === 0) {
                     analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                     this.props.history.push({ pathname: '/not-found' });
