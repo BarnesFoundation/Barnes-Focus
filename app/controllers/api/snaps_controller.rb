@@ -1,9 +1,12 @@
 require 'nokogiri'
+require 'rest-client'
 
 class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
 
   def search
+    images = params[:images]
+    
     data = params[:image_data]
     start_time = Time.now
     searched_result = { success: false }
@@ -15,8 +18,6 @@ class Api::SnapsController < Api::BaseController
     File.open(file_name, 'wb') do |f|
       f.write image_data
     end
-    # for development env testing
-    #file_name = "#{Rails.root}/public/IMG_4971.jpg"
 
     file = api.loadFileData(file_name)
     response = api.search_image(file)
@@ -40,6 +41,7 @@ class Api::SnapsController < Api::BaseController
     )
     ImageUploadJob.perform_later(r.id)
 
+
     render json: searched_result
   end
 
@@ -56,6 +58,9 @@ class Api::SnapsController < Api::BaseController
     images = params[:images]
     submissionId = params[:submissionId]
 
+    # Create empty hash with default value
+    matches = Hash.new(0)
+
     # Iterate through each image
     images.each do |image|
 
@@ -68,13 +73,34 @@ class Api::SnapsController < Api::BaseController
         file.write imageData
       end
 
-      puts "Wrote to file " + fileName
+      url = 'https://search.craftar.net/v1/search'
+      token = '2999d63fc1694ce4'
 
+      # Send it to the Catchoom Image Recognition API
+      # response = RestClient.post url, {:token => token, :multipart => true, :image => File.new(fileName, 'rb') }
+      
+      # results = response.body['results']
+
+      # Mock results
+      results = [ { :score => 100, :name => '7356'} ]
+
+      # Iterate through each result
+      results.each do |result|
+
+        if result[:score] >= 40
+          # Add it to the hash table and increment its count
+          matches[result[:name]] += 1
+        end
+      end   
     end
 
-    render json: { text: 'Images: ' + images.length.to_s + ' Submission Id: ' + submissionId.to_s }
+    # Find the likely matching image from the hash table
+    matchedImageId = matches.max_by{|key,value| value}[0].to_i
+
+    render json: { text: 'Images: ' + images.length.to_s + ' Submission Id: ' + submissionId.to_s, matchedImageId: matchedImageId }
 
   end
+
 
   ## Provides a unique 4-digit id 
   def submissionId 
