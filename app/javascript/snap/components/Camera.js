@@ -65,7 +65,7 @@ class Camera extends Component {
     }
 
     takePhoto = () => {
-        analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.TAKE_PHOTO, eventLabel: GA_EVENT_LABEL.SNAP_BUTTON });
+        
         setTimeout(() => {
             let image = this.capturePhoto();
 
@@ -130,6 +130,9 @@ class Camera extends Component {
     capturePhotoShots = () => {
 
         let images = [];
+
+        // Track on Google Analytics that a photo was captured
+        analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.TAKE_PHOTO, eventLabel: GA_EVENT_LABEL.SNAP_BUTTON });
 
         // Capture a photo scan every third of a second
         let scan = setInterval(() => {
@@ -204,7 +207,7 @@ class Camera extends Component {
                 this.submissionId = result.data.submissionId;
                 this.sendPhotoScan(images);
 
-                // Update the snap attempt
+                // Update the snap attempts
                 localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
                 localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
 
@@ -212,6 +215,7 @@ class Camera extends Component {
             });
     }
 
+    /** Sends the image scans to the server */
     sendPhotoScan = (images) => {
 
         // Make request to server
@@ -248,12 +252,12 @@ class Camera extends Component {
             });
     }
 
+    /** Requests a Submission Id from the server */
     getSubmissionId = () => {
         return axios.get('/api/snaps/submissionId');
     }
 
     clearPhoto = (ev) => {
-        console.log('Clear taken photo');
         this.toggleImage(false);
         this.setState((prevState, props) => {
             return {
@@ -268,41 +272,6 @@ class Camera extends Component {
         setTimeout(() => {
             this.zoomLevel = 1;
         }, 0);
-    }
-
-    submitPhoto = () => {
-        this.toggleImage(false);
-        this.setState({ searchInProgress: true });
-        localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-        localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
-        var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
-        axios.post('/api/snaps/search', {
-            image_data: this.state.capturedImage,
-            language: prefLang
-        }).then(response => {
-            this.setState({ searchInProgress: false });
-            // Navigate to search result page or not found page
-            const res = response.data;
-            if (res.data.records.length === 0) {
-                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                this.props.history.push({ pathname: '/not-found' });
-            } else {
-                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_SUCCESS, eventLabel: GA_EVENT_LABEL.SNAP_SUCCESS });
-                this.props.history.push({
-                    pathname: '/results',
-                    state: {
-                        result: res,
-                        snapCount: localStorage.getItem(SNAP_ATTEMPTS)
-                    }
-                });
-            }
-
-        })
-            .catch(error => {
-                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                this.setState({ searchInProgress: false });
-                this.props.history.push({ pathname: '/not-found' });
-            });
     }
 
     /** Resets the zoom to its initial state when navigating back to the Camera page */
@@ -398,7 +367,6 @@ class Camera extends Component {
 
     getCanvas = () => {
         const video = this.video;
-        console.log('getCanvas video height:', video.videoHeight);
         if (!video.videoHeight) return null;
 
         if (!this.ctx) {
