@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       collection do
         post 'search'
         post 'searcher'
+        post 'searchCudaScan'
         get 'submissionId'
         get 'languages'
       end
