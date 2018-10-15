@@ -107,12 +107,15 @@ class Camera extends Component {
                 let x = xCenter - (cWidth / 2);
                 let y = yCenter - (cHeight / 2);
 
-                // Size the canas to the same as the cropped image -- to avoid black space
-                canvas1.width = cWidth;
-                canvas1.height = cHeight;
+                // Scale the canvas 
+                let sWidth = 2 * cWidth;
+                let sHeight = 2 * cHeight
+
+                canvas1.width = sWidth;
+                canvas1.height = sHeight;
 
                 // Draw the new image, keeping its proportions intact for optimal matching
-                context1.drawImage(image, x, y, cWidth, cHeight, 0, 0, cWidth, cHeight);
+                context1.drawImage(image, x, y, cWidth, cHeight, 0, 0, sWidth, sHeight);
 
                 image = canvas1.toDataURL('image/jpeg', 1.0);
 
@@ -136,7 +139,7 @@ class Camera extends Component {
             let imageUri = canvas.toDataURL();
             let croppedImageUri;
 
-            this.cropPhoto(sampleImage/*imageUri*/)
+            this.cropPhoto(imageUri)
                 .then((result) => {
                     croppedImageUri = result;
                     images.push(croppedImageUri);
@@ -191,96 +194,62 @@ class Camera extends Component {
     /** Submit a photo scan to the server */
     submitRequest = (images) => {
 
+        // Show search-in-progress animation
+        this.setState({ searchInProgress: true, showVideo: false });
+
         this.getSubmissionId()
             .then((result) => {
+
+                // Get the submissionId and send off the request
                 this.submissionId = result.data.submissionId;
                 this.sendPhotoScan(images);
+
+                // Update the snap attempt
+                localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+                localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
+
+                let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
             });
-
-
-
-
-        // this.toggleImage(false);
-        // this.setState({ searchInProgress: true });
-
-        // localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-        // localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
-
-        // var prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
     }
 
     sendPhotoScan = (images) => {
 
-        this.toggleImage(false);
-        this.setState({ searchInProgress: true });
-
-        axios.post('/api/snaps/searcher', {
+        // Make request to server
+        axios.post('/api/snaps/search', {
             submissionId: this.submissionId,
             images: images,
         })
             .then(response => {
+
+                // Update search animation
                 this.setState({ searchInProgress: false });
-                // Navigate to search result page or not found page
                 const res = response.data;
-                console.log(res);
-                /* if (res.data.records.length === 0) {
+
+                if (res.data.records.length === 0) {
+                    // Update analytics of the failed snap event and navigate to not found page
                     analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                     this.props.history.push({ pathname: '/not-found' });
-                } else {
+                }
+
+                else {
+                    // Update analytics of the successful snap event and navigate to results page
                     analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_SUCCESS, eventLabel: GA_EVENT_LABEL.SNAP_SUCCESS });
                     this.props.history.push({
                         pathname: '/results',
-                        state: {
-                            result: res,
-                            snapCount: localStorage.getItem(SNAP_ATTEMPTS)
-                        }
+                        state: { result: res, snapCount: localStorage.getItem(SNAP_ATTEMPTS) }
                     });
-                } */
+                }
 
             })
             .catch(error => {
-                // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                // this.setState({ searchInProgress: false });
-                // this.props.history.push({ pathname: '/not-found' });
+                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
+                this.setState({ searchInProgress: false });
+                this.props.history.push({ pathname: '/not-found' });
             });
-
     }
 
     getSubmissionId = () => {
         return axios.get('/api/snaps/submissionId');
-    }
-
-    capturePhoto = () => {
-        console.log('capture photo clicked!');
-        let canvas = this.getCanvas();
-        const context = canvas.getContext("2d");
-
-        if (isIOS || !this.camera_capabilities) {
-            let rect = this.video.getBoundingClientRect();
-            let tempCanvas = document.createElement('canvas');
-            let tempCtx = tempCanvas.getContext('2d');
-
-            //first draw the scaled video in a temp canvas.
-            tempCanvas.width = rect.width;
-            tempCanvas.height = rect.height;
-            tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
-
-            // Now copy image that is visible within the viewport into our original canvas.
-
-            let x = (rect.x < 0) ? -(rect.x) : rect.x;
-            let y = (rect.y < 0) ? -(rect.y) : rect.y;
-            console.log('Drawing viewport area x:y ' + x + ' : ' + y + ' and width:heignt ' + canvas.width + ' : ' + canvas.height);
-            if (x > 0 && y > 0) {
-                context.drawImage(tempCanvas, Math.floor(x), Math.floor(y), canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
-            } else {
-                context.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
-            }
-        } else {
-            context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
-        }
-        console.log(canvas.height, canvas.width);
-        const image = canvas.toDataURL('image/jpeg', 1.0);
-        return image;
     }
 
     clearPhoto = (ev) => {
@@ -376,8 +345,6 @@ class Camera extends Component {
             }
         })
             .then(videoStream => {
-
-                // Set the video stream to state for playback
                 this.setState({ videoStream });
             })
             .catch(err => this.setState({ error: "An error occurred accessing the device camera" }));
@@ -431,7 +398,7 @@ class Camera extends Component {
 
     getCanvas = () => {
         const video = this.video;
-
+        console.log('getCanvas video height:', video.videoHeight);
         if (!video.videoHeight) return null;
 
         if (!this.ctx) {
@@ -490,7 +457,7 @@ class Camera extends Component {
                         </div>
                     }
                 </div>
-                {<CameraControls searchInProgress={this.state.searchInProgress} showVideo={this.state.showVideo} cancelCamera={this.cancelCamera} takePhoto={this.capturePhotoShots} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />}
+                {<CameraControls searchInProgress={this.state.searchInProgress} showVideo={this.state.showVideo} cancelCamera={this.cancelCamera} capturePhotoShots={this.capturePhotoShots} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />}
             </div>
         );
     }
