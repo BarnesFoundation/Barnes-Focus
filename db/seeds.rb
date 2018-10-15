@@ -301,3 +301,11 @@ Translation.create(
   english_translation: 'Use Photo',
   unique_identifier: 'text_4'
 )
+
+scan_photo = Translation.find_or_create_by(screen_text: "Scan_photo	", display_order: 102)
+Translation.create(
+  screen_text: "Scan photo",
+  parent_id: scan_photo.id,
+  english_translation: "Scan photo",
+  unique_identifier: 'text_1'
+)
