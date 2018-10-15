@@ -15,7 +15,7 @@ class CameraControls extends Component {
     componentDidMount() {
         setTimeout(() => {
             this.props.capturePhotoShots();
-        }, 200);
+        }, 1000);
     }
 
     render() {
