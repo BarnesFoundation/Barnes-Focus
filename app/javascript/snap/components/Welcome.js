@@ -388,7 +388,7 @@ class WelcomeComponent extends Component {
 
 
                                     <Link className="btn take-photo-btn" to="/snap">
-                                        {(this.state.translation) ? this.state.translation.Photo_Button_Label.text_1.translated_content : `Take photo`}
+                                        {(this.state.translation) ? this.state.translation.Scan_photo.text_1.translated_content : `Scan photo`}
                                         <span className="icon">
                                             <img src={icon_camera} alt="camera_icon" />
                                         </span>
