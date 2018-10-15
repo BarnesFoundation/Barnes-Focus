@@ -4,10 +4,8 @@ require 'rest-client'
 class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
 
-  def search
-    images = params[:images]
-    
-    data = params[:image_data]
+  def search    
+    data = params[:images][0]
     start_time = Time.now
     searched_result = { success: false }
     #using test image for API testing
@@ -41,6 +39,51 @@ class Api::SnapsController < Api::BaseController
     )
     ImageUploadJob.perform_later(r.id)
 
+
+    render json: searched_result
+  end
+
+  def searchCudaScan
+
+    # Get parameters from the request
+    images = params[:images]
+    searched_result = nil    
+
+    # Iterate through each image
+    images.each do |image|
+
+      # Prepare for search
+      start_time = Time.now
+      searched_result = { success: false }
+      api = CudaSift.new
+
+      # Get the image data and generate file for it
+      imageData = Base64.decode64(image['data:image/jpeg;base64,'.length .. -1])
+
+      fileName = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
+      File.open(fileName, 'wb') do |f|
+        f.write imageData
+      end
+
+      # Load the file and begin the CUDA search
+      file = api.loadFileData(fileName)
+      response = api.search_image(file)
+
+      if response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && response["results"].any? && is_response_accepted?(response["results"].first)
+        # Get the image ids of the match
+        response["image_ids"] = [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact
+      else
+        response["image_ids"] = []
+      end
+
+      searched_result = process_searched_images_response(response)
+      File.delete(file.path)
+
+      overall_processing = Time.at((Time.now - start_time).to_i.abs).utc.strftime "%H:%M:%S"
+      searched_result['total_time_consumed']['overall_processing'] = overall_processing if searched_result['total_time_consumed'].present?
+
+      p searched_result
+    end
 
     render json: searched_result
   end
