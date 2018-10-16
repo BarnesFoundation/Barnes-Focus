@@ -64,22 +64,6 @@ class Camera extends Component {
         }
     }
 
-    takePhoto = () => {
-        
-        setTimeout(() => {
-            let image = this.capturePhoto();
-
-            this.img.src = image;
-            this.setState({ capturedImage: image, showVideo: false });
-            this.toggleImage(true);
-
-            this.cropPhoto(sampleImage).then((result) => {
-                console.log('The image uri ' + result);
-                this.setState({ capturedImage: result })
-            });
-        }, 200);
-    }
-
     /** Crops an image and returns the uri of the cropped image */
     cropPhoto = (imageUri) => {
         return new Promise(resolve => {
@@ -219,7 +203,7 @@ class Camera extends Component {
     sendPhotoScan = (images) => {
 
         // Make request to server
-        axios.post('/api/snaps/search', {
+        axios.post('/api/snaps/searchCudaScan', {
             submissionId: this.submissionId,
             images: images,
         })
