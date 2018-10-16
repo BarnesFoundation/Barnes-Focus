@@ -39,7 +39,6 @@ class Api::SnapsController < Api::BaseController
     )
     ImageUploadJob.perform_later(r.id)
 
-    puts 'The result is' , searched_result
     render json: searched_result
   end
 
