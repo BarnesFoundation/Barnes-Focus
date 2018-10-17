@@ -24,7 +24,7 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
-    ticking = false;
+    ticking = false; requestComplete = false;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel; submissionId;
 
 
@@ -113,30 +113,37 @@ class Camera extends Component {
     /** Captures photo over a 3-second duration */
     capturePhotoShots = () => {
 
-        let images = [];
+        let imageCount = 1;
 
         // Track on Google Analytics that a photo was captured
         analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.TAKE_PHOTO, eventLabel: GA_EVENT_LABEL.SNAP_BUTTON });
 
+        // Update the snap attempts with this scan as a single attempt
+        localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+        localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
+
+        let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+
         // Capture a photo scan every third of a second
         let scan = setInterval(() => {
 
-            // Get the the present image in the canvas and crop the image
-            let canvas = this.getVideoCanvas();
-            let imageUri = canvas.toDataURL();
-            let croppedImageUri;
+            if (!this.requestComplete) {
+                // Get the the present image in the canvas and crop the image
+                let canvas = this.getVideoCanvas();
+                let imageUri = canvas.toDataURL();
 
-            this.cropPhoto(imageUri)
-                .then((result) => {
-                    croppedImageUri = result;
-                    images.push(croppedImageUri);
-                });
+                this.cropPhoto(imageUri)
+                    .then((croppedImageUri) => {
+                        this.submitRequest(croppedImageUri, imageCount);
+                        imageCount++;
+                    });
+            }
         }, 1000 / 3);
 
         // End the interval after three seconds
         setTimeout(() => {
             clearInterval(scan);
-            this.submitRequest(images);
+            // if (!this.requestComplete) { this.setState({ searchInProgress: true, showVideo: false }); }// Show search-in-progress animation
         }, 3000);
     }
 
@@ -179,61 +186,63 @@ class Camera extends Component {
     }
 
     /** Submit a photo scan to the server */
-    submitRequest = (images) => {
+    submitRequest = (image, imageCount) => {
 
-        // Show search-in-progress animation
-        this.setState({ searchInProgress: true, showVideo: false });
-
-        this.getSubmissionId()
-            .then((result) => {
-
-                // Get the submissionId and send off the request
-                this.submissionId = result.data.submissionId;
-                this.sendPhotoScan(images);
-
-                // Update the snap attempts
-                localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-                localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
-
-                let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
-            });
+        // Get the Submission Id if it isn't set
+        if (!this.submissionId) {
+            this.getSubmissionId()
+                .then((result) => {
+                    // Get the submissionId and send off the request
+                    this.submissionId = result.data.submissionId;
+                    this.sendPhotoScan(image, imageCount);
+                });
+        }
+        // Otherwise proceed as normal 
+        else { this.sendPhotoScan(image, imageCount); }
     }
 
     /** Sends the image scans to the server */
-    sendPhotoScan = (images) => {
+    sendPhotoScan = (image, imageCount) => {
 
         // Make request to server
         axios.post('/api/snaps/searchCudaScan', {
             submissionId: this.submissionId,
-            images: images,
+            image: image,
+            imageCount: imageCount
         })
             .then(response => {
-
-                // Update search animation
-                this.setState({ searchInProgress: false });
                 const res = response.data;
-
-                if (res.data.records.length === 0) {
-                    // Update analytics of the failed snap event and navigate to not found page
-                    analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                    this.props.history.push({ pathname: '/not-found' });
+                if (res.requestComplete == true) {
+                    this.requestComplete = true;
+                    if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
+                    this.processRequestComplete(res);
                 }
-
-                else {
-                    // Update analytics of the successful snap event and navigate to results page
-                    analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_SUCCESS, eventLabel: GA_EVENT_LABEL.SNAP_SUCCESS });
-                    this.props.history.push({
-                        pathname: '/results',
-                        state: { result: res, snapCount: localStorage.getItem(SNAP_ATTEMPTS) }
-                    });
-                }
-
             })
             .catch(error => {
                 analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 this.setState({ searchInProgress: false });
                 this.props.history.push({ pathname: '/not-found' });
             });
+    }
+
+    /** Process the request complete response */
+    processRequestComplete(res) {
+
+        if (res.data.records.length === 0) {
+            // Update analytics of the failed snap event and navigate to not found page
+            analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
+            this.props.history.push({ pathname: '/not-found' });
+        }
+
+        else {
+            // Update analytics of the successful snap event and navigate to results page
+            analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_SUCCESS, eventLabel: GA_EVENT_LABEL.SNAP_SUCCESS });
+            this.props.history.push({
+                pathname: '/results',
+                state: { result: res, snapCount: localStorage.getItem(SNAP_ATTEMPTS) }
+            });
+        }
+
     }
 
     /** Requests a Submission Id from the server */
@@ -288,7 +297,6 @@ class Camera extends Component {
     }
 
     componentDidMount() {
-
         // Fetch the device camera
         navigator.mediaDevices.getUserMedia({
             video: {
