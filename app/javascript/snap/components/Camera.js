@@ -25,7 +25,7 @@ class Camera extends Component {
     };
 
     ticking = false; requestComplete = false;
-    track; camera_capabilities; camera_settings; initZoom; zoomLevel; submissionId;
+    track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
 
 
@@ -187,26 +187,14 @@ class Camera extends Component {
 
     /** Submit a photo scan to the server */
     submitRequest = (image, imageCount) => {
-
-        // Get the Submission Id if it isn't set
-        if (!this.submissionId) {
-            this.getSubmissionId()
-                .then((result) => {
-                    // Get the submissionId and send off the request
-                    this.submissionId = result.data.submissionId;
-                    this.sendPhotoScan(image, imageCount);
-                });
-        }
-        // Otherwise proceed as normal 
-        else { this.sendPhotoScan(image, imageCount); }
+        this.sendPhotoScan(image, imageCount);
     }
 
     /** Sends the image scans to the server */
     sendPhotoScan = (image, imageCount) => {
 
         // Make request to server
-        axios.post('/api/snaps/searchCudaScan', {
-            submissionId: this.submissionId,
+        axios.post('/api/snaps/searcher', {
             image: image,
             imageCount: imageCount
         })
@@ -243,11 +231,6 @@ class Camera extends Component {
             });
         }
 
-    }
-
-    /** Requests a Submission Id from the server */
-    getSubmissionId = () => {
-        return axios.get('/api/snaps/submissionId');
     }
 
     clearPhoto = (ev) => {
