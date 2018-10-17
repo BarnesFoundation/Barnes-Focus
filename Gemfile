@@ -36,6 +36,7 @@ gem 'exception_notification'
 gem 'health_check'
 gem 'apipie-rails'
 gem 'nokogiri'
+gem 'redis'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
