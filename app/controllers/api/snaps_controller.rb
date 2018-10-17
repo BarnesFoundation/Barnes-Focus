@@ -46,67 +46,54 @@ class Api::SnapsController < Api::BaseController
   def searchCudaScan
 
     # Get parameters from the request
-    images = params[:images]
+    image = params[:image]
     searched_result = nil
+    request_id = params[:submissionId]
+    count = params[:imageCount]
 
-    # Empty matched results 
-    matched_results = Hash.new(0)
+    # Prepare for search
+    start_time = Time.now
+    searched_result = { success: false }
+    api = CudaSift.new
 
-    # Iterate through each image
-    images.each do |image|
+    # Get the image data 
+    image_data = Base64.decode64(image['data:image/jpeg;base64,'.length .. -1])
 
-      # Prepare for search
-      start_time = Time.now
-      searched_result = { success: false }
-      api = CudaSift.new
-
-      # Get the image data and generate file for it
-      image_data = Base64.decode64(image['data:image/jpeg;base64,'.length .. -1])
-
-      file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
-      File.open(file_name, 'wb') do |f|
-        f.write image_data
-      end
-
-      # Load the file and begin the CUDA search
-      file = api.loadFileData(file_name)
-      response = api.search_image(file)
-
-      if response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && response["results"].any? && is_response_accepted?(response["results"].first)
-        # Get the image ids of the match
-        response["image_ids"] = [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact
-      else
-        response["image_ids"] = []
-      end
-
-      searched_result = process_searched_images_response(response)
-      File.delete(file.path)
-
-      overall_processing = Time.at((Time.now - start_time).to_i.abs).utc.strftime "%H:%M:%S"
-      searched_result['total_time_consumed']['overall_processing'] = overall_processing if searched_result['total_time_consumed'].present?
-
-      # If the searched result contains a match
-      if searched_result['data']['records'].length > 0 
-
-        # Grab the id 
-        id = searched_result['data']['records'][0]['id']
-
-        # Store it in persistent hash table
-        result = Hash.new(0)
-        result['count'] += 1
-        result['object'] = searched_result
-
-        matched_results[id] = result
-      end
+    # Generate temporary file for it
+    file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
+    File.open(file_name, 'wb') do |f|
+      f.write image_data
     end
-    
-    # Check which possible match was matched the most
-    matched_id = matched_results.max_by{|key,value| value['count']}[0].to_i
-    result = matched_results[matched_id]['object']
 
-    render json: result
+    # Load the file and begin the CUDA search
+    file = api.loadFileData(file_name)
+    response = api.search_image(file)
+
+    if response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && response["results"].any? && is_response_accepted?(response["results"].first)
+      # Get the image ids of the match
+      response["image_ids"] = [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact
+    else
+      response["image_ids"] = []
+    end
+
+    # Process the result and delete the temporary image
+    searched_result = process_searched_images_response(response)
+    File.delete(file.path)
+
+    overall_processing = Time.at((Time.now - start_time).to_i.abs).utc.strftime "%H:%M:%S"
+    searched_result['total_time_consumed']['overall_processing'] = overall_processing if searched_result['total_time_consumed'].present?
+
+    # If the searched result contains a match
+    if searched_result['data']['records'].length > 0 
+
+      searched_result['requestComplete'] = true
+      render json: searched_result
+
+    else
+      searched_result['requestComplete'] = if (count == 9) then true else false end
+      render json: searched_result
+    end
   end
-
 
   def languages
     translator = GoogleTranslate.new preferred_language
