@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'rest-client'
+require 'json'
 
 class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
@@ -48,7 +49,6 @@ class Api::SnapsController < Api::BaseController
     # Get parameters from the request
     image = params[:image]
     searched_result = nil
-    request_id = params[:submissionId]
     count = params[:imageCount]
 
     # Prepare for search
@@ -104,63 +104,97 @@ class Api::SnapsController < Api::BaseController
   def searcher
 
     # Get parameters from the request
-    images = params[:images]
-    submissionId = params[:submissionId]
+    image = params[:image]
+    image_count = params[:imageCount]
 
-    # Create empty hash with default value
-    matches = Hash.new(0)
+    # Craftar credentials
+    url = 'https://search.craftar.net/v1/search'
+    token = '2999d63fc1694ce4'
 
-    # Iterate through each image
-    images.each do |image|
+    # Get the image data 
+    image_data = Base64.decode64(image['data:image/jpeg;base64,'.length .. -1])
 
-      # Get the image data and generate a file name for it
-      imageData = Base64.decode64(image['data:image/jpeg;base64,'.length .. -1])
-      fileName = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
-
-      # Write the image file
-      File.open(fileName, 'wb') do |file|
-        file.write imageData
-      end
-
-      url = 'https://search.craftar.net/v1/search'
-      token = '2999d63fc1694ce4'
-
-      # Send it to the Catchoom Image Recognition API
-      # response = RestClient.post url, {:token => token, :multipart => true, :image => File.new(fileName, 'rb') }
-      
-      # results = response.body['results']
-
-      # Mock results
-      results = [ { :score => 100, :name => '7356'} ]
-
-      # Iterate through each result
-      results.each do |result|
-
-        if result[:score] >= 40
-          # Add it to the hash table and increment its count
-          matches[result[:name]] += 1
-        end
-      end   
+    # Generate temporary file for it
+    file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
+    File.open(file_name, 'wb') do |f|
+      f.write image_data
     end
 
-    # Find the likely matching image from the hash table
-    matchedImageId = matches.max_by{|key,value| value}[0].to_i
+    # Send it to the Catchoom Image Recognition API
+    image_response = RestClient.post url, {:token => token, :multipart => true, :image => File.new(file_name, 'rb') }
+    results = JSON.parse(image_response)['results']
+    File.delete(file_name)
 
-    render json: { text: 'Images: ' + images.length.to_s + ' Submission Id: ' + submissionId.to_s, matchedImageId: matchedImageId }
+    response = nil
 
+    # If the searched result contains a match
+    if results.length > 0
+      image_id = results[0]['item']['name'].to_i 
+      response = process_searched_image(image_id, image_count)
+    else
+      response = process_searched_image(nil, image_count)
+    end
+
+    render json: response
   end
 
-
-  ## Provides a unique 4-digit id 
-  def submissionId 
-
-    # Generate the unique id for the submission and return it 
-    submissionId = rand(10 ** 4)
-    render json: { submissionId: submissionId }
-  end
-
-
+  ## Mark all subsequent methods as private methods 
   private
+  
+    ## Processes a recognized image using its id
+    def process_searched_image image_id, image_count
+
+      # Empty response object
+      response = { }
+      response[:api_data] = []
+
+      if image_id
+        response[:data] = { :records => [], :message => 'Result found' }
+        response[:success] = true
+        response[:requestComplete] = true
+        response[:data][:records] << get_image_information(image_id)
+      else
+        response[:data] = { :records => [], :message => 'No result found' }
+        response[:success] = false
+        image_count == 9 ? response[:requestComplete] = true : response[:requestComplete] = false
+      end
+      return response
+    end
+
+    ## Gets the image information for the specific id
+    def get_image_information(image_id)
+      
+      # Request the image information from Elastic Search
+      image_info = EsCachedRecord.search(image_id)
+
+      # Translate the short description if needed
+      if image_info[:shortDescription] && preferred_language.present? 
+        image_info[:shortDescription] = translate_text(image_info[:shortDescription]) 
+      end
+      return image_info
+    end
+
+    ## Translates the given text
+    def translate_text(short_description)
+      
+      # Configure language translator
+      translator = GoogleTranslate.new preferred_language
+
+      # Strip unwanted content
+      begin
+          document = Nokogiri::HTML(translator.translate(short_description))
+          document.remove_namespaces!
+          short_description = doccument.xpath("//p")[0].content
+          short_description = translator.translate(strip_tags(short_description).html_safe) if short_description.nil?
+      rescue Exception => error
+        p error
+        short_description = strip_tags(short_description).html_safe if short_description
+      end
+
+      return short_description
+    end
+
+
     def process_searched_images_response searched_images
       response = { }
       response["data"] = {"records" => [], "message" => "No records found"}
@@ -180,7 +214,6 @@ class Api::SnapsController < Api::BaseController
       end
       response
     end
-
 
     def get_similar_images image_ids, response
       if image_ids.present?
@@ -204,6 +237,7 @@ class Api::SnapsController < Api::BaseController
               searched_data['shortDescription'] = strip_tags(searched_data["shortDescription"]).html_safe if searched_data["shortDescription"]
             end
           end
+
           time_diff = Time.now - start_time
           response['total_time_consumed']['es_endpoint'] = Time.at(time_diff.to_i.abs).utc.strftime "%H:%M:%S"
           response["data"]["records"] << searched_data
