@@ -24,7 +24,7 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
-    ticking = false; requestComplete = false;
+    ticking = false; requestComplete = false; requestCompleteFlag = false;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
 
@@ -194,8 +194,8 @@ class Camera extends Component {
         })
             .then(response => {
                 const res = response.data;
-                if (res.requestComplete == true) {
-                    this.requestComplete = true;
+                if (res.requestComplete == true && this.requestCompleteFlag == false) {
+                    this.requestComplete = true; this.requestCompleteFlag = true;
                     if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
                     this.processRequestComplete(res);
                 }
@@ -305,6 +305,8 @@ class Camera extends Component {
             // The below disables the page zoom in that occurs on pinch in camera-control buttons section
             event.preventDefault();
         }, false);
+
+        this.capturePhotoShots();
     }
 
     componentDidUpdate() {
@@ -332,6 +334,8 @@ class Camera extends Component {
             // Reset snap attemps count if last_snap_timestamp is 12 hours or before.
             this.resetSnapCounter();
         }
+
+        this.requestComplete = false; this.requestCompleteFlag = false;
     }
 
     getCanvas = () => {
