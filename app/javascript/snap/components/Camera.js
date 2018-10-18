@@ -188,7 +188,7 @@ class Camera extends Component {
     /** Submit a photo scan to the server */
     submitRequest = (image, imageCount) => {
         // Make request to server
-        axios.post('/api/snaps/searcher', {
+        axios.post('/api/snaps/searchCudaScan', {
             image: image,
             imageCount: imageCount
         })

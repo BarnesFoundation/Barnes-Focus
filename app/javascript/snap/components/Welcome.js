@@ -290,7 +290,7 @@ class WelcomeComponent extends Component {
                             <div className="carousel-item active">
                                 <div className="welcome-screen">
                                     <div>
-                                        {isIOS && this.checkForGetUserMedia()}
+                                        {/** isIOS && this.checkForGetUserMedia() */}
                                     </div>
                                     <div className="img-gallery">
                                         <div className="gallery-item">
