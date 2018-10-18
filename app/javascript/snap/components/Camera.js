@@ -187,12 +187,6 @@ class Camera extends Component {
 
     /** Submit a photo scan to the server */
     submitRequest = (image, imageCount) => {
-        this.sendPhotoScan(image, imageCount);
-    }
-
-    /** Sends the image scans to the server */
-    sendPhotoScan = (image, imageCount) => {
-
         // Make request to server
         axios.post('/api/snaps/searcher', {
             image: image,
@@ -212,7 +206,7 @@ class Camera extends Component {
                 this.props.history.push({ pathname: '/not-found' });
             });
     }
-
+    
     /** Process the request complete response */
     processRequestComplete(res) {
 
