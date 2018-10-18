@@ -143,7 +143,7 @@ class Camera extends Component {
         // End the interval after three seconds
         setTimeout(() => {
             clearInterval(scan);
-            // if (!this.requestComplete) { this.setState({ searchInProgress: true, showVideo: false }); }// Show search-in-progress animation
+            if (!this.requestComplete && !this.requestCompleteFlag) { this.setState({ searchInProgress: true, showVideo: false }); }// Show search-in-progress animation
         }, 3000);
     }
 
