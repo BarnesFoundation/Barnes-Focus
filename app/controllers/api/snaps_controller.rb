@@ -95,11 +95,6 @@ class Api::SnapsController < Api::BaseController
     end
   end
 
-  def languages
-    translator = GoogleTranslate.new preferred_language
-    render json: translator.supported_languages(preferred_language)
-  end
-
   ## Endpoint for matching a image from a search
   def searcher
 
@@ -138,11 +133,24 @@ class Api::SnapsController < Api::BaseController
     render json: response
   end
 
-  ## Mark all subsequent methods as private methods 
+  def languages
+    translator = GoogleTranslate.new preferred_language
+    render json: translator.supported_languages(preferred_language)
+  end
+
+  def getArtworkInformation
+    # Get parameters from the request
+    image_id = params[:imageId]
+    response = process_searched_image(image_id)
+
+    render json: response
+  end
+
+  ###### Mark all subsequent methods as private methods ######
   private
-  
+
     ## Processes a recognized image using its id
-    def process_searched_image image_id, image_count
+    def process_searched_image image_id
 
       # Empty response object
       response = { }
@@ -156,7 +164,6 @@ class Api::SnapsController < Api::BaseController
       else
         response[:data] = { :records => [], :message => 'No result found' }
         response[:success] = false
-        image_count == 9 ? response[:requestComplete] = true : response[:requestComplete] = false
       end
       return response
     end
@@ -173,27 +180,6 @@ class Api::SnapsController < Api::BaseController
       end
       return image_info
     end
-
-    ## Translates the given text
-    def translate_text(short_description)
-      
-      # Configure language translator
-      translator = GoogleTranslate.new preferred_language
-
-      # Strip unwanted content
-      begin
-          document = Nokogiri::HTML(translator.translate(short_description))
-          document.remove_namespaces!
-          short_description = doccument.xpath("//p")[0].content
-          short_description = translator.translate(strip_tags(short_description).html_safe) if short_description.nil?
-      rescue Exception => error
-        p error
-        short_description = strip_tags(short_description).html_safe if short_description
-      end
-
-      return short_description
-    end
-
 
     def process_searched_images_response searched_images
       response = { }
@@ -256,6 +242,26 @@ class Api::SnapsController < Api::BaseController
       resp_val = nil
       first_response.select { |k, v| resp_val = v }
       return resp_val >= ENV.fetch('RESPONSE_THRESHOLD').to_f
+    end
+
+    ## Translates the given text
+    def translate_text(short_description)
+      
+      # Configure language translator
+      translator = GoogleTranslate.new preferred_language
+
+      # Strip unwanted content
+      begin
+          document = Nokogiri::HTML(translator.translate(short_description))
+          document.remove_namespaces!
+          short_description = doccument.xpath("//p")[0].content
+          short_description = translator.translate(strip_tags(short_description).html_safe) if short_description.nil?
+      rescue Exception => error
+        p error
+        short_description = strip_tags(short_description).html_safe if short_description
+      end
+
+      return short_description
     end
 
 end
