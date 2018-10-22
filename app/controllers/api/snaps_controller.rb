@@ -6,7 +6,7 @@ class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
 
   def search    
-    data = params[:images][0]
+    data = params[:image]
     start_time = Time.now
     searched_result = { success: false }
     #using test image for API testing
@@ -43,17 +43,14 @@ class Api::SnapsController < Api::BaseController
     render json: searched_result
   end
 
-  ## Endpoint for searching the CUDA server using an array of images
-  def searchCudaScan
+  ## Endpoint for searching the CUDA server and returning an image id
+  def searchCuda
 
     # Get parameters from the request
     image = params[:image]
-    searched_result = nil
-    count = params[:imageCount]
 
     # Prepare for search
     start_time = Time.now
-    searched_result = { success: false }
     api = CudaSift.new
 
     # Get the image data 
@@ -65,38 +62,23 @@ class Api::SnapsController < Api::BaseController
       f.write image_data
     end
 
-    # Load the file and begin the CUDA search
+    # Load the file to  begin the CUDA search and delete it once complete
     file = api.loadFileData(file_name)
     response = api.search_image(file)
+    File.delete(file.path)
 
+    # Get the image ids of the match
     if response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && response["results"].any? && is_response_accepted?(response["results"].first)
-      # Get the image ids of the match
       response["image_ids"] = [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact
     else
       response["image_ids"] = []
     end
-
-    # Process the result and delete the temporary image
-    searched_result = process_searched_images_response(response)
-    File.delete(file.path)
-
-    overall_processing = Time.at((Time.now - start_time).to_i.abs).utc.strftime "%H:%M:%S"
-    searched_result['total_time_consumed']['overall_processing'] = overall_processing if searched_result['total_time_consumed'].present?
-
-    # If the searched result contains a match
-    if searched_result['data']['records'].length > 0 
-
-      searched_result['requestComplete'] = true
-      render json: searched_result
-
-    else
-      searched_result['requestComplete'] = if (count == 9) then true else false end
-      render json: searched_result
-    end
+    
+    render json: response
   end
 
   ## Endpoint for matching a image from a search
-  def searcher
+  def searchCatchoom
 
     # Get parameters from the request
     image = params[:image]
