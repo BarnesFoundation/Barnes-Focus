@@ -24,7 +24,7 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
-    ticking = false; requestComplete = false; requestCompleteFlag = false;
+    ticking = false; requestComplete = false; matchFound = false;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
 
@@ -127,62 +127,31 @@ class Camera extends Component {
         // Capture a photo scan every third of a second
         let scan = setInterval(() => {
 
-            if (!this.requestComplete) {
+            // Only capture if a match hasn't already been found
+            if (this.requestComplete == false) {
+
                 // Get the the present image in the canvas and crop the image
                 let canvas = this.getVideoCanvas();
-                let imageUri = canvas.toDataURL();
 
-                this.cropPhoto(imageUri)
+                // let imageUri = canvas.toDataURL();
+                canvas.toBlob((imageBlob) => {
+                    this.submitRequestCatchoom(imageBlob, imageCount);
+                }, 'image/jpeg');
+
+                /* this.cropPhoto(imageUri)
                     .then((croppedImageUri) => {
                         this.submitRequest(croppedImageUri, imageCount);
                         imageCount++;
-                    });
+                    }); */
             }
         }, 1000 / 3);
 
         // End the interval after three seconds
         setTimeout(() => {
             clearInterval(scan);
-            if (!this.requestComplete && !this.requestCompleteFlag) { this.setState({ searchInProgress: true, showVideo: false }); }// Show search-in-progress animation
+            this.requestComplete = true;
+            if (!this.requestComplete) { this.setState({ searchInProgress: true, showVideo: false }); }// Show search-in-progress animation
         }, 3000);
-    }
-
-    /** Gets the video drawn onto the canvas */
-    getVideoCanvas = () => {
-
-        // Get the canvas
-        let canvas = this.getCanvas();
-        const context = canvas.getContext("2d");
-
-        if (isIOS || !this.camera_capabilities) {
-
-            // Draw rectangle
-            let rect = this.video.getBoundingClientRect();
-            let tempCanvas = document.createElement('canvas');
-            let tempCtx = tempCanvas.getContext('2d');
-
-            // Draw the video onto a temporary canvas
-            tempCanvas.width = rect.width;
-            tempCanvas.height = rect.height;
-            tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
-
-            // Now copy the viewport image onto our original canvas
-            let x = (rect.x < 0) ? -(rect.x) : rect.x;
-            let y = (rect.y < 0) ? -(rect.y) : rect.y;
-
-            if (x > 0 && y > 0) {
-                context.drawImage(tempCanvas, Math.floor(x), Math.floor(y), canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
-            }
-
-            else {
-                context.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        else {
-            context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
-        }
-        return canvas;
     }
 
     /** Submit a photo scan to the server */
@@ -206,25 +175,76 @@ class Camera extends Component {
                 this.props.history.push({ pathname: '/not-found' });
             });
     }
-    
-    /** Process the request complete response */
-    processRequestComplete(res) {
 
-        if (res.data.records.length === 0) {
+    /** Submit the image to Catchoom for image recognition */
+    submitRequestCatchoom = (imageBlob) => {
+
+        // Axios headers
+        const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+        let url = 'https://search.craftar.net/v1/search';
+        let token = '2999d63fc1694ce4';
+
+        // Append to form data
+        let fd = new FormData();
+        fd.append('token', token);
+        fd.append('image', imageBlob);
+
+        // Make request to server
+        axios.post(url, fd, config)
+            .then(response => {
+
+                // If a match was found
+                if (response.data.results.length > 0) {
+
+                    this.requestComplete = true; // Update that the match request has been completed
+
+                    let imageId = response.data.results[0].item.name // Image id is stored in the name of the item 
+
+                    this.getArtworkInformation(imageId);
+                }
+                // Otherwise, no match was found
+                else { if (this.requestComplete) { this.processRequestComplete(false, null) } }
+            })
+            .catch(error => {
+                // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
+                this.setState({ searchInProgress: false });
+                this.props.history.push({ pathname: '/not-found' });
+            });
+    }
+
+    /** Retrieves the information for the identified piece */
+    getArtworkInformation = (imageId) => {
+        // Make request to server
+        axios.post('/api/snaps/getArtworkInformation', { imageId: imageId })
+            .then(response => { this.processRequestComplete(true, response.data); })
+            .catch(error => {
+                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
+                this.setState({ searchInProgress: false });
+                this.props.history.push({ pathname: '/not-found' });
+            });
+    }
+
+    /** Process the request complete response */
+    processRequestComplete(responseFound, response) {
+
+        // Turn off the search-in-progress animation
+        if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); } 
+
+        if (responseFound) {
+            // Update analytics of the successful snap event
+            analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_SUCCESS, eventLabel: GA_EVENT_LABEL.SNAP_SUCCESS });
+
+            // Navigate to results page
+            this.props.history.push({
+                pathname: '/results',
+                state: { result: response, snapCount: localStorage.getItem(SNAP_ATTEMPTS) }
+            });
+        }
+        else {
             // Update analytics of the failed snap event and navigate to not found page
             analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
             this.props.history.push({ pathname: '/not-found' });
         }
-
-        else {
-            // Update analytics of the successful snap event and navigate to results page
-            analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_SUCCESS, eventLabel: GA_EVENT_LABEL.SNAP_SUCCESS });
-            this.props.history.push({
-                pathname: '/results',
-                state: { result: res, snapCount: localStorage.getItem(SNAP_ATTEMPTS) }
-            });
-        }
-
     }
 
     clearPhoto = (ev) => {
@@ -305,8 +325,6 @@ class Camera extends Component {
             // The below disables the page zoom in that occurs on pinch in camera-control buttons section
             event.preventDefault();
         }, false);
-
-        this.capturePhotoShots();
     }
 
     componentDidUpdate() {
@@ -324,6 +342,7 @@ class Camera extends Component {
                     this.camera_capabilities = this.track.getCapabilities();
                     this.camera_settings = this.track.getSettings();
                     requestAnimationFrame(this.resetZoom);
+                    this.capturePhotoShots();
                 })
                 .catch((error) => {
                     console.log('Not allowed to access camera. Please check settings!');
@@ -336,6 +355,44 @@ class Camera extends Component {
         }
 
         this.requestComplete = false; this.requestCompleteFlag = false;
+    }
+
+    /** Gets the video drawn onto the canvas */
+    getVideoCanvas = () => {
+
+        // Get the canvas
+        let canvas = this.getCanvas();
+        const context = canvas.getContext("2d");
+
+        if (isIOS || !this.camera_capabilities) {
+
+            // Draw rectangle
+            let rect = this.video.getBoundingClientRect();
+            let tempCanvas = document.createElement('canvas');
+            let tempCtx = tempCanvas.getContext('2d');
+
+            // Draw the video onto a temporary canvas
+            tempCanvas.width = rect.width;
+            tempCanvas.height = rect.height;
+            tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
+
+            // Now copy the viewport image onto our original canvas
+            let x = (rect.x < 0) ? -(rect.x) : rect.x;
+            let y = (rect.y < 0) ? -(rect.y) : rect.y;
+
+            if (x > 0 && y > 0) {
+                context.drawImage(tempCanvas, Math.floor(x), Math.floor(y), canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+            }
+
+            else {
+                context.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        else {
+            context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+        }
+        return canvas;
     }
 
     getCanvas = () => {
