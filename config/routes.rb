@@ -9,8 +9,8 @@ Rails.application.routes.draw do
     resources :snaps, only: [ :show ] do
       collection do
         post 'search'
-        post 'searcher'
-        post 'searchCudaScan'
+        post 'searchCatchoom'
+        post 'searchCuda'
         post 'getArtworkInformation'
         get 'submissionId'
         get 'languages'
