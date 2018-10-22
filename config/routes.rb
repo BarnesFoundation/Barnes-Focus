@@ -11,6 +11,7 @@ Rails.application.routes.draw do
         post 'search'
         post 'searcher'
         post 'searchCudaScan'
+        post 'getArtworkInformation'
         get 'submissionId'
         get 'languages'
       end
