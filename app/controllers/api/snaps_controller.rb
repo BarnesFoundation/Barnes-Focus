@@ -64,52 +64,24 @@ class Api::SnapsController < Api::BaseController
 
     # Load the file to  begin the CUDA search and delete it once complete
     file = api.loadFileData(file_name)
-    response = api.search_image(file)
+    cuda_response = api.search_image(file)
     File.delete(file.path)
 
+    image_ids = nil
+
     # Get the image ids of the match
-    if response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && response["results"].any? && is_response_accepted?(response["results"].first)
-      response["image_ids"] = [response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact
+    if cuda_response["type"] == CudaSift::RESPONSE_CODES[:SEARCH_RESULTS] && cuda_response["results"].any? && is_response_accepted?(cuda_response["results"].first)
+      image_ids = [cuda_response["results"].collect{|k| File.basename(k.keys[0], ".jpg").split('_')[0]}.compact[0]].compact
     else
-      response["image_ids"] = []
+      image_ids = []
     end
     
-    render json: response
-  end
+    response = { :results => [] }
 
-  ## Endpoint for matching a image from a search
-  def searchCatchoom
-
-    # Get parameters from the request
-    image = params[:image]
-    image_count = params[:imageCount]
-
-    # Craftar credentials
-    url = 'https://search.craftar.net/v1/search'
-    token = '2999d63fc1694ce4'
-
-    # Get the image data 
-    image_data = Base64.decode64(image['data:image/jpeg;base64,'.length .. -1])
-
-    # Generate temporary file for it
-    file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
-    File.open(file_name, 'wb') do |f|
-      f.write image_data
-    end
-
-    # Send it to the Catchoom Image Recognition API
-    image_response = RestClient.post url, {:token => token, :multipart => true, :image => File.new(file_name, 'rb') }
-    results = JSON.parse(image_response)['results']
-    File.delete(file_name)
-
-    response = nil
-
-    # If the searched result contains a match
-    if results.length > 0
-      image_id = results[0]['item']['name'].to_i 
-      response = process_searched_image(image_id, image_count)
-    else
-      response = process_searched_image(nil, image_count)
+    if image_ids.length > 0
+      response[:results] << { :item => { :name => image_ids[0] } }
+    else 
+      response[:results] = []
     end
 
     render json: response
