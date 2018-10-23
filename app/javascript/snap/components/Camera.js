@@ -174,7 +174,7 @@ class Camera extends Component {
 
             url = 'https://search.craftar.net/v1/search';
             config = { headers: { 'Content-Type': 'multipart/form-data' } };
-            
+
             // Append form data  
             data.append('token', token);
             data.append('image', imageData);
@@ -188,32 +188,25 @@ class Camera extends Component {
 
                 // Increment the responses we've received
                 this.responseCounter++;
-                let imageId;
 
-                if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
+                console.log('Response counter', this.responseCounter);
 
-                    // If a match was found
-                    if (response.data.results.length > 0 && !this.matchFound) {
+                if (response.data.results.length > 0 && !this.matchFound) {
 
-                        this.matchFound = true;
-                        clearInterval(this.scan);
-                        imageId = response.data.results[0].item.name
-                        this.setState({ searchInProgress: true, showVideo: false });
-                        this.getArtworkInformation(imageId);
-                    }
+                    // Get the image id
+                    let imageId = response.data.results[0].item.name
 
-                    else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
+                    // End scanning operations 
+                    clearInterval(this.scan);
+
+                    // Update tha we've found a match and show search animation
+                    this.matchFound = true;
+                    this.setState({ searchInProgress: true, showVideo: false });
+                    
+                    this.getArtworkInformation(imageId);
                 }
-                else {
-                    if (response.data.image_ids.length > 0 && !this.matchFound) {
-                        this.matchFound = true;
-                        clearInterval(this.scan);
-                        imageId = response.data.image_ids[0];
-                        this.setState({ searchInProgress: true, showVideo: false });
-                        this.getArtworkInformation(imageId);
-                    }
-                    else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
-                }
+
+                else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
             })
             .catch(error => {
                 // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
@@ -226,16 +219,17 @@ class Camera extends Component {
     getArtworkInformation = (imageId) => {
 
         if (!this.requestComplete) {
+
+            this.requestComplete = true;
             // Make request to server
             axios.post('/api/snaps/getArtworkInformation', { imageId: imageId })
-                .then(response => { this.requestComplete = true; this.processRequestComplete(true, response.data); })
+                .then(response => { this.processRequestComplete(true, response.data); })
                 .catch(error => {
                     analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                     this.setState({ searchInProgress: false });
                     this.props.history.push({ pathname: '/not-found' });
                 });
         }
-
     }
 
     /** Process the request complete response */
@@ -369,8 +363,6 @@ class Camera extends Component {
             // Reset snap attemps count if last_snap_timestamp is 12 hours or before.
             this.resetSnapCounter();
         }
-
-        this.requestComplete = false; this.requestCompleteFlag = false;
     }
 
     /** Gets the video drawn onto the canvas */
