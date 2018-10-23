@@ -131,12 +131,16 @@ class Camera extends Component {
                 // Get the the present image in the canvas and crop the image
                 let canvas = this.getVideoCanvas();
 
-                let imageUri = canvas.toDataURL('image/jpeg', 1.0);
-                /* canvas.toBlob((imageBlob) => {
-                    this.submitRequestCatchoom(imageBlob, imageCount);
-                }, 'image/jpeg'); */
+                if (process.env.IMAGE_ENGINE === 'CUDA') {
+                    let imageUri = canvas.toDataURL('image/jpeg', 1.0);
+                    this.submitRequestCuda(imageUri);
+                }
 
-                this.submitRequestCuda(imageUri);
+                else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
+                    canvas.toBlob((imageBlob) => {
+                        this.submitRequestCatchoom(imageBlob);
+                    }, 'image/jpeg');
+                }
 
                 /* this.cropPhoto(imageUri)
                     .then((croppedImageUri) => {
@@ -161,7 +165,7 @@ class Camera extends Component {
             image: imageUri
         })
             .then(response => {
-                
+
                 // If a match was found 
                 if (response.data.image_ids.length > 0) {
 
@@ -202,8 +206,8 @@ class Camera extends Component {
                 if (response.data.results.length > 0) {
 
                     // Update that the match request has been completed and get the image id
-                    this.requestComplete = true; 
-                    let imageId = response.data.results[0].item.name 
+                    this.requestComplete = true;
+                    let imageId = response.data.results[0].item.name
 
                     this.getArtworkInformation(imageId);
                 }
@@ -219,6 +223,7 @@ class Camera extends Component {
 
     /** Retrieves the information for the identified piece */
     getArtworkInformation = (imageId) => {
+
         // Make request to server
         axios.post('/api/snaps/getArtworkInformation', { imageId: imageId })
             .then(response => { this.processRequestComplete(true, response.data); })
