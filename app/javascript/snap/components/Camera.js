@@ -232,6 +232,7 @@ class Camera extends Component {
 
         if (process.env.IMAGE_ENGINE === 'CUDA') {
 
+            // Configurations for Axios request
             url = '/api/snaps/searchCuda';
             data = { image: imageData };
             config = null;
@@ -239,17 +240,16 @@ class Camera extends Component {
 
         else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
 
-            // Axios headers
-            config = { headers: { 'Content-Type': 'multipart/form-data' } };
-            url = 'https://search.craftar.net/v1/search';
+            // Configurations for Axios request
             let token = '2999d63fc1694ce4';
+            data = new FormData();
 
-            // Append to form data
-            let fd = new FormData();
-            fd.append('token', token);
-            fd.append('image', imageBlob);
-
-            data = fd;
+            url = 'https://search.craftar.net/v1/search';
+            config = { headers: { 'Content-Type': 'multipart/form-data' } };
+            
+            // Append to form data  
+            data.append('token', token);
+            data.append('image', imageBlob);
         }
         this.executeRequest(url, data, config)
     }
