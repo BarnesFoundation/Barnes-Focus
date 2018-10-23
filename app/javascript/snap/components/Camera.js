@@ -189,8 +189,6 @@ class Camera extends Component {
                 // Increment the responses we've received
                 this.responseCounter++;
 
-                console.log('Response counter', this.responseCounter);
-
                 if (response.data.results.length > 0 && !this.matchFound) {
 
                     // Get the image id
@@ -202,10 +200,11 @@ class Camera extends Component {
                     // Update tha we've found a match and show search animation
                     this.matchFound = true;
                     this.setState({ searchInProgress: true, showVideo: false });
-                    
+
                     this.getArtworkInformation(imageId);
                 }
 
+                // If we've received 9 responses and no match was found yet, process as a non-matched image
                 else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
             })
             .catch(error => {
@@ -218,18 +217,13 @@ class Camera extends Component {
     /** Retrieves the information for the identified piece */
     getArtworkInformation = (imageId) => {
 
-        if (!this.requestComplete) {
-
-            this.requestComplete = true;
-            // Make request to server
-            axios.post('/api/snaps/getArtworkInformation', { imageId: imageId })
-                .then(response => { this.processRequestComplete(true, response.data); })
-                .catch(error => {
-                    analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                    this.setState({ searchInProgress: false });
-                    this.props.history.push({ pathname: '/not-found' });
-                });
-        }
+        axios.post('/api/snaps/getArtworkInformation', { imageId: imageId })
+            .then(response => { this.processRequestComplete(true, response.data); })
+            .catch(error => {
+                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
+                this.setState({ searchInProgress: false });
+                this.props.history.push({ pathname: '/not-found' });
+            });
     }
 
     /** Process the request complete response */
