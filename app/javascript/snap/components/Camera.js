@@ -24,11 +24,8 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
-    ticking = false; requestComplete = false; matchFound = false;
+    ticking = false; requestComplete = false; responseCounter = 0;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
-
-
-
 
     resetSnapCounter = () => {
         let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
@@ -131,7 +128,7 @@ class Camera extends Component {
                 // Get the the present image in the canvas and crop the image
                 let canvas = this.getVideoCanvas();
 
-                console.log('The image engine to use is' , process.env)
+                console.log('The image engine to use is', process.env.IMAGE_ENGINE)
 
                 if (process.env.IMAGE_ENGINE === 'CUDA') {
                     let imageUri = canvas.toDataURL('image/jpeg', 1.0);
@@ -155,7 +152,8 @@ class Camera extends Component {
         // End the interval after three seconds
         setTimeout(() => {
             clearInterval(scan);
-            this.requestComplete = true;
+            // If the request isn't complete by now, wait for all http requests to complete and then see if a match hasn't been found
+
             if (!this.requestComplete) { this.setState({ searchInProgress: true, showVideo: false }); }// Show search-in-progress animation
         }, 3000);
     }
@@ -168,7 +166,10 @@ class Camera extends Component {
         })
             .then(response => {
 
-                // If a match was found 
+                // Increment the responses we've received
+                this.responseCounter ++;
+                console.log('RequestComplete' , this.requestComplete);
+                // If a match was found     
                 if (response.data.image_ids.length > 0) {
 
                     // Update that the match request has been completed and get the image id
@@ -177,10 +178,11 @@ class Camera extends Component {
 
                     this.getArtworkInformation(imageId);
                 }
-                // Otherwise, no match was found
-                else { if (this.requestComplete) { this.processRequestComplete(false, null) } }
+                // Otherwise, no match was found by the time we've received all of our requests
+                else { if (this.responseCounter == 9 && !this.requestComplete) { this.processRequestComplete(false, null) } }
             })
             .catch(error => {
+                console.log('An error occurred in Cuda', error);
                 // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 this.setState({ searchInProgress: false });
                 this.props.history.push({ pathname: '/not-found' });
@@ -204,6 +206,9 @@ class Camera extends Component {
         axios.post(url, fd, config)
             .then(response => {
 
+                // Increment the responses we've received
+                this.responseCounter ++;
+
                 // If a match was found
                 if (response.data.results.length > 0) {
 
@@ -213,8 +218,8 @@ class Camera extends Component {
 
                     this.getArtworkInformation(imageId);
                 }
-                // Otherwise, no match was found
-                else { if (this.requestComplete) { this.processRequestComplete(false, null) } }
+                // Otherwise, no match was found by the time we've received all of our requests
+                else { if (this.responseCounter == 9 && !this.requestComplete) { this.processRequestComplete(false, null) } }
             })
             .catch(error => {
                 // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
