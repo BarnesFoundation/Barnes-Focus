@@ -129,13 +129,12 @@ class Camera extends Component {
                 let canvas = this.getVideoCanvas();
 
                 if (process.env.IMAGE_ENGINE === 'CUDA') {
-                    let imageUri = canvas.toDataURL('image/jpeg', 1.0);
-                    this.submitRequestCuda(imageUri);
+                    this.submitRequest(canvas.toDataURL('image/jpeg', 1.0));
                 }
 
                 else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
                     canvas.toBlob((imageBlob) => {
-                        this.submitRequestCatchoom(imageBlob);
+                        this.submitRequest(imageBlob);
                     }, 'image/jpeg');
                 }
 
@@ -151,77 +150,6 @@ class Camera extends Component {
         setTimeout(() => {
             clearInterval(this.scan);
         }, 3000);
-    }
-
-    /** Submit a photo scan to the server */
-    submitRequestCuda = (imageUri) => {
-        // Make request to server
-        axios.post('/api/snaps/searchCuda', {
-            image: imageUri
-        })
-            .then(response => {
-
-                // Increment the responses we've received
-                this.responseCounter++;
-
-                // If a match was found     
-                if (response.data.image_ids.length > 0 && !this.matchFound) {
-
-                    // Update that the match request has been completed and get the image id
-                    clearInterval(this.scan);
-                    this.matchFound = true;
-                    this.setState({ searchInProgress: true, showVideo: false });
-                    let imageId = response.data.image_ids[0];
-
-                    this.getArtworkInformation(imageId);
-                }
-                // Otherwise, no match was found by the time we've received all of our requests
-                else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
-            })
-            .catch(error => {
-                console.log('An error occurred in Cuda', error);
-                // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                this.setState({ searchInProgress: false });
-                this.props.history.push({ pathname: '/not-found' });
-            });
-    }
-
-    /** Submit the image to Catchoom for image recognition */
-    submitRequestCatchoom = (imageBlob) => {
-
-        // Axios headers
-        const config = { headers: { 'Content-Type': 'multipart/form-data' } };
-        let url = 'https://search.craftar.net/v1/search';
-        let token = '2999d63fc1694ce4';
-
-        // Append to form data
-        let fd = new FormData();
-        fd.append('token', token);
-        fd.append('image', imageBlob);
-
-        // Make request to server
-        axios.post(url, fd, config)
-            .then(response => {
-
-                // If a match was found
-                if (response.data.results.length > 0 && !this.matchFound) {
-
-                    // Update that the match request has been completed and get the image id
-                    clearInterval(this.scan);
-                    this.matchFound = true;
-                    this.setState({ searchInProgress: true, showVideo: false });
-
-                    let imageId = response.data.results[0].item.name
-                    this.getArtworkInformation(imageId);
-                }
-                // Otherwise, no match was found by the time we've received all of our requests
-                else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
-            })
-            .catch(error => {
-                // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                this.setState({ searchInProgress: false });
-                this.props.history.push({ pathname: '/not-found' });
-            });
     }
 
     submitRequest = (imageData) => {
@@ -247,9 +175,9 @@ class Camera extends Component {
             url = 'https://search.craftar.net/v1/search';
             config = { headers: { 'Content-Type': 'multipart/form-data' } };
             
-            // Append to form data  
+            // Append form data  
             data.append('token', token);
-            data.append('image', imageBlob);
+            data.append('image', imageData);
         }
         this.executeRequest(url, data, config)
     }
