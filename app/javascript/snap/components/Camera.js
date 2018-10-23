@@ -154,7 +154,7 @@ class Camera extends Component {
             clearInterval(scan);
             // If the request isn't complete by now, wait for all http requests to complete and then see if a match hasn't been found
 
-            if (!this.requestComplete) { this.setState({ searchInProgress: true, showVideo: false }); }// Show search-in-progress animation
+            // if (!this.requestComplete) { this.setState({ searchInProgress: true, showVideo: false }); }// Show search-in-progress animation
         }, 3000);
     }
 
@@ -215,7 +215,6 @@ class Camera extends Component {
                     // Update that the match request has been completed and get the image id
                     this.requestComplete = true;
                     let imageId = response.data.results[0].item.name
-
                     this.getArtworkInformation(imageId);
                 }
                 // Otherwise, no match was found by the time we've received all of our requests
@@ -344,6 +343,9 @@ class Camera extends Component {
     }
 
     componentDidUpdate() {
+
+        this.requestComplete = false;
+        this.responseCounter = 0;
 
         // When video is able to be captured
         if (this.state.showVideo && this.state.videoStream) {
