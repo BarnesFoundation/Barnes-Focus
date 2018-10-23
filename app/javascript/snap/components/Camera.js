@@ -203,19 +203,19 @@ class Camera extends Component {
         axios.post(url, fd, config)
             .then(response => {
 
-                // Increment the responses we've received
-                this.responseCounter++;
-
                 // If a match was found
                 if (response.data.results.length > 0) {
 
                     // Update that the match request has been completed and get the image id
-                    this.requestComplete = true;
+                    clearInterval(this.scan);
+                    this.matchFound = true;
+                    this.setState({ searchInProgress: true, showVideo: false });
+
                     let imageId = response.data.results[0].item.name
                     this.getArtworkInformation(imageId);
                 }
                 // Otherwise, no match was found by the time we've received all of our requests
-                else { if (this.responseCounter == 9 && !this.requestComplete) { this.processRequestComplete(false, null) } }
+                else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
             })
             .catch(error => {
                 // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
