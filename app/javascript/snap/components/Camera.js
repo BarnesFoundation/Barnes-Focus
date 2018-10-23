@@ -131,6 +131,8 @@ class Camera extends Component {
                 // Get the the present image in the canvas and crop the image
                 let canvas = this.getVideoCanvas();
 
+                console.log('The image engine to use is' , process.env)
+
                 if (process.env.IMAGE_ENGINE === 'CUDA') {
                     let imageUri = canvas.toDataURL('image/jpeg', 1.0);
                     this.submitRequestCuda(imageUri);
