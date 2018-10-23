@@ -11,4 +11,6 @@ environment.plugins.prepend('Provide', new webpack.ProvidePlugin({
 })
 )
 
+new webpack.EnvironmentPlugin(['IMAGE_ENGINE']);
+
 module.exports = environment
