@@ -24,7 +24,7 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
-    ticking = false; requestComplete = false; responseCounter = 0;
+    ticking = false; requestComplete = false; responseCounter = 0; scan; matchFound = false;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
     resetSnapCounter = () => {
@@ -120,15 +120,13 @@ class Camera extends Component {
         let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
 
         // Capture a photo scan every third of a second
-        let scan = setInterval(() => {
+        this.scan = setInterval(() => {
 
             // Only capture if a match hasn't already been found
-            if (this.requestComplete == false) {
+            if (this.matchFound == false) {
 
                 // Get the the present image in the canvas and crop the image
                 let canvas = this.getVideoCanvas();
-
-                console.log('The image engine to use is', process.env.IMAGE_ENGINE)
 
                 if (process.env.IMAGE_ENGINE === 'CUDA') {
                     let imageUri = canvas.toDataURL('image/jpeg', 1.0);
@@ -151,10 +149,7 @@ class Camera extends Component {
 
         // End the interval after three seconds
         setTimeout(() => {
-            clearInterval(scan);
-            // If the request isn't complete by now, wait for all http requests to complete and then see if a match hasn't been found
-
-            // if (!this.requestComplete) { this.setState({ searchInProgress: true, showVideo: false }); }// Show search-in-progress animation
+            clearInterval(this.scan);
         }, 3000);
     }
 
@@ -167,19 +162,21 @@ class Camera extends Component {
             .then(response => {
 
                 // Increment the responses we've received
-                this.responseCounter ++;
-                console.log('RequestComplete' , this.requestComplete);
+                this.responseCounter++;
+
                 // If a match was found     
-                if (response.data.image_ids.length > 0) {
+                if (response.data.image_ids.length > 0 && !this.matchFound) {
 
                     // Update that the match request has been completed and get the image id
-                    this.requestComplete = true;
+                    clearInterval(this.scan);
+                    this.matchFound = true;
+                    this.setState({ searchInProgress: true, showVideo: false });
                     let imageId = response.data.image_ids[0];
 
                     this.getArtworkInformation(imageId);
                 }
                 // Otherwise, no match was found by the time we've received all of our requests
-                else { if (this.responseCounter == 9 && !this.requestComplete) { this.processRequestComplete(false, null) } }
+                else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
             })
             .catch(error => {
                 console.log('An error occurred in Cuda', error);
@@ -207,7 +204,7 @@ class Camera extends Component {
             .then(response => {
 
                 // Increment the responses we've received
-                this.responseCounter ++;
+                this.responseCounter++;
 
                 // If a match was found
                 if (response.data.results.length > 0) {
@@ -230,14 +227,17 @@ class Camera extends Component {
     /** Retrieves the information for the identified piece */
     getArtworkInformation = (imageId) => {
 
-        // Make request to server
-        axios.post('/api/snaps/getArtworkInformation', { imageId: imageId })
-            .then(response => { this.processRequestComplete(true, response.data); })
-            .catch(error => {
-                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                this.setState({ searchInProgress: false });
-                this.props.history.push({ pathname: '/not-found' });
-            });
+        if (!this.requestComplete) {
+            // Make request to server
+            axios.post('/api/snaps/getArtworkInformation', { imageId: imageId })
+                .then(response => { this.requestComplete = true; this.processRequestComplete(true, response.data); })
+                .catch(error => {
+                    analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
+                    this.setState({ searchInProgress: false });
+                    this.props.history.push({ pathname: '/not-found' });
+                });
+        }
+
     }
 
     /** Process the request complete response */
