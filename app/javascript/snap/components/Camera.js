@@ -204,7 +204,7 @@ class Camera extends Component {
             .then(response => {
 
                 // If a match was found
-                if (response.data.results.length > 0) {
+                if (response.data.results.length > 0 && !this.matchFound) {
 
                     // Update that the match request has been completed and get the image id
                     clearInterval(this.scan);
@@ -216,6 +216,76 @@ class Camera extends Component {
                 }
                 // Otherwise, no match was found by the time we've received all of our requests
                 else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
+            })
+            .catch(error => {
+                // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
+                this.setState({ searchInProgress: false });
+                this.props.history.push({ pathname: '/not-found' });
+            });
+    }
+
+    submitRequest = (imageData) => {
+
+        let url;
+        let data;
+        let config;
+
+        if (process.env.IMAGE_ENGINE === 'CUDA') {
+
+            url = '/api/snaps/searchCuda';
+            data = { image: imageData };
+            config = null;
+        }
+
+        else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
+
+            // Axios headers
+            config = { headers: { 'Content-Type': 'multipart/form-data' } };
+            url = 'https://search.craftar.net/v1/search';
+            let token = '2999d63fc1694ce4';
+
+            // Append to form data
+            let fd = new FormData();
+            fd.append('token', token);
+            fd.append('image', imageBlob);
+
+            data = fd;
+        }
+        this.executeRequest(url, data, config)
+    }
+
+    executeRequest = (url, data, config) => {
+        axios.post(url, data, config)
+            .then(response => {
+
+                // Increment the responses we've received
+                this.responseCounter++;
+                let imageId;
+
+                if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
+
+                    // If a match was found
+                    if (response.data.results.length > 0 && !this.matchFound) {
+
+                        this.matchFound = true;
+                        clearInterval(this.scan);
+                        imageId = response.data.results[0].item.name
+                        this.setState({ searchInProgress: true, showVideo: false });
+                        this.getArtworkInformation(imageId);
+                    }
+
+                    else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
+                }
+                else {
+                    if (response.data.image_ids.length > 0 && !this.matchFound) {
+                        this.matchFound = true;
+                        clearInterval(this.scan);
+                        imageId = response.data.image_ids[0];
+                        this.setState({ searchInProgress: true, showVideo: false });
+                        this.getArtworkInformation(imageId);
+                    }
+                    else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
+                }
             })
             .catch(error => {
                 // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
