@@ -98,9 +98,10 @@ class Camera extends Component {
                 // Draw the new image, keeping its proportions intact for optimal matching
                 context1.drawImage(image, x, y, cWidth, cHeight, 0, 0, sWidth, sHeight);
 
-                image = canvas1.toDataURL('image/jpeg', 1.0);
-
-                resolve(image);
+                // image = canvas1.toDataURL('image/jpeg', 1.0);
+                canvas1.toBlob((imageBlob) => { 
+                    resolve(imageBlob);
+                }, 'image/jpeg');
             }
             // Trigger loading of the image
             image.src = imageUri;
@@ -134,15 +135,19 @@ class Camera extends Component {
 
                 else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
                     canvas.toBlob((imageBlob) => {
-                        this.prepareServerRequest(imageBlob);
+
+                        window.URL = window.URL || window.webkitURL;
+
+                        let imageUri = window.URL.createObjectURL(imageBlob);
+                        //this.prepareServerRequest(imageBlob);
+
+                        this.cropPhoto(imageUri)
+                            .then((imageCrop) => {
+                                window.URL.revokeObjectURL(imageUri);
+                                this.prepareServerRequest(imageCrop);
+                            });
                     }, 'image/jpeg');
                 }
-
-                /* this.cropPhoto(imageUri)
-                    .then((croppedImageUri) => {
-                        this.submitRequest(croppedImageUri, imageCount);
-                        imageCount++;
-                    }); */
             }
         }, 1000 / 3);
 
