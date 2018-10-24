@@ -48,7 +48,7 @@ class SnapNotFound extends Component {
                 <div className="row">
                     <div className="col-6 offset-3 col-md-2 offset-md-5 text-center">
                         <button className="btn snap-btn snap-btn-default" onClick={this.handleBackToCamera}>
-                            {(this.state.translation) ? this.state.translation.Photo_Button_Label.text_1.translated_content : `Take photo`}
+                            {(this.state.translation) ? this.state.translation.Scan_photo.text_1.translated_content : `Scan photo`}
                         </button>
                     </div>
                 </div>

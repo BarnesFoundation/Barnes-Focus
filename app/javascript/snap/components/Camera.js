@@ -129,12 +129,12 @@ class Camera extends Component {
                 let canvas = this.getVideoCanvas();
 
                 if (process.env.IMAGE_ENGINE === 'CUDA') {
-                    this.submitRequest(canvas.toDataURL('image/jpeg', 1.0));
+                    this.prepareServerRequest(canvas.toDataURL('image/jpeg', 1.0));
                 }
 
                 else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
                     canvas.toBlob((imageBlob) => {
-                        this.submitRequest(imageBlob);
+                        this.prepareServerRequest(imageBlob);
                     }, 'image/jpeg');
                 }
 
@@ -146,13 +146,13 @@ class Camera extends Component {
             }
         }, 1000 / 3);
 
-        // End the interval after three seconds
         setTimeout(() => {
-            clearInterval(this.scan);
+            clearInterval(this.scan); // End the interval after three seconds
         }, 3000);
     }
 
-    submitRequest = (imageData) => {
+    /** Prepares image match request options */
+    prepareServerRequest = (imageData) => {
 
         let url;
         let data;
@@ -162,8 +162,8 @@ class Camera extends Component {
 
             // Configurations for Axios request
             url = '/api/snaps/searchCuda';
-            data = { image: imageData };
             config = null;
+            data = { image: imageData };
         }
 
         else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
@@ -179,10 +179,11 @@ class Camera extends Component {
             data.append('token', token);
             data.append('image', imageData);
         }
-        this.executeRequest(url, data, config)
+        this.submitRequest(url, data, config)
     }
 
-    executeRequest = (url, data, config) => {
+    /** Submits the request to the server */
+    submitRequest = (url, data, config) => {
         axios.post(url, data, config)
             .then(response => {
 
@@ -197,7 +198,7 @@ class Camera extends Component {
                     // End scanning operations 
                     clearInterval(this.scan);
 
-                    // Update tha we've found a match and show search animation
+                    // Update that we've found a match and show search animation
                     this.matchFound = true;
                     this.setState({ searchInProgress: true, showVideo: false });
 
@@ -265,7 +266,7 @@ class Camera extends Component {
         }, 0);
     }
 
-    /** Resets the zoom to its initial state when navigating back to the Camera page */
+    /** Resets the zoom to its initial state */
     resetZoom = () => {
         if (this.camera_capabilities && 'zoom' in this.camera_capabilities) {
             this.track.applyConstraints({ advanced: [{ zoom: 1 }] });
@@ -323,8 +324,7 @@ class Camera extends Component {
         // Beginning with iOS 10, the "user-scalable=no" attribute is no longer supported 
         const camera_controls = document.querySelector('.camera-controls');
         camera_controls.addEventListener('touchmove', function (event) {
-            // The below disables the page zoom in that occurs on pinch in camera-control buttons section
-            event.preventDefault();
+            event.preventDefault(); // Disables the page zoom in that occurs on pinch in camera-control buttons section
         }, false);
     }
 
