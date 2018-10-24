@@ -10,6 +10,8 @@ import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-de
 import * as analytics from './Analytics';
 
 
+const artworkUrl = '/api/snaps/getArtworkInformation';
+
 class Camera extends Component {
 
     translationObj = localStorage.getItem(SNAP_LANGUAGE_TRANSLATION);
@@ -99,7 +101,7 @@ class Camera extends Component {
                 context1.drawImage(image, x, y, cWidth, cHeight, 0, 0, sWidth, sHeight);
 
                 // image = canvas1.toDataURL('image/jpeg', 1.0);
-                canvas1.toBlob((imageBlob) => { 
+                canvas1.toBlob((imageBlob) => {
                     resolve(imageBlob);
                 }, 'image/jpeg');
             }
@@ -134,18 +136,23 @@ class Camera extends Component {
                 }
 
                 else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
+
                     canvas.toBlob((imageBlob) => {
 
-                        window.URL = window.URL || window.webkitURL;
+                        if (process.env.CROP_IMAGE === 'TRUE') {
 
-                        let imageUri = window.URL.createObjectURL(imageBlob);
-                        //this.prepareServerRequest(imageBlob);
+                            window.URL = window.URL || window.webkitURL;
 
-                        this.cropPhoto(imageUri)
-                            .then((imageCrop) => {
-                                window.URL.revokeObjectURL(imageUri);
-                                this.prepareServerRequest(imageCrop);
-                            });
+                            let imageUri = window.URL.createObjectURL(imageBlob);
+
+                            this.cropPhoto(imageUri)
+                                .then((imageCrop) => {
+                                    window.URL.revokeObjectURL(imageUri);
+                                    this.prepareServerRequest(imageCrop);
+                                });
+                        }
+
+                        else { this.prepareServerRequest(imageBlob); }
                     }, 'image/jpeg');
                 }
             }
@@ -222,8 +229,7 @@ class Camera extends Component {
 
     /** Retrieves the information for the identified piece */
     getArtworkInformation = (imageId) => {
-
-        axios.post('/api/snaps/getArtworkInformation', { imageId: imageId })
+        axios.post(artworkUrl, { imageId: imageId })
             .then(response => { this.processRequestComplete(true, response.data); })
             .catch(error => {
                 analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
