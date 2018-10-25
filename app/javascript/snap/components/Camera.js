@@ -26,7 +26,7 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
-    ticking = false; requestComplete = false; responseCounter = 0; scan; matchFound = false;
+    ticking = false; responseCounter = 0; scan; requestComplete = false; matchFound = false;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
     resetSnapCounter = () => {
@@ -202,7 +202,14 @@ class Camera extends Component {
                 // Increment the responses we've received
                 this.responseCounter++;
 
-                if (response.data.results.length > 0 && !this.matchFound) {
+                if (response.data.error) {
+                    console.log('An error occurred on Catchoom API');
+                }
+
+                if (response.data.results.length > 0 && !this.requestComplete && !this.matchFound) {
+
+                    // Update that we've found a match and show search animation
+                    this.matchFound = true;
 
                     // Get the image id
                     let imageId = response.data.results[0].item.name
@@ -210,27 +217,31 @@ class Camera extends Component {
                     // End scanning operations 
                     clearInterval(this.scan);
 
-                    // Update that we've found a match and show search animation
-                    this.matchFound = true;
+
                     this.setState({ searchInProgress: true, showVideo: false });
 
                     this.getArtworkInformation(imageId);
                 }
 
                 // If we've received 9 responses and no match was found yet, process as a non-matched image
-                else { if (this.responseCounter == 9 && !this.matchFound) { this.processRequestComplete(false, null) } }
+                else { if (this.responseCounter == 9 && !this.requestComplete) { this.processRequestComplete(false, null) } }
             })
             .catch(error => {
+                console.log('An error occurred in receiving request');
+                clearInterval(this.scan);
+                this.requestComplete = true;
+                this.matchFound = true;
                 // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                this.setState({ searchInProgress: false });
+                // this.setState({ searchInProgress: false });
                 this.props.history.push({ pathname: '/not-found' });
             });
     }
 
     /** Retrieves the information for the identified piece */
     getArtworkInformation = (imageId) => {
+
         axios.post(artworkUrl, { imageId: imageId })
-            .then(response => { this.processRequestComplete(true, response.data); })
+            .then(response => { this.requestComplete = true; this.processRequestComplete(true, response.data); })
             .catch(error => {
                 analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 this.setState({ searchInProgress: false });
