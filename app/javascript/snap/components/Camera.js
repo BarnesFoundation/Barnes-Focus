@@ -5,7 +5,10 @@ import CameraControls from './CameraControls';
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
-import { sampleImage, SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LAST_TIMESTAMP, SNAP_COUNT_RESET_INTERVAL, SNAP_APP_RESET_INTERVAL, SNAP_USER_EMAIL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
+import {
+    theImageUri, sampleImage, SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION,
+    GA_EVENT_LABEL, SNAP_LAST_TIMESTAMP, SNAP_COUNT_RESET_INTERVAL, SNAP_APP_RESET_INTERVAL, SNAP_USER_EMAIL, SNAP_LANGUAGE_TRANSLATION
+} from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import * as analytics from './Analytics';
 
@@ -143,11 +146,11 @@ class Camera extends Component {
 
                             window.URL = window.URL || window.webkitURL;
 
-                            let imageUri = window.URL.createObjectURL(imageBlob);
+                            // let imageUri = window.URL.createObjectURL(imageBlob);
 
-                            this.cropPhoto(imageUri)
+                            this.cropPhoto(theImageUri)
                                 .then((imageCrop) => {
-                                    window.URL.revokeObjectURL(imageUri);
+                                    // window.URL.revokeObjectURL(imageUri);
                                     this.prepareServerRequest(imageCrop);
                                 });
                         }
@@ -202,13 +205,9 @@ class Camera extends Component {
                 // Increment the responses we've received
                 this.responseCounter++;
 
-                if (response.data.error) {
-                    console.log('An error occurred on Catchoom API');
-                }
-
                 if (response.data.results.length > 0 && !this.requestComplete && !this.matchFound) {
 
-                    // Update that we've found a match and show search animation
+                    // Update that we've found a match
                     this.matchFound = true;
 
                     // Get the image id
@@ -217,14 +216,12 @@ class Camera extends Component {
                     // End scanning operations 
                     clearInterval(this.scan);
 
-
                     this.setState({ searchInProgress: true, showVideo: false });
-
                     this.getArtworkInformation(imageId);
                 }
 
                 // If we've received 9 responses and no match was found yet, process as a non-matched image
-                else { if (this.responseCounter == 9 && !this.requestComplete) { this.processRequestComplete(false, null) } }
+                else { console.log('Current counter' , this.responseCounter); if (this.responseCounter == 9 && !this.matchFound) { console.log('No match found at 9th counter'); this.processRequestComplete(false, null) } }
             })
             .catch(error => {
                 console.log('An error occurred in receiving request');
