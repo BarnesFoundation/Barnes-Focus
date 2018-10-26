@@ -19,6 +19,7 @@ class Camera extends Component {
 
     translationObj = localStorage.getItem(SNAP_LANGUAGE_TRANSLATION);
 
+    // Set state variables
     state = {
         videoStream: null,
         frontCamera: false,
@@ -29,8 +30,10 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
-    ticking = false; scan; artworkRetrieved = false; matchFound = false; requestCompleted = false; responseCounter = 0; 
-    track; camera_capabilities; camera_settings; initZoom; zoomLevel;
+    // Set booleans and counter
+    ticking = false; artworkRetrieved = false; matchFound = false; requestCompleted = false; responseCounter = 0; 
+
+    track; camera_capabilities; camera_settings; initZoom; zoomLevel; scan;
 
     resetSnapCounter = () => {
         let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
@@ -149,11 +152,11 @@ class Camera extends Component {
 
                             window.URL = window.URL || window.webkitURL;
 
-                            // let imageUri = window.URL.createObjectURL(imageBlob);
+                            let imageUri = window.URL.createObjectURL(imageBlob);
 
-                            this.cropPhoto(theImageUri)
+                            this.cropPhoto(imageUri)
                                 .then((imageCrop) => {
-                                    // window.URL.revokeObjectURL(imageUri);
+                                    window.URL.revokeObjectURL(imageUri);
                                     this.prepareServerRequest(imageCrop);
                                 });
                         }
