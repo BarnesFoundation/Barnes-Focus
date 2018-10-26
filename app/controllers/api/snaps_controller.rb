@@ -92,12 +92,28 @@ class Api::SnapsController < Api::BaseController
     render json: translator.supported_languages(preferred_language)
   end
 
+  ## Retrieves the artwork information response for a provided image id
   def getArtworkInformation
     # Get parameters from the request
     image_id = params[:imageId]
     response = process_searched_image(image_id)
 
     render json: response
+  end
+
+  ## Stores the provided image result in the Snap dashboard
+  def storeSearchedResult
+
+    puts 'The params will be printed'
+    puts params
+
+    image = params[:image]
+    tempfile = image.tempfile
+    path = tempfile.path()
+
+    puts image.original_filename + ' and located in ' + path.to_s  
+    
+
   end
 
   ###### Mark all subsequent methods as private methods ######

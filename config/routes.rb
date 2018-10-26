@@ -10,7 +10,7 @@ Rails.application.routes.draw do
       collection do
         post 'search'
         post 'searchCatchoom'
-        post 'searchCuda'
+        post 'storeSearchedResult'
         post 'getArtworkInformation'
         get 'submissionId'
         get 'languages'
