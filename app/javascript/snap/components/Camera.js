@@ -29,7 +29,7 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
-    ticking = false; responseCounter = 0; scan; requestComplete = false; matchFound = false; scanningComplete = false;
+    ticking = false; scan; artworkRetrieved = false; matchFound = false; requestCompleted = false; responseCounter = 0; 
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
     resetSnapCounter = () => {
@@ -124,19 +124,22 @@ class Camera extends Component {
         localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
 
         let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+        let intervalExecutions = 0;
 
         // Capture a photo scan every third of a second
         this.scan = setInterval(() => {
 
+            intervalExecutions++;
+
+            if (intervalExecutions == 9) { clearInterval(this.scan); }
+
             // Only capture if a match hasn't already been found
-            if (this.matchFound == false) {
+            if (!this.matchFound) {
 
                 // Get the the present image in the canvas and crop the image
                 let canvas = this.getVideoCanvas();
 
-                if (process.env.IMAGE_ENGINE === 'CUDA') {
-                    this.prepareServerRequest(canvas.toDataURL('image/jpeg', 1.0));
-                }
+                if (process.env.IMAGE_ENGINE === 'CUDA') { this.prepareServerRequest(canvas.toDataURL('image/jpeg', 1.0)); }
 
                 else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
 
@@ -160,19 +163,12 @@ class Camera extends Component {
                 }
             }
         }, 1000 / 3);
-
-        setTimeout(() => {
-            clearInterval(this.scan); // End the interval after three seconds
-            this.captureComplete = true;
-        }, 3000);
     }
 
     /** Prepares image match request options */
     prepareServerRequest = (imageData) => {
 
-        let url;
-        let data;
-        let config;
+        let url, data, config;
 
         if (process.env.IMAGE_ENGINE === 'CUDA') {
 
@@ -203,10 +199,10 @@ class Camera extends Component {
         axios.post(url, data, config)
             .then(response => {
 
-                // Increment the responses we've received
-                this.responseCounter++;
+                // Increment our response counter
+                this.responseCounter ++;
 
-                if (response.data.results.length > 0 && !this.requestComplete && !this.matchFound) {
+                if (response.data.results.length > 0 && !this.matchFound) {
 
                     // Update that we've found a match
                     this.matchFound = true;
@@ -221,14 +217,12 @@ class Camera extends Component {
                     this.getArtworkInformation(imageId);
                 }
 
-                // If we've received 9 responses and no match was found yet, process as a non-matched image
-                else { console.log('Current counter' , this.responseCounter); if (this.captureComplete && !this.matchFound) { console.log('No match found at ' , this.responseCounter, ' counter'); this.processRequestComplete(false, null) } }
+                // If we've received all responses and no match was found yet, process as a non-matched image
+                else { if (!this.matchFound && this.responseCounter == 9) { this.processRequestComplete(false, null) } }
             })
             .catch(error => {
                 console.log('An error occurred in receiving request');
                 clearInterval(this.scan);
-                this.requestComplete = true;
-                this.matchFound = true;
                 // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 // this.setState({ searchInProgress: false });
                 this.props.history.push({ pathname: '/not-found' });
@@ -239,7 +233,7 @@ class Camera extends Component {
     getArtworkInformation = (imageId) => {
 
         axios.post(artworkUrl, { imageId: imageId })
-            .then(response => { this.requestComplete = true; this.processRequestComplete(true, response.data); })
+            .then(response => { this.artworkRetrieved = true; this.processRequestComplete(true, response.data); })
             .catch(error => {
                 analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 this.setState({ searchInProgress: false });
@@ -349,9 +343,8 @@ class Camera extends Component {
     }
 
     componentDidUpdate() {
-
-        this.requestComplete = false;
         this.responseCounter = 0;
+        this.artworkRetrieved = false;
 
         // When video is able to be captured
         if (this.state.showVideo && this.state.videoStream) {
