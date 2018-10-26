@@ -31,7 +31,7 @@ class Camera extends Component {
     };
 
     // Set booleans and counter
-    ticking = false; artworkRetrieved = false; matchFound = false; requestCompleted = false; responseCounter = 0; 
+    ticking = false; artworkRetrieved = false; matchFound = false; responseCounter = 0; 
 
     track; camera_capabilities; camera_settings; initZoom; zoomLevel; scan;
 
@@ -194,11 +194,11 @@ class Camera extends Component {
             data.append('token', token);
             data.append('image', imageData);
         }
-        this.submitRequest(url, data, config)
+        this.submitSearchRequest(url, data, config)
     }
 
-    /** Submits the request to the server */
-    submitRequest = (url, data, config) => {
+    /** Submits the image search request to the server */
+    submitSearchRequest = (url, data, config) => {
         axios.post(url, data, config)
             .then(response => {
 
@@ -218,10 +218,11 @@ class Camera extends Component {
 
                     this.setState({ searchInProgress: true, showVideo: false });
                     this.getArtworkInformation(imageId);
+                    this.storeSearchedResult(data);
                 }
 
                 // If we've received all responses and no match was found yet, process as a non-matched image
-                else { if (!this.matchFound && this.responseCounter == 9) { this.processRequestComplete(false, null) } }
+                else { if (!this.matchFound && this.responseCounter == 9) { this.completeImageSearchRequest(false, null) } }
             })
             .catch(error => {
                 console.log('An error occurred in receiving request');
@@ -236,7 +237,7 @@ class Camera extends Component {
     getArtworkInformation = (imageId) => {
 
         axios.post(artworkUrl, { imageId: imageId })
-            .then(response => { this.artworkRetrieved = true; this.processRequestComplete(true, response.data); })
+            .then(response => { this.artworkRetrieved = true; this.completeImageSearchRequest(true, response.data); })
             .catch(error => {
                 analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
                 this.setState({ searchInProgress: false });
@@ -244,8 +245,8 @@ class Camera extends Component {
             });
     }
 
-    /** Process the request complete response */
-    processRequestComplete(responseFound, response) {
+    /** Processes the completion of an image search */
+    completeImageSearchRequest(responseFound, response) {
 
         // Turn off the search-in-progress animation
         if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
@@ -264,6 +265,17 @@ class Camera extends Component {
             //  Navigate to not found page
             this.props.history.push({ pathname: '/not-found' });
         }
+    }
+
+    storeSearchedResult(imageFormData) {
+        axios.post('/api/snaps/storeSearchedResult', imageFormData)
+        .then((response) => {
+            console.log('The search result was received by the server');
+        })
+        .catch((error) => {
+            console.log('An error occurred in storing the search result');
+        })
+
     }
 
     clearPhoto = (ev) => {
@@ -346,6 +358,7 @@ class Camera extends Component {
     }
 
     componentDidUpdate() {
+        this.matchFound = false;
         this.responseCounter = 0;
         this.artworkRetrieved = false;
 
