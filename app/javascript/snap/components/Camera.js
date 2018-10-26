@@ -29,7 +29,7 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
     };
 
-    ticking = false; responseCounter = 0; scan; requestComplete = false; matchFound = false;
+    ticking = false; responseCounter = 0; scan; requestComplete = false; matchFound = false; scanningComplete = false;
     track; camera_capabilities; camera_settings; initZoom; zoomLevel;
 
     resetSnapCounter = () => {
@@ -163,6 +163,7 @@ class Camera extends Component {
 
         setTimeout(() => {
             clearInterval(this.scan); // End the interval after three seconds
+            this.captureComplete = true;
         }, 3000);
     }
 
@@ -221,7 +222,7 @@ class Camera extends Component {
                 }
 
                 // If we've received 9 responses and no match was found yet, process as a non-matched image
-                else { console.log('Current counter' , this.responseCounter); if (this.responseCounter == 9 && !this.matchFound) { console.log('No match found at 9th counter'); this.processRequestComplete(false, null) } }
+                else { console.log('Current counter' , this.responseCounter); if (this.captureComplete && !this.matchFound) { console.log('No match found at ' , this.responseCounter, ' counter'); this.processRequestComplete(false, null) } }
             })
             .catch(error => {
                 console.log('An error occurred in receiving request');
