@@ -206,8 +206,10 @@ class Camera extends Component {
             // Increment our response counter
             this.responseCounter++;
 
+            let searchTime = response.data.search_time;
+
             // If a match was found
-            if (response.data.results.length > 0 && !this.matchFound) {
+            if (response.data.results.length > 0 && !this.matchFound && !this.artworkRetrieved) {
 
                 this.matchFound = true;
 
@@ -216,43 +218,53 @@ class Camera extends Component {
 
                 // Get the image id
                 let imageId = response.data.results[0].item.name
+                let refImage = response.data.results[0].image.thumb_120;
 
-                // this.setState({ searchInProgress: true, showVideo: false });
+                // Show the search animation while retrieving artwork information
+                this.setState({ searchInProgress: true, showVideo: false });
                 let artworkInfo = await this.getArtworkInformation(imageId);
+                this.setState({ searchInProgress: false });
+
 
                 this.completeImageSearchRequest(true, artworkInfo);
+                this.storeSearchedResult(true, data, refImage, artworkInfo, searchTime);
             }
 
             // If we've received all responses and no match was found yet, process as a non-matched image
-            else { if (!this.matchFound && this.responseCounter == 9) { this.completeImageSearchRequest(false, null) } }
+            else {
+                this.storeSearchedResult(false, data, null, null, searchTime);
+
+                if (!this.matchFound && this.responseCounter == 9) { this.completeImageSearchRequest(false, null) }
+            }
         }
 
         catch (error) {
-            console.log('An error occurred in receiving request');
+            // End the photo scan 
             clearInterval(this.scan);
-            // analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-            // this.setState({ searchInProgress: false });
-            this.props.history.push({ pathname: '/not-found' });
+            this.handleSnapFailure();
         }
     }
 
     /** Retrieves the information for the identified piece */
     getArtworkInformation = async (imageId) => {
 
-        if (!this.artworkRetrieved) {
-
-            try {
-                let response = await axios.post(artworkUrl, { imageId: imageId });
-                this.artworkRetrieved = true;
-                return response.data;
-            }
-
-            catch (error) {
-                analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-                this.setState({ searchInProgress: false });
-                this.props.history.push({ pathname: '/not-found' });
-            }
+        this.artworkRetrieved = true;
+        try {
+            let response = await axios.post(artworkUrl, { imageId: imageId });
+            return response.data;
         }
+        catch (error) { console.log('An error occurred while retrieving the artwork information from the server'); }
+    }
+
+    /** Stores the search attempt in the server */
+    storeSearchedResult = async (searchSuccess, formData, referenceImageUrl, esResponse, searchTime) => {
+
+        formData.append('searchSuccess', searchSuccess);
+        formData.append('referenceImageUrl', referenceImageUrl);
+        formData.append('esResponse', JSON.stringify(esResponse));
+        formData.append('searchTime', searchTime)
+
+        await axios.post('/api/snaps/storeSearchedResult', formData);
     }
 
     /** Processes the completion of an image search */
@@ -268,25 +280,18 @@ class Camera extends Component {
             // Navigate to results page
             this.props.history.push({ pathname: '/results', state: { result: response, snapCount: localStorage.getItem(SNAP_ATTEMPTS) } });
         }
-        else {
-            // Update analytics of the failed snap event
-            analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-
-            //  Navigate to not found page
-            this.props.history.push({ pathname: '/not-found' });
-        }
+        else { this.handleSnapFailure(); }
     }
 
-    storeSearchedResult = async (resultData) => {
+    /** Provides the snap failure event to Google Analytics */
+    handleSnapFailure = () => {
 
-        try {
-            let response = axios.post('/api/snaps/storeSearchedResult', resultData);
-            console.log('The search result was received by the server');
-        }
+        // Turn off search in-progress animation
+        if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
 
-        catch (error) {
-            console.log('An error occurred in storing the search result');
-        }
+        // Track this snap failure and navigate to the not found page
+        analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
+        this.props.history.push({ pathname: '/not-found' });
     }
 
     clearPhoto = (ev) => {
