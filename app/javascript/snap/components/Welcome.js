@@ -143,6 +143,10 @@ class WelcomeComponent extends Component {
 
     componentDidMount() {
 
+        if (process.env.CROP_IMAGE === 'TRUE') {
+            console.log('Image crop will be applied');
+        } else { console.log('Image crop will not be applied'); }
+
         if (this.state.cameraCancelled) {
             $("#snapCarousel .carousel-inner .carousel-item:first").removeClass("active");
             $("#snapCarousel .carousel-inner .carousel-item:last").addClass("active");
