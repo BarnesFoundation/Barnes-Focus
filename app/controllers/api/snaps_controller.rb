@@ -104,15 +104,17 @@ class Api::SnapsController < Api::BaseController
   ## Stores the provided image result in the Snap dashboard
   def storeSearchedResult
 
-    puts 'The params will be printed'
-    puts params
-
     image = params[:image]
     tempfile = image.tempfile
     path = tempfile.path()
-
-    puts image.original_filename + ' and located in ' + path.to_s  
     
+    result = SnapSearchResult.create(
+      searched_image_data: nil,
+      api_response: 'Catchoom API Search Result',
+      es_response: 'Catchoom API Search Result',
+      response_time: 'Elapsed time'
+    )
+    ImageUploadJob.perform_later(result.id, path)
 
   end
 
