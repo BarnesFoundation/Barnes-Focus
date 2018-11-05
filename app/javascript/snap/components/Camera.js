@@ -142,28 +142,22 @@ class Camera extends Component {
                 // Get the the present image in the canvas and crop the image
                 let canvas = this.getVideoCanvas();
 
-                if (process.env.IMAGE_ENGINE === 'CUDA') { this.prepareServerRequest(canvas.toDataURL('image/jpeg', 1.0)); }
+                canvas.toBlob(async (imageBlob) => {
 
-                else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
+                    if (process.env.CROP_IMAGE === 'TRUE') {
 
-                    canvas.toBlob((imageBlob) => {
+                        window.URL = window.URL || window.webkitURL;
 
-                        if (process.env.CROP_IMAGE === 'TRUE') {
+                        let imageUri = window.URL.createObjectURL(imageBlob);
 
-                            window.URL = window.URL || window.webkitURL;
+                        let imageCrop = await this.cropPhoto(imageUri);
 
-                            let imageUri = window.URL.createObjectURL(imageBlob);
+                        window.URL.revokeObjectURL(imageUri);
+                        this.prepareServerRequest(imageCrop);
+                    }
 
-                            this.cropPhoto(imageUri)
-                                .then((imageCrop) => {
-                                    window.URL.revokeObjectURL(imageUri);
-                                    this.prepareServerRequest(imageCrop);
-                                });
-                        }
-
-                        else { this.prepareServerRequest(imageBlob); }
-                    }, 'image/jpeg');
-                }
+                    else { this.prepareServerRequest(imageBlob); }
+                }, 'image/jpeg');
             }
         }, 1000 / 3);
     }
@@ -173,27 +167,17 @@ class Camera extends Component {
 
         let url, data, config;
 
-        if (process.env.IMAGE_ENGINE === 'CUDA') {
+        // Configurations for Axios request
+        let token = '2999d63fc1694ce4';
+        data = new FormData();
 
-            // Configurations for Axios request
-            url = '/api/snaps/searchCuda';
-            config = null;
-            data = { image: imageData };
-        }
+        url = 'https://search.craftar.net/v1/search';
+        config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
-        else if (process.env.IMAGE_ENGINE === 'CATCHOOM') {
+        // Append form data  
+        data.append('token', token);
+        data.append('image', imageData);
 
-            // Configurations for Axios request
-            let token = '2999d63fc1694ce4';
-            data = new FormData();
-
-            url = 'https://search.craftar.net/v1/search';
-            config = { headers: { 'Content-Type': 'multipart/form-data' } };
-
-            // Append form data  
-            data.append('token', token);
-            data.append('image', imageData);
-        }
         this.submitSearchRequest(url, data, config)
     }
 
@@ -209,7 +193,29 @@ class Camera extends Component {
             let searchTime = response.data.search_time;
 
             // If a match was found
-            if (response.data.results.length > 0 && !this.matchFound && !this.artworkRetrieved) {
+            if (response.data.results.length > 0 && this.matchFound == false) { this.processImageMatch(response, data, searchTime); }
+
+            // If we've received all responses and no match was found yet, process as a non-matched image
+            else {
+                this.storeSearchedResult(false, data, null, null, searchTime);
+
+                if (!this.matchFound && this.responseCounter == 9) { this.completeImageSearchRequest(false, null) }
+            }
+        }
+
+        catch (error) {
+            // End the photo scan 
+            clearInterval(this.scan);
+            this.handleSnapFailure();
+        }
+    }
+
+    /** Closure function so that a image match response is processed only once */
+    processImageMatch = ((response, data, searchTime) => {
+        let executed = false;
+        return async (response, data, searchTime) => {
+            if (!executed) {
+                executed = true;
 
                 this.matchFound = true;
 
@@ -228,22 +234,10 @@ class Camera extends Component {
 
                 this.completeImageSearchRequest(true, artworkInfo);
                 this.storeSearchedResult(true, data, refImage, artworkInfo, searchTime);
+
             }
-
-            // If we've received all responses and no match was found yet, process as a non-matched image
-            else {
-                this.storeSearchedResult(false, data, null, null, searchTime);
-
-                if (!this.matchFound && this.responseCounter == 9) { this.completeImageSearchRequest(false, null) }
-            }
-        }
-
-        catch (error) {
-            // End the photo scan 
-            clearInterval(this.scan);
-            this.handleSnapFailure();
-        }
-    }
+        };
+    })();
 
     /** Retrieves the information for the identified piece */
     getArtworkInformation = async (imageId) => {
