@@ -234,7 +234,6 @@ class Camera extends Component {
 
                 this.completeImageSearchRequest(true, artworkInfo);
                 this.storeSearchedResult(true, data, refImage, artworkInfo, searchTime);
-
             }
         };
     })();
