@@ -32,7 +32,9 @@ ActiveAdmin.register_page "Dashboard" do
                   if snap_result.searched_image_url.present?
                     image_tag snap_result.searched_image_url, class: 'pastec_image_size'
                   else
-                    image_tag snap_result.searched_image_data, class: 'pastec_image_size'
+                    if image_tag snap_result.searched_image_data.present?
+                      image_tag snap_result.searched_image_data, class: 'pastec_image_size'
+                    end
                   end
                 end
 
