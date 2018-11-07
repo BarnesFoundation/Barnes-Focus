@@ -3,7 +3,7 @@ require 's3_store'
 class ImageUploadJob < ApplicationJob
   queue_as ENV['SQS_QUEUE'].to_sym
 
-  def performCuda(snap_id)
+  def perform(snap_id)
     # Save to S3
     snap_search_result = SnapSearchResult.find_by id: snap_id
     if snap_search_result
@@ -34,7 +34,7 @@ class ImageUploadJob < ApplicationJob
     #SnapSearchResult.create(searched_image_url: url, api_response: args[1][:response], es_response: args[1][:es_response], response_time: args[1][:response_time])
   end
 
-  def perform(snap_id, image_file_path)
+  def performCatchoom(snap_id, image_file_path)
 
     # Get the object from the database
     snap_search_result = SnapSearchResult.find_by(id: snap_id)
