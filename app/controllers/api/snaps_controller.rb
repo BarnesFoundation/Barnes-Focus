@@ -119,6 +119,8 @@ class Api::SnapsController < Api::BaseController
     )
 
     ImageUploadJob.perform_later(result.id, query_image_path)
+
+    render json: 'Image was stored' 
   end
 
   ###### Mark all subsequent methods as private methods ######
