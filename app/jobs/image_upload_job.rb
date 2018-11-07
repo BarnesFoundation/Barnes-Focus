@@ -56,6 +56,9 @@ class ImageUploadJob < ApplicationJob
         # Save the search result with the url the image is located at
         snap_search_result.searched_image_url = stored_image_url
         snap_search_result.save
+
+      else 
+        puts 'The image at ' + image_file_path + ' does not exist'
       end     
     end
   end
