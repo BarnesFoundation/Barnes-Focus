@@ -104,11 +104,11 @@ class Api::SnapsController < Api::BaseController
       begin
           document = Nokogiri::HTML(translator.translate(short_description))
           document.remove_namespaces!
-          short_description = doccument.xpath("//p")[0].content
-          short_description = translator.translate(strip_tags(short_description).html_safe) if short_description.nil?
+          short_description = document.xpath("//p")[0].content
+          short_description = translator.translate(short_description) if short_description.nil?
       rescue Exception => error
         p error
-        short_description = strip_tags(short_description).html_safe if short_description
+        short_description = short_description if short_description
       end
 
       return short_description
