@@ -176,7 +176,7 @@ class Camera extends Component {
 
         // Append form data  
         data.append('token', token);
-        data.append('image', imageData);
+        data.append('image', imageData, 'temp_image.jpg');
 
         this.submitSearchRequest(url, data, config)
     }
