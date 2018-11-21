@@ -23,6 +23,10 @@ class BarnesElasticSearch
     end
   end
 
+  def get_objects_in_room
+    
+  end
+
   private
   def get_image_query object_id
     query = Jbuilder.encode do |json|
@@ -44,4 +48,5 @@ class BarnesElasticSearch
       end
     end
   end
+
 end
