@@ -59,13 +59,13 @@ class Api::SnapsController < Api::BaseController
       response[:api_data] = []
 
       if image_id
+        # Build the response object
         response[:data] = { :records => [], :message => 'Result found' }
         response[:success] = true
         response[:requestComplete] = true
+
+        # Get the image information for the id
         response[:data][:records] << get_image_information(image_id)
-      else
-        response[:data] = { :records => [], :message => 'No result found' }
-        response[:success] = false
       end
       return response
     end
@@ -90,11 +90,12 @@ class Api::SnapsController < Api::BaseController
       return image_info
     end
 
+    ## Pulls the preferred language from the request
     def preferred_language
       params["language"]
     end
 
-    ## Translates the given text
+    ## Translates the given text to the preferred language
     def translate_text(short_description)
       
       # Configure language translator
@@ -110,7 +111,6 @@ class Api::SnapsController < Api::BaseController
         p error
         short_description = short_description if short_description
       end
-
       return short_description
     end
 
