@@ -12,9 +12,12 @@ class Api::SnapsController < Api::BaseController
 
   ## Retrieves the artwork information response for a provided image id
   def getArtworkInformation
+
     # Get parameters from the request
     image_id = params[:imageId]
-    response = process_searched_image(image_id)
+    viewed_image_ids = params[:viewedImageIds]
+
+    response = process_searched_image(image_id, viewed_image_ids)
 
     render json: response
   end
@@ -52,7 +55,7 @@ class Api::SnapsController < Api::BaseController
   private
 
     ## Processes a recognized image using its id
-    def process_searched_image image_id
+    def process_searched_image image_id, viewed_image_ids
 
       # Empty response object
       response = { }
@@ -60,12 +63,16 @@ class Api::SnapsController < Api::BaseController
 
       if image_id
         # Build the response object
-        response[:data] = { :records => [], :message => 'Result found' }
+        response[:data] = { :records => [], :roomRecords => nil, :message => 'Result found' }
         response[:success] = true
         response[:requestComplete] = true
 
-        # Get the image information for the id
+        # Get the image information for the image id
         response[:data][:records] << get_image_information(image_id)
+
+        # Get other records in the same room
+        room_id = response[:data][:records][0][:room] 
+        response[:data][:roomRecords] = get_room_artworks(room_id, viewed_image_ids)
       end
       return response
     end
@@ -112,6 +119,20 @@ class Api::SnapsController < Api::BaseController
         short_description = short_description if short_description
       end
       return short_description
+    end
+
+    ## Get artworks from the same room
+    def get_room_artworks(room, viewed_images)
+
+      # Get the objects from the room
+      room_objects = BarnesElasticSearch.instance.get_room_objects(room, viewed_images)
+  
+      # Extract the ids
+      ids = []
+      room_objects.each do |image_id|
+        ids << image_id['_id']
+      end
+      return ids
     end
 
 end
