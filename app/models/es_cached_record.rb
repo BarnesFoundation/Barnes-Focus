@@ -6,7 +6,7 @@ class EsCachedRecord < ApplicationRecord
   ]
   validates :image_id, presence: true
 
-  @es_fields = ['id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate', 'dimensions', 'objRightsTypeID', 'creditLine']
+  @es_fields = ['id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate', 'dimensions', 'objRightsTypeID', 'creditLine', 'room']
 
   ## Determines whether a cached record has expired data or not
   def not_expired?
