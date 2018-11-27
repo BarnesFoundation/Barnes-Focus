@@ -57,10 +57,10 @@ class BarnesElasticSearch
   end
 
   ## Builds query for retrieving object ids from room in Elastic Search
-  def get_room_query room_id, image_ids
+  def get_room_query room_id, viewed_image_ids
     query = Jbuilder.encode do |json|
       json.from 0
-      json.size 5
+      json.size 3
       json.query do
         json.bool do
           json.filter do
@@ -75,10 +75,12 @@ class BarnesElasticSearch
             end
           end
           # Image ids must not match one's we've already seen
-          json.must_not do
-            json.array!(image_ids) do |image_id|
-              json.match do
-                json._id image_id
+          if viewed_image_ids.length > 0
+            json.must_not do
+              json.array!(viewed_image_ids) do |image_id|
+                json.match do
+                  json._id image_id
+                end
               end
             end
           end
