@@ -241,9 +241,12 @@ class Camera extends Component {
     /** Retrieves the information for the identified piece */
     getArtworkInformation = async (imageId) => {
 
+        /** TODO - retrieve the stored list of already viewed images from local storage to pass to the front end... */
+        let viewedImageIds = [];
+
         this.artworkRetrieved = true;
         try {
-            let response = await axios.post(artworkUrl, { imageId: imageId });
+            let response = await axios.post(artworkUrl, { imageId: imageId, viewedImageIds: viewedImageIds });
             return response.data;
         }
         catch (error) { console.log('An error occurred while retrieving the artwork information from the server'); }
