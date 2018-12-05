@@ -8,7 +8,9 @@ environment.plugins.prepend('Provide', new webpack.ProvidePlugin({
     jquery: 'jquery',
     'window.Tether': "tether",
     Popper: ['popper.js', 'default']
-})
+}), new webpack.EnvironmentPlugin(['IMAGE_ENGINE'])
 )
+
+
 
 module.exports = environment

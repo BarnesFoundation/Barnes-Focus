@@ -143,6 +143,10 @@ class WelcomeComponent extends Component {
 
     componentDidMount() {
 
+        if (process.env.CROP_IMAGE === 'TRUE') {
+            console.log('Image crop will be applied');
+        } else { console.log('Image crop will not be applied'); }
+
         if (this.state.cameraCancelled) {
             $("#snapCarousel .carousel-inner .carousel-item:first").removeClass("active");
             $("#snapCarousel .carousel-inner .carousel-item:last").addClass("active");
@@ -290,7 +294,7 @@ class WelcomeComponent extends Component {
                             <div className="carousel-item active">
                                 <div className="welcome-screen">
                                     <div>
-                                        {isIOS && this.checkForGetUserMedia()}
+                                        {/** isIOS && this.checkForGetUserMedia() */}
                                     </div>
                                     <div className="img-gallery">
                                         <div className="gallery-item">
@@ -388,7 +392,7 @@ class WelcomeComponent extends Component {
 
 
                                     <Link className="btn take-photo-btn" to="/snap">
-                                        {(this.state.translation) ? this.state.translation.Photo_Button_Label.text_1.translated_content : `Take photo`}
+                                        {(this.state.translation) ? this.state.translation.Scan_photo.text_1.translated_content : `Scan photo`}
                                         <span className="icon">
                                             <img src={icon_camera} alt="camera_icon" />
                                         </span>

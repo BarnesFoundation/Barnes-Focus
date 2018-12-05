@@ -8,7 +8,8 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     resources :snaps, only: [ :show ] do
       collection do
-        post 'search'
+        post 'storeSearchedResult'
+        post 'getArtworkInformation'
         get 'languages'
       end
     end

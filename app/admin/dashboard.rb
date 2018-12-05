@@ -3,51 +3,65 @@ ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: proc{ I18n.t("active_admin.dashboard") }
 
   content title: proc{ I18n.t("active_admin.dashboard") } do
-    # Here is an example of a simple dashboard with columns and panels.
-    #
+
     columns do
       column do
-        panel "Recent Searches" do
+        panel 'Recent Searches' do
           table do
+
+            # Header row
             tr do
               th '#'
-              th 'Searched Image'
-              th 'Imgix Image'
+              th 'Query Image'
+              th 'Reference Image'
               th 'API Response'
-              th 'Elastic Search Result'
+              th 'Elastic Search Response'
               th 'Response Time'
             end
-            SnapSearchResult.recent.map do |img|
+
+            # Map the Snap Search Result fields
+            SnapSearchResult.recent.map do |snap_result|
               tr do
-                td img.id
+
+                # Id cell
+                td snap_result.id
+
+                # Query image cell
                 td do
-                  unless img.searched_image_url.blank?
-                    image_tag img.searched_image_url, class: 'pastec_image_size'
+                  if snap_result.searched_image_url.present?
+                    image_tag snap_result.searched_image_url, class: 'pastec_image_size'
                   else
-                    image_tag img.searched_image_data, class: 'pastec_image_size'
+                    if snap_result.searched_image_data.present?
+                      image_tag snap_result.searched_image_data, class: 'pastec_image_size'
+                    end
                   end
                 end
 
+                # Reference image cell
                 td do
-                  table do
-                    img.es_response["records"].each do |es_image|
-                      tr do
-                        td do
-                          image_tag Image.imgix_url(es_image['id'], es_image['imageSecret']), class: 'es_image_size'
-                        end
-                      end
-                    end if img.es_response["records"].present?
+                  if !snap_result.searched_image_data.nil?
+                    image_tag snap_result.searched_image_data, class: 'es_image_size' 
+                  elsif snap_result.es_response.present?
+                    es_image = snap_result.es_response['records'][0]
+                    image_tag Image.imgix_url(es_image['id'], es_image['imageSecret']), class: 'es_image_size' 
+                  else 
+                    es_image = nil
                   end
                 end
 
-                td img.api_response.to_s
-                td img.es_response.to_s
-                td img.response_time
+                # API response cell
+                td snap_result.api_response.to_s
+
+                # Elastic Search response cell
+                td snap_result.es_response.to_s
+
+                # Response time cell
+                td snap_result.response_time
               end
             end
           end
         end
       end
     end
-  end # content
+  end
 end
