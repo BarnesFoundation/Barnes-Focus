@@ -27,7 +27,8 @@ class Camera extends Component {
         showVideo: true,
         searchInProgress: false,
         snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
-        translation: (this.translationObj) ? JSON.parse(this.translationObj) : null
+        translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
+        scanSeqId: Date.now()
     };
 
     // Set booleans and counter
@@ -177,6 +178,7 @@ class Camera extends Component {
         // Append form data  
         data.append('token', token);
         data.append('image', imageData, 'temp_image.jpg');
+        data.append('scanSeqId', this.state.scanSeqId);
 
         this.submitSearchRequest(url, data, config)
     }
