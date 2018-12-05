@@ -77,38 +77,27 @@ class Camera extends Component {
             let image = new Image();
             image.onload = function (event) {
 
+                let screenWidth = screen.width;
                 // Create temporary canvas
-                let canvas1 = document.createElement('canvas');
-                let context1 = canvas1.getContext('2d');
+                let cropCanvas = document.createElement('canvas');
+                let cropContext = cropCanvas.getContext('2d');
 
-                // Get the center of the image for center-oriented cropping
-                let xCenter = image.width / 2;
-                let yCenter = image.height / 2;
-
-                // Section the height and width into quarter segments
-                let heightSeg = image.height / 4;
-                let widthSeg = image.width / 4;
-
-                // Set the width and height for the cropped image to 2.5 of their respective segments from the origin 
-                let cWidth = 2.5 * widthSeg;
-                let cHeight = 2.5 * heightSeg;
+                let cropWidth = screenWidth * 0.8;
+                let cropHeight = screenWidth * 0.7;
+                console.log('cw/ch :: ' + cropWidth + '/' + cropHeight);
 
                 // Mark the origin point such that the crop is centered on the image
-                let x = xCenter - (cWidth / 2);
-                let y = yCenter - (cHeight / 2);
+                let x = 40;
+                let y = 140;
 
-                // Scale the canvas 
-                let sWidth = 2 * cWidth;
-                let sHeight = 2 * cHeight
-
-                canvas1.width = sWidth;
-                canvas1.height = sHeight;
+                cropCanvas.width = cropWidth;
+                cropCanvas.height = cropHeight;
 
                 // Draw the new image, keeping its proportions intact for optimal matching
-                context1.drawImage(image, x, y, cWidth, cHeight, 0, 0, sWidth, sHeight);
+                cropContext.drawImage(image, x, y, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
 
-                // image = canvas1.toDataURL('image/jpeg', 1.0);
-                canvas1.toBlob((imageBlob) => {
+                // image = cropCanvas.toDataURL('image/jpeg', 1.0);
+                cropCanvas.toBlob((imageBlob) => {
                     resolve(imageBlob);
                 }, 'image/jpeg');
             }
@@ -147,11 +136,25 @@ class Camera extends Component {
 
                     if (process.env.CROP_IMAGE === 'TRUE') {
 
+                        /* let reader = new FileReader();
+                        reader.readAsDataURL(imageBlob);
+                        reader.onloadend = function () {
+                            let base64data = reader.result;
+                            console.log("before crop ::");
+                            console.log(base64data);
+                        } */
+
                         window.URL = window.URL || window.webkitURL;
-
                         let imageUri = window.URL.createObjectURL(imageBlob);
-
                         let imageCrop = await this.cropPhoto(imageUri);
+
+                        /* let reader2 = new FileReader();
+                        reader2.readAsDataURL(imageCrop);
+                        reader2.onloadend = function () {
+                            let b64 = reader2.result;
+                            console.log("after crop ::");
+                            console.log(b64);
+                        } */
 
                         window.URL.revokeObjectURL(imageUri);
                         this.prepareServerRequest(imageCrop);
