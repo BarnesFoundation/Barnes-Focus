@@ -1,0 +1,88 @@
+.logo-center {
+   width: 148px;
+   height: 46px;
+   position: absolute;
+   left: 50%;
+   top: 10%; 
+   margin-left: -74px;
+   margin-top: -23px;
+}
+
+.user-loc-prompt {
+    position: absolute;
+    width: 325px;
+    height: 86px;
+    left: 50%;
+    top: 250px;
+
+    font-family: Calibre;
+    line-height: 40px;
+    font-size: 40px;
+    text-align: center;
+    margin-left: -163px;
+
+    color: #FFFFFF;
+}
+
+.yes-button {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    left: 111px;
+    top: 360px;
+
+    //opacity: 0.3;
+    border: 3px solid rgba(255, 255, 255, .3);
+    border-radius: 50%;
+    box-sizing: border-box;
+
+    color: #FFFFFF;
+}
+
+.no-button {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    left: 207px;
+    top: 360px;
+    border: 3px solid rgba(255, 255, 255, .3);
+    border-radius: 50%;
+    box-sizing: border-box;
+    color: #FFFFFF;
+}
+
+.yes, .no {
+    position: absolute;
+    width: 60px;
+    height: 30px;
+    left: -3px;
+    top: 14px;
+    font-family: Calibre;
+    line-height: 25px;
+    font-size: 22px;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.kf-logo {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    left: 35px;
+    top: 565px;
+}
+
+.kf-text {
+    position: absolute;
+    width: 282px;
+    height: 40px;
+    left: 86px;
+    top: 561px;
+
+    font-family: Calibre;
+    line-height: 15px;
+    font-size: 14px;
+
+    color: #FFFFFF;
+}
+

@@ -84,8 +84,8 @@ class LanguageSelect extends Component {
                 >
                     <button type="button" className="close pull-right offset-11" aria-label="Close" onClick={this.closeModal}>
                     </button>
-                    <h1>{(this.state.translation) ? this.state.translation.Language_selector.text_1.translated_content : `Please select your language.`}</h1>
-                    <p>{(this.state.translation) ? this.state.translation.Language_selector.text_2.translated_content : `We are using Google to help us automatically translate our text.`}</p>
+                    <h1>Please select your language.</h1>
+                    <p>We are using Google to help us automatically translate our text.</p>
                     <ul className="list-group">
                         {this.state.languageOptions.map((lang, index) => <a className="list-group-item list-group-item-action" key={index} data-lang={lang.name} data-id={lang.code} onClick={this.selectLanguage}>{lang.name} {this.state.selectedLanguage.name === lang.name ? <span className="selected-lang">Selected</span> : ''}</a>)}
                     </ul>
