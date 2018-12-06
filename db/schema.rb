@@ -34,8 +34,10 @@ ActiveRecord::Schema.define(version: 20181205165625) do
 
   create_table "albums", force: :cascade do |t|
     t.string "name", default: "", null: false
+    t.string "unique_identifier", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["unique_identifier"], name: "index_albums_on_unique_identifier"
   end
 
   create_table "bookmarks", force: :cascade do |t|
