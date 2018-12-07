@@ -1,7 +1,9 @@
 class Album < ApplicationRecord
-    validates :name, presence: true
+    validates :name, :unique_identifier, presence: true
 
     before_validation :set_name
+
+    has_many :photos, dependent: :destroy
 
 protected
     def set_name
