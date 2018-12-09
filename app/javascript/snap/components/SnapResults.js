@@ -80,7 +80,7 @@ class SnapResults extends Component {
         console.log(art_obj);
         result['id'] = art_obj.id;
         result['title'] = art_obj.title;
-        result['shortDescription'] = art_obj.shortDescription || `In this scene set inside Georges Seurat's studio, we see models posing in front of A Sunday on La Grande Jatte (Art Institute of Chicago), the famous pointillist painting that caused a scandal when it was first exhibited in 1886. Informed by scientific theories of light, color, and optics, pointillism was dismissed by many critics at the time for being too cold and methodical, a style that could never be applied to noble subjects like the nude. Here, Seurat seems to offer his response, presenting life-size nude bodies from three angles and on a monumental scale.`;
+        result['shortDescription'] = art_obj.shortDescription;
         result['artist'] = art_obj.people;
         result['classification'] = art_obj.classification;
         result['locations'] = art_obj.locations;
