@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router'
 import axios from 'axios';
 import LanguageSelect from '../components/LanguageSelect';
-import share from 'images/share_icon.svg';
+import share from 'images/share.svg';
 import bookmark from 'images/bookmark_icon.svg';
 import icon_camera from 'images/camera_icon.svg';
 import team_picture from 'images/team-alert.jpg';
@@ -77,9 +77,10 @@ class SnapResults extends Component {
 
         const result = {};
         const art_obj = search_result["data"]["records"][0];
+        console.log(art_obj);
         result['id'] = art_obj.id;
         result['title'] = art_obj.title;
-        result['shortDescription'] = art_obj.shortDescription;
+        result['shortDescription'] = art_obj.shortDescription || `In this scene set inside Georges Seurat's studio, we see models posing in front of A Sunday on La Grande Jatte (Art Institute of Chicago), the famous pointillist painting that caused a scandal when it was first exhibited in 1886. Informed by scientific theories of light, color, and optics, pointillism was dismissed by many critics at the time for being too cold and methodical, a style that could never be applied to noble subjects like the nude. Here, Seurat seems to offer his response, presenting life-size nude bodies from three angles and on a monumental scale.`;
         result['artist'] = art_obj.people;
         result['classification'] = art_obj.classification;
         result['locations'] = art_obj.locations;
@@ -88,6 +89,7 @@ class SnapResults extends Component {
         result['bookmarkImageUrl'] = art_obj.art_url + bookmarkCropParams;
         result['invno'] = art_obj.invno;
         result['displayDate'] = art_obj.displayDate;
+        result['dimensions'] = art_obj.dimensions;
         this.setState({
           searchResults: this.state.searchResults.concat(result)
         });
@@ -340,18 +342,49 @@ class SnapResults extends Component {
           <div className="col-12 col-md-12">
             <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
               <div className="card-top-container">
-                <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image" />
+                <div className="card-img-container">
+                  <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image_background" />
+                </div>
                 <div className="card-img-overlay">
+                  <div className="card-img-result">
+                    <img src={this.state.searchResults[0].url} alt="match_image" />
+                  </div>
                   <h3 className="card-title">{this.state.searchResults[0].title}</h3>
                 </div>
               </div>
-              <button type="button" className="btn btn-circle" onClick={this.handleBackToCamera}>
-                <img src={icon_camera} className="profile-avatar" alt="camera" />
-              </button>
               <div className="card-body">
-                <div className="d-flex justify-content-around action-icons">
-                  <div id="share-it" ref="target" onClick={this.shareIt}><img src={share} alt="share" />
-                    {(this.state.translation) ? this.state.translation['Share / Bookmark icons'].text_1.translated_content : `Share it`}
+                <div className="card-info">
+                  <table className="detail-table">
+                    <tbody>
+                      <tr>
+                        <td className="text-left item-label">Artist:</td>
+                        <td className="text-left item-info">{this.state.searchResults[0].artist}</td>
+                      </tr>
+                      <tr>
+                        <td className="text-left item-label">Title:</td>
+                        <td className="text-left item-info">{this.state.searchResults[0].title}</td>
+                      </tr>
+                      <tr>
+                        <td className="text-left item-label">Date:</td>
+                        <td className="text-left item-info">{this.state.searchResults[0].displayDate}</td>
+                      </tr>
+                      <tr>
+                        <td className="text-left item-label">Medium:</td>
+                        <td className="text-left item-info">{this.state.searchResults[0].medium}</td>
+                      </tr>
+                      <tr>
+                        <td className="text-left item-label">Dimensions:</td>
+                        <td className="text-left item-info">{this.state.searchResults[0].dimensions}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
+
+                <div className="share-wrapper">
+                  <div id="share-it" className="btn-share-result" ref="target" onClick={this.shareIt}>
+                    <img src={share} alt="share" />
+                    <span className="text-share">Share</span>
                   </div>
                   <Popover
                     placement='top'
@@ -366,158 +399,19 @@ class SnapResults extends Component {
                       <a data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
                         <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
                       </a>
-                      {/* <a data-id={SOCIAL_MEDIA_INSTAGRAM} onClick={this.nativeAppShareWithWebFallback}>
-                            <i class="fa fa-instagram" aria-hidden="true"></i>
-                          </a> */}
                     </div>
                   </Popover>
-                  <div id="bookmark-it" onClick={this.bookmarkIt}><img src={bookmark} alt="bookmark" />
-                    {(this.state.translation) ? this.state.translation['Share / Bookmark icons'].text_2.translated_content : `Bookmark it`}
-                  </div>
-                  <Modal
-                    isOpen={this.state.bookmarkModalIsOpen}
-                    onRequestClose={this.closeBookmarkModal}
-                    contentLabel="Bookmark Modal"
-                    className="Modal"
-                    overlayClassName="Overlay"
-                  >
-                    <div className="bookmark">
-                      <div className="row">
-                        <div className="col-12">
-                          <i className="fa fa-2x fa-angle-left pull-left"></i>
-                          <span className="dismiss" onClick={this.closeBookmarkModal}>
-                            Go back
-                          </span>
-                        </div>
-                      </div>
-                      <div className="title mt-3">
-                        <h2>{this.state.searchResults[0].title}</h2>
-                      </div>
-                      <div className="picture">
-                        <img src={this.state.searchResults[0].bookmarkImageUrl} alt="bookmark_img" />
-                      </div>
-                      <div className="message">
-                        {(this.state.translation) ? this.state.translation.Bookmark_capture.text_1.translated_content : `Information about the art you bookmark will be emailed to you after your visit.`}
-                      </div>
-                      <form onSubmit={this.submitBookMark}>
-                        <input type="email" placeholder={(this.state.translation) ? this.state.translation.Bookmark_capture.text_2.translated_content : `Email address`} className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
-                        <div className="checkbox">
-                          <input id="newsletter-chk" type="checkbox" name="newsletterSubscription" onChange={this.handleBookmarkFormInputChange} />
-                          <label htmlFor="newsletter-chk">
-                            {(this.state.translation) ? this.state.translation.Bookmark_capture.text_3.translated_content : `Sign up for the Barnes newsletter`}
-                          </label>
-                        </div>
-                        <div className="row">
-                          <div className="col-6 offset-3 text-center">
-                            <button id="bookmark-submit" type="submit" className="btn snap-btn snap-btn-default">
-                              Submit
-                           </button>
-                          </div>
-                        </div>
-                      </form>
+                </div>
 
-                    </div>
-                  </Modal>
-                </div>
-                <hr />
-                {this.state.searchResults[0].shortDescription && <div className="card-text">
-                  <p className="text-muted">{this.state.searchResults[0].artist}. {this.state.searchResults[0].title}, {this.state.searchResults[0].displayDate}. {this.state.searchResults[0].medium}</p>
-                </div>}
-                {!this.state.searchResults[0].shortDescription && <div className="center-section">
-                  <table className="detail-table">
-                    <tbody>
-                      <tr>
-                        <td className="text-left">Artist:</td>
-                        <td className="text-muted text-right">{this.state.searchResults[0].artist}</td>
-                      </tr>
-                      <tr>
-                        <td className="text-left">Title:</td>
-                        <td className="text-muted text-right">{this.state.searchResults[0].title}</td>
-                      </tr>
-                      <tr>
-                        <td className="text-left">Date:</td>
-                        <td className="text-muted text-right">{this.state.searchResults[0].displayDate}</td>
-                      </tr>
-                      <tr>
-                        <td className="text-left">Medium:</td>
-                        <td className="text-muted text-right">{this.state.searchResults[0].medium}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>}
-                {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
-                {/* <div className="card-text">- John House, Renoir in the Barnes Foundation.</div> */}
               </div>
-              {/* <div className="card-footer">
-                <h2>Albert Barnes taught people to look at works of art primarily in terms of their visual relationships.</h2>
-                <p>Swipe for visually similar works</p>
-              </div> */}
             </div>
           </div>
         </div>
-        <div className="content mt-5">
-          <LanguageSelect reset={this.state.resetLanguageBox} onSelectLanguage={this.onSelectLanguage} />
-        </div>
-        <div id="reset-experience" className="row mt-5 mb-3">
-          <div className="col-6 offset-3 text-center">
-            <span className="reset-experience" onClick={this.openResetModal}>
-              {(this.state.translation) ? this.state.translation.Footer.text_1.translated_content : `Reset Experience`}
-            </span>
-          </div>
-          <Modal
-            isOpen={this.state.resetModalIsOpen}
-            onRequestClose={this.closeResetModal}
-            contentLabel="Reset Experience Modal"
-            className="Modal"
-            overlayClassName="Overlay"
-          >
-            <div className="reset">
-              <div className="row">
-                <div className="col-12">
-                  <i className="fa fa-2x fa-angle-left pull-left"></i>
-                  <span className="dismiss" onClick={this.closeResetModal}>
-                    Cancel</span>
-                </div>
-              </div>
-              <div className="title">
-                <h1>{(this.state.translation) ? this.state.translation.Manual_reset.text_1.translated_content : `You are about to reset the Snap experience.`}</h1>
-              </div>
-              <div className="message">
-                {(this.state.translation) ? this.state.translation.Manual_reset.text_2.translated_content : `Warning: This will erase your bookmarked artwork, email address, and language preferences.`}
-              </div>
-              <div className="row action">
-                <div className="col-6 offset-3 text-center">
-                  <button className="btn snap-btn snap-btn-danger" onClick={this.resetExperience}>
-                    Reset
-                  </button>
-                </div>
-              </div>
-            </div>
-          </Modal>
-        </div>
+
+
 
         <Footer />
-        <NotificationSystem ref="notificationSystem" />
-        <Modal
-          isOpen={this.state.alertModalIsOpen}
-          onRequestClose={this.closeAlertModal}
-          contentLabel="Snap Team Alert Modal"
-          style={customStyles}
-          className="Modal"
-          overlayClassName="Overlay"
-        >
-          <div className="team-alert">
-            <button type="button" className="close pull-right offset-11" aria-label="Close" onClick={this.closeAlertModal}>
-            </button>
-            <div className="picture">
-              <img className="img-thumbnail" src={team_picture} alt="bookmark_img" />
-            </div>
-            <div className="message">
-              <h1>{(this.state.translation) ? this.state.translation.Art_team_alert.text_1.translated_content : `Want to know even more?`}</h1>
-              <p>{(this.state.translation) ? this.state.translation.Art_team_alert.text_2.translated_content : `Find a member of our Art team and start a conversation about any work that interests you. Our Art Team is wearing special black T-shirts.`}</p>
-            </div>
-          </div>
-        </Modal>
+
       </div>
     );
   }

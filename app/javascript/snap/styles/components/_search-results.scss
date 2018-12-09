@@ -12,43 +12,100 @@
         .card-top-container {
             position: relative;
             height: auto !important;
+            overflow: hidden;
+        }
+
+        .card-img-container {
+            filter: blur(10px);
+            margin: -10px;
         }
 
         .card-img-overlay {
+
+            .card-img-result {
+                position: absolute;
+                width: 72vw;
+                left: 14vw;
+                padding: 20px;
+                top: 40px;
+                z-index: 1;
+                pointer-events: none;
+
+                img {
+                    width:100%;
+                }
+            }
+
             .card-title {
                 color: #fff;
-                font-size: 2rem;
+                font-size: 30px;
                 position: absolute;
-                bottom: 10vh;
+                bottom: 4vh;
                 padding: 0 20vw;
                 width: 100%;
                 left: 0;
-                line-height: 1.2;
+                line-height: 35px;
             }
         }
 
         .card-body {
-            margin-top: -30px;
-            padding: 1rem;
+            padding: 25px;
             color: #282828;
-            .action-icons {
-                img {
-                    padding: 0 10px;
-                }
-            }
+            text-align: left;
 
             .card-text {
-                padding-bottom: 1.25rem;
+                padding-bottom: 30px;
             }
 
-            .center-section {
+            .card-info {
                 display: flex;
                 justify-content: center;
-                margin-bottom: 23px;
+                margin-bottom: 45px;
             }
 
             .detail-table {
-                width: 95%;
+                width: 100%;
+
+                .item-label {
+                    line-height: 30px;
+                    font-size: 16px;
+                    letter-spacing: 0.01em;
+                    color: #6E6E6E;
+                    opacity: 0.8;
+                    vertical-align: top;
+                    width: 30%;
+                }
+
+                .item-info {
+                    line-height: 30px;
+                    font-size: 16px;
+                    letter-spacing: 0.01em;
+                    color: #282828;
+                    vertical-align: top;
+                }
+            }
+
+            .btn-share-result {
+                width: 95px;
+                height: 45px;
+                border: 2px solid rgba(0, 0, 0, 0.12);
+                border-radius: 100px;
+                margin: 0 auto;
+
+                img {
+                    position: relative;
+                    left: 12px;
+                    top: 5px;
+                }
+
+                .text-share {
+                    line-height: 24px;
+                    font-size: 16px;
+                    color: #6E6E6E;
+                    top: 5px;
+                    left: 22px;
+                    position: relative;
+                }
             }
 
             .text-left {

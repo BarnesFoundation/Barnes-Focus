@@ -12,6 +12,7 @@ import ReactModal from 'react-modal';
 import home_background from 'images/barnes-v2-landing.png';
 import barnes_logo from 'images/barnes-logo.png';
 import barnes_kf_logo from 'images/barnes-knight-foundation-logo.png';
+import cross from 'images/cross.png';
 
 import axios from 'axios';
 
@@ -31,7 +32,8 @@ class HomeComponent extends Component {
             snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
             selectedLanguage: '',
             translation: null,
-            showBrowserModal: false
+            showBrowserModal: false,
+            userAtBarnes: true
         }
     }
 
@@ -246,51 +248,73 @@ class HomeComponent extends Component {
 
     }
 
-    processFile = (e) => {
-
-        this.setState({ searchInProgress: true });
-        // photo was cancelled by the user, fire camera again
-        if (e.target.files.length === 0) {
-            this.input.click();
-        }
-        else {
-            let file = e.target.files[0];
-            let options = {
-                maxWidth: screen.width,
-                canvas: true,
-                downsamplingRatio: 0.5,
-                orientation: true
+    onSelectYes = () => {
+        console.log('Yes, user is at Barnes!');
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                "facingMode": "environment",
+                "width": 1920,
+                "height": 1080
             }
+        })
+            .then(videoStream => {
+                console.log('User permission recieved for camera access. Redirect user to /snap now.');
+                // Navigate to snap page
+                this.props.history.push({ pathname: '/snap' });
 
-            loadImage(
-                file,
-                this.submitPhoto,
-                options
-            );
+            })
+            .catch(err => this.setState({ error: "An error occurred accessing the device camera" }));
+    }
 
-        }
+    onSelectNo = () => {
+        console.log('No, user is not at Barnes!');
+        this.setState({ userAtBarnes: false });
+    }
+
+    closeWindow = () => {
+        console.log('window is closed');
+        close();
     }
 
     render() {
         return (
             <div className="home-wrapper" id="home-wrapper">
                 <img src={home_background} alt="home_background" style={{ width: screen.width, height: window.innerHeight }} />
-                <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
-                <div className="user-loc-prompt">Are you at the Barnes?</div>
-                <div className="yes-button">
-                    <span className="yes">Yes</span>
+                {this.state.userAtBarnes && <div className="landing-screen">
+                    <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
+                    <div className="user-loc-prompt">Are you at the Barnes?</div>
+                    <div className="yes-button" onClick={this.onSelectYes}>
+                        <span className="yes">Yes</span>
+                    </div>
+                    <div className="no-button" onClick={this.onSelectNo}>
+                        <span className="no">No</span>
+                    </div>
+                    <div className="kf-banner">
+                        <img src={barnes_kf_logo} alt="knight_foundation_logo" className="kf-logo" />
+                        <div className="kf-text">The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation.</div>
+                    </div>
                 </div>
-                <div className="no-button">
-                    <span className="no">No</span>
-                </div>
-                <div className="kf-banner">
-                    <img src={barnes_kf_logo} alt="knight_foundation_logo" className="kf-logo" />
-                    <div className="kf-text">The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation.</div>
-                </div>
+                }
+                {!this.state.userAtBarnes &&
+                    <div>
+                        <div className="app-usage-alert">
+                            <div className="app-usage-msg">
+                                This app is meant for use at the Barnes. Please come see us soon !
+                            </div>
+                            <div className="visit-online-link">
+                                <a href="https://collection.barnesfoundation.org/" target="_blank">Visit us online</a>
+                            </div>
+                        </div>
+                        <div className="btn-close" onClick={this.closeWindow}>
+                            <img src={cross} alt="close" />
+                        </div>
+                    </div>
+                }
+
             </div >
         );
     }
 }
 
-export default HomeComponent;
+export default withRouter(HomeComponent);
 

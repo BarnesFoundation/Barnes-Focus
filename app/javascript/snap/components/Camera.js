@@ -6,8 +6,9 @@ import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
 import {
-    theImageUri, sampleImage, SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION,
-    GA_EVENT_LABEL, SNAP_LAST_TIMESTAMP, SNAP_COUNT_RESET_INTERVAL, SNAP_APP_RESET_INTERVAL, SNAP_USER_EMAIL, SNAP_LANGUAGE_TRANSLATION
+    SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION,
+    GA_EVENT_LABEL, SNAP_LAST_TIMESTAMP, SNAP_COUNT_RESET_INTERVAL, SNAP_APP_RESET_INTERVAL, SNAP_USER_EMAIL, SNAP_LANGUAGE_TRANSLATION,
+    CATCHOOM_ACCESS_TOKEN, CATCHOOM_REQUEST_URL
 } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import * as analytics from './Analytics';
@@ -34,7 +35,7 @@ class Camera extends Component {
     // Set booleans and counter
     ticking = false; artworkRetrieved = false; matchFound = false; responseCounter = 0;
 
-    track; camera_capabilities; camera_settings; initZoom; zoomLevel; scan;
+    track; camera_capabilities; camera_settings; initZoom; zoomLevel; scan; cropRect;
 
     resetSnapCounter = () => {
         let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
@@ -75,26 +76,34 @@ class Camera extends Component {
         return new Promise(resolve => {
 
             let image = new Image();
-            image.onload = function (event) {
+            image.onload = () => {
 
-                let screenWidth = screen.width;
+                let scanBox = this.scanBox.getBoundingClientRect();
+                this.cropRect = {
+                    x: Math.floor(scanBox.x),
+                    y: Math.floor(scanBox.y),
+                    width: Math.floor(scanBox.width),
+                    height: Math.floor(scanBox.height)
+                }
+                console.log('Crop rect :: ' + JSON.stringify(this.cropRect));
+
+                var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+                var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
                 // Create temporary canvas
                 let cropCanvas = document.createElement('canvas');
                 let cropContext = cropCanvas.getContext('2d');
 
-                let cropWidth = screenWidth * 0.8;
-                let cropHeight = screenWidth * 0.7;
-                console.log('cw/ch :: ' + cropWidth + '/' + cropHeight);
 
-                // Mark the origin point such that the crop is centered on the image
-                let x = 40;
-                let y = 140;
+                console.log(this.cropRect);
+
+                let cropWidth = Math.floor(this.cropRect.width);
+                let cropHeight = Math.floor(this.cropRect.height);
 
                 cropCanvas.width = cropWidth;
                 cropCanvas.height = cropHeight;
 
                 // Draw the new image, keeping its proportions intact for optimal matching
-                cropContext.drawImage(image, x, y, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+                cropContext.drawImage(image, this.cropRect.x, this.cropRect.y, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
 
                 // image = cropCanvas.toDataURL('image/jpeg', 1.0);
                 cropCanvas.toBlob((imageBlob) => {
@@ -148,20 +157,22 @@ class Camera extends Component {
                         let imageUri = window.URL.createObjectURL(imageBlob);
                         let imageCrop = await this.cropPhoto(imageUri);
 
-                        /* let reader2 = new FileReader();
-                        reader2.readAsDataURL(imageCrop);
-                        reader2.onloadend = function () {
-                            let b64 = reader2.result;
-                            console.log("after crop ::");
-                            console.log(b64);
-                        } */
+                        // let reader2 = new FileReader();
+                        // reader2.readAsDataURL(imageCrop);
+                        // reader2.onloadend = function () {
+                        //     let b64 = reader2.result;
+                        //     console.log("after crop ::");
+                        //     console.log(b64);
+                        // }
 
                         window.URL.revokeObjectURL(imageUri);
                         this.prepareServerRequest(imageCrop);
                     }
 
-                    else { this.prepareServerRequest(imageBlob); }
-                }, 'image/jpeg');
+                    else {
+                        this.prepareServerRequest(imageBlob);
+                    }
+                }, 'image/jpeg', 1);
             }
         }, 1000 / 3);
     }
@@ -172,13 +183,13 @@ class Camera extends Component {
         let url, data, config;
 
         // Configurations for Axios request
-        let token = '2999d63fc1694ce4';
-        data = new FormData();
+        let token = CATCHOOM_ACCESS_TOKEN;
 
-        url = 'https://search.craftar.net/v1/search';
+        url = CATCHOOM_REQUEST_URL;
+        data = new FormData();
         config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
-        // Append form data  
+        // Append form data    
         data.append('token', token);
         data.append('image', imageData, 'temp_image.jpg');
         data.append('scanSeqId', this.state.scanSeqId);
@@ -188,15 +199,11 @@ class Camera extends Component {
 
     /** Submits the image search request to the server */
     submitSearchRequest = async (url, data, config) => {
-
         try {
             let response = await axios.post(url, data, config)
-
             // Increment our response counter
             this.responseCounter++;
-
             let searchTime = response.data.search_time;
-
             // If a match was found
             if (response.data.results.length > 0 && this.matchFound == false) { this.processImageMatch(response, data, searchTime); }
 
@@ -207,7 +214,6 @@ class Camera extends Component {
                 if (!this.matchFound && this.responseCounter == 9) { this.completeImageSearchRequest(false, null) }
             }
         }
-
         catch (error) {
             // End the photo scan 
             clearInterval(this.scan);
@@ -367,11 +373,6 @@ class Camera extends Component {
             this.requestZoom();
         });
 
-        // Beginning with iOS 10, the "user-scalable=no" attribute is no longer supported 
-        const camera_controls = document.querySelector('.camera-controls');
-        camera_controls.addEventListener('touchmove', function (event) {
-            event.preventDefault(); // Disables the page zoom in that occurs on pinch in camera-control buttons section
-        }, false);
     }
 
     componentDidUpdate() {
@@ -471,9 +472,9 @@ class Camera extends Component {
                         this.state.showVideo &&
                         <div>
                             <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline />
-                            <div className="video-frame">
+                            <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
                                 {/* Hint text */}
-                                <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p>
+                                {/* <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p> */}
                             </div>
                         </div>
                     }
@@ -503,7 +504,7 @@ class Camera extends Component {
                         </div>
                     }
                 </div>
-                {<CameraControls searchInProgress={this.state.searchInProgress} showVideo={this.state.showVideo} cancelCamera={this.cancelCamera} capturePhotoShots={this.capturePhotoShots} clearPhoto={this.clearPhoto} submitPhoto={this.submitPhoto} />}
+
             </div>
         );
     }

@@ -86,3 +86,40 @@
     color: #FFFFFF;
 }
 
+.app-usage-alert {
+    position: absolute;
+    width: 282px;
+    height: 125px;
+    left: calc(50% - 141px);
+    top: 194px;
+
+    font-family: Calibre;
+    line-height: 25px;
+    font-size: 25px;
+    text-align: center;
+
+    color: #FFFFFF;
+
+    .app-usage-msg {
+         margin-bottom: 40px;
+    }
+
+    .visit-online-link {
+        a {
+            color: #FFFFFF;
+            bottom: 0;
+            text-decoration: underline;
+        }
+    }
+
+    
+}
+
+.btn-close {
+        position: absolute;
+        bottom: 50px;
+        left: calc(50% - 22px);
+    }
+
+
+
