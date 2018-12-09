@@ -12,11 +12,9 @@ class Api::SnapsController < Api::BaseController
 
   ## Retrieves the artwork information response for a provided image id
   def getArtworkInformation
-
     # Get parameters from the request
     image_id = params[:imageId]
     viewed_image_ids = params[:viewedImageIds]
-
     response = process_searched_image(image_id, viewed_image_ids)
 
     render json: response
@@ -24,29 +22,31 @@ class Api::SnapsController < Api::BaseController
 
   ## Stores the provided image result in the Snap dashboard
   def storeSearchedResult
-
     # Get parameters from the request
     query_image_path = params[:image].tempfile.path()
     reference_image_url = if params[:referenceImageUrl] === 'null' then nil else params[:referenceImageUrl] end
-    es_response = if params[:esResponse] === 'null' then nil else params[:esResponse] end 
-    search_time = params[:searchTime]
-    
-    # Create the result
-    result = SnapSearchResult.create(
-      searched_image_data: reference_image_url,
-      api_response: 'Catchoom API Search Result',
-      es_response: es_response,
-      response_time: search_time
-    )
 
     # Get the data data uri
     query_image_uri = 'data:image/jpeg;base64,' + Base64.encode64(open(query_image_path) { |io| io.read })
 
+    if params[:scanSeqId].present?
+      @album = Album.find_or_create_by(unique_identifier: params[:scanSeqId])
+
+      @photo = @album.photos.create(
+        searched_image_blob: query_image_uri || reference_image_url,
+        es_response: params[:esResponse] == 'null' ? nil : params[:esResponse],
+        response_time: params[:searchTime],
+        search_engine: 'Catchoom API'
+      )
+
+      if @photo
+        ImageUploadJob.perform_later(@album.id, @photo.id)
+      end
+    end
+
     if File.exists?(query_image_path)
       File.delete(query_image_path)
     end
-
-    ImageUploadJob.perform_later(result.id, query_image_uri)
 
     render json: 'Image was stored'
   end
@@ -134,5 +134,4 @@ class Api::SnapsController < Api::BaseController
       end
       return ids
     end
-
 end
