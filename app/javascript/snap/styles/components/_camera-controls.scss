@@ -13,28 +13,14 @@
 
     .video-frame {
         position: absolute;
-        width: 86%;
-        height: 90%;
-        margin: 0 auto;
+        width: 72vw;
+        height: calc(245/295 * 72vw);
+        left: 14vw;
         padding: 20px;
-        left: 7%;
-        top: 5%;
+        top: 10vh;
         z-index: 1;
         pointer-events: none;
-    
-        &:before {
-            content: "";
-            display: block;
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background-image: linear-gradient(to right, red 4px, transparent 4px), linear-gradient(to right, red 4px, transparent 4px), linear-gradient(to left, red 4px, transparent 4px), linear-gradient(to left, red 4px, transparent 4px), linear-gradient(to bottom, red 4px, transparent 4px), linear-gradient(to bottom, red 4px, transparent 4px), linear-gradient(to top, red 4px, transparent 4px), linear-gradient(to top, red 4px, transparent 4px);
-            background-position: 0 0, 0 100%, 100% 0, 100% 100%, 0 0, 100% 0, 0 100%, 100% 100%;
-            background-repeat: no-repeat;
-            background-size: 10vw 10vw;
-        }
+        outline: 100vh solid rgba(255,255,255,0.75);
 
         .hint-text {
             position: absolute;
