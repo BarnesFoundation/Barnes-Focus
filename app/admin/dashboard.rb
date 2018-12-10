@@ -8,56 +8,40 @@ ActiveAdmin.register_page "Dashboard" do
       column do
         panel 'Recent Searches' do
           table do
-
-            # Header row
             tr do
-              th '#'
-              th 'Query Image'
-              th 'Reference Image'
-              th 'API Response'
-              th 'Elastic Search Response'
-              th 'Response Time'
+              th 'Name'
+              th 'Unique Identifier'
+              th 'Scanned Session'
             end
 
-            # Map the Snap Search Result fields
-            SnapSearchResult.recent.map do |snap_result|
+            Album.recent.each do | album |
               tr do
-
-                # Id cell
-                td snap_result.id
-
-                # Query image cell
+                td album.name
+                td album.unique_identifier
                 td do
-                  if snap_result.searched_image_url.present?
-                    image_tag snap_result.searched_image_url, class: 'pastec_image_size'
-                  else
-                    if snap_result.searched_image_data.present?
-                      image_tag snap_result.searched_image_data, class: 'pastec_image_size'
+                  table do
+                    album.photos.each do | photo |
+                      tr do
+                        td do
+                          if photo.searched_image_s3_url.blank?
+                            image_tag photo.searched_image_blob, class: 'pastec_image_size'
+                          else
+                            image_tag photo.searched_image_s3_url, class: 'pastec_image_size'
+                          end
+                        end
+                        td photo.es_response
+                        td photo.search_engine
+                        td photo.response_time
+                        td do
+                          if photo.result_image_url.present?
+                            image_tag photo.result_image_url, class: 'pastec_image_size'
+                          end
+                        end
+                      end
                     end
                   end
                 end
-
-                # Reference image cell
-                td do
-                  if !snap_result.searched_image_data.nil?
-                    image_tag snap_result.searched_image_data, class: 'es_image_size' 
-                  elsif snap_result.es_response.present?
-                    es_image = snap_result.es_response['records'][0]
-                    image_tag Image.imgix_url(es_image['id'], es_image['imageSecret']), class: 'es_image_size' 
-                  else 
-                    es_image = nil
-                  end
-                end
-
-                # API response cell
-                td snap_result.api_response.to_s
-
-                # Elastic Search response cell
-                td snap_result.es_response.to_s
-
-                # Response time cell
-                td snap_result.response_time
-              end
+              end              
             end
           end
         end
