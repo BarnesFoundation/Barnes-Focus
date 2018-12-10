@@ -33,9 +33,10 @@ class Api::SnapsController < Api::BaseController
       @album = Album.find_or_create_by(unique_identifier: params[:scanSeqId])
 
       @photo = @album.photos.create(
-        searched_image_blob: query_image_uri || reference_image_url,
+        searched_image_blob: query_image_uri,
         es_response: params[:esResponse] == 'null' ? nil : params[:esResponse],
         response_time: params[:searchTime],
+        result_image_url: reference_image_url,
         search_engine: 'Catchoom API'
       )
 
