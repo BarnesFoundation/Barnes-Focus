@@ -36,7 +36,10 @@ const sliderSettings = {
   centerMode: true,
   arrows: false,
   swipe: true,
-  speed: 500,
+  speed: 200,
+  centerPadding: '72px',
+  cssEase: 'linear',
+  mobileFirst: true,
   slidesToShow: 1,
   slidesToScroll: 1
 };
@@ -61,12 +64,13 @@ class SnapResults extends Component {
       alertModalIsOpen: false,
       searchResults: [],
       alsoInRoomResults: [
-        'https://barnes-images.imgix.net/5208_WlLgJFDAWDcYxeCG_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260',
-        'https://barnes-images.imgix.net/6049_cG8dDj7SRiVWjAlx_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260',
-        'https://barnes-images.imgix.net/5779_l3mR3e3s3Uj8LEAb_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260',
-        'https://barnes-images.imgix.net/5787_DDgdCr6AoP8f5J3d_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260',
-        'https://barnes-images.imgix.net/6272_6l5AGpGtzwRRxuwd_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260'
+        'https://barnes-images.imgix.net/5208_WlLgJFDAWDcYxeCG_b.jpg',
+        'https://barnes-images.imgix.net/6049_cG8dDj7SRiVWjAlx_b.jpg',
+        'https://barnes-images.imgix.net/5779_l3mR3e3s3Uj8LEAb_b.jpg',
+        'https://barnes-images.imgix.net/5787_DDgdCr6AoP8f5J3d_b.jpg',
+        'https://barnes-images.imgix.net/6272_6l5AGpGtzwRRxuwd_b.jpg'
       ],
+      activeSlideIndex: 0,
       email: localStorage.getItem(SNAP_USER_EMAIL) || '',
       newsletterSubscription: false,
       resetLanguageBox: false,
@@ -76,6 +80,11 @@ class SnapResults extends Component {
       selectedLanguage: '',
       translation: (translationObj) ? JSON.parse(translationObj) : null
     }
+
+    this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
+    this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+    this.sliderTopMax = 0;
+    this.blurValue = 5;
 
   }
 
@@ -123,6 +132,10 @@ class SnapResults extends Component {
     */
   }
 
+  afterChangeHandler = (currentSlide) => {
+    console.log('Active slide :: ' + currentSlide);
+    this.setState({ activeSlideIndex: currentSlide });
+  }
 
   _addNotification = ({ success, message }) => {
     event.preventDefault();
@@ -176,6 +189,29 @@ class SnapResults extends Component {
     if (!this.state.searchResults[0].shortDescription) {
       $("#result-card").attr("data-nodesc-invno", this.state.searchResults[0].invno);
     }
+    // Register scroll listener
+    window.addEventListener('scroll', this.handleScroll, true);
+
+  }
+
+  componentWillUnmount() {
+    // Un-register scroll listener
+    window.removeEventListener('scroll', this.handleScroll);
+  }
+
+  handleScroll = (event) => {
+    let sliderElemTop = this.sliderContainer.getBoundingClientRect().y;
+    var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    this.sliderTopMax = (sliderElemTop > this.sliderTopMax) ? sliderElemTop : this.sliderTopMax;
+    let traversedY = h + document.body.scrollTop;
+
+    let visibleSliderHeight = Math.floor(traversedY - this.sliderTopMax);
+    let blur = Math.floor(visibleSliderHeight / 30);
+    if (blur >= 0 && blur <= 15) {
+      this.blurValue = 5 + Math.floor(visibleSliderHeight / 30);
+      console.log('sliderBlur = ' + this.blurValue);
+    }
+
   }
 
   handleBackToCamera = () => {
@@ -353,9 +389,11 @@ class SnapResults extends Component {
   }
 
   render() {
+    let sliderContainerStyle = {
+      backgroundImage: 'url(' + this.state.alsoInRoomResults[this.state.activeSlideIndex] + this.sliderBackgroundCropParams + ')'
+    }
     return (
-      <div className="container-fluid search-container">
-
+      <div className="container-fluid search-container" id="search-result">
         <div className="row">
           <div className="col-12 col-md-12">
             <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
@@ -420,18 +458,22 @@ class SnapResults extends Component {
                     </div>
                   </Popover>
                 </div>
+              </div>
 
+              <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} >
+                <div className="slider-background">
+                  <img src={this.state.alsoInRoomResults[this.state.activeSlideIndex] + this.sliderBackgroundCropParams} />
+                </div>
+                <div className="slider-header"><h2>Also in this Room</h2></div>
                 <div className="slider-container">
-                  <div className="also-in-room-header"><h2>Also in this Room</h2></div>
-                  <Slider {...sliderSettings}>
+                  <Slider {...sliderSettings} afterChange={this.afterChangeHandler}>
                     {
                       this.state.alsoInRoomResults.map((result, index) =>
-                        <div key={index}><img src={result} /></div>
+                        <div key={index}><img src={result + this.sliderCropParams} /></div>
                       )
                     }
                   </Slider>
                 </div>
-
               </div>
             </div>
           </div>
