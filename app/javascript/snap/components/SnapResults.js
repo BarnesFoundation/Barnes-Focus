@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router'
 import axios from 'axios';
+import Slider from 'react-slick';
 import LanguageSelect from '../components/LanguageSelect';
 import share from 'images/share.svg';
 import bookmark from 'images/bookmark_icon.svg';
@@ -30,6 +31,16 @@ const customStyles = {
   }
 };
 
+const sliderSettings = {
+  className: "slider-container",
+  centerMode: true,
+  arrows: false,
+  swipe: true,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1
+};
+
 const fb_app_id = '349407548905454';
 
 /** 
@@ -49,6 +60,13 @@ class SnapResults extends Component {
       sharePopoverIsOpen: false,
       alertModalIsOpen: false,
       searchResults: [],
+      alsoInRoomResults: [
+        'https://barnes-images.imgix.net/5208_WlLgJFDAWDcYxeCG_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260',
+        'https://barnes-images.imgix.net/6049_cG8dDj7SRiVWjAlx_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260',
+        'https://barnes-images.imgix.net/5779_l3mR3e3s3Uj8LEAb_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260',
+        'https://barnes-images.imgix.net/5787_DDgdCr6AoP8f5J3d_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260',
+        'https://barnes-images.imgix.net/6272_6l5AGpGtzwRRxuwd_b.jpg?crop=faces,entropy&fit=crop&h=260&w=260'
+      ],
       email: localStorage.getItem(SNAP_USER_EMAIL) || '',
       newsletterSubscription: false,
       resetLanguageBox: false,
@@ -80,7 +98,7 @@ class SnapResults extends Component {
         console.log(art_obj);
         result['id'] = art_obj.id;
         result['title'] = art_obj.title;
-        result['shortDescription'] = art_obj.shortDescription;
+        result['shortDescription'] = art_obj.shortDescription || `In this scene set inside Georges Seurat's studio, we see models posing in front of A Sunday on La Grande Jatte (Art Institute of Chicago), the famous pointillist painting that caused a scandal when it was first exhibited in 1886. Informed by scientific theories of light, color, and optics, pointillism was dismissed by many critics at the time for being too cold and methodical, a style that could never be applied to noble subjects like the nude. Here, Seurat seems to offer his response, presenting life-size nude bodies from three angles and on a monumental scale.`;
         result['artist'] = art_obj.people;
         result['classification'] = art_obj.classification;
         result['locations'] = art_obj.locations;
@@ -401,6 +419,17 @@ class SnapResults extends Component {
                       </a>
                     </div>
                   </Popover>
+                </div>
+
+                <div className="slider-container">
+                  <div className="also-in-room-header"><h2>Also in this Room</h2></div>
+                  <Slider {...sliderSettings}>
+                    {
+                      this.state.alsoInRoomResults.map((result, index) =>
+                        <div key={index}><img src={result} /></div>
+                      )
+                    }
+                  </Slider>
                 </div>
 
               </div>
