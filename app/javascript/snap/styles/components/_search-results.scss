@@ -114,17 +114,7 @@
 
             
 
-            .slider-container {
-                height: 540px;
-                background: #6E6E6E;
-
-                .also-in-room-header {
-                    color: #FFF;
-                    padding-top: 50px;
-                    padding-bottom: 30px;
-                    line-height: 25px;
-                }
-            }
+            
 
             .text-left {
                 text-align: left;
@@ -132,6 +122,35 @@
 
             .text-right {
                 text-align: right;
+            }
+        }
+
+        .slider-wrapper{
+            height: 540px;
+            overflow: hidden;
+            position: relative;
+
+            .slider-background {
+                filter: blur(10px);
+                z-index: 1;
+            }
+
+            .slider-header {
+                color: #FFF;
+                //padding-top: 50px;
+                line-height: 25px;
+                z-index: 9999;
+                position: absolute;
+                top: 50px;
+                width: 200px;
+                left: calc(50% - 100px);
+            }
+
+            .slider-container {
+                z-index: 9999;
+                position: absolute;
+                width: 100%;
+                top:35px;
             }
         }
 
@@ -184,6 +203,35 @@
     color: #fff !important;
     box-shadow: rgba(0, 0, 0, .9) 0px 0px 1px !important;
     text-align: center;
+}
+
+/* Slick sider customization for scale and animation*/
+
+// .slick-list,
+// .slick-track,
+// .slick-slide img {
+//    height: 100%;   
+// }
+
+.slick-list {
+    padding: 0px 92px !important;
+}
+
+.slick-slide {
+    margin: 50px 0;
+    img {
+        opacity: 0.7;
+    }
+}
+
+.slick-center img{
+    -moz-transform:scale(1.13);
+    -ms-transform:scale(1.13);
+    -o-transform:scale(1.13);
+    -webkit-transform:scale(1.13);
+    transform:scale(1.13);
+    opacity:1;
+    transition: all .3s ease-in-out;
 }
 
 /* iPhone 6,7,8  */
