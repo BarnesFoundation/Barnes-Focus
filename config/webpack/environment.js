@@ -8,7 +8,8 @@ environment.plugins.prepend('Provide', new webpack.ProvidePlugin({
     jquery: 'jquery',
     'window.Tether': "tether",
     Popper: ['popper.js', 'default']
-}), new webpack.EnvironmentPlugin(['IMAGE_ENGINE'])
+}),
+    new webpack.EnvironmentPlugin(['IMAGE_ENGINE', 'CROP_IMAGE']) // this makes sure that these are accessible as env variables to react
 )
 
 

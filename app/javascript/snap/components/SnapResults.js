@@ -71,6 +71,7 @@ class SnapResults extends Component {
         'https://barnes-images.imgix.net/6272_6l5AGpGtzwRRxuwd_b.jpg'
       ],
       activeSlideIndex: 0,
+      blurValue: 5,
       email: localStorage.getItem(SNAP_USER_EMAIL) || '',
       newsletterSubscription: false,
       resetLanguageBox: false,
@@ -84,7 +85,6 @@ class SnapResults extends Component {
     this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
     this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
     this.sliderTopMax = 0;
-    this.blurValue = 5;
 
   }
 
@@ -207,9 +207,8 @@ class SnapResults extends Component {
 
     let visibleSliderHeight = Math.floor(traversedY - this.sliderTopMax);
     let blur = Math.floor(visibleSliderHeight / 30);
-    if (blur >= 0 && blur <= 15) {
-      this.blurValue = 5 + Math.floor(visibleSliderHeight / 30);
-      console.log('sliderBlur = ' + this.blurValue);
+    if (blur >= 0 && blur <= 15 && blur != this.state.blurValue) {
+      this.setState({ blurValue: 5 + blur });
     }
 
   }
@@ -389,8 +388,9 @@ class SnapResults extends Component {
   }
 
   render() {
-    let sliderContainerStyle = {
-      backgroundImage: 'url(' + this.state.alsoInRoomResults[this.state.activeSlideIndex] + this.sliderBackgroundCropParams + ')'
+    console.log('this.state.blurValue = ' + this.state.blurValue);
+    let sliderBackground = {
+      filter: `blur(` + this.state.blurValue + `px)`
     }
     return (
       <div className="container-fluid search-container" id="search-result">
@@ -461,7 +461,7 @@ class SnapResults extends Component {
               </div>
 
               <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} >
-                <div className="slider-background">
+                <div className="slider-background" style={sliderBackground} >
                   <img src={this.state.alsoInRoomResults[this.state.activeSlideIndex] + this.sliderBackgroundCropParams} />
                 </div>
                 <div className="slider-header"><h2>Also in this Room</h2></div>

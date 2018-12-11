@@ -144,6 +144,7 @@ class Camera extends Component {
                 canvas.toBlob(async (imageBlob) => {
 
                     if (process.env.CROP_IMAGE === 'TRUE') {
+                        console.log('Going to crop image before catchoom request!');
 
                         /* let reader = new FileReader();
                         reader.readAsDataURL(imageBlob);
@@ -172,7 +173,7 @@ class Camera extends Component {
                     else {
                         this.prepareServerRequest(imageBlob);
                     }
-                }, 'image/jpeg', 1);
+                }, 'image/jpeg');
             }
         }, 1000 / 3);
     }
@@ -181,7 +182,6 @@ class Camera extends Component {
     prepareServerRequest = (imageData) => {
 
         let url, data, config;
-
         // Configurations for Axios request
         let token = CATCHOOM_ACCESS_TOKEN;
 
@@ -205,13 +205,17 @@ class Camera extends Component {
             this.responseCounter++;
             let searchTime = response.data.search_time;
             // If a match was found
-            if (response.data.results.length > 0 && this.matchFound == false) { this.processImageMatch(response, data, searchTime); }
-
+            if (response.data.results.length > 0 && this.matchFound == false) {
+                this.processImageMatch(response, data, searchTime);
+            }
             // If we've received all responses and no match was found yet, process as a non-matched image
             else {
-                this.storeSearchedResult(false, data, null, null, searchTime);
-
-                if (!this.matchFound && this.responseCounter == 9) { this.completeImageSearchRequest(false, null) }
+                if (!this.matchFound) {
+                    this.storeSearchedResult(false, data, null, null, searchTime);
+                }
+                if (!this.matchFound && this.responseCounter == 9) {
+                    this.completeImageSearchRequest(false, null)
+                }
             }
         }
         catch (error) {
@@ -242,9 +246,9 @@ class Camera extends Component {
                 let artworkInfo = await this.getArtworkInformation(imageId);
                 this.setState({ searchInProgress: false });
 
-
-                this.completeImageSearchRequest(true, artworkInfo);
                 this.storeSearchedResult(true, data, refImage, artworkInfo, searchTime);
+                this.completeImageSearchRequest(true, artworkInfo);
+
             }
         };
     })();
@@ -278,7 +282,9 @@ class Camera extends Component {
     completeImageSearchRequest(responseFound, response) {
 
         // Turn off the search-in-progress animation
-        if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
+        if (this.state.searchInProgress) {
+            this.setState({ searchInProgress: false });
+        }
 
         if (responseFound) {
             // Update analytics of the successful snap event
@@ -287,7 +293,9 @@ class Camera extends Component {
             // Navigate to results page
             this.props.history.push({ pathname: '/results', state: { result: response, snapCount: localStorage.getItem(SNAP_ATTEMPTS) } });
         }
-        else { this.handleSnapFailure(); }
+        else {
+            this.handleSnapFailure();
+        }
     }
 
     /** Provides the snap failure event to Google Analytics */
