@@ -1,4 +1,5 @@
 ActiveAdmin.register SnapSearchResult do
+  menu false # no longer using this model
   permit_params :id, :password, :password_confirmation
   config.filters = false
   config.per_page = 10
