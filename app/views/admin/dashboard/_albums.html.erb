@@ -1,0 +1,58 @@
+<table>
+    <thead>
+        <tr>
+            <th rowspan="2">Name</th>
+            <th rowspan="2">Unique Identifier</th>
+            <th colspan="5" style="text-align: center;">Scanned Session</th>
+        </tr>
+
+        <tr>
+            <th>Session Images</th>
+            <th>Response from ES</th>
+            <th>Search Engine</th>
+            <th>Response Time</th>
+            <th>Result from Catchoom</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% albums.each do |album| %>
+            <% photos_count = album.photos.count %>
+            <% first_scanned_image = album.photos.first %>
+            <tr>
+                <td rowspan="<%= photos_count %>"><%= album.name %></td>
+                <td rowspan="<%= photos_count %>"><%= album.unique_identifier %></td>
+                <td>
+                    <% if first_scanned_image.searched_image_s3_url.blank? %>
+                        <%= image_tag first_scanned_image.searched_image_blob, class: 'pastec_image_size' %>
+                    <% else %>
+                        <%= image_tag first_scanned_image.searched_image_s3_url, class: 'pastec_image_size' %>
+                    <% end %>
+                </td>
+                <td><%= first_scanned_image.es_response %></td>
+                <td><%= first_scanned_image.search_engine %></td>
+                <td><%= first_scanned_image.response_time %></td>
+                <td>
+                    <%= first_scanned_image.result_image_url.present? ? image_tag(first_scanned_image.result_image_url, class: 'pastec_image_size') : '' %>
+                </td>
+            </tr>
+            <% album.photos.reject { |r| r == first_scanned_image }.each do | photo | %>
+                <tr>
+                    <td>
+                        <% if photo.searched_image_s3_url.blank? %>
+                            <%= image_tag photo.searched_image_blob, class: 'pastec_image_size' %>
+                        <% else %>
+                            <%= image_tag photo.searched_image_s3_url, class: 'pastec_image_size' %>
+                        <% end %>
+                    </td>
+                    <td><%= photo.es_response %></td>
+                    <td><%= photo.search_engine %></td>
+                    <td><%= photo.response_time %></td>
+                    <td>
+                        <%= photo.result_image_url.present? ? image_tag(photo.result_image_url, class: 'pastec_image_size') : '' %>
+                    </td>
+                </tr>
+            <% end %>
+        <% end %>
+    </tbody>
+</table>
