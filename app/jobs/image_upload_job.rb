@@ -30,7 +30,7 @@ class ImageUploadJob < ApplicationJob
         end
 
         # Save the search result with the url the image is located at
-        @photo.searched_image_blob = nil
+        @photo.searched_image_blob = nil unless stored_image_url.blank?
         @photo.searched_image_s3_url = stored_image_url
         @photo.save
       end

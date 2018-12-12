@@ -17,8 +17,9 @@
 
     <tbody>
         <% albums.each do |album| %>
-            <% photos_count = album.photos.count %>
-            <% first_scanned_image = album.photos.first %>
+            <% photos = album.photos.order_by_scanned_time %>
+            <% photos_count = photos.count %>
+            <% first_scanned_image = photos.first %>
             <tr>
                 <td rowspan="<%= photos_count %>"><%= album.name %></td>
                 <td rowspan="<%= photos_count %>"><%= album.unique_identifier %></td>
@@ -36,7 +37,7 @@
                     <%= first_scanned_image.result_image_url.present? ? image_tag(first_scanned_image.result_image_url, class: 'pastec_image_size') : '' %>
                 </td>
             </tr>
-            <% album.photos.reject { |r| r == first_scanned_image }.each do | photo | %>
+            <% photos.reject { |r| r == first_scanned_image }.each do | photo | %>
                 <tr>
                     <td>
                         <% if photo.searched_image_s3_url.blank? %>
