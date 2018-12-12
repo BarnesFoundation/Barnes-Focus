@@ -22,7 +22,7 @@ ActiveAdmin.register Album, as: 'Scanned Sessions' do
         end
 
         panel "Scanned Sessions" do
-            table_for resource.photos do
+            table_for resource.photos.order_by_scanned_time do
                 column "Scanned Image" do | photo |
                     if photo.searched_image_s3_url.blank?
                         image_tag photo.searched_image_blob, class: 'pastec_image_size'
