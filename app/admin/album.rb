@@ -7,8 +7,9 @@ ActiveAdmin.register Album, as: 'Scanned Sessions' do
         id_column
         column :name
         column :unique_identifier
-        column :created_at
-        column :updated_at
+        column :created_at do | resource |
+            resource.created_at.present? ? ApplicationHelper.date_time_in_eastern( resource.created_at ) : nil
+        end
         actions
     end
 
@@ -17,8 +18,9 @@ ActiveAdmin.register Album, as: 'Scanned Sessions' do
             row :id
             row :name
             row :unique_identifier
-            row :created_at
-            row :updated_at
+            row :created_at do
+                resource.created_at.present? ? ApplicationHelper.date_time_in_eastern( resource.created_at ) : nil
+            end
         end
 
         panel "Scanned Sessions" do
@@ -41,6 +43,9 @@ ActiveAdmin.register Album, as: 'Scanned Sessions' do
                 end
                 column "Result from Catchoom" do | photo |
                     photo.result_image_url.present? ? image_tag(photo.result_image_url, class: 'pastec_image_size') : ''
+                end
+                column "Captured At" do | photo |
+                    photo.created_at.present? ? ApplicationHelper.date_time_in_eastern( photo.created_at ) : nil
                 end
             end
         end

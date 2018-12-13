@@ -9,6 +9,6 @@ class Album < ApplicationRecord
 
 protected
     def set_name
-        self.name = "Album: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
+        self.name = "Album: #{unique_identifier}"
     end
 end
