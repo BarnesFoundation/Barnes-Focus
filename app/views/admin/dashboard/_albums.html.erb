@@ -3,6 +3,7 @@
         <tr>
             <th rowspan="2">Name</th>
             <th rowspan="2">Unique Identifier</th>
+            <th rowspan="2">Created At</th>
             <th colspan="5" style="text-align: center;">Scanned Session</th>
         </tr>
 
@@ -23,6 +24,7 @@
             <tr>
                 <td rowspan="<%= photos_count %>"><%= album.name %></td>
                 <td rowspan="<%= photos_count %>"><%= album.unique_identifier %></td>
+                <td rowspan="<%= photos_count %>"><%= album.created_at.present? ? ApplicationHelper.date_time_in_eastern( album.created_at ) : nil %></td>
                 <td>
                     <% if first_scanned_image.searched_image_s3_url.blank? %>
                         <%= image_tag first_scanned_image.searched_image_blob, class: 'pastec_image_size' %>
