@@ -283,11 +283,13 @@ class HomeComponent extends Component {
                 {this.state.userAtBarnes && <div className="landing-screen">
                     <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
                     <div className="user-loc-prompt">Are you at the Barnes?</div>
-                    <div className="yes-button" onClick={this.onSelectYes}>
-                        <span className="yes">Yes</span>
-                    </div>
-                    <div className="no-button" onClick={this.onSelectNo}>
-                        <span className="no">No</span>
+                    <div className="home-action">
+                        <div className="yes-button" onClick={this.onSelectYes}>
+                            <span className="yes">Yes</span>
+                        </div>
+                        <div className="no-button" onClick={this.onSelectNo}>
+                            <span className="no">No</span>
+                        </div>
                     </div>
                     <div className="kf-banner">
                         <img src={barnes_kf_logo} alt="knight_foundation_logo" className="kf-logo" />

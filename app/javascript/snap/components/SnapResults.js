@@ -2,19 +2,16 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router'
 import axios from 'axios';
-import Slider from 'react-slick';
-import LanguageSelect from '../components/LanguageSelect';
 import share from 'images/share.svg';
-import bookmark from 'images/bookmark_icon.svg';
-import icon_camera from 'images/camera_icon.svg';
-import team_picture from 'images/team-alert.jpg';
+import scan_button from 'images/scan-button.svg';
 import Modal from 'react-modal';
+import InRoomSlider from './Slider'
 import Footer from './Footer';
 import Popover from 'react-simple-popover';
-import NotificationSystem from 'react-notification-system';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import * as analytics from './Analytics';
+import Plx from 'react-plx';
 
 const customStyles = {
   overlay: {
@@ -31,18 +28,21 @@ const customStyles = {
   }
 };
 
-const sliderSettings = {
-  className: "slider-container",
-  centerMode: true,
-  arrows: false,
-  swipe: true,
-  speed: 200,
-  centerPadding: '72px',
-  cssEase: 'linear',
-  mobileFirst: true,
-  slidesToShow: 1,
-  slidesToScroll: 1
-};
+
+
+const blurPlx = [
+  {
+    start: '.slider-background',
+    end: '.scan-button',
+    properties: [
+      {
+        startValue: 0,
+        endValue: 20,
+        property: "blur"
+      }
+    ]
+  }
+]
 
 const fb_app_id = '349407548905454';
 
@@ -71,7 +71,8 @@ class SnapResults extends Component {
         'https://barnes-images.imgix.net/6272_6l5AGpGtzwRRxuwd_b.jpg'
       ],
       activeSlideIndex: 0,
-      blurValue: 5,
+      blurValue: 1,
+      isShortDescVisible: false,
       email: localStorage.getItem(SNAP_USER_EMAIL) || '',
       newsletterSubscription: false,
       resetLanguageBox: false,
@@ -82,9 +83,12 @@ class SnapResults extends Component {
       translation: (translationObj) ? JSON.parse(translationObj) : null
     }
 
-    this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
-    this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+    // v2 class level properties
+
+
     this.sliderTopMax = 0;
+    this.shortDescTopMax = 0;
+    this.scrollInProgress = false;
 
   }
 
@@ -132,10 +136,7 @@ class SnapResults extends Component {
     */
   }
 
-  afterChangeHandler = (currentSlide) => {
-    console.log('Active slide :: ' + currentSlide);
-    this.setState({ activeSlideIndex: currentSlide });
-  }
+
 
   _addNotification = ({ success, message }) => {
     event.preventDefault();
@@ -190,46 +191,49 @@ class SnapResults extends Component {
       $("#result-card").attr("data-nodesc-invno", this.state.searchResults[0].invno);
     }
     // Register scroll listener
-    window.addEventListener('scroll', this.handleScroll, true);
+    window.addEventListener('scroll', this.onScroll, true);
 
   }
 
   componentWillUnmount() {
     // Un-register scroll listener
-    window.removeEventListener('scroll', this.handleScroll);
+    window.removeEventListener('scroll', this.onScroll);
   }
 
-  handleScroll = (event) => {
+  handleScroll = () => {
     let sliderElemTop = this.sliderContainer.getBoundingClientRect().y;
+    let shortDescElemTop = this.shortDescContainer.getBoundingClientRect().y;
+
     var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
     this.sliderTopMax = (sliderElemTop > this.sliderTopMax) ? sliderElemTop : this.sliderTopMax;
+    this.shortDescTopMax = (shortDescElemTop > this.shortDescTopMax) ? shortDescElemTop : this.shortDescTopMax;
+
     let traversedY = h + document.body.scrollTop;
 
     let visibleSliderHeight = Math.floor(traversedY - this.sliderTopMax);
-    let blur = Math.floor(visibleSliderHeight / 30);
-    if (blur >= 0 && blur <= 15 && blur != this.state.blurValue) {
-      this.setState({ blurValue: 5 + blur });
+    let isShortDescVisible = (traversedY - this.shortDescTopMax) > 0;
+
+    /**
+     * Show hide scan button and language selectpr button if users scrolls down till shortDesc is visible in viewport.
+     */
+    if ((!this.state.isShortDescVisible && isShortDescVisible) || (this.state.isShortDescVisible && !isShortDescVisible)) {
+      this.setState({ isShortDescVisible: isShortDescVisible });
     }
 
+    let blur = Math.floor(visibleSliderHeight / 30);
+    if (blur >= 0 && blur <= 19) {
+      this.setState({ blurValue: 1 + blur });
+    }
+
+    this.scrollInProgress = false;
   }
 
-  handleBackToCamera = () => {
-    // if (isAndroid && isChrome) {
-    //   this.props.history.push({
-    //     pathname: '/snap'
-    //   });
-    // } else if (isIOS || (isAndroid && isFirefox)) {
-    //   this.props.history.push({
-    //     pathname: '/',
-    //     state: {
-    //       launchCamera: true
-    //     }
-    //   });
-    // }
-
-    this.props.history.push({
-      pathname: '/snap'
-    });
+  onScroll = (event) => {
+    if (!this.scrollInProgress) {
+      requestAnimationFrame(this.handleScroll)
+      this.scrollInProgress = true;
+    }
   }
 
   nativeAppShareWithWebFallback = (e) => {
@@ -349,14 +353,6 @@ class SnapResults extends Component {
       });
   }
 
-  openResetModal = () => {
-    this.setState({ resetModalIsOpen: true });
-  }
-
-  closeResetModal = () => {
-    this.setState({ resetModalIsOpen: false });
-  }
-
   resetExperience = () => {
     localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
     localStorage.removeItem(SNAP_USER_EMAIL);
@@ -367,9 +363,6 @@ class SnapResults extends Component {
     this.setState({ resetLanguageBox: true });
   }
 
-  closeAlertModal = () => {
-    this.setState({ alertModalIsOpen: false });
-  }
 
   handleBookmarkFormInputChange = (event) => {
     const target = event.target;
@@ -387,11 +380,12 @@ class SnapResults extends Component {
     return this.state.email.length > 0 && emailRegex.test(this.state.email);
   }
 
+  handleScan = () => {
+    this.props.history.push({ pathname: '/snap' });
+  }
+
   render() {
-    console.log('this.state.blurValue = ' + this.state.blurValue);
-    let sliderBackground = {
-      filter: `blur(` + this.state.blurValue + `px)`
-    }
+
     return (
       <div className="container-fluid search-container" id="search-result">
         <div className="row">
@@ -435,8 +429,9 @@ class SnapResults extends Component {
                     </tbody>
                   </table>
                 </div>
-                {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
-
+                <div className="short-desc-container" ref={el => this.shortDescContainer = el}>
+                  {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
+                </div>
                 <div className="share-wrapper">
                   <div id="share-it" className="btn-share-result" ref="target" onClick={this.shareIt}>
                     <img src={share} alt="share" />
@@ -461,27 +456,48 @@ class SnapResults extends Component {
               </div>
 
               <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} >
-                <div className="slider-background" style={sliderBackground} >
-                  <img src={this.state.alsoInRoomResults[this.state.activeSlideIndex] + this.sliderBackgroundCropParams} />
+                <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue}></InRoomSlider>
+
+                <div className="scan-button" onClick={this.handleScan}>
+                  <img src={scan_button} alt="scan" />
                 </div>
-                <div className="slider-header"><h2>Also in this Room</h2></div>
-                <div className="slider-container">
-                  <Slider {...sliderSettings} afterChange={this.afterChangeHandler}>
-                    {
-                      this.state.alsoInRoomResults.map((result, index) =>
-                        <div key={index}><img src={result + this.sliderCropParams} /></div>
-                      )
-                    }
-                  </Slider>
+
+                <div className="footer-text">
+                  <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
+                  <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
                 </div>
               </div>
+
+
+
+              <div className="email-container">
+                <div className="email-head">
+                  Enter your e-mail address to receive all the artworks you are scanning today
+                </div>
+                <div className="email-input">
+                  <form onSubmit={this.submitBookMark}>
+
+                    <div className="input-group">
+                      <input type="email" placeholder={(this.state.translation) ? this.state.translation.Bookmark_capture.text_2.translated_content : `Email address`} className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
+                      <div className="input-group-append">
+                        <button className="btn btn-outline-secondary" type="button">Submit</button>
+                      </div>
+                    </div>
+
+                  </form>
+                </div>
+                <div className="email-disclaimer">
+                    <span>We will use your e-mail address only to send you the artworks you are scanning today.</span>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
 
 
 
-        <Footer />
+
 
       </div>
     );

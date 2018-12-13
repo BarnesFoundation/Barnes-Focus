@@ -24,45 +24,53 @@
     color: #FFFFFF;
 }
 
-.yes-button {
+.home-action {
+
     position: absolute;
-    width: 60px;
-    height: 60px;
-    left: 111px;
     top: 360px;
+    width: 240px;
+    left: calc(50% - 120px);
+    display: flex;
+    justify-content: space-around;
 
-    //opacity: 0.3;
-    border: 3px solid rgba(255, 255, 255, .3);
-    border-radius: 50%;
-    box-sizing: border-box;
+    .yes-button {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        border: 3px solid rgba(255, 255, 255, .3);
+        border-radius: 50%;
+        box-sizing: border-box;
 
-    color: #FFFFFF;
+        color: #FFFFFF;
+    }
+
+    .no-button {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        border: 3px solid rgba(255, 255, 255, .3);
+        border-radius: 50%;
+        box-sizing: border-box;
+        color: #FFFFFF;
+    }
+
+    .yes, .no {
+        width: 60px;
+        height: 30px;
+        left: -3px;
+        top: 14px;
+        font-family: Calibre;
+        line-height: 25px;
+        font-size: 22px;
+        text-align: center;
+        color: #FFFFFF;
+    }
+
 }
 
-.no-button {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    left: 207px;
-    top: 360px;
-    border: 3px solid rgba(255, 255, 255, .3);
-    border-radius: 50%;
-    box-sizing: border-box;
-    color: #FFFFFF;
-}
 
-.yes, .no {
-    position: absolute;
-    width: 60px;
-    height: 30px;
-    left: -3px;
-    top: 14px;
-    font-family: Calibre;
-    line-height: 25px;
-    font-size: 22px;
-    text-align: center;
-    color: #FFFFFF;
-}
 
 .kf-logo {
     position: absolute;
