@@ -54,6 +54,14 @@ p {
     font-family: 'Calibre-Regular';
 } 
 
+.scan-button {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    left: calc(50% - 30px);
+    bottom: 45px;
+}
+
 .content {
     text-align: center;
     padding: 0 5vw;

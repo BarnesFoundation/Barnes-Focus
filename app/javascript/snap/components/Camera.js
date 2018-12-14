@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import Hammer from 'hammerjs';
-import CameraControls from './CameraControls';
+import scan_button from 'images/scan-button.svg';
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
@@ -29,7 +29,8 @@ class Camera extends Component {
         searchInProgress: false,
         snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
-        scanSeqId: Date.now()
+        scanSeqId: Date.now(),
+        matchError: false
     };
 
     // Set booleans and counter
@@ -55,22 +56,6 @@ class Camera extends Component {
         });
     }
 
-    /** Toggles the captured image being shown */
-    toggleImage = (show) => {
-
-        // Shows the image
-        if (show) {
-            this.img.style.visibility = 'visible';
-            this.img.style.display = 'block';
-        }
-        // Hides the image
-        else {
-            this.img.src = '';
-            this.img.style.visibility = 'hidden';
-            this.img.style.display = 'none';
-        }
-    }
-
     /** Crops an image and returns the uri of the cropped image */
     cropPhoto = (imageUri) => {
         return new Promise(resolve => {
@@ -78,23 +63,30 @@ class Camera extends Component {
             let image = new Image();
             image.onload = () => {
 
-                let scanBox = this.scanBox.getBoundingClientRect();
-                this.cropRect = {
+                // let scanBox = this.scanBox.getBoundingClientRect();
+                /* this.cropRect = {
                     x: Math.floor(scanBox.x),
                     y: Math.floor(scanBox.y),
                     width: Math.floor(scanBox.width),
                     height: Math.floor(scanBox.height)
-                }
-                console.log('Crop rect :: ' + JSON.stringify(this.cropRect));
+                } */
 
                 var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
                 var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+                // We will be croping the top half of entire viewport for better image matching.
+                this.cropRect = {
+                    x: 0,
+                    y: 0,
+                    width: screen.width,
+                    height: h / 2
+                }
+                console.log('Crop rect :: ');
+                console.log(this.cropRect);
+
                 // Create temporary canvas
                 let cropCanvas = document.createElement('canvas');
                 let cropContext = cropCanvas.getContext('2d');
-
-
-                console.log(this.cropRect);
 
                 let cropWidth = Math.floor(this.cropRect.width);
                 let cropHeight = Math.floor(this.cropRect.height);
@@ -301,12 +293,19 @@ class Camera extends Component {
     /** Provides the snap failure event to Google Analytics */
     handleSnapFailure = () => {
 
+        // End scanning operations 
+        clearInterval(this.scan);
+
         // Turn off search in-progress animation
         if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
 
         // Track this snap failure and navigate to the not found page
-        analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-        this.props.history.push({ pathname: '/not-found' });
+        //analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
+        //this.props.history.push({ pathname: '/not-found' });
+        if (!this.state.matchError) {
+            this.setState({ matchError: true });
+        }
+
     }
 
     clearPhoto = (ev) => {
@@ -407,7 +406,6 @@ class Camera extends Component {
                     console.log('Not allowed to access camera. Please check settings!');
                 });
 
-            this.img.style.display = 'none';
 
             // Reset snap attemps count if last_snap_timestamp is 12 hours or before.
             this.resetSnapCounter();
@@ -472,6 +470,11 @@ class Camera extends Component {
         return canvas;
     }
 
+    handleScan = () => {
+        console.log('Back to scan mode');
+        this.capturePhotoShots();
+    }
+
     render() {
         return (
             <div className="camera-container">
@@ -480,13 +483,27 @@ class Camera extends Component {
                         this.state.showVideo &&
                         <div>
                             <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline />
-                            <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
-                                {/* Hint text */}
-                                {/* <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p> */}
-                            </div>
+                            {!this.state.matchError &&
+                                <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
+                                    {/* Hint text */}
+                                    {/* <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p> */}
+                                </div>
+                            }
+                            {this.state.matchError &&
+                                <div id="no-match-overlay" className="no-match-overlay">
+                                    <div className="hint">
+                                        <span>No results found. </span>
+                                        <span>Click on the button to bring the art back into focus.</span>
+                                    </div>
+                                    <div className="scan-button" onClick={this.handleScan}>
+                                        <img src={scan_button} alt="scan" />
+                                    </div>
+                                </div>
+                            }
+
                         </div>
                     }
-                    <img ref={img => this.img = img} />
+
                     {/* ========= Search in progress screen ============ */
                         this.state.searchInProgress &&
                         <div>

@@ -6,10 +6,53 @@
 
 .camera{
     width: 100%;
-    height: 75vh;
+    height: 100vh;
     background: #fff;
     margin: 0 auto;
     position: relative;
+    overflow: hidden;
+
+    .no-match-overlay {
+        position: absolute;
+        top:0;
+        left:0;
+        bottom:0;
+        width: 100vw;
+        height: 93vh;
+        z-index: 1;
+        overflow: hidden;
+        background: inherit;
+
+        .hint {
+            position: absolute;
+            width: 285px;
+            height: 110px;
+            left: calc(50% - 142px);
+            top: 210px;
+            span {
+                
+                font-family: Calibre;
+                line-height: 25px;
+                font-size: 25px;
+                text-align: center;       
+                color: #fff;
+            }
+            
+        }
+    }
+
+    .no-match-overlay:after{
+        content: '';
+        width: 100vw;
+        height: 100vh;
+        background: inherit; 
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        box-shadow: inset 0 0 0 200px rgba(255,255,255,0.05);
+        filter: blur(20px);
+        -webkit-filter:blur(20px);
+    }
 
     .video-frame {
         position: absolute;
