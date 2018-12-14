@@ -73,7 +73,8 @@ class Api::SnapsController < Api::BaseController
 
         # Get other records in the same room
         room_id = response[:data][:records][0][:room] 
-        response[:data][:roomRecords] = get_room_artworks(room_id, viewed_image_ids)
+        # get_room_artworks was written keeping in mind that we get similar work of arts. But this is no longer needed now
+        response[:data][:roomRecords] = [] # get_room_artworks(room_id, viewed_image_ids)
       end
       return response
     end
