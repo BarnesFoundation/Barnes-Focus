@@ -5,7 +5,8 @@ import axios from 'axios';
 import share from 'images/share.svg';
 import scan_button from 'images/scan-button.svg';
 import Modal from 'react-modal';
-import InRoomSlider from './Slider'
+import InRoomSlider from './Slider';
+import LanguageDropdown from './LanguageDropdown';
 import Footer from './Footer';
 import Popover from 'react-simple-popover';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
@@ -56,6 +57,19 @@ class SnapResults extends Component {
     super(props);
     let translationObj = localStorage.getItem(SNAP_LANGUAGE_TRANSLATION);
 
+    this.langOptions = [
+      { name: 'English', code: 'En', selected: true },
+      { name: 'Spanish', code: 'Es', selected: false },
+      { name: 'French', code: 'Fr', selected: false },
+      { name: 'Deutsch', code: 'De', selected: false },
+      { name: 'Italian', code: 'It', selected: false },
+      { name: 'Russian', code: 'Ru', selected: false },
+      { name: 'Chinese', code: 'Zh', selected: false },
+      { name: 'Japanese', code: 'Ja', selected: false },
+      { name: 'Korean', code: 'Ko', selected: false }
+    ];
+
+
     this.state = {
       ...props.location.state,  // these properties are passed on from Camera component.
       resetModalIsOpen: false,
@@ -79,7 +93,7 @@ class SnapResults extends Component {
       errors: {
         email: false
       },
-      selectedLanguage: '',
+      selectedLanguage: this.langOptions[0],
       translation: (translationObj) ? JSON.parse(translationObj) : null
     }
 
@@ -155,27 +169,15 @@ class SnapResults extends Component {
 
   onSelectLanguage = (lang) => {
     console.log('Selected lang changed in SnapResults component : ' + JSON.stringify(lang));
+    this.langOptions.map(option => {
+      if (option.code === lang.code) {
+        option.selected = true;
+      } else {
+        option.selected = false;
+      }
+    })
     this.setState({ selectedLanguage: lang });
-    this.setState({ resetLanguageBox: false });
 
-    axios.get('/api/translations?language=' + lang.code)
-      .then(response => {
-        console.log('successfully fetched translations.');
-        let res = response.data;
-        if (res.data.translations) {
-          let translation;
-          try {
-            this.setState({ translation: res.data.translations });
-            localStorage.setItem(SNAP_LANGUAGE_TRANSLATION, JSON.stringify(res.data.translations));
-          } catch (err) {
-            console.log('Error while parsing translations object to JSON.');
-          }
-
-        }
-      })
-      .catch(error => {
-        console.log('Error while fetching translations!');
-      });
   }
 
   componentDidMount() {
@@ -462,13 +464,15 @@ class SnapResults extends Component {
                   <img src={scan_button} alt="scan" />
                 </div>
 
+                <div className="language-dropdown">
+                  <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+                </div>
+
                 <div className="footer-text">
-                  <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
                   <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
+                  <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
                 </div>
               </div>
-
-
 
               <div className="email-container">
                 <div className="email-head">
@@ -487,7 +491,7 @@ class SnapResults extends Component {
                   </form>
                 </div>
                 <div className="email-disclaimer">
-                    <span>We will use your e-mail address only to send you the artworks you are scanning today.</span>
+                  <span>We will use your e-mail address only to send you the artworks you are scanning today.</span>
                 </div>
               </div>
 

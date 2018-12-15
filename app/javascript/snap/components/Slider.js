@@ -37,7 +37,7 @@ class InRoomSlider extends Component {
     }
 
     render() {
-        console.log('this.props.blurValue = ' + this.props.blurValue);
+        //console.log('this.props.blurValue = ' + this.props.blurValue);
         let sliderBackground = {
             filter: `blur(` + this.props.blurValue + `px)`
         }
