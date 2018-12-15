@@ -1,0 +1,93 @@
+.dd-wrapper {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  position: relative;
+  width: 100%;
+}
+.dd-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  line-height: 38px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-radius: 25px;
+  cursor: default;
+  position: relative;
+  background-color: #fff;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); 
+
+  .fa {
+      margin-right: 10px;
+      font-size: 22px;
+  } 
+}
+.dd-header span {
+  margin-right: 20px;
+}
+.dd-header-title {
+    margin: 4px 6px;
+    margin-left: 16px;
+}
+.angle-down {
+  color: #000;
+  margin-right: 20px;
+}
+.dd-list {
+  z-index: 99999 !important;
+  position: absolute;
+  right:0px;
+  width: 130px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-radius: 22px;
+  text-align: left;
+  background-color: #fff;
+  padding: 8px 0;
+  max-height: 340px;
+  opacity: 1;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  bottom: 100%; // this ensures that the dropdown opens upwards.
+}
+.dd-list-item {
+  width: 100%;
+  font-size: 1rem;
+  padding: 0 0 0 19px;
+  cursor: default;
+  display: inline-block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: Calibre;
+  line-height: 35px;
+  font-size: 16px;
+  color: #282828;
+}
+.dd-list-item.selected {
+  color: #fff;
+}
+
+.dd-wrapper-single {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  position: relative;
+  width: 265px;
+}
+.dd-wrapper-single .dd-header {
+  border: 1px solid #ccc;
+}
+.dd-wrapper-single .dd-header .dd-header-name {
+  font-weight: 400;
+}
+.dd-wrapper-single .dd-list {
+  border: 1px solid #ccc;
+  border-top: none;
+}

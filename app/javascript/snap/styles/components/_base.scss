@@ -60,6 +60,18 @@ p {
     height: 60px;
     left: calc(50% - 30px);
     bottom: 45px;
+    z-index: 99999;
+}
+
+.language-dropdown {
+    position: absolute;
+    width: 68px;
+    height: 45px;
+    right: 22px;
+    bottom: 45px;
+    //background: #FFFFFF;
+    //border: 2px solid rgba(0, 0, 0, 0.12);
+    z-index: 99999;
 }
 
 .content {

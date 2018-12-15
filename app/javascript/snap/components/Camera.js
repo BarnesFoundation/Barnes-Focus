@@ -30,7 +30,8 @@ class Camera extends Component {
         snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
         scanSeqId: Date.now(),
-        matchError: false
+        matchError: false,
+        videoBlur: 0
     };
 
     // Set booleans and counter
@@ -292,10 +293,8 @@ class Camera extends Component {
 
     /** Provides the snap failure event to Google Analytics */
     handleSnapFailure = () => {
-
         // End scanning operations 
         clearInterval(this.scan);
-
         // Turn off search in-progress animation
         if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
 
@@ -303,7 +302,7 @@ class Camera extends Component {
         //analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
         //this.props.history.push({ pathname: '/not-found' });
         if (!this.state.matchError) {
-            this.setState({ matchError: true });
+            this.setState({ matchError: true, videoBlur: 25 });
         }
 
     }
@@ -472,17 +471,21 @@ class Camera extends Component {
 
     handleScan = () => {
         console.log('Back to scan mode');
+        this.setState({ matchError: false, videoBlur: 0 });
         this.capturePhotoShots();
     }
 
     render() {
+        let videoStyle = {
+            filter: `blur(` + this.state.videoBlur + `px)`
+        }
         return (
-            <div className="camera-container">
+            <div className="camera-container" >
                 <div className="camera">
                     {
                         this.state.showVideo &&
                         <div>
-                            <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline />
+                            <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline style={videoStyle} />
                             {!this.state.matchError &&
                                 <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
                                     {/* Hint text */}
