@@ -477,7 +477,8 @@ class Camera extends Component {
 
     render() {
         let videoStyle = {
-            filter: `blur(` + this.state.videoBlur + `px)`
+            filter: `blur(` + this.state.videoBlur + `px)`,
+            transform: `scale(` + (this.state.matchError) ? 1.2 : 1 + `)`
         }
         return (
             <div className="camera-container" >
