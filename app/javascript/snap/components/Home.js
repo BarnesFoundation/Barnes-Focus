@@ -279,7 +279,7 @@ class HomeComponent extends Component {
     render() {
         return (
             <div className="home-wrapper" id="home-wrapper">
-                <img src={home_background} alt="home_background" style={{ width: screen.width, height: window.innerHeight }} />
+                <img src={home_background} alt="home_background" style={{ width: screen.width, height: screen.height }} />
                 {this.state.userAtBarnes && <div className="landing-screen">
                     <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
                     <div className="user-loc-prompt">Are you at the Barnes?</div>
