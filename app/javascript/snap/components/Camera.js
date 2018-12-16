@@ -407,7 +407,7 @@ class Camera extends Component {
 
 
             // Reset snap attemps count if last_snap_timestamp is 12 hours or before.
-            this.resetSnapCounter();
+            // this.resetSnapCounter();
         }
     }
 
@@ -485,7 +485,7 @@ class Camera extends Component {
                     {
                         this.state.showVideo &&
                         <div>
-                            <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline style={videoStyle} />
+                            <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
                             {!this.state.matchError &&
                                 <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
                                     {/* Hint text */}
