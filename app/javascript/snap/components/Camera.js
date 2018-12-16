@@ -402,7 +402,7 @@ class Camera extends Component {
                     this.capturePhotoShots();
                 })
                 .catch((error) => {
-                    console.log('Not allowed to access camera. Please check settings!');
+                    console.log('Not allowed to access camera. Please check settings! ' + error);
                 });
 
 
