@@ -42,7 +42,7 @@ class InRoomSlider extends Component {
             filter: `blur(` + this.props.blurValue + `px)`
         }
         return (
-            <div id="slider-wrapper">
+            <div>
 
                 <div className="slider-background" style={sliderBackground}>
                     <img src={this.props.alsoInRoomResults[this.state.activeSlideIndex] + this.sliderBackgroundCropParams} />

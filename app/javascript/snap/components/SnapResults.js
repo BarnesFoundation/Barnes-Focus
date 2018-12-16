@@ -205,15 +205,17 @@ class SnapResults extends Component {
   handleScroll = () => {
     let sliderElemTop = this.sliderContainer.getBoundingClientRect().y;
     let shortDescElemTop = this.shortDescContainer.getBoundingClientRect().y;
-
-    var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
     this.sliderTopMax = (sliderElemTop > this.sliderTopMax) ? sliderElemTop : this.sliderTopMax;
     this.shortDescTopMax = (shortDescElemTop > this.shortDescTopMax) ? shortDescElemTop : this.shortDescTopMax;
 
     let traversedY = h + document.body.scrollTop;
+    let currentScrollOffset = h - sliderElemTop;
+    // console.log('traveredY = ' + traversedY);
+    // console.log('ios visible slider height : ' + (h - sliderElemTop));
 
-    let visibleSliderHeight = Math.floor(traversedY - this.sliderTopMax);
+    let visibleSliderHeight = (isIOS) ? Math.floor(currentScrollOffset) : Math.floor(traversedY - this.sliderTopMax);
     let isShortDescVisible = (traversedY - this.shortDescTopMax) > 0;
 
     /**
