@@ -35,7 +35,7 @@ class Camera extends Component {
     };
 
     // Set booleans and counter
-    ticking = false; artworkRetrieved = false; matchFound = false; responseCounter = 0;
+    ticking = false; artworkRetrieved = false; matchFound = false; responseCounter = 0; intervalExecutions;
 
     track; camera_capabilities; camera_settings; initZoom; zoomLevel; scan; cropRect;
 
@@ -82,8 +82,8 @@ class Camera extends Component {
                     width: screen.width,
                     height: h / 2
                 }
-                console.log('Crop rect :: ');
-                console.log(this.cropRect);
+                //console.log('Crop rect :: ');
+                //console.log(this.cropRect);
 
                 // Create temporary canvas
                 let cropCanvas = document.createElement('canvas');
@@ -108,6 +108,12 @@ class Camera extends Component {
         });
     }
 
+    stopScan = () => {
+        // End the photo scan 
+        clearInterval(this.scan);
+        this.scan = null;
+    }
+
     /** Captures photo over a 3-second duration */
     capturePhotoShots = () => {
 
@@ -119,14 +125,17 @@ class Camera extends Component {
         localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
 
         let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
-        let intervalExecutions = 0;
+        this.intervalExecutions = 0;
 
+        this.stopScan();
         // Capture a photo scan every third of a second
         this.scan = setInterval(() => {
 
-            intervalExecutions++;
+            this.intervalExecutions++;
 
-            if (intervalExecutions == 9) { clearInterval(this.scan); }
+            if (this.intervalExecutions == 9) {
+                this.stopScan();
+            }
 
             // Only capture if a match hasn't already been found
             if (!this.matchFound) {
@@ -137,7 +146,7 @@ class Camera extends Component {
                 canvas.toBlob(async (imageBlob) => {
 
                     if (process.env.CROP_IMAGE === 'TRUE') {
-                        console.log('Going to crop image before catchoom request!');
+                        //console.log('Going to crop image before catchoom request!');
 
                         /* let reader = new FileReader();
                         reader.readAsDataURL(imageBlob);
@@ -213,8 +222,9 @@ class Camera extends Component {
         }
         catch (error) {
             // End the photo scan 
-            clearInterval(this.scan);
-            this.handleSnapFailure();
+            if (this.intervalExecutions == 9) {
+                this.handleSnapFailure();
+            }
         }
     }
 
@@ -227,8 +237,7 @@ class Camera extends Component {
 
                 this.matchFound = true;
 
-                // End scanning operations 
-                clearInterval(this.scan);
+                this.stopScan();
 
                 // Get the image id
                 let imageId = response.data.results[0].item.name
@@ -293,8 +302,7 @@ class Camera extends Component {
 
     /** Provides the snap failure event to Google Analytics */
     handleSnapFailure = () => {
-        // End scanning operations 
-        clearInterval(this.scan);
+        this.stopScan();
         // Turn off search in-progress animation
         if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
 
@@ -387,7 +395,7 @@ class Camera extends Component {
         this.artworkRetrieved = false;
 
         // When video is able to be captured
-        if (this.state.showVideo && this.state.videoStream) {
+        if (this.state.showVideo && this.state.videoStream && !this.state.matchError) {
             console.log('Component updated');
 
             this.video.srcObject = this.state.videoStream;
@@ -471,14 +479,15 @@ class Camera extends Component {
 
     handleScan = () => {
         console.log('Back to scan mode');
-        this.setState({ matchError: false, videoBlur: 0 });
+        this.setState({ matchError: false, videoBlur: 0, scanSeqId: Date.now() });
         this.capturePhotoShots();
     }
 
     render() {
+        let scale = (this.state.matchError) ? 1.2 : 1;
         let videoStyle = {
             filter: `blur(` + this.state.videoBlur + `px)`,
-            transform: `scale(` + (this.state.matchError) ? 1.2 : 1 + `)`
+            transform: `scale(` + scale + `)`
         }
         return (
             <div className="camera-container" >
