@@ -191,6 +191,8 @@ class Camera extends Component {
         data = new FormData();
         config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
+        console.log('Catchoom token and url :: ' + token + ' & ' + url);
+
         // Append form data    
         data.append('token', token);
         data.append('image', imageData, 'temp_image.jpg');
