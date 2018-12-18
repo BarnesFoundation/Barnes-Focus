@@ -1,16 +1,12 @@
 require 'barnes_elastic_search'
 
 class EsCachedRecord < ApplicationRecord
-  store :es_data, coder: JSON, accessors: [
-    'id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate'
-  ]
   validates :image_id, presence: true
 
   @es_fields = ['id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate', 'dimensions', 'objRightsTypeID', 'creditLine', 'room']
 
   ## Determines whether a cached record has expired data or not
   def not_expired?
-
     expired = false
 
     # If last fetch time isn't blank
@@ -22,7 +18,6 @@ class EsCachedRecord < ApplicationRecord
 
   ## Returns the cached data for a provided image id 
   def self.search img_id
-
     searched_data = nil
 
     # Search for the record, create new one if none exists
