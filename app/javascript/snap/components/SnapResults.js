@@ -87,6 +87,15 @@ class SnapResults extends Component {
       activeSlideIndex: 0,
       blurValue: 1,
       isShortDescVisible: false,
+      scanBtnStyle: {
+        position: 'fixed',
+        top: '80vh'
+      },
+      langDropdownStyle: {
+        position: 'fixed',
+        height: '80vh',
+        opacity: 0
+      },
       email: localStorage.getItem(SNAP_USER_EMAIL) || '',
       newsletterSubscription: false,
       resetLanguageBox: false,
@@ -202,32 +211,84 @@ class SnapResults extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
+  /**
+   * All the fancy scroll animation goes here.
+   */
   handleScroll = () => {
     let sliderElemTop = this.sliderContainer.getBoundingClientRect().y;
     let shortDescElemTop = this.shortDescContainer.getBoundingClientRect().y;
+    let shortDescElemHeight = this.shortDescContainer.getBoundingClientRect().bottom - this.shortDescContainer.getBoundingClientRect().top;
     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
     this.sliderTopMax = (sliderElemTop > this.sliderTopMax) ? sliderElemTop : this.sliderTopMax;
     this.shortDescTopMax = (shortDescElemTop > this.shortDescTopMax) ? shortDescElemTop : this.shortDescTopMax;
 
     let traversedY = h + document.body.scrollTop;
-    let currentScrollOffset = h - sliderElemTop;
+
+    let currentSliderScrollOffset = h - sliderElemTop;
+    let currentShortDescScrollOffset = h - shortDescElemTop;
     // console.log('traveredY = ' + traversedY);
     // console.log('ios visible slider height : ' + (h - sliderElemTop));
+    //console.log('shortDescElemHeight = ' + shortDescElemHeight);
 
-    let visibleSliderHeight = (isIOS) ? Math.floor(currentScrollOffset) : Math.floor(traversedY - this.sliderTopMax);
-    let isShortDescVisible = (traversedY - this.shortDescTopMax) > 0;
+    let visibleSliderHeight = (isIOS) ? Math.floor(currentSliderScrollOffset) : Math.floor(traversedY - this.sliderTopMax);
+    let visibleShortDescHeight = Math.floor(currentShortDescScrollOffset);
+    //let isShortDescVisible = (traversedY - this.shortDescTopMax) > 0;
+    //console.log('visibleShortDescHeight = ' + visibleShortDescHeight);
 
     /**
-     * Show hide scan button and language selectpr button if users scrolls down till shortDesc is visible in viewport.
+     * Show hide scan button and language selector button if users scrolls down till shortDesc is visible in viewport.
      */
-    if ((!this.state.isShortDescVisible && isShortDescVisible) || (this.state.isShortDescVisible && !isShortDescVisible)) {
-      this.setState({ isShortDescVisible: isShortDescVisible });
-    }
+    // if ((!this.state.isShortDescVisible && isShortDescVisible) || (this.state.isShortDescVisible && !isShortDescVisible)) {
+    //   this.setState({ isShortDescVisible: isShortDescVisible });
+    // }
 
     let blur = Math.floor(visibleSliderHeight / 30);
     if (blur >= 0 && blur <= 19) {
       this.setState({ blurValue: 1 + blur });
+    }
+
+    if (visibleSliderHeight >= 520) {
+      this.setState({
+        scanBtnStyle: {
+          position: 'relative',
+          bottom: `110px`
+        }
+      });
+    } else {
+      this.setState({
+        scanBtnStyle: {
+          position: 'fixed',
+          top: `80vh`
+        }
+      });
+    }
+    if (visibleShortDescHeight < 0) {
+      this.setState({
+        langDropdownStyle: {
+          position: 'fixed',
+          top: '80vh',
+          opacity: 0
+        }
+      });
+    }
+    else if (visibleShortDescHeight > 0 && visibleShortDescHeight <= shortDescElemHeight) {
+      this.setState({
+        langDropdownStyle: {
+          position: 'fixed',
+          top: '80vh',
+          opacity: 1
+        }
+      });
+    } else if (visibleShortDescHeight > shortDescElemHeight) {
+      this.setState({
+        langDropdownStyle: {
+          position: 'relative',
+          bottom: '75px',
+          opacity: 1,
+          right: 0
+        }
+      })
     }
 
     this.scrollInProgress = false;
@@ -391,119 +452,117 @@ class SnapResults extends Component {
   render() {
 
     return (
-      <div className="container-fluid search-container" id="search-result">
-        <div className="row">
-          <div className="col-12 col-md-12">
-            <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
-              <div className="card-top-container">
-                <div className="card-img-container">
-                  <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image_background" />
-                </div>
-                <div className="card-img-overlay">
-                  <div className="card-img-result">
-                    <img src={this.state.searchResults[0].url} alt="match_image" />
+      <div>
+        <div className="container-fluid search-container" id="search-result">
+          <div className="row">
+            <div className="col-12 col-md-12">
+              <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
+                <div className="card-top-container">
+                  <div className="card-img-container">
+                    <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image_background" />
                   </div>
-                  <h3 className="card-title">{this.state.searchResults[0].title}</h3>
-                </div>
-              </div>
-              <div className="card-body">
-                <div className="card-info">
-                  <table className="detail-table">
-                    <tbody>
-                      <tr>
-                        <td className="text-left item-label">Artist:</td>
-                        <td className="text-left item-info">{this.state.searchResults[0].artist}</td>
-                      </tr>
-                      <tr>
-                        <td className="text-left item-label">Title:</td>
-                        <td className="text-left item-info">{this.state.searchResults[0].title}</td>
-                      </tr>
-                      <tr>
-                        <td className="text-left item-label">Date:</td>
-                        <td className="text-left item-info">{this.state.searchResults[0].displayDate}</td>
-                      </tr>
-                      <tr>
-                        <td className="text-left item-label">Medium:</td>
-                        <td className="text-left item-info">{this.state.searchResults[0].medium}</td>
-                      </tr>
-                      <tr>
-                        <td className="text-left item-label">Dimensions:</td>
-                        <td className="text-left item-info">{this.state.searchResults[0].dimensions}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="short-desc-container" ref={el => this.shortDescContainer = el}>
-                  {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
-                </div>
-                <div className="share-wrapper">
-                  <div id="share-it" className="btn-share-result" ref="target" onClick={this.shareIt}>
-                    <img src={share} alt="share" />
-                    <span className="text-share">Share</span>
-                  </div>
-                  <Popover
-                    placement='top'
-                    container={this}
-                    target={this.refs.target}
-                    show={this.state.sharePopoverIsOpen}
-                    onHide={this.closeShareModal} >
-                    <div className="share d-flex justify-content-around">
-                      <a data-id={SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
-                        <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
-                      </a>
-                      <a data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
-                        <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
-                      </a>
+                  <div className="card-img-overlay">
+                    <div className="card-img-result">
+                      <img src={this.state.searchResults[0].url} alt="match_image" />
                     </div>
-                  </Popover>
+                    <h3 className="card-title">{this.state.searchResults[0].title}</h3>
+                  </div>
                 </div>
-              </div>
-
-              <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} >
-                <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue}></InRoomSlider>
-
-                <div className="scan-button" onClick={this.handleScan}>
-                  <img src={scan_button} alt="scan" />
-                </div>
-
-                <div className="language-dropdown">
-                  <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
-                </div>
-
-                <div className="footer-text">
-                  <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
-                  <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
-                </div>
-              </div>
-
-              <div className="email-container">
-                <div className="email-head">
-                  Enter your e-mail address to receive all the artworks you are scanning today
-                </div>
-                <div className="email-input">
-                  <form onSubmit={this.submitBookMark}>
-
-                    <div className="input-group">
-                      <input type="email" placeholder={(this.state.translation) ? this.state.translation.Bookmark_capture.text_2.translated_content : `Email address`} className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
-                      <div className="input-group-append">
-                        <button className="btn btn-outline-secondary" type="button">Submit</button>
+                <div className="card-body">
+                  <div className="card-info">
+                    <table className="detail-table">
+                      <tbody>
+                        <tr>
+                          <td className="text-left item-label">Artist:</td>
+                          <td className="text-left item-info">{this.state.searchResults[0].artist}</td>
+                        </tr>
+                        <tr>
+                          <td className="text-left item-label">Title:</td>
+                          <td className="text-left item-info">{this.state.searchResults[0].title}</td>
+                        </tr>
+                        <tr>
+                          <td className="text-left item-label">Date:</td>
+                          <td className="text-left item-info">{this.state.searchResults[0].displayDate}</td>
+                        </tr>
+                        <tr>
+                          <td className="text-left item-label">Medium:</td>
+                          <td className="text-left item-info">{this.state.searchResults[0].medium}</td>
+                        </tr>
+                        <tr>
+                          <td className="text-left item-label">Dimensions:</td>
+                          <td className="text-left item-info">{this.state.searchResults[0].dimensions}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="short-desc-container" ref={el => this.shortDescContainer = el}>
+                    {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
+                    <div className="language-dropdown" style={this.state.langDropdownStyle}>
+                      <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+                    </div>
+                  </div>
+                  <div className="share-wrapper">
+                    <div id="share-it" className="btn-share-result" ref="target" onClick={this.shareIt}>
+                      <img src={share} alt="share" />
+                      <span className="text-share">Share</span>
+                    </div>
+                    <Popover
+                      placement='top'
+                      container={this}
+                      target={this.refs.target}
+                      show={this.state.sharePopoverIsOpen}
+                      onHide={this.closeShareModal} >
+                      <div className="share d-flex justify-content-around">
+                        <a data-id={SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                          <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
+                        </a>
+                        <a data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
+                          <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
+                        </a>
                       </div>
-                    </div>
+                    </Popover>
+                  </div>
+                </div>
 
-                  </form>
+                <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} >
+                  <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue}></InRoomSlider>
+
+                  <div className="footer-text">
+                    <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
+                    <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
+                  </div>
+
+                  <div className="scan-button" onClick={this.handleScan} style={this.state.scanBtnStyle}>
+                    <img src={scan_button} alt="scan" />
+                  </div>
+
                 </div>
-                <div className="email-disclaimer">
-                  <span>We will use your e-mail address only to send you the artworks you are scanning today.</span>
+
+                <div className="email-container">
+                  <div className="email-head">
+                    Enter your e-mail address to receive all the artworks you are scanning today
                 </div>
+                  <div className="email-input">
+                    <form onSubmit={this.submitBookMark}>
+
+                      <div className="input-group">
+                        <input type="email" placeholder={(this.state.translation) ? this.state.translation.Bookmark_capture.text_2.translated_content : `Email address`} className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
+                        <div className="input-group-append">
+                          <button className="btn btn-outline-secondary" type="button">Submit</button>
+                        </div>
+                      </div>
+
+                    </form>
+                  </div>
+                  <div className="email-disclaimer">
+                    <span>We will use your e-mail address only to send you the artworks you are scanning today.</span>
+                  </div>
+                </div>
+
               </div>
-
             </div>
           </div>
         </div>
-
-
-
-
 
       </div>
     );
