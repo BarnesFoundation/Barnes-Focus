@@ -508,7 +508,7 @@ class Camera extends Component {
                                         <span>No results found. </span>
                                         <span>Click on the button to bring the art back into focus.</span>
                                     </div>
-                                    <div className="scan-button" onClick={this.handleScan}>
+                                    <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', top: '80vh' }}>
                                         <img src={scan_button} alt="scan" />
                                     </div>
                                 </div>

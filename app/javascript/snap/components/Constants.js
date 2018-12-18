@@ -2,8 +2,8 @@
  * snap v2 constants
  * ===== START =====
  */
-export const CATCHOOM_ACCESS_TOKEN = '2999d63fc1694ce4';
-export const CATCHOOM_REQUEST_URL = 'https://search.craftar.net/v1/search';
+export const CATCHOOM_ACCESS_TOKEN = process.env.CATCHOOM_ACCESS_TOKEN;
+export const CATCHOOM_REQUEST_URL = process.env.CATCHOOM_REQUEST_URL;
 /**
  * snap v2 constants
  * ===== END =======

@@ -9,7 +9,12 @@ environment.plugins.prepend('Provide', new webpack.ProvidePlugin({
     'window.Tether': "tether",
     Popper: ['popper.js', 'default']
 }),
-    new webpack.EnvironmentPlugin(['IMAGE_ENGINE', 'CROP_IMAGE']) // this makes sure that these are accessible as env variables to react
+    new webpack.EnvironmentPlugin([
+        'IMAGE_ENGINE',
+        'CROP_IMAGE',
+        'CATCHOOM_ACCESS_TOKEN',
+        'CATCHOOM_REQUEST_URL'
+    ]) // this makes sure that these are accessible as env variables to react
 )
 
 
