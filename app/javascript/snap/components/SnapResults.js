@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router'
+import { compose } from 'redux';
+import withOrientation from './withOrientation';
 import axios from 'axios';
 import share from 'images/share.svg';
 import scan_button from 'images/scan-button.svg';
@@ -569,4 +571,7 @@ class SnapResults extends Component {
   }
 }
 
-export default withRouter(SnapResults);
+export default compose(
+  withOrientation,
+  withRouter
+)(SnapResults);
