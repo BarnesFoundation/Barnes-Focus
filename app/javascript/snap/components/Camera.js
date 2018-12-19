@@ -320,7 +320,10 @@ class Camera extends Component {
             .then(videoStream => {
                 this.setState({ videoStream: videoStream, cameraPermission: true });
             })
-            .catch(err => this.setState({ error: "An error occurred accessing the device camera" }));
+            .catch(error => {
+                console.log('Not allowed to access camera. Please check settings! ' + error);
+                this.setState({ error: "An error occurred accessing the device camera" });
+            });
 
     }
 
@@ -344,7 +347,7 @@ class Camera extends Component {
                     this.capturePhotoShots();
                 })
                 .catch((error) => {
-                    console.log('Not allowed to access camera. Please check settings! ' + error);
+                    console.log('Cannot auto play video stream! ' + error);
                 });
 
 
