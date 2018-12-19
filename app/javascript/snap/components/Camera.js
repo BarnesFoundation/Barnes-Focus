@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import Hammer from 'hammerjs';
+import { compose } from 'redux';
+import withOrientation from './withOrientation';
 import scan_button from 'images/scan-button.svg';
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
@@ -12,7 +13,6 @@ import {
 } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import * as analytics from './Analytics';
-import Home from './Home';
 
 
 const artworkUrl = '/api/snaps/getArtworkInformation';
@@ -484,4 +484,7 @@ class Camera extends Component {
     }
 }
 
-export default withRouter(Camera);
+export default compose(
+    withOrientation,
+    withRouter
+)(Camera);

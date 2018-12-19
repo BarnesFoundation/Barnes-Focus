@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
+
+import withOrientation from './withOrientation';
+
 
 import home_background from 'images/barnes-v2-landing.png';
 import barnes_logo from 'images/barnes-logo.png';
@@ -99,18 +103,42 @@ class HomeComponent extends Component {
     componentWillMount() {
         // Reset snap application if last_snap_timestamp is more than 24 hrs
         this.resetSnapApp();
+
+        //screen.lockOrientationUniversal = screen.lockOrientation || screen.mozLockOrientation || screen.msLockOrientation || screen.orientation.lock;
+
+        // screen.lockOrientationUniversal("portrait").then((result) => {
+        //     console.log('Successfully locked Screen to Portrait mode');
+        // }, (error) => {
+        //     console.log('Screen lock failed. ' + error);
+        // });
     }
 
     componentDidMount() {
 
         if (process.env.CROP_IMAGE === 'TRUE') {
             console.log('Image crop will be applied');
-        } else { console.log('Image crop will not be applied'); }
+        } else {
+            console.log('Image crop will not be applied');
+        }
+
+        if ('orientation' in screen) {
+            screen.orientation.addEventListener('change', (e) => {
+                console.log('current orientation :: ' + screen.orientation.type);
+                if (screen.orientation.type !== 'portrait-primary') {
+                    console.log('The app is best viewed on Portrait mode');
+                } else {
+
+                }
+            });
+        } else {
+            console.log('Orientation API not supported');
+        }
+
 
     }
 
     onSelectLanguage = (lang) => {
-        console.log('Selected lang changed in Welcome component : ' + JSON.stringify(lang));
+        console.log('Selected lang changed in Home component : ' + JSON.stringify(lang));
         this.setState({ selectedLanguage: lang });
 
         /* axios.get('/api/translations?language=' + lang.code)
@@ -204,5 +232,8 @@ class HomeComponent extends Component {
     }
 }
 
-export default withRouter(HomeComponent);
+export default compose(
+    withOrientation,
+    withRouter
+)(HomeComponent);
 
