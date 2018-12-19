@@ -427,65 +427,58 @@ class Camera extends Component {
             transform: `scale(` + scale + `)`
         }
         return (
-            <div>
-                {this.state.cameraPermission &&
-                    <div className="camera-container" >
-                        <div className="camera">
-                            {
-                                this.state.showVideo &&
-                                <div>
-                                    <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
-                                    {!this.state.matchError &&
-                                        <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
-                                            {/* Hint text */}
-                                            {/* <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p> */}
-                                        </div>
-                                    }
-                                    {this.state.matchError &&
-                                        <div id="no-match-overlay" className="no-match-overlay">
-                                            <div className="hint">
-                                                <span>No results found. </span>
-                                                <span>Click on the button to bring the art back into focus.</span>
-                                            </div>
-                                            <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', top: '80vh' }}>
-                                                <img src={scan_button} alt="scan" />
-                                            </div>
-                                        </div>
-                                    }
-
+            <div className="camera-container" >
+                <div className="camera">
+                    {
+                        this.state.showVideo &&
+                        <div>
+                            <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
+                            {!this.state.matchError &&
+                                <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
+                                    {/* Hint text */}
+                                    {/* <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p> */}
                                 </div>
                             }
-
-                            {/* ========= Search in progress screen ============ */
-                                this.state.searchInProgress &&
-                                <div>
-                                    <nav className="narbar header">
-                                        <a className="navbar-brand">
-                                            <img src={barnes_logo} alt="Barnes" />
-                                        </a>
-                                    </nav>
-                                    <div className="search-progress-container">
-                                        <div className="snap-spinner">
-                                            <PulseLoader
-                                                color={'#999999'}
-                                                size={20}
-                                                margin={'5px'}
-                                                loading={this.state.searchInProgress}
-                                            />
-                                        </div>
-                                        <div className="content">
-                                            <h1>{(this.state.translation) ? this.state.translation.Snap_searching.text_1.translated_content : `Searching`}</h1>
-                                            <p>{(this.state.translation) ? this.state.translation.Snap_searching.text_2.translated_content : `Please wait while we search our database.`}</p>
-                                        </div>
+                            {this.state.matchError &&
+                                <div id="no-match-overlay" className="no-match-overlay">
+                                    <div className="hint">
+                                        <span>No results found. </span>
+                                        <span>Click on the button to bring the art back into focus.</span>
+                                    </div>
+                                    <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', top: '80vh' }}>
+                                        <img src={scan_button} alt="scan" />
                                     </div>
                                 </div>
                             }
+
                         </div>
+                    }
 
-                    </div>
-                }
-
-                {!this.state.cameraPermission && <Home />}
+                    {/* ========= Search in progress screen ============ */
+                        this.state.searchInProgress &&
+                        <div>
+                            <nav className="narbar header">
+                                <a className="navbar-brand">
+                                    <img src={barnes_logo} alt="Barnes" />
+                                </a>
+                            </nav>
+                            <div className="search-progress-container">
+                                <div className="snap-spinner">
+                                    <PulseLoader
+                                        color={'#999999'}
+                                        size={20}
+                                        margin={'5px'}
+                                        loading={this.state.searchInProgress}
+                                    />
+                                </div>
+                                <div className="content">
+                                    <h1>{(this.state.translation) ? this.state.translation.Snap_searching.text_1.translated_content : `Searching`}</h1>
+                                    <p>{(this.state.translation) ? this.state.translation.Snap_searching.text_2.translated_content : `Please wait while we search our database.`}</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
             </div>
         );
     }
