@@ -136,8 +136,20 @@ class HomeComponent extends Component {
 
     onSelectYes = () => {
         console.log('Yes, user is at Barnes!');
-        // Navigate to snap page
-        this.props.history.push({ pathname: '/snap' });
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                "facingMode": "environment",
+                "width": 1920,
+                "height": 1080
+            }
+        })
+            .then(videoStream => {
+                console.log('User permission recieved for camera access. Redirect user to /snap now.');
+                // Navigate to snap page
+                this.props.history.push({ pathname: '/snap' });
+
+            })
+            .catch(err => this.setState({ error: "An error occurred accessing the device camera" }));
     }
 
     onSelectNo = () => {
