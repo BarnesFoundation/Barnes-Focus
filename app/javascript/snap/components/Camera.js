@@ -12,6 +12,7 @@ import {
 } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import * as analytics from './Analytics';
+import Home from './Home';
 
 
 const artworkUrl = '/api/snaps/getArtworkInformation';
@@ -24,20 +25,20 @@ class Camera extends Component {
     state = {
         videoStream: null,
         frontCamera: false,
-        capturedImage: null,
         showVideo: true,
         searchInProgress: false,
         snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
+        cameraPermission: false,
         scanSeqId: Date.now(),
         matchError: false,
         videoBlur: 0
     };
 
     // Set booleans and counter
-    ticking = false; artworkRetrieved = false; matchFound = false; responseCounter = 0; intervalExecutions;
+    artworkRetrieved = false; matchFound = false; responseCounter = 0; intervalExecutions;
 
-    track; camera_capabilities; camera_settings; initZoom; zoomLevel; scan; cropRect;
+    track; camera_capabilities; camera_settings; scan; cropRect;
 
     resetSnapCounter = () => {
         let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
@@ -48,13 +49,6 @@ class Camera extends Component {
                 this.setState({ snapAttempts: 0 });
             }
         }
-    }
-
-    cancelCamera = () => {
-        this.props.history.push({
-            pathname: '/',
-            state: { cameraCancelled: true }
-        });
     }
 
     /** Crops an image and returns the uri of the cropped image */
@@ -191,7 +185,7 @@ class Camera extends Component {
         data = new FormData();
         config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
-        console.log('Catchoom token and url :: ' + token + ' & ' + url);
+        //console.log('Catchoom token and url :: ' + token + ' & ' + url);
 
         // Append form data    
         data.append('token', token);
@@ -308,59 +302,10 @@ class Camera extends Component {
         // Turn off search in-progress animation
         if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
 
-        // Track this snap failure and navigate to the not found page
-        //analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_FAILURE, eventLabel: GA_EVENT_LABEL.SNAP_FAILURE });
-        //this.props.history.push({ pathname: '/not-found' });
         if (!this.state.matchError) {
             this.setState({ matchError: true, videoBlur: 25 });
         }
 
-    }
-
-    clearPhoto = (ev) => {
-        this.toggleImage(false);
-        this.setState((prevState, props) => {
-            return {
-                ...prevState,
-                showVideo: true,
-                searchedImageURL: '',
-                searchResults: [],
-                error: ''
-            };
-        });
-
-        setTimeout(() => {
-            this.zoomLevel = 1;
-        }, 0);
-    }
-
-    /** Resets the zoom to its initial state */
-    resetZoom = () => {
-        if (this.camera_capabilities && 'zoom' in this.camera_capabilities) {
-            this.track.applyConstraints({ advanced: [{ zoom: 1 }] });
-        }
-    }
-
-    updateZoom = () => {
-        if ('zoom' in this.camera_capabilities && this.zoomLevel >= this.camera_capabilities.zoom.min && this.zoomLevel <= this.camera_capabilities.zoom.max) {
-            this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
-        } else {
-            if (isIOS) {
-                console.log('Setting scale to = ' + this.zoomLevel);
-                this.video.style.webkitTransform = 'scale(' + this.zoomLevel + ')';
-            } else {
-                console.log('Either zoom is not supported by the device or you are zooming beyond supported range.');
-            }
-        }
-
-        this.ticking = false;
-    }
-
-    requestZoom = () => {
-        if (!this.ticking) {
-            requestAnimationFrame(this.updateZoom);
-            this.ticking = true;
-        }
     }
 
     componentDidMount() {
@@ -373,21 +318,9 @@ class Camera extends Component {
             }
         })
             .then(videoStream => {
-                this.setState({ videoStream });
+                this.setState({ videoStream: videoStream, cameraPermission: true });
             })
             .catch(err => this.setState({ error: "An error occurred accessing the device camera" }));
-
-        const el = document.querySelector('.camera');
-        const mc = new Hammer.Manager(el, { preventDefault: true });
-        mc.add(new Hammer.Pinch({ threshold: 0 }));
-        mc.on("pinchstart pinchin pinchout", (e) => {
-            if (e.type == 'pinchstart') {
-                this.initZoom = this.zoomLevel || 1;
-            }
-            this.zoomLevel = (this.initZoom * e.scale).toFixed(1);
-            this.zoomLevel = (this.zoomLevel < 1) ? 1 : this.zoomLevel;
-            this.requestZoom();
-        });
 
     }
 
@@ -408,7 +341,6 @@ class Camera extends Component {
                     this.track = this.state.videoStream.getVideoTracks()[0];
                     this.camera_capabilities = this.track.getCapabilities();
                     this.camera_settings = this.track.getSettings();
-                    requestAnimationFrame(this.resetZoom);
                     this.capturePhotoShots();
                 })
                 .catch((error) => {
@@ -492,59 +424,65 @@ class Camera extends Component {
             transform: `scale(` + scale + `)`
         }
         return (
-            <div className="camera-container" >
-                <div className="camera">
-                    {
-                        this.state.showVideo &&
-                        <div>
-                            <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
-                            {!this.state.matchError &&
-                                <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
-                                    {/* Hint text */}
-                                    {/* <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p> */}
+            <div>
+                {this.state.cameraPermission &&
+                    <div className="camera-container" >
+                        <div className="camera">
+                            {
+                                this.state.showVideo &&
+                                <div>
+                                    <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
+                                    {!this.state.matchError &&
+                                        <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
+                                            {/* Hint text */}
+                                            {/* <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p> */}
+                                        </div>
+                                    }
+                                    {this.state.matchError &&
+                                        <div id="no-match-overlay" className="no-match-overlay">
+                                            <div className="hint">
+                                                <span>No results found. </span>
+                                                <span>Click on the button to bring the art back into focus.</span>
+                                            </div>
+                                            <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', top: '80vh' }}>
+                                                <img src={scan_button} alt="scan" />
+                                            </div>
+                                        </div>
+                                    }
+
                                 </div>
                             }
-                            {this.state.matchError &&
-                                <div id="no-match-overlay" className="no-match-overlay">
-                                    <div className="hint">
-                                        <span>No results found. </span>
-                                        <span>Click on the button to bring the art back into focus.</span>
-                                    </div>
-                                    <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', top: '80vh' }}>
-                                        <img src={scan_button} alt="scan" />
+
+                            {/* ========= Search in progress screen ============ */
+                                this.state.searchInProgress &&
+                                <div>
+                                    <nav className="narbar header">
+                                        <a className="navbar-brand">
+                                            <img src={barnes_logo} alt="Barnes" />
+                                        </a>
+                                    </nav>
+                                    <div className="search-progress-container">
+                                        <div className="snap-spinner">
+                                            <PulseLoader
+                                                color={'#999999'}
+                                                size={20}
+                                                margin={'5px'}
+                                                loading={this.state.searchInProgress}
+                                            />
+                                        </div>
+                                        <div className="content">
+                                            <h1>{(this.state.translation) ? this.state.translation.Snap_searching.text_1.translated_content : `Searching`}</h1>
+                                            <p>{(this.state.translation) ? this.state.translation.Snap_searching.text_2.translated_content : `Please wait while we search our database.`}</p>
+                                        </div>
                                     </div>
                                 </div>
                             }
-
                         </div>
-                    }
 
-                    {/* ========= Search in progress screen ============ */
-                        this.state.searchInProgress &&
-                        <div>
-                            <nav className="narbar header">
-                                <a className="navbar-brand">
-                                    <img src={barnes_logo} alt="Barnes" />
-                                </a>
-                            </nav>
-                            <div className="search-progress-container">
-                                <div className="snap-spinner">
-                                    <PulseLoader
-                                        color={'#999999'}
-                                        size={20}
-                                        margin={'5px'}
-                                        loading={this.state.searchInProgress}
-                                    />
-                                </div>
-                                <div className="content">
-                                    <h1>{(this.state.translation) ? this.state.translation.Snap_searching.text_1.translated_content : `Searching`}</h1>
-                                    <p>{(this.state.translation) ? this.state.translation.Snap_searching.text_2.translated_content : `Please wait while we search our database.`}</p>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
+                    </div>
+                }
 
+                {!this.state.cameraPermission && <Home />}
             </div>
         );
     }
