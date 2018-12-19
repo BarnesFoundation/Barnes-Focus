@@ -1,20 +1,10 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
-import { PulseLoader } from 'react-spinners';
-
-import LanguageSelect from './LanguageSelect';
-import Hammer from 'hammerjs';
-import ReactModal from 'react-modal';
-
 
 import home_background from 'images/barnes-v2-landing.png';
 import barnes_logo from 'images/barnes-logo.png';
 import barnes_kf_logo from 'images/barnes-knight-foundation-logo.png';
 import cross from 'images/cross.png';
-
-import axios from 'axios';
 
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, SNAP_LAST_TIMESTAMP, SNAP_USER_EMAIL, SNAP_APP_RESET_INTERVAL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome, osVersion } from 'react-device-detect';
@@ -27,12 +17,8 @@ class HomeComponent extends Component {
         super(props);
 
         this.state = {
-            ...props.location.state, // when "Take Photo" button is clicked in /not-found or /results page in (iOS, Android/Firefox), we pass {launchCamera: true} property
-            searchInProgress: false,
             snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
             selectedLanguage: '',
-            translation: null,
-            showBrowserModal: false,
             userAtBarnes: true
         }
     }
@@ -56,7 +42,7 @@ class HomeComponent extends Component {
         }
     }
 
-    checkForGetUserMedia = () => {
+    /* checkForGetUserMedia = () => {
         console.log('iOS was detected');
         ReactModal.setAppElement('#app');
 
@@ -82,16 +68,16 @@ class HomeComponent extends Component {
         }
 
         // If they're not on iOS 11, it doesn't matter what browser they're using, navigator.mediaDevices.getUserMedia() will return undefined
-        /* else {
+        else {
             return <ReactModal isOpen={true} className="Modal">
                 <div className="browser-modal">
                     {<p className="safari-text">Please upgrade to iOS 11 to use the Snap app with Safari</p>}
                 </div>
             </ReactModal>
-        } */
-    }
+        } 
+    } */
 
-    copyUrlToClipboard = () => {
+    /* copyUrlToClipboard = () => {
         console.log('Copy clicked');
         let copyText = document.getElementById("link-text");
         let range = document.createRange();
@@ -108,28 +94,7 @@ class HomeComponent extends Component {
         document.execCommand('copy');
 
         // clipboard.writeText('https://snap.barnesfoundation.org');
-    }
-
-
-    checkIndex = () => {
-        const $this = $("#snapCarousel");
-        if ($("#snapCarousel .carousel-inner .carousel-item:first").hasClass("active")) {
-            $this.children(".carousel-control-prev").addClass('opaque');
-            $this.children(".carousel-control-prev").show();
-            $this.children(".carousel-control-next").show();
-            $this.children(".carousel-indicators").show();
-        } else if ($("#snapCarousel .carousel-inner .carousel-item:last").hasClass("active")) {
-
-            $this.children(".carousel-control-next").hide();
-            $this.children(".carousel-control-prev").hide();
-            $this.children(".carousel-indicators").hide();
-        } else {
-            $this.children(".carousel-control-prev").removeClass('opaque');
-            $this.children(".carousel-control-prev").show();
-            $this.children(".carousel-control-next").show();
-            $this.children(".carousel-indicators").show();
-        }
-    };
+    } */
 
     componentWillMount() {
         // Reset snap application if last_snap_timestamp is more than 24 hrs
@@ -142,62 +107,13 @@ class HomeComponent extends Component {
             console.log('Image crop will be applied');
         } else { console.log('Image crop will not be applied'); }
 
-        if (this.state.cameraCancelled) {
-            $("#snapCarousel .carousel-inner .carousel-item:first").removeClass("active");
-            $("#snapCarousel .carousel-inner .carousel-item:last").addClass("active");
-        }
-
-        this.checkIndex();
-
-        const settings = {
-            interval: false,
-            wrap: false
-        };
-        // axios
-        //     .get('/api/snaps/languages?language=en')
-        //     .then((response) => {
-        //         var prefLang = localStorage.getItem('barnes.snap.pref.lang') || "en";
-        //         var savedLanguage = response.data.find(function (obj) { return obj.code === prefLang; });
-        //         this.setState({ languageOptions: response.data, selectedLanguage: savedLanguage });
-        //     })
-        //     .catch((e) => {
-        //         console.error(e);
-        //     });
-
-        $('#snapCarousel').carousel(settings);
-
-        $('#snapCarousel').each(function () {
-            var $carousel = $(this);
-            var hammertime = new Hammer(this, {
-                recognizers: [
-                    [Hammer.Swipe, { direction: Hammer.DIRECTION_HORIZONTAL, threshold: 0 }],
-                    [Hammer.Pinch, { enable: true }]
-                ]
-            });
-            hammertime.on('swipeleft', function () {
-                $carousel.carousel('next');
-            });
-            hammertime.on('swiperight', function () {
-                $carousel.carousel('prev');
-            });
-        });
-
-        $('#snapCarousel').on('slid.bs.carousel', () => {
-            this.checkIndex();
-        })
-
-        // NOTE: below code is to be used only when native camera capture is enabled using <input type="file".../>
-        // if (this.state.launchCamera && (isIOS || (isAndroid && isFirefox))) {
-        //     this.input.click();
-        // }
-
     }
 
     onSelectLanguage = (lang) => {
         console.log('Selected lang changed in Welcome component : ' + JSON.stringify(lang));
         this.setState({ selectedLanguage: lang });
 
-        axios.get('/api/translations?language=' + lang.code)
+        /* axios.get('/api/translations?language=' + lang.code)
             .then(response => {
                 console.log('successfully fetched translations.');
                 let res = response.data;
@@ -214,56 +130,14 @@ class HomeComponent extends Component {
             })
             .catch(error => {
                 console.log('Error while fetching translations!');
-            });
+            }); */
     }
 
-    submitPhoto = (canvas) => {
-        let processedImage = canvas.toDataURL('image/jpeg');
-
-        localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-        let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
-        axios.post('/api/snaps/search', {
-            image_data: processedImage,
-            language: prefLang
-        }).then(response => {
-            this.setState({ searchInProgress: false });
-            // Navigate to search result page or not found page
-            const res = response.data;
-            if (res.data.records.length === 0) {
-                this.props.history.push({ pathname: '/not-found' });
-            } else {
-                this.props.history.push({
-                    pathname: '/results',
-                    state: {
-                        result: res,
-                        snapCount: localStorage.getItem(SNAP_ATTEMPTS)
-                    }
-                });
-            }
-        })
-            .catch(error => {
-                this.setState({ searchInProgress: false });
-                this.props.history.push({ pathname: '/not-found' });
-            });
-
-    }
 
     onSelectYes = () => {
         console.log('Yes, user is at Barnes!');
-        navigator.mediaDevices.getUserMedia({
-            video: {
-                "facingMode": "environment",
-                "width": 1920,
-                "height": 1080
-            }
-        })
-            .then(videoStream => {
-                console.log('User permission recieved for camera access. Redirect user to /snap now.');
-                // Navigate to snap page
-                this.props.history.push({ pathname: '/snap' });
-
-            })
-            .catch(err => this.setState({ error: "An error occurred accessing the device camera" }));
+        // Navigate to snap page
+        this.props.history.push({ pathname: '/snap' });
     }
 
     onSelectNo = () => {
