@@ -52,6 +52,28 @@ class Api::SnapsController < Api::BaseController
     render json: 'Image was stored'
   end
 
+  def similar_arts
+    respond_to do | wants |
+      if params[:image_id]
+        @es_cached_record = EsCachedRecord.find_by image_id: params[:image_id]
+
+        if @es_cached_record
+          wants.json do
+            render json: { data: { success: true, similar_arts: EsCachedRecord.find_similar_arts( @es_cached_record ) }, message: 'ok' }, status: :ok
+          end
+        else
+          wants.json do
+            render json: { data: { success: false, errors: [ 'Record not found' ] }, message: 'not found' }, status: 404
+          end
+        end
+      else
+        wants.json do
+          render json: { data: { success: false, errors: ['Image id is not present'] }, message: 'bad entry' }, status: 400
+        end
+      end
+    end
+  end
+
   ###### Mark all subsequent methods as private methods ######
   private
 

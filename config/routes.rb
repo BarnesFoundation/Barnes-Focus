@@ -11,6 +11,7 @@ Rails.application.routes.draw do
         post 'storeSearchedResult'
         post 'getArtworkInformation'
         get 'languages'
+        get :similar_arts
       end
     end
     resources :bookmarks, only: [:index, :create]
