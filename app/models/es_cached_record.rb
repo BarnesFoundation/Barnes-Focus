@@ -3,7 +3,24 @@ require 'barnes_elastic_search'
 class EsCachedRecord < ApplicationRecord
   validates :image_id, presence: true
 
-  @es_fields = ['id', 'imageSecret', 'title', 'shortDescription', 'people', 'classification', 'locations', 'medium', 'url', 'invno', 'displayDate', 'dimensions', 'objRightsTypeID', 'creditLine', 'room']
+  @es_fields = [
+    'id',
+    'imageSecret',
+    'title',
+    'shortDescription',
+    'people',
+    'classification',
+    'locations',
+    'medium',
+    'url',
+    'invno',
+    'displayDate',
+    'dimensions',
+    'objRightsTypeID',
+    'creditLine',
+    'room',
+    'ensembleIndex'
+  ]
 
   ## Determines whether a cached record has expired data or not
   def not_expired?
@@ -48,5 +65,45 @@ class EsCachedRecord < ApplicationRecord
     searched_data = BarnesElasticSearch.instance.get_object(image_id).slice(*@es_fields)
 
     return searched_data
+  end
+
+  ## While you're in this room feature ##
+  ## this method accepts two parameters. (1) image_id and (2) viewed images ##
+  def self.find_similar_arts image_id, viewed_images = []
+    similar_art_objects = []
+
+    @es_record = find_by image_id: image_id
+
+    if @es_record
+      given_value = @es_record.es_data[ "ensembleIndex" ]
+
+      if given_value.present? && (!given_value.to_i.eql?(0) || !given_value.blank?)
+        # calculate lower bound for given value
+        # formula is: LB = x % 4 == 0 ? ((x-1) /4 * 4 + 1) : (x /4 * 4 + 1)
+        lower_bound = given_value.to_i
+        lower_bound = lower_bound % 4 == 0 ? ( ( ( ( lower_bound - 1 ) / 4 ) * 4 )+ 1 ) : ( ( ( lower_bound / 4 ) * 4 ) + 1 )
+
+        # cacluate upper bound for given value
+        # formula is: UB = x % 4 == 0 ?  ((x-1) / 4 + 1) * 4 :  ((x / 4 + 1) * 4)
+        upper_bound = given_value.to_i
+        upper_bound = upper_bound % 4 == 0 ? ( ( ( upper_bound - 1 ) / 4 + 1 ) * 4 ) : ( ( upper_bound / 4 + 1 ) * 4 )
+
+        # querying table against `ensembleIndex` of es_data
+        es_cached_records = all
+        es_cached_records = es_cached_records.where.not( image_id: viewed_images ) if viewed_images.present?
+
+        es_cached_records = es_cached_records.where( "es_data ->> 'ensembleIndex' >= ?", lower_bound.to_s )
+        es_cached_records = es_cached_records.where( "es_data ->> 'ensembleIndex' <= ?", upper_bound.to_s )
+
+        # querying table against `shortDescription` of es_data
+        es_cached_records = es_cached_records.where( "es_data ->> 'shortDescription' != ?", '' )
+
+        es_cached_records = es_cached_records.limit(3)
+        similar_art_objects = similar_art_objects.push es_cached_records.collect(&:image_id)
+        similar_art_objects = similar_art_objects.flatten
+      end
+    end
+
+    return similar_art_objects
   end
 end
