@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       collection do
         post 'storeSearchedResult'
         post 'getArtworkInformation'
+        get :getArtworkInformation
         get 'languages'
         get :similar_arts
       end

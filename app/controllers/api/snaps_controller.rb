@@ -79,7 +79,6 @@ class Api::SnapsController < Api::BaseController
 
     ## Processes a recognized image using its id
     def process_searched_image image_id, viewed_image_ids
-
       # Empty response object
       response = { }
       response[:api_data] = []
@@ -92,11 +91,7 @@ class Api::SnapsController < Api::BaseController
 
         # Get the image information for the image id
         response[:data][:records] << get_image_information(image_id)
-
-        # Get other records in the same room
-        room_id = response[:data][:records][0][:room] 
-        # get_room_artworks was written keeping in mind that we get similar work of arts. But this is no longer needed now
-        response[:data][:roomRecords] = [] # get_room_artworks(room_id, viewed_image_ids)
+        response[:data][:roomRecords] = get_similar_artworks(image_id, viewed_image_ids)
       end
       return response
     end
@@ -146,16 +141,9 @@ class Api::SnapsController < Api::BaseController
     end
 
     ## Get artworks from the same room
-    def get_room_artworks(room, viewed_images)
-
+    def get_similar_artworks(image_id, viewed_images)
       # Get the objects from the room
-      room_objects = BarnesElasticSearch.instance.get_room_objects(room, viewed_images)
-  
-      # Extract the ids
-      ids = []
-      room_objects.each do |image_id|
-        ids << image_id['_id']
-      end
-      return ids
+      similar_arts = EsCachedRecord.find_similar_arts image_id, viewed_images
+      return similar_arts
     end
 end
