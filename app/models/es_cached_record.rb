@@ -69,10 +69,10 @@ class EsCachedRecord < ApplicationRecord
 
   ## While you're in this room feature ##
   ## this method accepts two parameters. (1) image_id and (2) viewed images ##
-  def self.find_similar_arts es_cached_record_obj, viewed_images = []
+  def self.find_similar_arts image_id, viewed_images = []
     similar_art_objects = []
 
-    @es_cached_record = es_cached_record_obj
+    @es_cached_record = find_by image_id: image_id
 
     if @es_cached_record
       given_value = @es_cached_record.es_data[ "ensembleIndex" ]
@@ -101,9 +101,10 @@ class EsCachedRecord < ApplicationRecord
         es_cached_records = es_cached_records.limit(3)
         similar_art_objects = similar_art_objects.push es_cached_records.collect(&:es_data)
         similar_art_objects = similar_art_objects.flatten
-        similar_art_objects.map { |similar_art_object| 
+        similar_art_objects.map { | similar_art_object |
           similar_art_object['art_url'] = Image.imgix_url(similar_art_object['id'], similar_art_object['imageSecret'])
         }
+        similar_art_objects = similar_art_objects.map { | similar_art_object | similar_art_object.slice( 'id', 'art_url' ) }
       end
     end
 
