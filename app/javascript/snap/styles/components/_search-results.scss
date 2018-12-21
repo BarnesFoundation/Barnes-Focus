@@ -315,6 +315,26 @@
     transition: all .3s ease-in-out;
 }
 
+.cross-fade-leave {
+  opacity: 1;
+}
+.cross-fade-leave.cross-fade-leave-active {
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+
+.cross-fade-enter {
+  opacity: 0;
+}
+.cross-fade-enter.cross-fade-enter-active {
+  opacity: 1;
+  transition: opacity 1s ease-in;
+}
+
+.cross-fade-height {
+  transition: height .5s ease-in-out;
+}
+
 /* iPhone 6,7,8  */
 @media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
     .btn-circle {
