@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import Slider from 'react-slick';
 import CrossfadeImage from 'react-crossfade-image';
+import { withRouter } from 'react-router-dom';
+import { ART_WORK_INFO_URL } from './Constants';
+import axios from 'axios';
 
 const sliderSettings = {
     className: "slider-container",
@@ -86,6 +89,18 @@ class InRoomSlider extends Component {
         }
     }
 
+    _handleOnClick = (id) => {
+        console.log('Also in room id = ' + id);
+
+        axios.get(ART_WORK_INFO_URL + id)
+            .then(response => {
+                this.props.onSelectInRoomArt(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+
+    }
 
     beforeChangeHandler = (oldSlide, nextSlide) => {
         this.setState({ activeSlideIndex: nextSlide });
@@ -101,7 +116,7 @@ class InRoomSlider extends Component {
             <div>
 
                 <div className="slider-background" style={sliderBackground}>
-                    <CrossfadeImage src={this.props.alsoInRoomResults[this.state.activeSlideIndex] + this.sliderBackgroundCropParams} duration={1000}
+                    <CrossfadeImage src={this.props.alsoInRoomResults[this.state.activeSlideIndex].art_url + this.sliderBackgroundCropParams} duration={1000}
                         timingFunction={"ease-out"} />
                 </div>
 
@@ -109,8 +124,8 @@ class InRoomSlider extends Component {
                 <div className="slider-container">
                     <Slider {...sliderSettings} beforeChange={this.beforeChangeHandler}>
                         {
-                            this.props.alsoInRoomResults.map((result, index) =>
-                                <div key={index}><img src={result + this.sliderCropParams} /></div>
+                            this.props.alsoInRoomResults.map((record, index) =>
+                                <div key={index} onClick={() => this._handleOnClick(record.id)}><img src={record.art_url + this.sliderCropParams} /></div>
                             )
                         }
                     </Slider>
@@ -120,4 +135,4 @@ class InRoomSlider extends Component {
     }
 }
 
-export default InRoomSlider;
+export default withRouter(InRoomSlider);

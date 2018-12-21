@@ -9,13 +9,10 @@ import barnes_logo from 'images/logo.svg';
 import {
     SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION,
     GA_EVENT_LABEL, SNAP_LAST_TIMESTAMP, SNAP_COUNT_RESET_INTERVAL, SNAP_APP_RESET_INTERVAL, SNAP_USER_EMAIL, SNAP_LANGUAGE_TRANSLATION,
-    CATCHOOM_ACCESS_TOKEN, CATCHOOM_REQUEST_URL
+    CATCHOOM_ACCESS_TOKEN, CATCHOOM_REQUEST_URL, ART_WORK_INFO_URL
 } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import * as analytics from './Analytics';
-
-
-const artworkUrl = '/api/snaps/getArtworkInformation?imageId=';
 
 class Camera extends Component {
 
@@ -254,12 +251,9 @@ class Camera extends Component {
     /** Retrieves the information for the identified piece */
     getArtworkInformation = async (imageId) => {
 
-        /** TODO - retrieve the stored list of already viewed images from local storage to pass to the front end... */
-        let viewedImageIds = [];
-
         this.artworkRetrieved = true;
         try {
-            let response = await axios.get(artworkUrl + imageId);
+            let response = await axios.get(ART_WORK_INFO_URL + imageId);
             return response.data;
         }
         catch (error) { console.log('An error occurred while retrieving the artwork information from the server'); }
