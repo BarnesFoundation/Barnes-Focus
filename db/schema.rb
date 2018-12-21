@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181218075146) do
+ActiveRecord::Schema.define(version: 20181220110037) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,11 +70,12 @@ ActiveRecord::Schema.define(version: 20181218075146) do
 
   create_table "es_cached_records", force: :cascade do |t|
     t.string "image_id", null: false
-    t.json "es_data"
+    t.jsonb "es_data"
     t.datetime "last_es_fetched_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "old_es_data"
+    t.index ["es_data"], name: "index_es_cached_records_on_es_data"
     t.index ["image_id"], name: "index_es_cached_records_on_image_id"
     t.index ["last_es_fetched_at"], name: "index_es_cached_records_on_last_es_fetched_at"
   end
