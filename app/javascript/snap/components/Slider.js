@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Slider from 'react-slick';
-
+import CrossfadeImage from 'react-crossfade-image';
 
 const sliderSettings = {
     className: "slider-container",
@@ -29,12 +29,68 @@ class InRoomSlider extends Component {
 
         this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
         this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+
+        /* this.swipeX;
+        this.firstClientX */
     }
 
-    afterChangeHandler = (currentSlide) => {
-        console.log('Active slide :: ' + currentSlide);
-        this.setState({ activeSlideIndex: currentSlide });
+    /* componentDidMount() {
+        window.addEventListener('touchstart', this._touchStart);
+        window.addEventListener('touchmove', this._debounced(200, this._onTouchMove), { passive: false });
     }
+
+    componentWillUnmount() {
+        window.removeEventListener('touchstart', this._touchStart);
+        window.removeEventListener('touchmove', this._debounced(200, this._onTouchMove), { passive: false });
+    } */
+
+    _touchStart = (e) => {
+        this.firstClientX = e.touches[0].clientX;
+        //this.firstClientY = e.touches[0].clientY;
+    }
+
+    _onTouchMove = (e) => {
+        this.swipeX = e.touches[0].clientX - this.firstClientX;
+        //this.clientY = e.touches[0].clientY - this.firstClientY;
+        console.log('Touch move X is ' + this.swipeX);
+        let activeSlide;
+        if (!isNaN(this.swipeX)) {
+
+            // scroll right to left
+            if (this.swipeX < 0 && Math.abs(this.swipeX > 100)) {
+                activeSlide = (this.state.activeSlideIndex === this.props.alsoInRoomResults.length - 1) ? -1 : this.state.activeSlideIndex;
+                console.log('active slide RTL == ' + activeSlide);
+                this.setState({ nextSlide: this.state.activeSlideIndex + 1 });
+            }
+            // scroll left to right
+            else if (this.swipeX > 0 && Math.abs(this.swipeX > 100)) {
+                activeSlide = (this.state.activeSlideIndex === 0) ? this.props.alsoInRoomResults.length : this.state.activeSlideIndex;
+                console.log('active slide LTR == ' + activeSlide);
+                this.setState({ nextSlide: this.state.activeSlideIndex - 1 });
+            }
+        }
+
+
+    }
+
+    _debounced = (delay, fn) => {
+        let timerId;
+        return function (...args) {
+            if (timerId) {
+                clearTimeout(timerId);
+            }
+            timerId = setTimeout(() => {
+                fn(...args);
+                timerId = null;
+            }, delay);
+        }
+    }
+
+
+    beforeChangeHandler = (oldSlide, nextSlide) => {
+        this.setState({ activeSlideIndex: nextSlide });
+    }
+
 
     render() {
         //console.log('this.props.blurValue = ' + this.props.blurValue);
@@ -45,12 +101,13 @@ class InRoomSlider extends Component {
             <div>
 
                 <div className="slider-background" style={sliderBackground}>
-                    <img src={this.props.alsoInRoomResults[this.state.activeSlideIndex] + this.sliderBackgroundCropParams} />
+                    <CrossfadeImage src={this.props.alsoInRoomResults[this.state.activeSlideIndex] + this.sliderBackgroundCropParams} duration={1000}
+                        timingFunction={"ease-out"} />
                 </div>
 
                 <div className="slider-header"><h2>Also in this Room</h2></div>
                 <div className="slider-container">
-                    <Slider {...sliderSettings} afterChange={this.afterChangeHandler}>
+                    <Slider {...sliderSettings} beforeChange={this.beforeChangeHandler}>
                         {
                             this.props.alsoInRoomResults.map((result, index) =>
                                 <div key={index}><img src={result + this.sliderCropParams} /></div>

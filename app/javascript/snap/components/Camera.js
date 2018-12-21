@@ -15,7 +15,7 @@ import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-de
 import * as analytics from './Analytics';
 
 
-const artworkUrl = '/api/snaps/getArtworkInformation';
+const artworkUrl = '/api/snaps/getArtworkInformation?imageId=';
 
 class Camera extends Component {
 
@@ -259,7 +259,7 @@ class Camera extends Component {
 
         this.artworkRetrieved = true;
         try {
-            let response = await axios.post(artworkUrl, { imageId: imageId, viewedImageIds: viewedImageIds });
+            let response = await axios.get(artworkUrl + imageId);
             return response.data;
         }
         catch (error) { console.log('An error occurred while retrieving the artwork information from the server'); }
