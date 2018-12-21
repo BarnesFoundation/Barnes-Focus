@@ -4,6 +4,7 @@
  */
 export const CATCHOOM_ACCESS_TOKEN = process.env.CATCHOOM_ACCESS_TOKEN;
 export const CATCHOOM_REQUEST_URL = process.env.CATCHOOM_REQUEST_URL;
+export const ART_WORK_INFO_URL = '/api/snaps/getArtworkInformation?imageId=';
 /**
  * snap v2 constants
  * ===== END =======

@@ -78,13 +78,7 @@ class SnapResults extends Component {
       sharePopoverIsOpen: false,
       alertModalIsOpen: false,
       searchResults: [],
-      alsoInRoomResults: [
-        'https://barnes-images.imgix.net/5208_WlLgJFDAWDcYxeCG_b.jpg',
-        'https://barnes-images.imgix.net/6049_cG8dDj7SRiVWjAlx_b.jpg',
-        'https://barnes-images.imgix.net/5779_l3mR3e3s3Uj8LEAb_b.jpg',
-        'https://barnes-images.imgix.net/5787_DDgdCr6AoP8f5J3d_b.jpg',
-        'https://barnes-images.imgix.net/6272_6l5AGpGtzwRRxuwd_b.jpg'
-      ],
+      alsoInRoomResults: [],
       activeSlideIndex: 0,
       blurValue: 1,
       isShortDescVisible: false,
@@ -116,9 +110,10 @@ class SnapResults extends Component {
 
   }
 
-  componentWillMount() {
-    const search_result = this.state.result;
+  constructResultAndInRoomSlider = (search_result) => {
     if (search_result["success"]) {
+      let result = {};
+      let roomRecords = [];
       if (search_result["data"]["records"].length > 0) {
 
         let h = Math.floor(0.6 * screen.height);
@@ -130,7 +125,6 @@ class SnapResults extends Component {
         let cropParams = '?crop=faces,entropy&fit=crop&h=' + h + '&w=' + w;
         let bookmarkCropParams = '?crop=faces,entropy&fit=crop&h=' + bh + '&w=' + bw;
 
-        const result = {};
         const art_obj = search_result["data"]["records"][0];
         console.log(art_obj);
         result['id'] = art_obj.id;
@@ -145,19 +139,22 @@ class SnapResults extends Component {
         result['invno'] = art_obj.invno;
         result['displayDate'] = art_obj.displayDate;
         result['dimensions'] = art_obj.dimensions;
-        this.setState({
-          searchResults: this.state.searchResults.concat(result)
-        });
       }
+
+      if (search_result["data"]["roomRecords"].length > 0) {
+        roomRecords = search_result["data"]["roomRecords"];
+      }
+
+      this.setState({ searchResults: [].concat(result), alsoInRoomResults: roomRecords });
+
 
     } else {
       this.setState({ error: "No records found!" });
     }
-    /* Disable the art team pop-up modal entirely
-    if (parseInt(this.state.snapCount) === 4) {
-      this.state.alertModalIsOpen = true;
-    }
-    */
+  }
+
+  componentWillMount() {
+    this.constructResultAndInRoomSlider(this.state.result)
   }
 
 
@@ -188,6 +185,12 @@ class SnapResults extends Component {
     })
     this.setState({ selectedLanguage: lang });
 
+  }
+
+  onSelectInRoomArt = (result) => {
+    console.log('In room art result');
+    console.log(JSON.stringify(result));
+    this.constructResultAndInRoomSlider(result);
   }
 
   componentDidMount() {
@@ -526,7 +529,7 @@ class SnapResults extends Component {
                 </div>
 
                 <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} >
-                  <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue}></InRoomSlider>
+                  <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt}></InRoomSlider>
 
                   <div className="footer-text">
                     <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>

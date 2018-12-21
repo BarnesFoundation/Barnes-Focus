@@ -45,22 +45,6 @@ class LanguageDropdown extends Component {
 
     render = () => {
         return (
-            // <div className={"dropdown-container" + (this.state.listVisible ? " show" : "")}>
-            //     <div className={"dropdown-display" + (this.state.listVisible ? " clicked" : "")} onClick={this.show}>
-            //         <span>{this.props.selected.code}</span>
-
-            //         {this.state.listVisible
-            //             ? <i className="fa fa-angle-up"></i>
-            //             : <i className="fa fa-angle-down"></i>
-            //         }
-            //     </div>
-            //     <div className="dropdown-list">
-            //         <div>
-            //             {this.renderListItems()}
-            //         </div>
-            //     </div>
-            // </div>
-
             <div className="dd-wrapper">
                 <div className="dd-header" onClick={this.show}>
                     <div className="dd-header-title">
