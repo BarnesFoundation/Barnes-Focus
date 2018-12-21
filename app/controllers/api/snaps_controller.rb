@@ -52,12 +52,33 @@ class Api::SnapsController < Api::BaseController
     render json: 'Image was stored'
   end
 
+  def similar_arts
+    respond_to do | wants |
+      if params[:image_id]
+        @es_cached_record = EsCachedRecord.find_by image_id: params[:image_id]
+
+        if @es_cached_record
+          wants.json do
+            render json: { data: { success: true, similar_arts: EsCachedRecord.find_similar_arts( @es_cached_record ) }, message: 'ok' }, status: :ok
+          end
+        else
+          wants.json do
+            render json: { data: { success: false, errors: [ 'Record not found' ] }, message: 'not found' }, status: 404
+          end
+        end
+      else
+        wants.json do
+          render json: { data: { success: false, errors: ['Image id is not present'] }, message: 'bad entry' }, status: 400
+        end
+      end
+    end
+  end
+
   ###### Mark all subsequent methods as private methods ######
   private
 
     ## Processes a recognized image using its id
     def process_searched_image image_id, viewed_image_ids
-
       # Empty response object
       response = { }
       response[:api_data] = []
@@ -70,11 +91,7 @@ class Api::SnapsController < Api::BaseController
 
         # Get the image information for the image id
         response[:data][:records] << get_image_information(image_id)
-
-        # Get other records in the same room
-        room_id = response[:data][:records][0][:room] 
-        # get_room_artworks was written keeping in mind that we get similar work of arts. But this is no longer needed now
-        response[:data][:roomRecords] = [] # get_room_artworks(room_id, viewed_image_ids)
+        response[:data][:roomRecords] = get_similar_artworks(image_id, viewed_image_ids)
       end
       return response
     end
@@ -124,16 +141,9 @@ class Api::SnapsController < Api::BaseController
     end
 
     ## Get artworks from the same room
-    def get_room_artworks(room, viewed_images)
-
+    def get_similar_artworks(image_id, viewed_images)
       # Get the objects from the room
-      room_objects = BarnesElasticSearch.instance.get_room_objects(room, viewed_images)
-  
-      # Extract the ids
-      ids = []
-      room_objects.each do |image_id|
-        ids << image_id['_id']
-      end
-      return ids
+      similar_arts = EsCachedRecord.find_similar_arts image_id, viewed_images
+      return similar_arts
     end
 end
