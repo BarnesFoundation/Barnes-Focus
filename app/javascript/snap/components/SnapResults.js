@@ -190,7 +190,12 @@ class SnapResults extends Component {
   onSelectInRoomArt = (result) => {
     console.log('In room art result');
     console.log(JSON.stringify(result));
+
+    let searchContainer = document.getElementById('search-result');
+    searchContainer.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" })
+
     this.constructResultAndInRoomSlider(result);
+
   }
 
   componentDidMount() {
