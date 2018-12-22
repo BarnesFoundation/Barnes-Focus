@@ -94,6 +94,9 @@ class InRoomSlider extends Component {
 
         axios.get(ART_WORK_INFO_URL + id)
             .then(response => {
+                this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
+                this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+                this.setState({ activeSlideIndex: 0 });
                 this.props.onSelectInRoomArt(response.data);
             })
             .catch(error => {
@@ -118,6 +121,7 @@ class InRoomSlider extends Component {
                 <div className="slider-background" style={sliderBackground}>
                     <CrossfadeImage src={this.props.alsoInRoomResults[this.state.activeSlideIndex].art_url + this.sliderBackgroundCropParams} duration={1000}
                         timingFunction={"ease-out"} />
+                    {/* <img src={this.props.alsoInRoomResults[this.state.activeSlideIndex].art_url + this.sliderBackgroundCropParams} /> */}
                 </div>
 
                 <div className="slider-header"><h2>Also in this Room</h2></div>
