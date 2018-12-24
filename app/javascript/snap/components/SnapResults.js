@@ -83,8 +83,7 @@ class SnapResults extends Component {
       blurValue: 1,
       isShortDescVisible: false,
       scanBtnStyle: {
-        position: 'fixed',
-        top: '80vh'
+        position: 'fixed'
       },
       langDropdownStyle: {
         position: 'fixed',
@@ -260,15 +259,16 @@ class SnapResults extends Component {
     if (visibleSliderHeight >= 520) {
       this.setState({
         scanBtnStyle: {
-          position: 'relative',
-          bottom: `110px`
+          position: 'absolute'
+        },
+        scanWrapperStyle: {
+          position: 'absolute'
         }
       });
     } else {
       this.setState({
         scanBtnStyle: {
-          position: 'fixed',
-          top: `80vh`
+          position: 'fixed'
         }
       });
     }
@@ -293,7 +293,6 @@ class SnapResults extends Component {
       this.setState({
         langDropdownStyle: {
           position: 'relative',
-          bottom: '75px',
           opacity: 1,
           right: 0
         }
@@ -541,10 +540,13 @@ class SnapResults extends Component {
                     <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
                   </div>
 
-                  <div className="scan-button" onClick={this.handleScan} style={this.state.scanBtnStyle}>
-                    <img src={scan_button} alt="scan" />
-                  </div>
 
+
+                  <div className="scan-wrapper" style={this.state.scanWrapperStyle}>
+                    <div className="scan-button" onClick={this.handleScan} style={this.state.scanBtnStyle}>
+                      <img src={scan_button} alt="scan" />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="email-container">
@@ -569,6 +571,7 @@ class SnapResults extends Component {
                 </div>
 
               </div>
+
             </div>
           </div>
         </div>
