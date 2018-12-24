@@ -27,9 +27,7 @@ module BarnesSnap
 
     # Don't generate system test files.
     config.generators.system_tests = nil
-    #config.autoload_paths << Rails.root.join('lib')
     config.eager_load_paths << Rails.root.join('lib')
-    #config.active_job.queue_adapter = :delayed_job
     #config.time_zone = 'Eastern Time (US & Canada)'
     #config.active_record.default_timezone = 'Eastern Time (US & Canada)'
 
