@@ -1,7 +1,10 @@
 .camera-container {
-    position: fixed;
-    width: 100%;
-    top: 0;
+    position:fixed !important;
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
 }
 
 .camera{
@@ -13,22 +16,24 @@
     overflow: hidden;
 
     .no-match-overlay {
-        position: absolute;
+        position:fixed !important;
+        position:absolute;
         top:0;
-        left:0;
+        right:0;
         bottom:0;
+        left:0;
+
         width: 100vw;
-        height: 93vh;
         z-index: 1;
         overflow: hidden;
         background: inherit;
 
         .hint {
             position: absolute;
-            width: 285px;
+            width: 265px;
             height: 110px;
             left: calc(50% - 142px);
-            top: 210px;
+            top: 140px;
             text-align: center;
             span {
                 

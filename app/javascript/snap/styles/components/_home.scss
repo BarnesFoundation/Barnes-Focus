@@ -1,3 +1,21 @@
+.home-wrapper {
+    position:fixed !important;
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+}
+
+.landing-screen {
+    position:fixed !important;
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+}
+
 .logo-center {
    width: 148px;
    height: 46px;
@@ -13,7 +31,7 @@
     width: 325px;
     height: 86px;
     left: 50%;
-    top: 250px;
+    top: 180px;
 
     font-family: Calibre;
     line-height: 40px;
@@ -27,7 +45,7 @@
 .home-action {
 
     position: absolute;
-    top: 360px;
+    top: 290px;
     width: 240px;
     left: calc(50% - 120px);
     display: flex;
@@ -76,16 +94,16 @@
     position: absolute;
     width: 40px;
     height: 40px;
-    left: 35px;
-    top: 565px;
+    left: 12%;
+    bottom: 10.04%;
 }
 
 .kf-text {
     position: absolute;
-    width: 282px;
+    width: 256px;
     height: 40px;
-    left: 86px;
-    top: 561px;
+    left: calc(12% + 51px);
+    bottom: 10.04%;
 
     font-family: Calibre;
     line-height: 15px;
@@ -99,7 +117,7 @@
     width: 282px;
     height: 125px;
     left: calc(50% - 141px);
-    top: 194px;
+    top: 124px;
 
     font-family: Calibre;
     line-height: 25px;
@@ -124,10 +142,10 @@
 }
 
 .btn-close {
-        position: absolute;
-        bottom: 50px;
-        left: calc(50% - 22px);
-    }
+    position: absolute;
+    bottom: 62px;
+    left: calc(50% - 22px);
+}
 
 
 

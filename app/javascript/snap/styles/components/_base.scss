@@ -3,7 +3,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-size: 1.125rem;
 }
 
 html, body {
@@ -86,188 +85,6 @@ p {
     opacity: 0.2 !important;
 }
 
-.language-select {
-    padding: 0 5vw;
-    .btn-group {
-        width: 100%;
-        .btn {
-            background-color: #FFF;
-            text-align: left;
-            border-radius: 0;
-            color: #8C8C8D;
-            border: 0.125rem solid #E3E3E3;
-
-            &:focus {
-                outline: none;
-                box-shadow: none;
-            }
-        }
-    }
-}
-
-.ReactModal__Body--open {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-}
-
-.Modal {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgb(255, 255, 255);
-    overflow: auto;
-    border-radius: 0px;
-    outline: none;
-    padding: 1.6rem 1.6rem 2.2rem;
-    text-align: center;
-
-    h1 {
-        margin-top:5vh;
-    }
-
-    .list-group {
-        font-size: 1rem;
-        margin-top: 1.5rem;
-        
-        .list-group-item {
-            text-align: left;
-            color: #8C8C8D;
-
-            &:first-child {
-                border-top-left-radius: 0;
-                border-top-right-radius: 0;
-            }
-
-            &:last-child {
-                border-bottom-left-radius: 0;
-                border-bottom-right-radius: 0;
-            }
-
-            .selected-lang {
-                color: #F74D31;
-                float: right;
-            }
-        }
-    }
-
-    .dismiss {
-        text-align: left;
-        float: left;
-        line-height: 2.25rem;
-        font-size: 1.25rem;
-    }
-
-    .reset {
-
-        .fa {
-            position: relative;
-            top: 50%;
-            transform:translateY(-50%);
-        }
-              
-        .title {
-            margin-top: 20vh;
-        }
-        
-        .message {
-            margin-top: 10vh;
-        }
-        
-        .action {
-            margin-top: 10vh;
-        }
-    }
-
-    .bookmark {
-
-        .fa {
-            position: relative;
-            top: 50%;
-            transform:translateY(-50%);
-        }
-
-        .picture {
-            margin-top: 2vh;
-            width: 100%;
-            height:25vh;
-            overflow: hidden;
-            img {
-                width: 100%;
-                position: relative;
-                max-width: 100%;
-                transform: translateY(-50%);
-                top: 50%;
-            }
-        }
-    
-        .message {
-            margin: 1.25rem 1rem 1.6rem;
-        }
-    
-        form {
-            input[type=email]{
-                border: 0;
-                border-radius: 0;
-                height: 50px;
-                border-bottom: 2px solid #E3E3E3;
-            }
-    
-            .form-check {
-                padding: 2rem;
-                label {
-                    font-size: 1.4rem;
-                }
-            }
-        }
-    }
-
-    .team-alert {
-
-        h1 {
-            line-height: 1;
-            margin-top: 0;
-        }
-
-        .picture {
-            margin-top: 0;
-            img {
-                border: 0;
-            }
-        }
-    
-        .message {
-            padding: 0 3vw;
-        }
-    
-        
-    }
-    
-}
-
-.snap-btn {
-    border-radius: 0;
-    border: .125rem solid #E3E3E3;
-    height: 55px;
-    width: 100%;
-    //padding: 3vh 0;
-    line-height: 1rem;
-
-    &.snap-btn-default {
-        color: #8C8C8D;
-        background-color: #fff;
-    }
-
-    &.snap-btn-danger {
-        color: #FFF;
-        background-color: #D4432A;
-        border: none !important;
-    }
-}
-
 input[type=email].error {
     border-bottom: 2px solid red !important;
 }
@@ -295,96 +112,14 @@ input[type=email].error {
 /* iPhone 6s and below. Smaller Devices (Portrait) */
 @media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
 /* Styles */
-
-    * {
-        font-size: 1rem;
-    }
-    
-    h1 {
-        font-size: 2rem;
-        margin-top: 0;
-        line-height: 1;
-    }
-
-    h2 {
-        font-size: 1.2rem;
-    }
-
-    .Modal {
-        .bookmark {
-            .picture {
-                height:22vh;
-            }
-        
-            .message {
-                margin: 2vh 3vh;
-            }
-        }
-        .reset {
-            .title {
-                margin-top: 8vh !important;
-            }
-        }
-
-        .dismiss {
-            font-size: 1rem;
-        }
-    }
+       
 
 }
 
 /* iPads (portrait and landscape) ----------- */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
 /* Styles */
-    h1 {
-        font-size: 2.8125rem;
-        margin-bottom: 2.5rem;
-    }
-
-    .content {
-        padding: 0 20vw;
-    }
-
-    .language-select {
-        .btn {
-            height: 3rem;
-        }
-    }
-
-    .snap-muted-text {
-        font-size: 1.125rem;
-    }
-
-    .Modal {
-        padding: 12rem;
-
-        .close {
-            font-size: 2rem;
-        }
-
-        h1 {
-            margin-top:0;
-        }
-
-        .dismiss {
-            line-height: 3rem !important;
-        }
-
-        .list-group {
-            font-size: 1rem;
-            margin-top: 2.875rem;
-            
-            .list-group-item {
-                height: 3.5rem;
-                line-height: 2rem;
-            }
-        }
-    }
-
-    .snap-btn {
-        height: 8vh;
-        font-size: 1.3125rem;
-    }
+   
 }
 
 // @media screen and (min-width: 320px) and (max-width: 1024px) and (orientation: landscape) {
@@ -403,13 +138,7 @@ input[type=email].error {
 /* iPads (landscape) ----------- */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
 /* Styles */
-    h2 {
-        font-size: 1.5625rem;
-    }
-
-    p {
-        font-size: 1.625rem;
-    } 
+    
 }
 
 /* iPads (portrait) ----------- */
