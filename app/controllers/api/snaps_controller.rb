@@ -4,6 +4,9 @@ require 'json'
 
 class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
+  before_action only: [ :getArtworkInformation ] do
+    capture_scanned_history( params[:imageId] )
+  end
 
   def languages
     translator = GoogleTranslate.new preferred_language
@@ -14,8 +17,7 @@ class Api::SnapsController < Api::BaseController
   def getArtworkInformation
     # Get parameters from the request
     image_id = params[:imageId]
-    viewed_image_ids = params[:viewedImageIds]
-    response = process_searched_image(image_id, viewed_image_ids)
+    response = process_searched_image(image_id)
 
     render json: response
   end
@@ -78,7 +80,7 @@ class Api::SnapsController < Api::BaseController
   private
 
     ## Processes a recognized image using its id
-    def process_searched_image image_id, viewed_image_ids
+    def process_searched_image image_id
       # Empty response object
       response = { }
       response[:api_data] = []
@@ -91,7 +93,7 @@ class Api::SnapsController < Api::BaseController
 
         # Get the image information for the image id
         response[:data][:records] << get_image_information(image_id)
-        response[:data][:roomRecords] = get_similar_artworks(image_id, viewed_image_ids)
+        response[:data][:roomRecords] = get_similar_artworks(image_id)
       end
       return response
     end
@@ -141,8 +143,9 @@ class Api::SnapsController < Api::BaseController
     end
 
     ## Get artworks from the same room
-    def get_similar_artworks(image_id, viewed_images)
+    def get_similar_artworks(image_id)
       # Get the objects from the room
+      viewed_images = cookies[ :user_scanned_history ] && !cookies[ :user_scanned_history ].blank? ? JSON.parse( cookies[ :user_scanned_history ] ) : []
       similar_arts = EsCachedRecord.find_similar_arts image_id, viewed_images
       return similar_arts
     end

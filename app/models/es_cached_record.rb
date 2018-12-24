@@ -69,7 +69,7 @@ class EsCachedRecord < ApplicationRecord
 
   ## While you're in this room feature ##
   ## this method accepts two parameters. (1) image_id and (2) viewed images ##
-  def self.find_similar_arts image_id, viewed_images = []
+  def self.find_similar_arts image_id, viewed_images = [], limit = ENV['SIMILAR_ARTS_MAX_LIMIT'] || 3
     similar_art_objects = []
 
     @es_cached_record = find_by image_id: image_id
@@ -92,13 +92,13 @@ class EsCachedRecord < ApplicationRecord
         es_cached_records = all
         es_cached_records = es_cached_records.where.not( image_id: viewed_images ) if viewed_images.present?
 
-        es_cached_records = es_cached_records.where( "es_data ->> 'ensembleIndex' >= ?", lower_bound.to_s )
-        es_cached_records = es_cached_records.where( "es_data ->> 'ensembleIndex' <= ?", upper_bound.to_s )
+        es_cached_records = es_cached_records.where( "(es_data ->> 'ensembleIndex')::int >= ?", lower_bound )
+        es_cached_records = es_cached_records.where( "(es_data ->> 'ensembleIndex')::int <= ?", upper_bound )
 
         # querying table against `shortDescription` of es_data
         es_cached_records = es_cached_records.where( "es_data ->> 'shortDescription' != ?", '' )
 
-        es_cached_records = es_cached_records.limit(3)
+        es_cached_records = es_cached_records.limit(limit)
         similar_art_objects = similar_art_objects.push es_cached_records.collect(&:es_data)
         similar_art_objects = similar_art_objects.flatten
         similar_art_objects.map { | similar_art_object |
