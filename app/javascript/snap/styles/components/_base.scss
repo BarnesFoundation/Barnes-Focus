@@ -52,12 +52,22 @@ p {
     font-family: 'Calibre-Regular';
 } 
 
+.scan-wrapper {
+    position:fixed;
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    z-index: 999999 !important;
+}
+
 .scan-button {
     //position: absolute;
     width: 60px;
     height: 60px;
     left: calc(50% - 30px);
-    //bottom: 45px;
+    bottom: 37px;
     z-index: 99999;
 }
 
