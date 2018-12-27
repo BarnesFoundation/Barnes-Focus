@@ -14,6 +14,28 @@ class BarnesElasticSearch
     })
   end
 
+  def find_all offset=0, limit=50
+    results = []
+    api = @elastic_search.search index: 'collection', body: fetch_all( offset, limit )
+
+    if api && api[ 'hits' ] && api[ 'hits' ][ 'hits' ].length > 0
+      results = api[ 'hits' ][ 'hits' ].map { |result| result[ '_source' ] }
+    end
+
+    results
+  end
+
+  def total
+    total   = 0
+    results = @elastic_search.search index: 'collection'
+
+    if results && results[ 'hits' ] && results[ 'hits' ][ 'total' ] > 0
+      total = results[ 'hits' ][ 'total' ]
+    end
+
+    total
+  end
+
   def get_object object_id
     search_result = @elastic_search.search index: "collection", body: get_image_query(object_id)
     if search_result && search_result['hits']['hits'].length > 0
@@ -82,6 +104,22 @@ class BarnesElasticSearch
                   json._id image_id
                 end
               end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def fetch_all offset, limit
+    query = Jbuilder.encode do |json|
+      json.from offset
+      json.size limit
+      json.query do
+        json.bool do
+          json.filter do
+            json.exists do
+              json.field "imageSecret"
             end
           end
         end
