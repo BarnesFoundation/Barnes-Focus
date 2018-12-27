@@ -67,6 +67,10 @@ class EsCachedRecord < ApplicationRecord
     return searched_data
   end
 
+  def self.keep_es_fields result_hash
+    result_hash.slice( *@es_fields )
+  end
+
   ## While you're in this room feature ##
   ## this method accepts two parameters. (1) image_id and (2) viewed images ##
   def self.find_similar_arts image_id, viewed_images = [], limit = ENV['SIMILAR_ARTS_MAX_LIMIT'] || 3
@@ -102,7 +106,7 @@ class EsCachedRecord < ApplicationRecord
         similar_art_objects = similar_art_objects.push es_cached_records.collect(&:es_data)
         similar_art_objects = similar_art_objects.flatten
         similar_art_objects.map { | similar_art_object |
-          similar_art_object['art_url'] = Image.imgix_url(similar_art_object['id'], similar_art_object['imageSecret'])
+          similar_art_object['art_url'] = Image.imgix_url(similar_art_object['id'], similar_art_object['imageSecret']) # To-Do: Duplicate code
         }
         similar_art_objects = similar_art_objects.map { | similar_art_object | similar_art_object.slice( 'id', 'art_url' ) }
       end
