@@ -6,13 +6,14 @@ import withOrientation from './withOrientation';
 import axios from 'axios';
 import share from 'images/share.svg';
 import scan_button from 'images/scan-button.svg';
-import Modal from 'react-modal';
 import InRoomSlider from './Slider';
 import LanguageDropdown from './LanguageDropdown';
+import EmailForm from './EmailForm';
 import Popover from 'react-simple-popover';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import * as analytics from './Analytics';
+import cross from 'images/cross.png';
 import Plx from 'react-plx';
 
 const customStyles = {
@@ -73,10 +74,10 @@ class SnapResults extends Component {
 
     this.state = {
       ...props.location.state,  // these properties are passed on from Camera component.
-      resetModalIsOpen: false,
       bookmarkModalIsOpen: false,
       sharePopoverIsOpen: false,
-      alertModalIsOpen: false,
+      showEmailScreen: false,
+      emailCaptured: false,
       searchResults: [],
       alsoInRoomResults: [],
       activeSlideIndex: 0,
@@ -154,6 +155,12 @@ class SnapResults extends Component {
 
   componentWillMount() {
     this.constructResultAndInRoomSlider(this.state.result)
+    /**
+     * If the number of scans equals 4, show the screen to capture user email.
+     */
+    if (parseInt(this.state.snapCount) === 4) {
+      this.setState({ showEmailScreen: true });
+    }
   }
 
 
@@ -198,8 +205,8 @@ class SnapResults extends Component {
   }
 
   componentDidMount() {
-    this._notificationSystem = this.refs.notificationSystem;
-    Modal.setAppElement('.search-container');
+    // Register scroll listener
+    window.addEventListener('scroll', this.onScroll, true);
 
     $("#result-card").attr("data-title", this.state.searchResults[0].title);
     $("#result-card").attr("data-artist", this.state.searchResults[0].artist);
@@ -209,8 +216,7 @@ class SnapResults extends Component {
     if (!this.state.searchResults[0].shortDescription) {
       $("#result-card").attr("data-nodesc-invno", this.state.searchResults[0].invno);
     }
-    // Register scroll listener
-    window.addEventListener('scroll', this.onScroll, true);
+
 
   }
 
@@ -235,14 +241,14 @@ class SnapResults extends Component {
 
     let currentSliderScrollOffset = h - sliderElemTop;
     let currentShortDescScrollOffset = h - shortDescElemTop;
-    // console.log('traveredY = ' + traversedY);
+    //console.log('traveredY = ' + traversedY);
     // console.log('ios visible slider height : ' + (h - sliderElemTop));
     //console.log('shortDescElemHeight = ' + shortDescElemHeight);
 
     let visibleSliderHeight = (isIOS) ? Math.floor(currentSliderScrollOffset) : Math.floor(traversedY - this.sliderTopMax);
     let visibleShortDescHeight = Math.floor(currentShortDescScrollOffset);
     //let isShortDescVisible = (traversedY - this.shortDescTopMax) > 0;
-    //console.log('visibleShortDescHeight = ' + visibleShortDescHeight);
+    //console.log('visibleSliderHeight = ' + visibleSliderHeight);
 
     /**
      * Show hide scan button and language selector button if users scrolls down till shortDesc is visible in viewport.
@@ -431,7 +437,6 @@ class SnapResults extends Component {
     localStorage.removeItem(SNAP_USER_EMAIL);
     localStorage.removeItem(SNAP_ATTEMPTS);
     localStorage.removeItem(SNAP_LANGUAGE_TRANSLATION);
-    this.setState({ resetModalIsOpen: false });
     this.setState({ translation: null });
     this.setState({ resetLanguageBox: true });
   }
@@ -457,11 +462,17 @@ class SnapResults extends Component {
     this.props.history.push({ pathname: '/snap' });
   }
 
+  _closeEmailPopupScreen = () => {
+    console.log('Email popup screen closed');
+    this.setState({ emailCaptured: false, showEmailScreen: false });
+  }
+
   render() {
+    let resultsContainerStyle = (this.state.showEmailScreen) ? { filter: 'blur(10px)', transform: 'scale(1.1)' } : {};
 
     return (
       <div>
-        <div className="container-fluid search-container" id="search-result">
+        <div className="container-fluid search-container" id="search-result" style={resultsContainerStyle}>
           <div className="row">
             <div className="col-12 col-md-12">
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
@@ -533,7 +544,11 @@ class SnapResults extends Component {
                 </div>
 
                 <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} >
-                  <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt}></InRoomSlider>
+                  {
+                    this.state.alsoInRoomResults.length > 0 &&
+                    <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt}></InRoomSlider>
+                  }
+
 
                   <div className="footer-text">
                     <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
@@ -549,32 +564,32 @@ class SnapResults extends Component {
                   </div>
                 </div>
 
-                <div className="email-container">
-                  <div className="email-head">
-                    Enter your e-mail address to receive all the artworks you are scanning today
-                </div>
-                  <div className="email-input">
-                    <form onSubmit={this.submitBookMark}>
+                {
+                  parseInt(this.state.snapCount) >= 4 &&
+                  !this.state.emailCaptured &&
+                  !this.state.showEmailScreen &&
+                  <EmailForm />
+                }
 
-                      <div className="input-group">
-                        <input type="email" placeholder={(this.state.translation) ? this.state.translation.Bookmark_capture.text_2.translated_content : `Email address`} className={this.state.errors.email ? 'error form-control' : 'form-control'} name="email" value={this.state.email} onChange={this.handleBookmarkFormInputChange} />
-                        <div className="input-group-append">
-                          <button className="btn btn-outline-secondary" type="button">Submit</button>
-                        </div>
-                      </div>
-
-                    </form>
-                  </div>
-                  <div className="email-disclaimer">
-                    <span>We will use your e-mail address only to send you the artworks you are scanning today.</span>
-                  </div>
-                </div>
 
               </div>
 
             </div>
           </div>
         </div>
+
+
+        {
+          this.state.showEmailScreen &&
+          <div>
+            <div className="email-popup-screen">
+              <EmailForm />
+              <div className="btn-close" onClick={this.closeWindow}>
+                <img src={cross} alt="close" onClick={() => { this._closeEmailPopupScreen() }} />
+              </div>
+            </div>
+          </div>
+        }
 
       </div>
     );

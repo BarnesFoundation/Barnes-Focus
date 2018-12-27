@@ -121,65 +121,6 @@
             }
         }        
 
-        .email-container {
-            padding: 50px 30px;
-            position: relative;
-            
-            .email-head {
-                width: 320px;
-                left: calc(50% - 160px);
-                position: relative;
-                font-family: Calibre;
-                line-height: 25px;
-                font-size: 25px;
-                text-align: center;
-
-                color: #000000;
-            }
-
-            .email-input {
-                width: 320px;
-                position: relative;
-                left: calc(50% -160px);
-                padding-top: 35px;
-
-                input {
-                    background: #FFFFFF;
-                    border: 2px solid #DCDCDC;
-                    box-sizing: border-box;
-                    height:50px;
-                    border-radius: 0;
-                }
-
-                button {
-                    background: #FFFFFF;
-                    border: 2px solid #DCDCDC;
-                    box-sizing: border-box;
-                    height:50px;
-
-                    font-family: Calibre;
-                    line-height: 25px;
-                    font-size: 16px;
-                    text-align: right;
-                    border-radius: 0;
-                    color: #6E6E6E;
-                }
-                
-            }
-
-            .email-disclaimer {
-                padding-top: 20px;
-                font-family: Calibre;
-                line-height: 20px;
-                font-size: 17px;
-                text-align: center;
-                letter-spacing: 0.01em;
-                position: relative;
-                width: 320px;
-                left: calc(50% -160px);
-            }
-        }
-
         .card-footer {
             background-color: #D4432A;
             color: #FFF;
@@ -247,6 +188,7 @@
     margin: 50px 0;
     img {
         opacity: 0.7;
+        z-index: 9;
     }
 }
 
@@ -258,6 +200,7 @@
     transform:scale(1.13);
     opacity:1;
     transition: all .3s ease-in-out;
+    z-index: 10;
 }
 
 .cross-fade-leave {
