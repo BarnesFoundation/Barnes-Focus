@@ -1,4 +1,32 @@
 
+.email-success-screen {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(34,34,34,0.5);
+
+    .success-icon {
+        position: absolute;
+        top: 120px;
+        width: 32px;
+        height: 22px;
+        left: calc(50% - 16px);
+    }
+
+    .success-message {
+        left: calc(50% - 152px);
+        font-family: Calibre;
+        line-height: 25px;
+        font-size: 25px;
+        text-align: center;
+        color: #FFFFFF;
+        width: 305px;
+        top: 179px;
+        position: absolute;
+    }
+}
 .email-popup-screen {
     position: fixed;
     top: 0;
@@ -8,7 +36,8 @@
     background: rgba(34,34,34,0.5);
 
     .email-container {
-
+        padding: 0;
+        position: relative;
         .email-head {
             position: absolute;
             left: calc(50% - 147px);
@@ -27,6 +56,7 @@
                 position: absolute;
                 left: calc(50% -162px);
                 top: 215px;
+                padding-top: 0;
 
                 input {
                     background: transparent;
@@ -52,14 +82,26 @@
                     color: #FFFFFF;
                 }
                 
+                .email-input-error {
+                    height: 65px;
+                    font-family: Calibre;
+                    line-height: 20px;
+                    font-size: 14px;
+                    text-align: center;
+                    letter-spacing: 0.01em;
+                    padding: 10px 20px 11px;
+                    color: #FFFFFF;
+                    background-color:rgba(0, 0, 0, 0.15);
+                }
             }
 
             .email-disclaimer {
-                position: absolute;
+                position: relative;
                 width: 325px;
                 height: 65px;
                 left: calc(50% - 162px);
                 top: 300px;
+                padding-top: 0;
 
                 font-family: Calibre;
                 line-height: 20px;
@@ -70,8 +112,6 @@
                 color: #F5F5F5;
             }
     }
-
-    
 
 }
 
@@ -87,7 +127,6 @@
                 line-height: 25px;
                 font-size: 25px;
                 text-align: center;
-
                 color: #000000;
             }
 
@@ -117,6 +156,18 @@
                     text-align: right;
                     border-radius: 0;
                     color: #6E6E6E;
+                }
+
+                .email-input-error {
+                    height: 65px;
+                    font-family: Calibre;
+                    line-height: 20px;
+                    font-size: 14px;
+                    text-align: center;
+                    letter-spacing: 0.01em;
+                    padding: 10px 20px 11px;
+                    color: #FFFFFF;
+                    background-color:rgba(0, 0, 0, 0.75);
                 }
                 
             }
