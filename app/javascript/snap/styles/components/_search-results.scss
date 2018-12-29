@@ -98,14 +98,14 @@
                     img {
                         position: relative;
                         left: 12px;
-                        top: 5px;
+                        top: 8px;
                     }
 
                     .text-share {
                         line-height: 24px;
                         font-size: 16px;
                         color: #6E6E6E;
-                        top: 5px;
+                        top: 8px;
                         left: 22px;
                         position: relative;
                     }
@@ -174,21 +174,30 @@
 
 /* Slick sider customization for scale and animation*/
 
-// .slick-list,
-// .slick-track,
-// .slick-slide img {
-//    height: 100%;   
-// }
+// Need position relative and a base z index
+.slick-slide {
+    position: relative;
+    z-index: 6;
+}
+// Set center to high zindex
+.slick-center {
+    z-index: 999; // or any high #
+}
+// Target slide after center to keep stacking
+.slick-center + .slick-slide {
+    z-index: 8;
+}
+
 
 .slick-list {
     padding: 0px 92px !important;
+    margin: 0 -50px;
 }
 
 .slick-slide {
     margin: 50px 0;
     img {
         opacity: 0.7;
-        z-index: 9;
     }
 }
 
@@ -200,7 +209,6 @@
     transform:scale(1.13);
     opacity:1;
     transition: all .3s ease-in-out;
-    z-index: 10;
 }
 
 .cross-fade-leave {
@@ -225,10 +233,5 @@
 
 /* iPhone 6,7,8  */
 @media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation : portrait) {
-    .btn-circle {
-        width: 60px !important;
-        height: 60px !important;
-        border-radius: 30px !important;
-        top: -30px !important;
-    }
+    
 }

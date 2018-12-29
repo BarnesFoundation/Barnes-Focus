@@ -1,51 +1,21 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router'
 import { compose } from 'redux';
+import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
+
+import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
 import withOrientation from './withOrientation';
 import axios from 'axios';
 import share from 'images/share.svg';
 import scan_button from 'images/scan-button.svg';
+import checkmark from 'images/checkmark.png'
 import InRoomSlider from './Slider';
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
 import Popover from 'react-simple-popover';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
-import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
+
 import * as analytics from './Analytics';
 import cross from 'images/cross.png';
-import Plx from 'react-plx';
-
-const customStyles = {
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)'
-  },
-  content: {
-    bottom: 'auto',
-    margin: '8vw'
-  }
-};
-
-
-
-const blurPlx = [
-  {
-    start: '.slider-background',
-    end: '.scan-button',
-    properties: [
-      {
-        startValue: 0,
-        endValue: 20,
-        property: "blur"
-      }
-    ]
-  }
-]
 
 const fb_app_id = '349407548905454';
 
@@ -78,6 +48,7 @@ class SnapResults extends Component {
       sharePopoverIsOpen: false,
       showEmailScreen: false,
       emailCaptured: false,
+      emailCaptureAck: false,
       searchResults: [],
       alsoInRoomResults: [],
       activeSlideIndex: 0,
@@ -441,25 +412,17 @@ class SnapResults extends Component {
     this.setState({ resetLanguageBox: true });
   }
 
-
-  handleBookmarkFormInputChange = (event) => {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-
-    this.setState({
-      [name]: value
-    });
-
-  }
-
-  validateEmail = () => {
-    const emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-    return this.state.email.length > 0 && emailRegex.test(this.state.email);
+  onSubmitEmail = (email) => {
+    console.log('Submitted email :: ' + email);
+    this.setState({ email: email, emailCaptured: true, showEmailScreen: false });
   }
 
   handleScan = () => {
     this.props.history.push({ pathname: '/snap' });
+  }
+
+  _emailSuccessAcknowledged = () => {
+    this.setState({ emailCaptureAck: true });
   }
 
   _closeEmailPopupScreen = () => {
@@ -468,8 +431,8 @@ class SnapResults extends Component {
   }
 
   render() {
-    let resultsContainerStyle = (this.state.showEmailScreen) ? { filter: 'blur(10px)', transform: 'scale(1.1)' } : {};
-
+    let resultsContainerStyle = ((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) ? { filter: 'blur(10px)', transform: 'scale(1.1)' } : {};
+    let emailScreenCloseBtnTop = Math.floor(445 / 667 * screen.height) + 'px';
     return (
       <div>
         <div className="container-fluid search-container" id="search-result" style={resultsContainerStyle}>
@@ -568,7 +531,7 @@ class SnapResults extends Component {
                   parseInt(this.state.snapCount) >= 4 &&
                   !this.state.emailCaptured &&
                   !this.state.showEmailScreen &&
-                  <EmailForm />
+                  <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} />
                 }
 
 
@@ -583,9 +546,24 @@ class SnapResults extends Component {
           this.state.showEmailScreen &&
           <div>
             <div className="email-popup-screen">
-              <EmailForm />
-              <div className="btn-close" onClick={this.closeWindow}>
+              <EmailForm isEmailScreen={true} onSubmitEmail={this.onSubmitEmail} />
+              <div className="btn-close" onClick={this.closeWindow} style={{ position: `absolute`, top: `${emailScreenCloseBtnTop}` }}>
                 <img src={cross} alt="close" onClick={() => { this._closeEmailPopupScreen() }} />
+              </div>
+            </div>
+          </div>
+        }
+
+        {
+          this.state.emailCaptured &&
+          !this.state.emailCaptureAck &&
+          <div>
+            <div className="email-success-screen">
+              <div className="success-icon" onClick={() => this._emailSuccessAcknowledged()}>
+                <img src={checkmark} alt="email_success" />
+              </div>
+              <div className="success-message">
+                Thanks, we will send you all the artworks seen today at this email address: {this.state.email}
               </div>
             </div>
           </div>

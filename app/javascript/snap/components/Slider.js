@@ -11,9 +11,10 @@ const sliderSettings = {
     arrows: false,
     swipe: true,
     speed: 200,
-    centerPadding: '72px',
+    centerPadding: '92px',
     cssEase: 'linear',
     mobileFirst: true,
+    variableWidth: true,
     slidesToShow: 1,
     slidesToScroll: 1
 };
@@ -37,40 +38,32 @@ class InRoomSlider extends Component {
         this.firstClientX */
     }
 
-    /* componentDidMount() {
+    componentDidMount() {
         window.addEventListener('touchstart', this._touchStart);
-        window.addEventListener('touchmove', this._debounced(200, this._onTouchMove), { passive: false });
+        window.addEventListener('touchmove', this._onTouchMove, { passive: false });
     }
 
     componentWillUnmount() {
         window.removeEventListener('touchstart', this._touchStart);
-        window.removeEventListener('touchmove', this._debounced(200, this._onTouchMove), { passive: false });
-    } */
+        window.removeEventListener('touchmove', this._onTouchMove, { passive: false });
+    }
 
     _touchStart = (e) => {
         this.firstClientX = e.touches[0].clientX;
-        //this.firstClientY = e.touches[0].clientY;
+        this.firstClientY = e.touches[0].clientY;
     }
 
     _onTouchMove = (e) => {
-        this.swipeX = e.touches[0].clientX - this.firstClientX;
-        //this.clientY = e.touches[0].clientY - this.firstClientY;
-        console.log('Touch move X is ' + this.swipeX);
-        let activeSlide;
-        if (!isNaN(this.swipeX)) {
+        const minValue = 5; // threshold
 
-            // scroll right to left
-            if (this.swipeX < 0 && Math.abs(this.swipeX > 100)) {
-                activeSlide = (this.state.activeSlideIndex === this.props.alsoInRoomResults.length - 1) ? -1 : this.state.activeSlideIndex;
-                console.log('active slide RTL == ' + activeSlide);
-                this.setState({ nextSlide: this.state.activeSlideIndex + 1 });
-            }
-            // scroll left to right
-            else if (this.swipeX > 0 && Math.abs(this.swipeX > 100)) {
-                activeSlide = (this.state.activeSlideIndex === 0) ? this.props.alsoInRoomResults.length : this.state.activeSlideIndex;
-                console.log('active slide LTR == ' + activeSlide);
-                this.setState({ nextSlide: this.state.activeSlideIndex - 1 });
-            }
+        this.clientX = e.touches[0].clientX - this.firstClientX;
+        this.clientY = e.touches[0].clientY - this.firstClientY;
+
+        // Vertical scrolling does not work when you start swiping horizontally.
+        if (Math.abs(this.clientX) > minValue) {
+            e.preventDefault();
+            e.returnValue = false;
+            return false;
         }
 
 
