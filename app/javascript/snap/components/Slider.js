@@ -7,11 +7,11 @@ import axios from 'axios';
 
 const sliderSettings = {
     className: "slider-container",
-    centerMode: true,
+    //centerMode: true,
     arrows: false,
     swipe: true,
     speed: 200,
-    centerPadding: '92px',
+    centerPadding: '102px',
     cssEase: 'linear',
     mobileFirst: true,
     variableWidth: true,

@@ -180,35 +180,36 @@
     z-index: 6;
 }
 // Set center to high zindex
-.slick-center {
+.slick-active {
     z-index: 999; // or any high #
+    margin: 0 15px;
 }
 // Target slide after center to keep stacking
-.slick-center + .slick-slide {
+.slick-active + .slick-slide {
     z-index: 8;
 }
 
 
 .slick-list {
-    padding: 0px 92px !important;
-    margin: 0 -50px;
+    padding: 0px 102px !important;
+    margin: 0 -15px;
 }
 
 .slick-slide {
-    margin: 50px 0;
+    margin: 50px 15px;
     img {
         opacity: 0.7;
     }
 }
 
-.slick-center img{
+.slick-active img{
     -moz-transform:scale(1.13);
     -ms-transform:scale(1.13);
     -o-transform:scale(1.13);
     -webkit-transform:scale(1.13);
     transform:scale(1.13);
     opacity:1;
-    transition: all .3s ease-in-out;
+    transition: all .2s ease-in-out;
 }
 
 .cross-fade-leave {
