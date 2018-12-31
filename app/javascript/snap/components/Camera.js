@@ -28,8 +28,7 @@ class Camera extends Component {
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
         cameraPermission: false,
         scanSeqId: Date.now(),
-        matchError: false,
-        videoBlur: 0
+        matchError: false
     };
 
     // Set booleans and counter
@@ -297,7 +296,7 @@ class Camera extends Component {
         if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
 
         if (!this.state.matchError) {
-            this.setState({ matchError: true, videoBlur: 25 });
+            this.setState({ matchError: true });
         }
 
     }
@@ -338,6 +337,7 @@ class Camera extends Component {
                     this.track = this.state.videoStream.getVideoTracks()[0];
                     this.camera_capabilities = this.track.getCapabilities();
                     this.camera_settings = this.track.getSettings();
+                    requestAnimationFrame(this.drawVideoPreview);
                     this.capturePhotoShots();
                 })
                 .catch((error) => {
@@ -408,17 +408,49 @@ class Camera extends Component {
         return canvas;
     }
 
+    /**
+     * Draws the portion of the video visible within the preview onto a canvas, in a loop.
+     */
+    drawVideoPreview = () => {
+        let previewCanvas = this.vpreview;
+        let previewContext = previewCanvas.getContext('2d');
+        let previewBox = this.vpreview.getBoundingClientRect();
+
+        let rect = this.video.getBoundingClientRect();
+        let tempCanvas = document.createElement('canvas');
+        let tempCtx = tempCanvas.getContext('2d');
+
+        // Draw the video onto a temporary canvas
+        tempCanvas.width = rect.width;
+        tempCanvas.height = rect.height;
+        tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
+
+        this.cropRect = {
+            x: Math.floor(previewBox.x),
+            y: Math.floor(previewBox.y),
+            width: Math.floor(previewBox.width),
+            height: Math.floor(previewBox.height)
+        }
+
+        previewCanvas.width = this.cropRect.width;
+        previewCanvas.height = this.cropRect.height;
+
+        previewContext.drawImage(tempCanvas, this.cropRect.x, this.cropRect.y, this.cropRect.width, this.cropRect.height, 0, 0, previewCanvas.width, previewCanvas.height);
+
+        requestAnimationFrame(this.drawVideoPreview);
+
+    }
+
     handleScan = () => {
         console.log('Back to scan mode');
-        this.setState({ matchError: false, videoBlur: 0, scanSeqId: Date.now() });
+        this.setState({ matchError: false, scanSeqId: Date.now() });
         this.capturePhotoShots();
     }
 
     render() {
-        let scale = (this.state.matchError) ? 1.2 : 1;
         let videoStyle = {
-            filter: `blur(` + this.state.videoBlur + `px)`,
-            transform: `scale(` + scale + `)`
+            filter: `blur(25px)`,
+            transform: `scale(1.2)`
         }
         return (
             <div className="camera-container" >
@@ -427,11 +459,10 @@ class Camera extends Component {
                         this.state.showVideo &&
                         <div>
                             <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
-                            {!this.state.matchError &&
-                                <div id="scan-box" className="video-frame" ref={elem => this.scanBox = elem} >
-                                    {/* Hint text */}
-                                    {/* <p className="hint-text">Hint: Zooming into the details will help our app recognize your photo.</p> */}
-                                </div>
+                            {
+                                !this.state.matchError &&
+                                <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
+
                             }
                             {this.state.matchError &&
                                 <div id="no-match-overlay" className="no-match-overlay">
