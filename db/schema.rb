@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181220110037) do
+ActiveRecord::Schema.define(version: 20190102064749) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -91,6 +91,15 @@ ActiveRecord::Schema.define(version: 20181220110037) do
     t.datetime "updated_at", null: false
     t.string "result_image_url"
     t.index ["album_id"], name: "index_photos_on_album_id"
+  end
+
+  create_table "sessions", force: :cascade do |t|
+    t.string "session_id", null: false
+    t.json "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["session_id"], name: "index_sessions_on_session_id", unique: true
+    t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
   create_table "snap_search_results", force: :cascade do |t|
