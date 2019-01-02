@@ -16,35 +16,39 @@
         }
 
         .card-img-container {
+            position: absolute;
             filter: blur(10px);
-            margin: -10px;
+            transform: scale(1.1);
+            height: 100%;
+            img {
+                height: 100%
+            }
         }
 
         .card-img-overlay {
+            padding: 40px 40px 50px 40px;
+            height: auto;
+            position: relative;
 
             .card-img-result {
-                position: absolute;
-                width: 72vw;
-                left: 14vw;
-                padding: 20px;
-                top: 40px;
+                position: relative;
                 z-index: 1;
                 pointer-events: none;
-
                 img {
                     width:100%;
                 }
             }
 
             .card-title {
-                color: #fff;
+                font-size: 31px;
+                position: relative;
+                padding-top:30px;
+                margin: 0 -15px;
+                font-family: Calibre;
+                line-height: 25px;
                 font-size: 30px;
-                position: absolute;
-                bottom: 4vh;
-                padding: 0 20vw;
-                width: 100%;
-                left: 0;
-                line-height: 35px;
+                text-align: center;
+                color: #FFFFFF;
             }
         }
 

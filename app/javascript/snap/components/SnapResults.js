@@ -44,6 +44,56 @@ class SnapResults extends Component {
 
     this.state = {
       ...props.location.state,  // these properties are passed on from Camera component.
+      // result: {
+      //   "api_data": [
+      //   ],
+      //   "data": {
+      //     "records": [
+      //       {
+      //         "id": 7007,
+      //         "room": "Main Room",
+      //         "invno": "BF14",
+      //         "title": "Cup of Chocolate (Femme prenant du chocolat)",
+      //         "medium": "Oil on canvas",
+      //         "people": "Pierre-Auguste Renoir",
+      //         "locations": "Barnes Foundation (Philadelphia), Collection Gallery, Main Room, North Wall",
+      //         "creditLine": "",
+      //         "dimensions": "Overall: 21 5/16 x 25 5/8 in. (54.1 x 65.1 cm)",
+      //         "displayDate": "c. 1912",
+      //         "imageSecret": "0ZAwvN86FoAq13N8",
+      //         "ensembleIndex": "1",
+      //         "classification": "Paintings",
+      //         "shortDescription": "Figures sitting at café tables were a frequent subject for impressionist painters interested in the bustling public life of modern Paris. This canvas, however, does not quite fit into that category. Renoir painted it well after his impressionist years were over, when he was living in the rural countryside of southern France. The painting shows a casually dressed figure stirring a cup of hot chocolate; lost in reverie, slumping forward, she is conveys dreamy inwardness rather than public sociability. The model is Gabrielle Renard, who worked as a nursemaid for the Renoir family and often modeled for the artist; here she is probably posing in his studio. Notice how many colors make up the white tablecloth—purple, green, blue—and how Renoir uses soft, delicate brushstrokes to create the appearance of velvety flesh. ",
+      //         "art_url": "https://barnes-images.imgix.net/7007_0ZAwvN86FoAq13N8_b.jpg"
+      //       }
+      //     ],
+      //     "roomRecords": [
+      //       {
+      //         "id": 6964,
+      //         "art_url": "https://barnes-images.imgix.net/6964_RehDRhZC5bQtSnko_b.jpg"
+      //       },
+      //       {
+      //         "id": 7020,
+      //         "art_url": "https://barnes-images.imgix.net/7020_f2wbizJUVJhRvCyC_b.jpg"
+      //       },
+      //       {
+      //         "id": 7010,
+      //         "art_url": "https://barnes-images.imgix.net/7010_eOCFXaKIIpWBFGrc_b.jpg"
+      //       },
+      //       {
+      //         "id": 7019,
+      //         "art_url": "https://barnes-images.imgix.net/7019_nfDkcKrMa9lLxn1W_b.jpg"
+      //       },
+      //       {
+      //         "id": 6981,
+      //         "art_url": "https://barnes-images.imgix.net/6981_BlvD0VojmGU5ETzC_b.jpg"
+      //       }
+      //     ],
+      //     "message": "Result found"
+      //   },
+      //   "success": true,
+      //   "requestComplete": true
+      // },
       bookmarkModalIsOpen: false,
       sharePopoverIsOpen: false,
       showEmailScreen: false,
@@ -93,8 +143,10 @@ class SnapResults extends Component {
         let bh = Math.floor(0.25 * screen.height);
         let bw = Math.floor(screen.width - 32);
 
-        let cropParams = '?crop=faces,entropy&fit=crop&h=' + h + '&w=' + w;
+        let cropParams = '?crop=faces,entropy&fit=crop&w=' + w;
         let bookmarkCropParams = '?crop=faces,entropy&fit=crop&h=' + bh + '&w=' + bw;
+
+
 
         const art_obj = search_result["data"]["records"][0];
         console.log(art_obj);
@@ -105,8 +157,8 @@ class SnapResults extends Component {
         result['classification'] = art_obj.classification;
         result['locations'] = art_obj.locations;
         result['medium'] = art_obj.medium;
-        result['url'] = art_obj.art_url + cropParams;
-        result['bookmarkImageUrl'] = art_obj.art_url + bookmarkCropParams;
+        result['url'] = art_obj.art_url;
+        result['bg_url'] = art_obj.art_url + cropParams;
         result['invno'] = art_obj.invno;
         result['displayDate'] = art_obj.displayDate;
         result['dimensions'] = art_obj.dimensions;
@@ -441,13 +493,13 @@ class SnapResults extends Component {
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
                 <div className="card-top-container">
                   <div className="card-img-container">
-                    <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image_background" />
+                    <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" />
                   </div>
                   <div className="card-img-overlay">
                     <div className="card-img-result">
                       <img src={this.state.searchResults[0].url} alt="match_image" />
                     </div>
-                    <h3 className="card-title">{this.state.searchResults[0].title}</h3>
+                    <div className="card-title">{this.state.searchResults[0].title}</div>
                   </div>
                 </div>
                 <div className="card-body">
