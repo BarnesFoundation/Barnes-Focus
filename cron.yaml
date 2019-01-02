@@ -6,3 +6,6 @@ cron:
  - name: "Send bookmark snaps in every 3 hours"
    url: "/jobs/compose_bookmarks"
    schedule: "0 */3 * * *"
+ - name: "delete all sessions that have not been updated in the last 7 days"
+   url: "/jobs/clear_sessions"
+   schedule: "0 5 * * *"
