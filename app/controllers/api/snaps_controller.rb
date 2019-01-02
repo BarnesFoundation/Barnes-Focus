@@ -145,7 +145,7 @@ class Api::SnapsController < Api::BaseController
     ## Get artworks from the same room
     def get_similar_artworks(image_id)
       # Get the objects from the room
-      viewed_images = cookies[ :user_scanned_history ] && !cookies[ :user_scanned_history ].blank? ? JSON.parse( cookies[ :user_scanned_history ] ) : []
+      viewed_images = session[ :user_scanned_history ] && !session[ :user_scanned_history ].blank? ? JSON.parse( session[ :user_scanned_history ] ) : []
       similar_arts = EsCachedRecord.find_similar_arts image_id, viewed_images
       return similar_arts
     end

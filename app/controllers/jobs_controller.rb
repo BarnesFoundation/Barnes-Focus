@@ -1,3 +1,4 @@
+require 'rake'
 require 'barnes_elastic_search'
 
 class JobsController < ApplicationController
@@ -60,6 +61,11 @@ class JobsController < ApplicationController
       end
     end
 
+    head :ok, content_type: "text/html"
+  end
+
+  def clear_sessions
+    system `bin/rake db:sessions:trim`
     head :ok, content_type: "text/html"
   end
 

@@ -37,6 +37,7 @@ gem 'health_check'
 gem 'apipie-rails'
 gem 'nokogiri'
 gem 'redis'
+gem 'activerecord-session_store'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
