@@ -72,8 +72,6 @@ class Camera extends Component {
                     width: screen.width,
                     height: h / 2
                 }
-                //console.log('Crop rect :: ');
-                //console.log(this.cropRect);
 
                 // Create temporary canvas
                 let cropCanvas = document.createElement('canvas');
@@ -120,43 +118,22 @@ class Camera extends Component {
         this.stopScan();
         // Capture a photo scan every third of a second
         this.scan = setInterval(() => {
-
             this.intervalExecutions++;
-
             if (this.intervalExecutions == 9) {
                 this.stopScan();
             }
-
             // Only capture if a match hasn't already been found
             if (!this.matchFound) {
-
                 // Get the the present image in the canvas and crop the image
                 let canvas = this.getVideoCanvas();
 
                 canvas.toBlob(async (imageBlob) => {
 
                     if (process.env.CROP_IMAGE === 'TRUE') {
-                        //console.log('Going to crop image before catchoom request!');
-
-                        /* let reader = new FileReader();
-                        reader.readAsDataURL(imageBlob);
-                        reader.onloadend = function () {
-                            let base64data = reader.result;
-                            console.log("before crop ::");
-                            console.log(base64data);
-                        } */
 
                         window.URL = window.URL || window.webkitURL;
                         let imageUri = window.URL.createObjectURL(imageBlob);
                         let imageCrop = await this.cropPhoto(imageUri);
-
-                        // let reader2 = new FileReader();
-                        // reader2.readAsDataURL(imageCrop);
-                        // reader2.onloadend = function () {
-                        //     let b64 = reader2.result;
-                        //     console.log("after crop ::");
-                        //     console.log(b64);
-                        // }
 
                         window.URL.revokeObjectURL(imageUri);
                         this.prepareServerRequest(imageCrop);
@@ -180,8 +157,6 @@ class Camera extends Component {
         url = CATCHOOM_REQUEST_URL;
         data = new FormData();
         config = { headers: { 'Content-Type': 'multipart/form-data' } };
-
-        //console.log('Catchoom token and url :: ' + token + ' & ' + url);
 
         // Append form data    
         data.append('token', token);
@@ -207,7 +182,7 @@ class Camera extends Component {
                 if (!this.matchFound) {
                     this.storeSearchedResult(false, data, null, null, searchTime);
                 }
-                if (!this.matchFound && this.responseCounter == 9) {
+                if (!this.matchFound && (this.responseCounter == 9 || this.intervalExecutions == 9)) {
                     this.completeImageSearchRequest(false, null)
                 }
             }
@@ -271,7 +246,7 @@ class Camera extends Component {
 
     /** Processes the completion of an image search */
     completeImageSearchRequest(responseFound, response) {
-
+        console.log('You SHOULD see me for each scan session whether success or failure!');
         // Turn off the search-in-progress animation
         if (this.state.searchInProgress) {
             this.setState({ searchInProgress: false });
