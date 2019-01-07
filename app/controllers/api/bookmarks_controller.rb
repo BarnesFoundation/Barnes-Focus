@@ -6,10 +6,16 @@ class Api::BookmarksController < Api::BaseController
     respond_to do | wants |
       if bookmark_params[:email]
         session = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
-        Bookmark.where( session_id: session.id ).update_all( email: bookmark_params[:email] )
-        check_for_newsletter
-        wants.json do
-          render json: { data: { errors: [] }, message: 'created' }, status: :created
+        if session
+          Bookmark.where( session_id: session.id ).update_all( email: bookmark_params[:email] )
+          check_for_newsletter
+          wants.json do
+            render json: { data: { errors: [] }, message: 'created' }, status: :created
+          end
+        else
+          wants.json do
+            render json: { data: { errors: [ 'Scanned history not found' ] }, message: 'not_found' }, status: 404
+          end
         end
       else
         wants.json do
