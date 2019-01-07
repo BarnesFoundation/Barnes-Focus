@@ -2,30 +2,24 @@ class Api::BookmarksController < Api::BaseController
   def index
   end
 
-  #api :POST, '/v1/bookmarks', 'Create bookmark entry'
-  #param :email, String, desc: "Email of user", required: true
-  #param :image_id, String, desc: "Image Id", required: true
-  #param :newsletter, String, desc: "Would like to subscribe to newsletter yes/no. Boolean field"
-  #param :language, String, desc: "Which language user is currently accessing to"
-  #example "bookmark[:email]='somone@example.com', bookmark[:image_id]='2072'"
   def create
-    @bookmark = Bookmark.new bookmark_params
-
     respond_to do | wants |
-      if @bookmark.save
-        check_for_newsletter params[:bookmark]
+      if bookmark_params[:email]
+        session = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
+        Bookmark.where( session_id: session.id ).update_all( email: bookmark_params[:email] )
+        check_for_newsletter
         wants.json do
-          render json: { data: { bookmark: @bookmark }, message: 'created' }, status: :created
+          render json: { data: { errors: [] }, message: 'created' }, status: :created
         end
       else
         wants.json do
-          render json: { data: { errors: @bookmark.errors.full_messages }, message: '' }, status: 422
+          render json: { data: { errors: ["Email can't be blank"] }, message: '' }, status: 422
         end
       end
     end
   end
 
-  def check_for_newsletter bookmark_params
+  def check_for_newsletter
     if bookmark_params[:newsletter].present?
       subscription = Subscription.find_or_create_by(email: bookmark_params[:email])
       subscription.is_subscribed = true if bookmark_params[:newsletter] == 'true'
