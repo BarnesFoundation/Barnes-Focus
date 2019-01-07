@@ -188,6 +188,8 @@ class Camera extends Component {
             }
         }
         catch (error) {
+            // Store the image even if catchoom request fails.
+            this.storeSearchedResult(false, data, null, null, null);
             // End the photo scan 
             if (this.intervalExecutions == 9) {
                 this.handleSnapFailure();

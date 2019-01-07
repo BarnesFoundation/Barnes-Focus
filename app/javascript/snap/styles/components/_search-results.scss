@@ -39,12 +39,11 @@
             }
 
             .card-title {
-                font-size: 31px;
                 position: relative;
                 padding-top:30px;
                 margin: 0 -15px;
                 font-family: Calibre;
-                line-height: 25px;
+                line-height: 35px;
                 font-size: 30px;
                 text-align: center;
                 color: #FFFFFF;
@@ -71,7 +70,7 @@
 
                 .item-label {
                     line-height: 30px;
-                    font-size: 16px;
+                    font-size: 17px;
                     letter-spacing: 0.01em;
                     color: #6E6E6E;
                     opacity: 0.8;
@@ -80,8 +79,9 @@
                 }
 
                 .item-info {
-                    line-height: 30px;
-                    font-size: 16px;
+                    line-height: 18px;
+                    padding-top: 6px;
+                    font-size: 17px;
                     letter-spacing: 0.01em;
                     color: #282828;
                     vertical-align: top;
