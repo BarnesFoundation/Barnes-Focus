@@ -1,5 +1,5 @@
 class Bookmark < ApplicationRecord
-  validates :email, :image_id, presence: true
+  validates :image_id, presence: true
 
   attr_accessor :newsletter
 
