@@ -8,7 +8,7 @@ class EmailFooter extends Component {
         super(props);
 
         this.state = {
-            email: localStorage.getItem(SNAP_USER_EMAIL) || '',
+            email: '',
             errors: {
                 email: false
             }
@@ -37,7 +37,10 @@ class EmailFooter extends Component {
         }
         else {
             console.log('Valid email. Call backend API to save email.');
-            this.props.onSubmitEmail(this.state.email);
+            const userEmail = this.state.email;
+            this.setState({ email: '' });
+            localStorage.setItem(SNAP_USER_EMAIL, userEmail);
+            this.props.onSubmitEmail(userEmail);
         }
     }
 

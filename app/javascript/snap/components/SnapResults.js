@@ -467,6 +467,17 @@ class SnapResults extends Component {
   onSubmitEmail = (email) => {
     console.log('Submitted email :: ' + email);
     this.setState({ email: email, emailCaptured: true, showEmailScreen: false });
+
+    const payload = {};
+    payload.email = email;
+    //payload.language = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || 'en';
+    axios.post('/api/bookmarks', payload).then(response => {
+      console.log('Successfully submitted email!');
+    })
+      .catch(error => {
+        console.log('Error submitting bookmark!');
+      });
+
   }
 
   handleScan = () => {
