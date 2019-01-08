@@ -53,8 +53,10 @@ class JobsController < ApplicationController
         }
 
         begin
-          BookmarkNotifierMailer.send_activity_email(mail, els_arr, language).deliver_now
-          bukmarks.each {|b| b.update_attributes(mail_sent: true)}
+          unless mail.blank?
+            BookmarkNotifierMailer.send_activity_email(mail, els_arr, language).deliver_now
+            bukmarks.each {|b| b.update_attributes(mail_sent: true)}
+          end
         rescue Exception => ex
           p "Unable to send email due to #{ex.to_s}"
         end
