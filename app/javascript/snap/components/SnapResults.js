@@ -14,7 +14,6 @@ import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
 import Popover from 'react-simple-popover';
 
-import * as analytics from './Analytics';
 import cross from 'images/cross.png';
 
 const fb_app_id = '349407548905454';
@@ -44,57 +43,6 @@ class SnapResults extends Component {
 
     this.state = {
       ...props.location.state,  // these properties are passed on from Camera component.
-      // result: {
-      //   "api_data": [
-      //   ],
-      //   "data": {
-      //     "records": [
-      //       {
-      //         "id": 7007,
-      //         "room": "Main Room",
-      //         "invno": "BF14",
-      //         "title": "Cup of Chocolate (Femme prenant du chocolat)",
-      //         "medium": "Oil on canvas",
-      //         "people": "Pierre-Auguste Renoir",
-      //         "locations": "Barnes Foundation (Philadelphia), Collection Gallery, Main Room, North Wall",
-      //         "creditLine": "",
-      //         "dimensions": "Overall: 21 5/16 x 25 5/8 in. (54.1 x 65.1 cm)",
-      //         "displayDate": "c. 1912",
-      //         "imageSecret": "0ZAwvN86FoAq13N8",
-      //         "ensembleIndex": "1",
-      //         "classification": "Paintings",
-      //         "shortDescription": "Figures sitting at café tables were a frequent subject for impressionist painters interested in the bustling public life of modern Paris. This canvas, however, does not quite fit into that category. Renoir painted it well after his impressionist years were over, when he was living in the rural countryside of southern France. The painting shows a casually dressed figure stirring a cup of hot chocolate; lost in reverie, slumping forward, she is conveys dreamy inwardness rather than public sociability. The model is Gabrielle Renard, who worked as a nursemaid for the Renoir family and often modeled for the artist; here she is probably posing in his studio. Notice how many colors make up the white tablecloth—purple, green, blue—and how Renoir uses soft, delicate brushstrokes to create the appearance of velvety flesh. ",
-      //         "art_url": "https://barnes-images.imgix.net/7007_0ZAwvN86FoAq13N8_b.jpg"
-      //       }
-      //     ],
-      //     "roomRecords": [
-      //       {
-      //         "id": 6964,
-      //         "art_url": "https://barnes-images.imgix.net/6964_RehDRhZC5bQtSnko_b.jpg"
-      //       },
-      //       {
-      //         "id": 7020,
-      //         "art_url": "https://barnes-images.imgix.net/7020_f2wbizJUVJhRvCyC_b.jpg"
-      //       },
-      //       {
-      //         "id": 7010,
-      //         "art_url": "https://barnes-images.imgix.net/7010_eOCFXaKIIpWBFGrc_b.jpg"
-      //       },
-      //       {
-      //         "id": 7019,
-      //         "art_url": "https://barnes-images.imgix.net/7019_nfDkcKrMa9lLxn1W_b.jpg"
-      //       },
-      //       {
-      //         "id": 6981,
-      //         "art_url": "https://barnes-images.imgix.net/6981_BlvD0VojmGU5ETzC_b.jpg"
-      //       }
-      //     ],
-      //     "message": "Result found"
-      //   },
-      //   "success": true,
-      //   "requestComplete": true
-      // },
-      bookmarkModalIsOpen: false,
       sharePopoverIsOpen: false,
       showEmailScreen: false,
       emailCaptured: false,
@@ -113,7 +61,6 @@ class SnapResults extends Component {
         opacity: 0
       },
       email: localStorage.getItem(SNAP_USER_EMAIL) || '',
-      newsletterSubscription: false,
       resetLanguageBox: false,
       errors: {
         email: false
@@ -123,8 +70,6 @@ class SnapResults extends Component {
     }
 
     // v2 class level properties
-
-
     this.sliderTopMax = 0;
     this.shortDescTopMax = 0;
     this.scrollInProgress = false;
@@ -137,16 +82,8 @@ class SnapResults extends Component {
       let roomRecords = [];
       if (search_result["data"]["records"].length > 0) {
 
-        let h = Math.floor(0.6 * screen.height);
         let w = screen.width;
-
-        let bh = Math.floor(0.25 * screen.height);
-        let bw = Math.floor(screen.width - 32);
-
         let cropParams = '?crop=faces,entropy&fit=crop&w=' + w;
-        let bookmarkCropParams = '?crop=faces,entropy&fit=crop&h=' + bh + '&w=' + bw;
-
-
 
         const art_obj = search_result["data"]["records"][0];
         console.log(art_obj);
@@ -169,8 +106,6 @@ class SnapResults extends Component {
       }
 
       this.setState({ searchResults: [].concat(result), alsoInRoomResults: roomRecords });
-
-
     } else {
       this.setState({ error: "No records found!" });
     }
@@ -185,23 +120,6 @@ class SnapResults extends Component {
       this.setState({ showEmailScreen: true });
     }
   }
-
-
-
-  _addNotification = ({ success, message }) => {
-    event.preventDefault();
-    this
-      ._notificationSystem
-      .addNotification({
-        message: message,
-        position: "tc",
-        level: success
-          ? "success"
-          : "error",
-        autoDismiss: 3,
-        dismissible: "none"
-      });
-  };
 
   onSelectLanguage = (lang) => {
     console.log('Selected lang changed in SnapResults component : ' + JSON.stringify(lang));
@@ -229,7 +147,7 @@ class SnapResults extends Component {
 
   componentDidMount() {
     // Register scroll listener
-    window.addEventListener('scroll', this.onScroll, true);
+    window.addEventListener('scroll', this._onScroll, true);
 
     $("#result-card").attr("data-title", this.state.searchResults[0].title);
     $("#result-card").attr("data-artist", this.state.searchResults[0].artist);
@@ -239,13 +157,11 @@ class SnapResults extends Component {
     if (!this.state.searchResults[0].shortDescription) {
       $("#result-card").attr("data-nodesc-invno", this.state.searchResults[0].invno);
     }
-
-
   }
 
   componentWillUnmount() {
     // Un-register scroll listener
-    window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('scroll', this._onScroll);
   }
 
   /**
@@ -264,9 +180,6 @@ class SnapResults extends Component {
 
     let currentSliderScrollOffset = h - sliderElemTop;
     let currentShortDescScrollOffset = h - shortDescElemTop;
-    //console.log('traveredY = ' + traversedY);
-    // console.log('ios visible slider height : ' + (h - sliderElemTop));
-    //console.log('shortDescElemHeight = ' + shortDescElemHeight);
 
     let visibleSliderHeight = (isIOS) ? Math.floor(currentSliderScrollOffset) : Math.floor(traversedY - this.sliderTopMax);
     let visibleShortDescHeight = Math.floor(currentShortDescScrollOffset);
@@ -331,7 +244,7 @@ class SnapResults extends Component {
     this.scrollInProgress = false;
   }
 
-  onScroll = (event) => {
+  _onScroll = (event) => {
     if (!this.scrollInProgress) {
       requestAnimationFrame(this.handleScroll)
       this.scrollInProgress = true;
@@ -375,21 +288,7 @@ class SnapResults extends Component {
     e.preventDefault();
   }
 
-  bookmarkIt = () => {
-    const email = localStorage.getItem(SNAP_USER_EMAIL);
-
-    if (email) {
-      this.submitBookMark();
-    } else {
-      this.setState({ bookmarkModalIsOpen: true });
-    }
-  }
-
-  closeBookmarkModal = () => {
-    this.setState({ bookmarkModalIsOpen: false });
-  }
-
-  shareIt = () => {
+  _onClickShare = () => {
 
     if (navigator.share) {
       let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
@@ -409,7 +308,6 @@ class SnapResults extends Component {
       })
         .then(() => {
           console.log('Successful share');
-          analytics.track({ eventCategory: GA_EVENT_CATEGORY.SOCIAL, eventAction: GA_EVENT_ACTION.SOCIAL_SHARE_NAVIGATOR, eventLabel: GA_EVENT_LABEL.SOCIAL_SHARE_NAVIGATOR });
         })
         .catch((error) => console.log('Error sharing', error));
     } else {
@@ -420,39 +318,6 @@ class SnapResults extends Component {
 
   closeShareModal = () => {
     this.setState({ sharePopoverIsOpen: false });
-  }
-
-  submitBookMark = (event) => {
-    console.log('submitting bookmark');
-    analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.BOOKMARK, eventLabel: GA_EVENT_LABEL.BOOKMARK });
-    // event is undefined when email is already present in localStorage and no bookmark modal is opened.
-    if (event) {
-      event.preventDefault();
-      if (!this.validateEmail()) {
-        this.setState({ errors: { email: true } });
-      } else {
-        this.setState({ errors: { email: false } });
-        this.closeBookmarkModal();
-        localStorage.setItem(SNAP_USER_EMAIL, this.state.email);
-
-      }
-
-    }
-
-    const payload = {};
-    payload.email = this.state.email;
-    payload.image_id = this.state.searchResults[0].id;
-    payload.newsletter = this.state.newsletterSubscription;
-    payload.language = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || 'en';
-
-    axios.post('/api/bookmarks', payload).then(response => {
-      this._addNotification({ success: true, message: 'Bookmark created successfully.' });
-      console.log('Successfully submitted bookmark!');
-    })
-      .catch(error => {
-        this._addNotification({ success: false, message: 'Error while creating bookmark.' });
-        console.log('Error submitting bookmark!');
-      });
   }
 
   resetExperience = () => {
@@ -547,7 +412,7 @@ class SnapResults extends Component {
                     </div>
                   </div>
                   <div className="share-wrapper">
-                    <div id="share-it" className="btn-share-result" ref="target" onClick={this.shareIt}>
+                    <div id="share-it" className="btn-share-result" ref="target" onClick={this._onClickShare}>
                       <img src={share} alt="share" />
                       <span className="text-share">Share</span>
                     </div>

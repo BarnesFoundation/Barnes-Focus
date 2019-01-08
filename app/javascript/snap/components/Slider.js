@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Slider from 'react-slick';
 import CrossfadeImage from 'react-crossfade-image';
-import { withRouter } from 'react-router-dom';
 import { ART_WORK_INFO_URL } from './Constants';
 import axios from 'axios';
 
@@ -132,4 +131,4 @@ class InRoomSlider extends Component {
     }
 }
 
-export default withRouter(InRoomSlider);
+export default InRoomSlider;

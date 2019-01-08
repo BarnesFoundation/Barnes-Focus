@@ -12,7 +12,7 @@ import {
     CATCHOOM_ACCESS_TOKEN, CATCHOOM_REQUEST_URL, ART_WORK_INFO_URL
 } from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
-import * as analytics from './Analytics';
+import { cropPhoto } from './CameraHelper';
 
 class Camera extends Component {
 
@@ -47,55 +47,6 @@ class Camera extends Component {
         }
     }
 
-    /** Crops an image and returns the uri of the cropped image */
-    cropPhoto = (imageUri) => {
-        return new Promise(resolve => {
-
-            let image = new Image();
-            image.onload = () => {
-
-                // let scanBox = this.scanBox.getBoundingClientRect();
-                /* this.cropRect = {
-                    x: Math.floor(scanBox.x),
-                    y: Math.floor(scanBox.y),
-                    width: Math.floor(scanBox.width),
-                    height: Math.floor(scanBox.height)
-                } */
-
-                var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-                var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
-                // We will be croping the top half of entire viewport for better image matching.
-                this.cropRect = {
-                    x: 0,
-                    y: 0,
-                    width: screen.width,
-                    height: h / 2
-                }
-
-                // Create temporary canvas
-                let cropCanvas = document.createElement('canvas');
-                let cropContext = cropCanvas.getContext('2d');
-
-                let cropWidth = Math.floor(this.cropRect.width);
-                let cropHeight = Math.floor(this.cropRect.height);
-
-                cropCanvas.width = cropWidth;
-                cropCanvas.height = cropHeight;
-
-                // Draw the new image, keeping its proportions intact for optimal matching
-                cropContext.drawImage(image, this.cropRect.x, this.cropRect.y, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-                // image = cropCanvas.toDataURL('image/jpeg', 1.0);
-                cropCanvas.toBlob((imageBlob) => {
-                    resolve(imageBlob);
-                }, 'image/jpeg');
-            }
-            // Trigger loading of the image
-            image.src = imageUri;
-        });
-    }
-
     stopScan = () => {
         // End the photo scan 
         clearInterval(this.scan);
@@ -104,9 +55,6 @@ class Camera extends Component {
 
     /** Captures photo over a 3-second duration */
     capturePhotoShots = () => {
-
-        // Track on Google Analytics that a photo was captured
-        analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.TAKE_PHOTO, eventLabel: GA_EVENT_LABEL.SNAP_BUTTON });
 
         // Update the snap attempts with this scan as a single attempt
         localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
@@ -133,7 +81,7 @@ class Camera extends Component {
 
                         window.URL = window.URL || window.webkitURL;
                         let imageUri = window.URL.createObjectURL(imageBlob);
-                        let imageCrop = await this.cropPhoto(imageUri);
+                        let imageCrop = await cropPhoto(imageUri);
 
                         window.URL.revokeObjectURL(imageUri);
                         this.prepareServerRequest(imageCrop);
@@ -255,9 +203,6 @@ class Camera extends Component {
         }
 
         if (responseFound) {
-            // Update analytics of the successful snap event
-            analytics.track({ eventCategory: GA_EVENT_CATEGORY.SNAP, eventAction: GA_EVENT_ACTION.SNAP_SUCCESS, eventLabel: GA_EVENT_LABEL.SNAP_SUCCESS });
-
             // Navigate to results page
             this.props.history.push({ pathname: '/results', state: { result: response, snapCount: localStorage.getItem(SNAP_ATTEMPTS) } });
         }
@@ -266,7 +211,7 @@ class Camera extends Component {
         }
     }
 
-    /** Provides the snap failure event to Google Analytics */
+    /** Transitions to an alert screen when no match is found */
     handleSnapFailure = () => {
         this.stopScan();
         // Turn off search in-progress animation
@@ -365,6 +310,7 @@ class Camera extends Component {
         return canvas;
     }
 
+    /** Gets a blank canvas of same size as the video */
     getCanvas = () => {
         const video = this.video;
         if (!video.videoHeight) return null;
@@ -385,9 +331,7 @@ class Camera extends Component {
         return canvas;
     }
 
-    /**
-     * Draws the portion of the video visible within the preview onto a canvas, in a loop.
-     */
+    /** Draws the portion of the video visible within the preview onto a canvas, in a loop. */
     drawVideoPreview = () => {
         let previewCanvas = this.vpreview;
         let previewContext = previewCanvas.getContext('2d');
@@ -418,6 +362,7 @@ class Camera extends Component {
 
     }
 
+    /** Transitions the alert screen back to camera focus when scan button is clicked */
     handleScan = () => {
         console.log('Back to scan mode');
         this.setState({ matchError: false, scanSeqId: Date.now() });
