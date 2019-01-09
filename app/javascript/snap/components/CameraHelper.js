@@ -44,4 +44,4 @@ export const cropPhoto = (imageUri) => {
         // Trigger loading of the image
         image.src = imageUri;
     });
-}
+};

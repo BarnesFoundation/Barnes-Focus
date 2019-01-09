@@ -12,6 +12,7 @@
             position: relative;
             height: auto !important;
             overflow: hidden;
+            z-index: 2;
         }
 
         .card-img-container {
@@ -54,7 +55,8 @@
             padding: 25px;
             color: #282828;
             text-align: left;
-
+            z-index: 2;
+            background: #fff;
             .card-text {
                 padding-bottom: 30px;
             }

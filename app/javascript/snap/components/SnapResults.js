@@ -50,7 +50,7 @@ class SnapResults extends Component {
       searchResults: [],
       alsoInRoomResults: [],
       activeSlideIndex: 0,
-      blurValue: 1,
+      blurValue: 5,
       isShortDescVisible: false,
       scanBtnStyle: {
         position: 'fixed'
@@ -60,6 +60,11 @@ class SnapResults extends Component {
         height: '80vh',
         opacity: 0
       },
+      slideOverStyle: {
+        position: 'fixed',
+        bottom: '0'
+      },
+      showSliderOverlay: true,
       email: localStorage.getItem(SNAP_USER_EMAIL) || '',
       resetLanguageBox: false,
       errors: {
@@ -69,11 +74,8 @@ class SnapResults extends Component {
       translation: (translationObj) ? JSON.parse(translationObj) : null
     }
 
-    // v2 class level properties
-    this.sliderTopMax = 0;
-    this.shortDescTopMax = 0;
     this.scrollInProgress = false;
-
+    this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
   }
 
   constructResultAndInRoomSlider = (search_result) => {
@@ -135,9 +137,6 @@ class SnapResults extends Component {
   }
 
   onSelectInRoomArt = (result) => {
-    console.log('In room art result');
-    console.log(JSON.stringify(result));
-
     let searchContainer = document.getElementById('search-result');
     searchContainer.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" })
 
@@ -168,52 +167,47 @@ class SnapResults extends Component {
    * All the fancy scroll animation goes here.
    */
   handleScroll = () => {
-    let sliderElemTop = this.sliderContainer.getBoundingClientRect().y;
-    let shortDescElemTop = this.shortDescContainer.getBoundingClientRect().y;
-    let shortDescElemHeight = this.shortDescContainer.getBoundingClientRect().bottom - this.shortDescContainer.getBoundingClientRect().top;
     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-    this.sliderTopMax = (sliderElemTop > this.sliderTopMax) ? sliderElemTop : this.sliderTopMax;
-    this.shortDescTopMax = (shortDescElemTop > this.shortDescTopMax) ? shortDescElemTop : this.shortDescTopMax;
+    let resultsContainerBottom = Math.floor(h - this.resultsContainer.getBoundingClientRect().bottom);
+    //console.log('Results container bottom :: ' + resultsContainerBottom);
 
-    let traversedY = h + document.body.scrollTop;
-
-    let currentSliderScrollOffset = h - sliderElemTop;
-    let currentShortDescScrollOffset = h - shortDescElemTop;
-
-    let visibleSliderHeight = (isIOS) ? Math.floor(currentSliderScrollOffset) : Math.floor(traversedY - this.sliderTopMax);
-    let visibleShortDescHeight = Math.floor(currentShortDescScrollOffset);
-    //let isShortDescVisible = (traversedY - this.shortDescTopMax) > 0;
-    //console.log('visibleSliderHeight = ' + visibleSliderHeight);
-
-    /**
-     * Show hide scan button and language selector button if users scrolls down till shortDesc is visible in viewport.
-     */
-    // if ((!this.state.isShortDescVisible && isShortDescVisible) || (this.state.isShortDescVisible && !isShortDescVisible)) {
-    //   this.setState({ isShortDescVisible: isShortDescVisible });
-    // }
-
-    let blur = Math.floor(visibleSliderHeight / 30);
-    if (blur >= 0 && blur <= 19) {
-      this.setState({ blurValue: 1 + blur });
+    /** animate blur based on results container bottom position */
+    let blur = Math.floor(resultsContainerBottom / 35);
+    if (blur >= 0 && blur <= 15) {
+      this.setState({ blurValue: 5 + blur });
     }
 
-    if (visibleSliderHeight >= 520) {
+    /** animate slider background and scan button based on results container bottom position */
+    if (resultsContainerBottom < 540) {
       this.setState({
+        slideOverStyle: {
+          position: 'fixed',
+          bottom: '0'
+        },
+        scanBtnStyle: {
+          position: 'fixed'
+        },
+        showSliderOverlay: true
+      })
+    } else {
+      this.setState({
+        slideOverStyle: {
+          position: 'relative'
+        },
         scanBtnStyle: {
           position: 'absolute'
         },
-        scanWrapperStyle: {
-          position: 'absolute'
-        }
-      });
-    } else {
-      this.setState({
-        scanBtnStyle: {
-          position: 'fixed'
-        }
-      });
+        showSliderOverlay: false
+      })
     }
+
+    let shortDescElemTop = this.shortDescContainer.getBoundingClientRect().y;
+    let shortDescElemHeight = this.shortDescContainer.getBoundingClientRect().bottom - this.shortDescContainer.getBoundingClientRect().top;
+    let currentShortDescScrollOffset = h - shortDescElemTop;
+    let visibleShortDescHeight = Math.floor(currentShortDescScrollOffset);
+
+    /** animate language dropdown basen on shortDesc container position */
     if (visibleShortDescHeight < 0) {
       this.setState({
         langDropdownStyle: {
@@ -231,7 +225,7 @@ class SnapResults extends Component {
           opacity: 1
         }
       });
-    } else if (visibleShortDescHeight > shortDescElemHeight) {
+    } else if (visibleShortDescHeight > shortDescElemHeight + 85) {
       this.setState({
         langDropdownStyle: {
           position: 'relative',
@@ -378,7 +372,7 @@ class SnapResults extends Component {
                     <div className="card-title">{this.state.searchResults[0].title}</div>
                   </div>
                 </div>
-                <div className="card-body">
+                <div className="card-body" ref={el => this.resultsContainer = el}>
                   <div className="card-info">
                     <table className="detail-table">
                       <tbody>
@@ -434,24 +428,35 @@ class SnapResults extends Component {
                   </div>
                 </div>
 
-                <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} >
-                  {
-                    this.state.alsoInRoomResults.length > 0 &&
+                {this.state.showSliderOverlay && <div id="slider-overlay" style={{ height: '540px', width: '100%', background: 'transparent', content: '' }}></div>}
+
+                {
+                  this.state.alsoInRoomResults.length > 0 &&
+                  <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
                     <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt}></InRoomSlider>
-                  }
-
-
-                  <div className="footer-text">
-                    <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
-                    <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
-                  </div>
-
-
-
-                  <div className="scan-wrapper" style={this.state.scanWrapperStyle}>
-                    <div className="scan-button" onClick={this.handleScan} style={this.state.scanBtnStyle}>
-                      <img src={scan_button} alt="scan" />
+                    <div className="footer-text">
+                      <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
+                      <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
                     </div>
+                  </div>
+                }
+
+                {
+                  this.state.alsoInRoomResults.length === 0 &&
+                  <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
+                    <div className="slider-background" style={{ filter: `blur(20px)` }}>
+                      <img src={this.state.searchResults[0].url + this.sliderBackgroundCropParams} />
+                    </div>
+                    <div className="footer-text">
+                      <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
+                      <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
+                    </div>
+                  </div>
+                }
+
+                <div className="scan-wrapper">
+                  <div className="scan-button" onClick={this.handleScan} style={this.state.scanBtnStyle}>
+                    <img src={scan_button} alt="scan" />
                   </div>
                 </div>
 
