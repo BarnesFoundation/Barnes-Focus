@@ -6,17 +6,16 @@ import scan_button from 'images/scan-button.svg';
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners';
 import barnes_logo from 'images/logo.svg';
-import {
-    SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION,
-    GA_EVENT_LABEL, SNAP_LAST_TIMESTAMP, SNAP_COUNT_RESET_INTERVAL, SNAP_APP_RESET_INTERVAL, SNAP_USER_EMAIL, SNAP_LANGUAGE_TRANSLATION,
-    CATCHOOM_ACCESS_TOKEN, CATCHOOM_REQUEST_URL, ART_WORK_INFO_URL
-} from './Constants';
+import * as constants from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import { cropPhoto } from './CameraHelper';
+import { SearchRequestService } from '../services/SearchRequestService';
 
 class Camera extends Component {
 
-    translationObj = localStorage.getItem(SNAP_LANGUAGE_TRANSLATION);
+    sr = new SearchRequestService();
+
+    translationObj = localStorage.getItem(constants.SNAP_LANGUAGE_TRANSLATION);
 
     // Set state variables
     state = {
@@ -24,7 +23,7 @@ class Camera extends Component {
         frontCamera: false,
         showVideo: true,
         searchInProgress: false,
-        snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
+        snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 0,
         translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
         cameraPermission: false,
         scanSeqId: Date.now(),
@@ -37,11 +36,11 @@ class Camera extends Component {
     track; camera_capabilities; camera_settings; scan; cropRect;
 
     resetSnapCounter = () => {
-        let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
+        let last_snap_timestamp = parseInt(localStorage.getItem(constants.SNAP_LAST_TIMESTAMP));
         if (last_snap_timestamp) {
-            let ttl = (last_snap_timestamp + parseInt(SNAP_COUNT_RESET_INTERVAL)) - Date.now();
+            let ttl = (last_snap_timestamp + parseInt(constants.SNAP_COUNT_RESET_INTERVAL)) - Date.now();
             if (ttl <= 0 && this.state.snapAttempts > 0) {
-                localStorage.removeItem(SNAP_ATTEMPTS);
+                localStorage.removeItem(constants.SNAP_ATTEMPTS);
                 this.setState({ snapAttempts: 0 });
             }
         }
@@ -57,67 +56,58 @@ class Camera extends Component {
     capturePhotoShots = () => {
 
         // Update the snap attempts with this scan as a single attempt
-        localStorage.setItem(SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-        localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
+        localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
+        localStorage.setItem(constants.SNAP_LAST_TIMESTAMP, Date.now());
 
-        let prefLang = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || "en";
+        let prefLang = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) || "en";
         this.intervalExecutions = 0;
 
         this.stopScan();
+
         // Capture a photo scan every third of a second
-        this.scan = setInterval(() => {
-            this.intervalExecutions++;
-            if (this.intervalExecutions == 9) {
-                this.stopScan();
-            }
-            // Only capture if a match hasn't already been found
-            if (!this.matchFound) {
-                // Get the the present image in the canvas and crop the image
-                let canvas = this.getVideoCanvas();
-
-                canvas.toBlob(async (imageBlob) => {
-
-                    if (process.env.CROP_IMAGE === 'TRUE') {
-
-                        window.URL = window.URL || window.webkitURL;
-                        let imageUri = window.URL.createObjectURL(imageBlob);
-                        let imageCrop = await cropPhoto(imageUri);
-
-                        window.URL.revokeObjectURL(imageUri);
-                        this.prepareServerRequest(imageCrop);
-                    }
-
-                    else {
-                        this.prepareServerRequest(imageBlob);
-                    }
-                }, 'image/jpeg');
-            }
-        }, 1000 / 3);
+        this.scan = setInterval((this.scanner), 1000 / 3);
     }
 
-    /** Prepares image match request options */
-    prepareServerRequest = (imageData) => {
+    /** Contains the logic for capturing scans */
+    scanner = () => {
+        this.intervalExecutions++;
+        if (this.intervalExecutions == 9) {
+            this.stopScan();
+        }
+        // Only capture if a match hasn't already been found
+        if (!this.matchFound) {
 
-        let url, data, config;
-        // Configurations for Axios request
-        let token = CATCHOOM_ACCESS_TOKEN;
+            // Get the the present image in the canvas and crop the image
+            let canvas = this.getVideoCanvas();
 
-        url = CATCHOOM_REQUEST_URL;
-        data = new FormData();
-        config = { headers: { 'Content-Type': 'multipart/form-data' } };
+            canvas.toBlob(async (imageBlob) => {
 
-        // Append form data    
-        data.append('token', token);
-        data.append('image', imageData, 'temp_image.jpg');
-        data.append('scanSeqId', this.state.scanSeqId);
+                if (process.env.CROP_IMAGE === 'TRUE') {
 
-        this.submitSearchRequest(url, data, config)
+                    window.URL = window.URL || window.webkitURL;
+                    let imageUri = window.URL.createObjectURL(imageBlob);
+                    let imageCrop = await cropPhoto(imageUri);
+
+                    window.URL.revokeObjectURL(imageUri);
+                    const requestConfig = this.sr.prepareRequest(imageCrop, this.state.scanSeqId);
+                    this.submitSearchRequest(requestConfig);
+                }
+
+                else {
+                    const requestConfig = this.sr.prepareRequest(imageCrop, this.state.scanSeqId);
+                    this.submitSearchRequest(requestConfig);
+                }
+            }, 'image/jpeg');
+        }
     }
 
     /** Submits the image search request to the server */
-    submitSearchRequest = async (url, data, config) => {
+    submitSearchRequest = async (requestConfig) => {
+
+        const { data } = requestConfig;
+
         try {
-            let response = await axios.post(url, data, config)
+            let response = await axios(requestConfig);
             // Increment our response counter
             this.responseCounter++;
             let searchTime = response.data.search_time;
@@ -128,7 +118,7 @@ class Camera extends Component {
             // If we've received all responses and no match was found yet, process as a non-matched image
             else {
                 if (!this.matchFound) {
-                    this.storeSearchedResult(false, data, null, null, searchTime);
+                    this.sr.storeSearchedResult(false, data, null, null, searchTime);
                 }
                 if (!this.matchFound && (this.responseCounter == 9 || this.intervalExecutions == 9)) {
                     this.completeImageSearchRequest(false, null)
@@ -137,7 +127,7 @@ class Camera extends Component {
         }
         catch (error) {
             // Store the image even if catchoom request fails.
-            this.storeSearchedResult(false, data, null, null, null);
+            this.sr.storeSearchedResult(false, data, null, null, null);
             // End the photo scan 
             if (this.intervalExecutions == 9) {
                 this.handleSnapFailure();
@@ -162,37 +152,16 @@ class Camera extends Component {
 
                 // Show the search animation while retrieving artwork information
                 this.setState({ searchInProgress: true, showVideo: false });
-                let artworkInfo = await this.getArtworkInformation(imageId);
+                this.artworkRetrieved = true;
+                let artworkInfo = await this.sr.getArtworkInformation(imageId);
                 this.setState({ searchInProgress: false });
 
-                this.storeSearchedResult(true, data, refImage, artworkInfo, searchTime);
+                this.sr.storeSearchedResult(true, data, refImage, artworkInfo, searchTime);
                 this.completeImageSearchRequest(true, artworkInfo);
 
             }
         };
     })();
-
-    /** Retrieves the information for the identified piece */
-    getArtworkInformation = async (imageId) => {
-
-        this.artworkRetrieved = true;
-        try {
-            let response = await axios.get(ART_WORK_INFO_URL + imageId);
-            return response.data;
-        }
-        catch (error) { console.log('An error occurred while retrieving the artwork information from the server'); }
-    }
-
-    /** Stores the search attempt in the server */
-    storeSearchedResult = async (searchSuccess, formData, referenceImageUrl, esResponse, searchTime) => {
-
-        formData.append('searchSuccess', searchSuccess);
-        formData.append('referenceImageUrl', referenceImageUrl);
-        formData.append('esResponse', JSON.stringify(esResponse));
-        formData.append('searchTime', searchTime)
-
-        await axios.post('/api/snaps/storeSearchedResult', formData);
-    }
 
     /** Processes the completion of an image search */
     completeImageSearchRequest(responseFound, response) {
@@ -204,7 +173,7 @@ class Camera extends Component {
 
         if (responseFound) {
             // Navigate to results page
-            this.props.history.push({ pathname: '/results', state: { result: response, snapCount: localStorage.getItem(SNAP_ATTEMPTS) } });
+            this.props.history.push({ pathname: '/results', state: { result: response, snapCount: localStorage.getItem(constants.SNAP_ATTEMPTS) } });
         }
         else {
             this.handleSnapFailure();
@@ -223,23 +192,23 @@ class Camera extends Component {
 
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         // Fetch the device camera
-        navigator.mediaDevices.getUserMedia({
-            video: {
-                "facingMode": (this.state.frontCamera) ? "user" : "environment",
-                "width": 1920,
-                "height": 1080
-            }
-        })
-            .then(videoStream => {
-                this.setState({ videoStream: videoStream, cameraPermission: true });
-            })
-            .catch(error => {
-                console.log('Not allowed to access camera. Please check settings! ' + error);
-                this.setState({ error: "An error occurred accessing the device camera" });
+        try {
+            const videoStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    "facingMode": (this.state.frontCamera) ? "user" : "environment",
+                    "width": 1920,
+                    "height": 1080
+                }
             });
+            this.setState({ videoStream: videoStream, cameraPermission: true });
+        }
 
+        catch (error) {
+            console.log('Not allowed to access camera. Please check settings! ' + error);
+            this.setState({ error: "An error occurred accessing the device camera" });
+        }
     }
 
     componentDidUpdate() {
