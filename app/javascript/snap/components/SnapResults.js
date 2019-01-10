@@ -3,7 +3,7 @@ import { withRouter } from 'react-router'
 import { compose } from 'redux';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SOCIAL_MEDIA_TWITTER, SOCIAL_MEDIA_FACEBOOK, SOCIAL_MEDIA_INSTAGRAM, SNAP_ATTEMPTS, GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
+import * as constants from './Constants';
 import withOrientation from './withOrientation';
 import axios from 'axios';
 import share from 'images/share.svg';
@@ -15,6 +15,8 @@ import EmailForm from './EmailForm';
 import Popover from 'react-simple-popover';
 
 import cross from 'images/cross.png';
+import { SearchRequestService } from '../services/SearchRequestService';
+
 
 const fb_app_id = '349407548905454';
 
@@ -26,7 +28,11 @@ class SnapResults extends Component {
 
   constructor(props) {
     super(props);
-    let translationObj = localStorage.getItem(SNAP_LANGUAGE_TRANSLATION);
+    console.log('SnapResults >> constructor');
+
+    let translationObj = localStorage.getItem(constants.SNAP_LANGUAGE_TRANSLATION);
+
+    this.sr = new SearchRequestService();
 
     this.langOptions = [
       { name: 'English', code: 'En', selected: true },
@@ -39,7 +45,6 @@ class SnapResults extends Component {
       { name: 'Japanese', code: 'Ja', selected: false },
       { name: 'Korean', code: 'Ko', selected: false }
     ];
-
 
     this.state = {
       ...props.location.state,  // these properties are passed on from Camera component.
@@ -65,8 +70,7 @@ class SnapResults extends Component {
         bottom: '0'
       },
       showSliderOverlay: true,
-      email: localStorage.getItem(SNAP_USER_EMAIL) || '',
-      resetLanguageBox: false,
+      email: localStorage.getItem(constants.SNAP_USER_EMAIL) || '',
       errors: {
         email: false
       },
@@ -88,7 +92,7 @@ class SnapResults extends Component {
         let cropParams = '?crop=faces,entropy&fit=crop&w=' + w;
 
         const art_obj = search_result["data"]["records"][0];
-        console.log(art_obj);
+        //console.log(art_obj);
         result['id'] = art_obj.id;
         result['title'] = art_obj.title;
         result['shortDescription'] = art_obj.shortDescription;
@@ -113,13 +117,34 @@ class SnapResults extends Component {
     }
   }
 
-  componentWillMount() {
-    this.constructResultAndInRoomSlider(this.state.result)
+  async componentWillMount() {
+    console.log('SnapResults >> componentWillMount');
+    let imageId = this.props.match.params.imageId;
+    if (imageId) {
+      let artworkInfo = await this.sr.getArtworkInformation(imageId);
+      this.setState({ result: artworkInfo });
+      this.constructResultAndInRoomSlider(artworkInfo);
+    } else {
+      this.constructResultAndInRoomSlider(this.state.result);
+    }
+
     /**
      * If the number of scans equals 4, show the screen to capture user email.
      */
     if (parseInt(this.state.snapCount) === 4) {
       this.setState({ showEmailScreen: true });
+    }
+  }
+
+  async componentWillReceiveProps(props) {
+    console.log('SnapResults >> componentWillReceiveProps');
+    let imageId = props.match.params.imageId;
+    if (imageId) {
+      let artworkInfo = await this.sr.getArtworkInformation(imageId);
+      this.setState({ result: artworkInfo });
+      this.constructResultAndInRoomSlider(artworkInfo);
+    } else {
+      this.constructResultAndInRoomSlider(this.state.result);
     }
   }
 
@@ -136,15 +161,17 @@ class SnapResults extends Component {
 
   }
 
-  onSelectInRoomArt = (result) => {
+  onSelectInRoomArt = (aitrId) => {
+    this.props.history.push({ pathname: `/results/${aitrId}` });
     let searchContainer = document.getElementById('search-result');
-    searchContainer.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" })
-
-    this.constructResultAndInRoomSlider(result);
-
+    searchContainer.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" });
   }
 
   componentDidMount() {
+    console.log('SnapResults >> componentDidMount');
+    if (this.state.searchResults.length === 0) {
+      return;
+    }
     // Register scroll listener
     window.addEventListener('scroll', this._onScroll, true);
 
@@ -254,7 +281,7 @@ class SnapResults extends Component {
     let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
 
     switch (socialMediaType) {
-      case SOCIAL_MEDIA_TWITTER: {
+      case constants.SOCIAL_MEDIA_TWITTER: {
 
         let hashtag = 'barnesfoundation';
 
@@ -271,7 +298,7 @@ class SnapResults extends Component {
         window.open(webFallbackURL, '_blank');
         break;
       }
-      case SOCIAL_MEDIA_FACEBOOK: {
+      case constants.SOCIAL_MEDIA_FACEBOOK: {
         webFallbackURL = 'https://www.facebook.com/dialog/share?app_id=' + fb_app_id + '&display=popup&href=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
         //webFallbackURL = 'http://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
         window.open(webFallbackURL, '_blank');
@@ -315,12 +342,11 @@ class SnapResults extends Component {
   }
 
   resetExperience = () => {
-    localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
-    localStorage.removeItem(SNAP_USER_EMAIL);
-    localStorage.removeItem(SNAP_ATTEMPTS);
-    localStorage.removeItem(SNAP_LANGUAGE_TRANSLATION);
+    localStorage.removeItem(constants.SNAP_LANGUAGE_PREFERENCE);
+    localStorage.removeItem(constants.SNAP_USER_EMAIL);
+    localStorage.removeItem(constants.SNAP_ATTEMPTS);
+    localStorage.removeItem(constants.SNAP_LANGUAGE_TRANSLATION);
     this.setState({ translation: null });
-    this.setState({ resetLanguageBox: true });
   }
 
   onSubmitEmail = (email) => {
@@ -355,6 +381,9 @@ class SnapResults extends Component {
   render() {
     let resultsContainerStyle = ((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) ? { filter: 'blur(10px)', transform: 'scale(1.1)' } : {};
     let emailScreenCloseBtnTop = Math.floor(445 / 667 * screen.height) + 'px';
+    if (this.state.searchResults.length === 0) {
+      return null;
+    }
     return (
       <div>
         <div className="container-fluid search-container" id="search-result" style={resultsContainerStyle}>
@@ -417,10 +446,10 @@ class SnapResults extends Component {
                       show={this.state.sharePopoverIsOpen}
                       onHide={this.closeShareModal} >
                       <div className="share d-flex justify-content-around">
-                        <a data-id={SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
                           <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
                         </a>
-                        <a data-id={SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
+                        <a data-id={constants.SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
                           <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
                         </a>
                       </div>

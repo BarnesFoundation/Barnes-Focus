@@ -6,7 +6,6 @@ import axios from 'axios';
 
 const sliderSettings = {
     className: "slider-container",
-    //centerMode: true,
     arrows: false,
     swipe: true,
     speed: 200,
@@ -83,18 +82,10 @@ class InRoomSlider extends Component {
 
     _handleOnClick = (id) => {
         console.log('Also in room id = ' + id);
-
-        axios.get(ART_WORK_INFO_URL + id)
-            .then(response => {
-                this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
-                this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
-                this.setState({ activeSlideIndex: 0 });
-                this.props.onSelectInRoomArt(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-
+        this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
+        this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+        this.setState({ activeSlideIndex: 0 });
+        this.props.onSelectInRoomArt(id);
     }
 
     beforeChangeHandler = (oldSlide, nextSlide) => {
