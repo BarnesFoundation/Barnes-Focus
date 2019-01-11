@@ -30,7 +30,7 @@ ready = () ->
     childItems val
 
   $('.owl-carousel').owlCarousel
-    loop: if $('.owl-carousel .item').length > 1 then true else false
+    loop: if $('.owl-carousel .item').length > 3 then true else false
     margin: 10
     nav: true
 
