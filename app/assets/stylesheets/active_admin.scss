@@ -10,6 +10,8 @@
 // Active Admin's got SASS!
 @import "active_admin/mixins";
 @import "active_admin/base";
+@import "owl.carousel";
+@import "owl.theme.default";
 
 // Overriding any non-variable SASS must be done after the fact.
 // For example, to change the default status-tag color:
@@ -20,4 +22,14 @@
 }
 .es_image_size{
   width: 200px;
+}
+.history-header {
+  min-width: 80%;
+  span.history-header-title {
+    font-weight: bold;
+    text-align: left;
+  }
+  span.history-header-info {
+    text-align: right;
+  }
 }
