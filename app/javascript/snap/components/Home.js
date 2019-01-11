@@ -81,25 +81,6 @@ class HomeComponent extends Component {
         } 
     } */
 
-    /* copyUrlToClipboard = () => {
-        console.log('Copy clicked');
-        let copyText = document.getElementById("link-text");
-        let range = document.createRange();
-
-        copyText.readOnly = false;
-        copyText.contentEditable = true;
-        range.selectNodeContents(copyText);
-
-        let s = window.getSelection();
-        s.removeAllRanges();
-        s.addRange(range);
-
-        copyText.setSelectionRange(0, 999999);
-        document.execCommand('copy');
-
-        // clipboard.writeText('https://snap.barnesfoundation.org');
-    } */
-
     componentWillMount() {
         // Reset snap application if last_snap_timestamp is more than 24 hrs
         this.resetSnapApp();
@@ -114,13 +95,6 @@ class HomeComponent extends Component {
     }
 
     componentDidMount() {
-
-        if (process.env.CROP_IMAGE === 'TRUE') {
-            console.log('Image crop will be applied');
-        } else {
-            console.log('Image crop will not be applied');
-        }
-
         if ('orientation' in screen) {
             screen.orientation.addEventListener('change', (e) => {
                 console.log('current orientation :: ' + screen.orientation.type);
@@ -133,8 +107,6 @@ class HomeComponent extends Component {
         } else {
             console.log('Orientation API not supported');
         }
-
-
     }
 
     onSelectLanguage = (lang) => {
