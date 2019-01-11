@@ -1,1 +1,1 @@
-//= require owl.carousel
+//= require owl.carousel2
