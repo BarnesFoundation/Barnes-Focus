@@ -38,7 +38,7 @@ gem 'apipie-rails'
 gem 'nokogiri'
 gem 'redis'
 gem 'activerecord-session_store'
-gem 'owlcarousel-rails'
+gem 'owlcarousel2-rails'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

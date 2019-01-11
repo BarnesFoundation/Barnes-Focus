@@ -29,11 +29,10 @@ ready = () ->
     val = el.val()
     childItems val
 
-  $(".owl-carousel").owlCarousel({
-    loop:true,
-    center:true,
-    nav: true,
-  });
+  $('.owl-carousel').owlCarousel
+    loop: if $('.owl-carousel .item').length > 1 then true else false
+    margin: 10
+    nav: true
 
 $(document).ready(ready)
 $(document).on('page:load', ready)
