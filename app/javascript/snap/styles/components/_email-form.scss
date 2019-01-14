@@ -17,7 +17,6 @@
 
     .success-message {
         left: calc(50% - 152px);
-        font-family: Calibre;
         line-height: 25px;
         font-size: 25px;
         text-align: center;
@@ -41,7 +40,6 @@
         .email-head {
             position: absolute;
             left: calc(50% - 147px);
-            font-family: Calibre;
             line-height: 25px;
             font-size: 25px;
             text-align: center;
@@ -59,6 +57,10 @@
                 padding-top: 0;
 
                 input {
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                    appearance: none;
+
                     background: transparent;
                     border: 2px solid #FFFFFF;
                     box-sizing: border-box;
@@ -74,7 +76,6 @@
                     height:50px;
                     letter-spacing: 0.01em;
 
-                    font-family: Calibre;
                     line-height: 20px;
                     font-size: 17px;
                     text-align: center;
@@ -84,7 +85,6 @@
                 
                 .email-input-error {
                     height: 65px;
-                    font-family: Calibre;
                     line-height: 20px;
                     font-size: 14px;
                     text-align: center;
@@ -103,7 +103,6 @@
                 top: 300px;
                 padding-top: 0;
 
-                font-family: Calibre;
                 line-height: 20px;
                 font-size: 17px;
                 text-align: center;
@@ -123,20 +122,23 @@
                 width: 320px;
                 left: calc(50% - 160px);
                 position: relative;
-                font-family: Calibre;
                 line-height: 25px;
                 font-size: 25px;
                 text-align: center;
                 color: #000000;
             }
 
-            .email-input {
+            .email-input {       
                 width: 320px;
                 position: relative;
                 left: calc(50% -160px);
                 padding-top: 35px;
 
                 input {
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                    appearance: none;
+
                     background: #FFFFFF;
                     border: 2px solid #DCDCDC;
                     box-sizing: border-box;
@@ -150,7 +152,6 @@
                     box-sizing: border-box;
                     height:50px;
 
-                    font-family: Calibre;
                     line-height: 25px;
                     font-size: 16px;
                     text-align: right;
@@ -160,7 +161,6 @@
 
                 .email-input-error {
                     height: 65px;
-                    font-family: Calibre;
                     line-height: 20px;
                     font-size: 14px;
                     text-align: center;
@@ -174,7 +174,6 @@
 
             .email-disclaimer {
                 padding-top: 20px;
-                font-family: Calibre;
                 line-height: 20px;
                 font-size: 17px;
                 text-align: center;

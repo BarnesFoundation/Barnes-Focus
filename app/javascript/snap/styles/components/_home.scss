@@ -32,8 +32,6 @@
     height: 86px;
     left: 50%;
     top: 180px;
-
-    font-family: Calibre;
     line-height: 40px;
     font-size: 40px;
     text-align: center;
@@ -43,7 +41,6 @@
 }
 
 .home-action {
-
     position: absolute;
     top: 290px;
     width: 240px;
@@ -51,19 +48,7 @@
     display: flex;
     justify-content: space-around;
 
-    .yes-button {
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        border: 3px solid rgba(255, 255, 255, .3);
-        border-radius: 50%;
-        box-sizing: border-box;
-
-        color: #FFFFFF;
-    }
-
-    .no-button {
+    .action-btn {
         width: 60px;
         height: 60px;
         display: flex;
@@ -72,14 +57,14 @@
         border-radius: 50%;
         box-sizing: border-box;
         color: #FFFFFF;
+        background: transparent;
     }
 
-    .yes, .no {
+    .action-text {
         width: 60px;
         height: 30px;
         left: -3px;
         top: 14px;
-        font-family: Calibre;
         line-height: 25px;
         font-size: 22px;
         text-align: center;
@@ -104,8 +89,6 @@
     height: 40px;
     left: calc(12% + 51px);
     bottom: 10.04%;
-
-    font-family: Calibre;
     line-height: 15px;
     font-size: 14px;
 
@@ -119,7 +102,6 @@
     left: calc(50% - 141px);
     top: 124px;
 
-    font-family: Calibre;
     line-height: 25px;
     font-size: 25px;
     text-align: center;

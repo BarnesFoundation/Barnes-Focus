@@ -101,7 +101,7 @@ class HomeComponent extends Component {
     } */
 
     componentWillMount() {
-        // Reset snap application if last_snap_timestamp is more than 24 hrs
+        // Reset barnesfoc.us application if last_snap_timestamp is more than 24 hrs
         this.resetSnapApp();
 
         //screen.lockOrientationUniversal = screen.lockOrientation || screen.mozLockOrientation || screen.msLockOrientation || screen.orientation.lock;
@@ -172,9 +172,9 @@ class HomeComponent extends Component {
             }
         })
             .then(videoStream => {
-                console.log('User permission recieved for camera access. Redirect user to /snap now.');
-                // Navigate to snap page
-                this.props.history.push({ pathname: '/snap' });
+                console.log('User permission recieved for camera access. Redirect user to /scan now.');
+                // Navigate to scan page
+                this.props.history.push({ pathname: '/scan' });
 
             })
             .catch(err => this.setState({ error: "An error occurred accessing the device camera" }));
@@ -198,12 +198,12 @@ class HomeComponent extends Component {
                     <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
                     <div className="user-loc-prompt">Are you at the Barnes?</div>
                     <div className="home-action">
-                        <div className="yes-button" onClick={this.onSelectYes}>
-                            <span className="yes">Yes</span>
-                        </div>
-                        <div className="no-button" onClick={this.onSelectNo}>
-                            <span className="no">No</span>
-                        </div>
+                        <button className="action-btn" onClick={this.onSelectYes}>
+                            <span className="action-text">Yes</span>
+                        </button>
+                        <button className="action-btn" onClick={this.onSelectNo}>
+                            <span className="action-text">No</span>
+                        </button>
                     </div>
                     <div className="kf-banner">
                         <img src={barnes_kf_logo} alt="knight_foundation_logo" className="kf-logo" />
@@ -215,10 +215,10 @@ class HomeComponent extends Component {
                     <div>
                         <div className="app-usage-alert">
                             <div className="app-usage-msg">
-                                This app is meant for use at the Barnes. Please come see us soon !
+                                The Barnes Focus app is meant for use at the Barnes. Please come visit us soon.
                             </div>
                             <div className="visit-online-link">
-                                <a href="https://collection.barnesfoundation.org/" target="_blank">Visit us online</a>
+                                <a href="https://www.barnesfoundation.org/" target="_blank">Visit us online.</a>
                             </div>
                         </div>
                         <div className="btn-close" onClick={this.closeWindow}>

@@ -366,7 +366,7 @@ class SnapResults extends Component {
   }
 
   handleScan = () => {
-    this.props.history.push({ pathname: '/snap' });
+    this.props.history.push({ pathname: '/scan' });
   }
 
   _emailSuccessAcknowledged = () => {
@@ -525,7 +525,7 @@ class SnapResults extends Component {
                 <img src={checkmark} alt="email_success" />
               </div>
               <div className="success-message">
-                Thanks, we will send you all the artworks seen today at this email address: {this.state.email}
+                Thank you. After your visit, look for an email in your inbox with links to all the works of art you've seen today.
               </div>
             </div>
           </div>
