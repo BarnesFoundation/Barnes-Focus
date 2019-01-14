@@ -1,4 +1,5 @@
 #= require active_admin/base
+#= require carousel
 
 ready = () ->
   childItems = (current_val) ->
@@ -27,6 +28,11 @@ ready = () ->
     el = $(this)
     val = el.val()
     childItems val
+
+  $('.owl-carousel').owlCarousel
+    loop: if $('.owl-carousel .item').length > 3 then true else false
+    margin: 10
+    nav: true
 
 $(document).ready(ready)
 $(document).on('page:load', ready)
