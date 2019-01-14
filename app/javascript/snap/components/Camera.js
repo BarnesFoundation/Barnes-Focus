@@ -359,7 +359,7 @@ class Camera extends Component {
                                 <div id="no-match-overlay" className="no-match-overlay">
                                     <div className="hint">
                                         <span>No results found. </span>
-                                        <span>Click on the scan button to bring the art back into focus.</span>
+                                        <span>Use the scan button to focus on a work of art.</span>
                                     </div>
                                     <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', bottom: '37px' }}>
                                         <img src={scan_button} alt="scan" />

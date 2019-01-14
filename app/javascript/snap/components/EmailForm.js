@@ -49,7 +49,7 @@ class EmailFooter extends Component {
         return (
             <div className="email-container">
                 <div className="email-head">
-                    Enter your e-mail address to receive all the artworks you are scanning today
+                    To receive all the artworks you are seeing today, please enter your email address.
                 </div>
                 <div className="email-input">
                     <form onSubmit={this.submitBookMark}>
@@ -71,7 +71,7 @@ class EmailFooter extends Component {
                     </form>
                 </div>
                 <div className="email-disclaimer" style={{ top: disclaimerTop }}>
-                    <span>We will use your e-mail address only to send you the artworks you are scanning today.</span>
+                    <span>We will only use your email to send you the links to the works you've seen. You won't be joined to any other list.</span>
                 </div>
             </div>
         );

@@ -1,5 +1,5 @@
 * {
-    font-family: 'Calibre-Regular', sans-serif;
+    font-family: 'Calibre','Calibre-Regular', sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -9,7 +9,7 @@ html, body {
     height:100%;
     width:100%;
     font-size: 1rem !important;
-    font-family: 'Calibre-Regular', sans-serif;
+    font-family: 'Calibre','Calibre-Regular', sans-serif;
     font-weight: 400;
     color: #282828;
     font-kerning:normal;
@@ -41,7 +41,6 @@ h1 {
 
 
 h2 {
-    font-family: Calibre;
     line-height: 25px;
     font-size: 25px;
     text-align: center;

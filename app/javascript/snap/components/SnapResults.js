@@ -47,7 +47,7 @@ class SnapResults extends Component {
     ];
 
     this.state = {
-      ...props.location.state,  // these properties are passed on from Camera component.
+      ...props.location.state,  // these properties are passed on from Camera component. Contains {result, snapCount}
       sharePopoverIsOpen: false,
       showEmailScreen: false,
       emailCaptured: false,
@@ -134,6 +134,10 @@ class SnapResults extends Component {
     if (parseInt(this.state.snapCount) === 4) {
       this.setState({ showEmailScreen: true });
     }
+    if (localStorage.getItem(constants.SNAP_USER_EMAIL) !== null) {
+      console.log('Email already captured!');
+      this.setState({ emailCaptured: true, emailCaptureAck: true });
+    }
   }
 
   async componentWillReceiveProps(props) {
@@ -195,15 +199,14 @@ class SnapResults extends Component {
    */
   handleScroll = () => {
     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
     let resultsContainerBottom = Math.floor(h - this.resultsContainer.getBoundingClientRect().bottom);
-    //console.log('Results container bottom :: ' + resultsContainerBottom);
 
     /** animate blur based on results container bottom position */
     let blur = Math.floor(resultsContainerBottom / 35);
     if (blur >= 0 && blur <= 15) {
       this.setState({ blurValue: 5 + blur });
     }
+    //console.log('Results container bottom :: ' + resultsContainerBottom + ' && blur:: ' + blur);
 
     /** animate slider background and scan button based on results container bottom position */
     if (resultsContainerBottom < 540) {
@@ -366,7 +369,7 @@ class SnapResults extends Component {
   }
 
   handleScan = () => {
-    this.props.history.push({ pathname: '/snap' });
+    this.props.history.push({ pathname: '/scan' });
   }
 
   _emailSuccessAcknowledged = () => {
@@ -525,7 +528,7 @@ class SnapResults extends Component {
                 <img src={checkmark} alt="email_success" />
               </div>
               <div className="success-message">
-                Thanks, we will send you all the artworks seen today at this email address: {this.state.email}
+                Thank you. After your visit, look for an email in your inbox with links to all the works of art you've seen today.
               </div>
             </div>
           </div>
