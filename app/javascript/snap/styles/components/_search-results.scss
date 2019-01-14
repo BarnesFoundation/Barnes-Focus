@@ -12,7 +12,8 @@
             position: relative;
             height: auto !important;
             overflow: hidden;
-            z-index: 2;
+            background-color: #fff;
+            z-index: 100;
         }
 
         .card-img-container {
