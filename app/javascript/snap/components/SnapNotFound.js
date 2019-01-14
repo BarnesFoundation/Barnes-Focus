@@ -21,7 +21,7 @@ class SnapNotFound extends Component {
 
     handleBackToCamera = () => {
         this.props.history.push({
-            pathname: '/snap'
+            pathname: '/scan'
         });
     }
 

@@ -43,7 +43,7 @@ class AppRouter extends Component {
                     {/* <Header /> */}
                     <Switch>
                         <Route path="/" component={Home} exact={true} />
-                        <Route path="/snap" component={Camera} exact={true} />
+                        <Route path="/scan" component={Camera} exact={true} />
                         <Route path="/results/:imageId?" component={SnapResults} />
                         <Route path="/not-found" component={SnapNotFound} exact={true} />
                     </Switch>

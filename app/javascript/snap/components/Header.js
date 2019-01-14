@@ -15,7 +15,7 @@ class Header extends Component {
         return (
             <div>
                 {
-                    this.props.location.pathname !== '/snap' &&
+                    this.props.location.pathname !== '/scan' &&
                     this.props.location.pathname !== '/results' &&
                     <nav className="narbar header">
                         <a className="navbar-brand">
