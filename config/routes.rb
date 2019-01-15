@@ -15,7 +15,11 @@ Rails.application.routes.draw do
         get :similar_arts
       end
     end
-    resources :bookmarks, only: [:index, :create]
+    resources :bookmarks, only: [:index, :create] do
+      collection do
+        post :set_language
+      end
+    end
     resources :translations, only: [:index]
   end
 
