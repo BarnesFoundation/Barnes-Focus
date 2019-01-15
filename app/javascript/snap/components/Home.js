@@ -4,13 +4,12 @@ import { compose } from 'redux';
 
 import withOrientation from './withOrientation';
 
-
 import home_background from 'images/barnes-v2-landing.png';
 import barnes_logo from 'images/barnes-logo.png';
 import barnes_kf_logo from 'images/barnes-knight-foundation-logo.png';
 import cross from 'images/cross.png';
 
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_ATTEMPTS, SNAP_LAST_TIMESTAMP, SNAP_USER_EMAIL, SNAP_APP_RESET_INTERVAL, SNAP_LANGUAGE_TRANSLATION } from './Constants';
+import * as constants from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome, osVersion } from 'react-device-detect';
 
 
@@ -21,7 +20,7 @@ class HomeComponent extends Component {
         super(props);
 
         this.state = {
-            snapAttempts: localStorage.getItem(SNAP_ATTEMPTS) || 0,
+            snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 0,
             selectedLanguage: '',
             userAtBarnes: true
         }
@@ -33,15 +32,23 @@ class HomeComponent extends Component {
      * @memberof HomeComponent
      */
     resetSnapApp = () => {
-        let last_snap_timestamp = parseInt(localStorage.getItem(SNAP_LAST_TIMESTAMP));
-        if (last_snap_timestamp) {
-            let ttl = (last_snap_timestamp + parseInt(SNAP_APP_RESET_INTERVAL)) - Date.now();
-            if (ttl <= 0) {
-                localStorage.setItem(SNAP_LAST_TIMESTAMP, Date.now());
 
-                localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
-                localStorage.removeItem(SNAP_USER_EMAIL);
-                localStorage.removeItem(SNAP_ATTEMPTS);
+        // Get last snap timestamp from local storage
+        let lastSnapTimestamp = parseInt(localStorage.getItem(constants.SNAP_LAST_TIMESTAMP));
+
+
+        if (lastSnapTimestamp) {
+
+            // Check if the last snap timestamp was more than the interval time ago
+            let ttl = (lastSnapTimestamp + parseInt(constants.SNAP_APP_RESET_INTERVAL)) - Date.now();
+
+            // Reset the application if so
+            if (ttl <= 0) {
+                localStorage.setItem(constants.SNAP_LAST_TIMESTAMP, Date.now());
+
+                localStorage.removeItem(constants.SNAP_LANGUAGE_PREFERENCE);
+                localStorage.removeItem(constants.SNAP_USER_EMAIL);
+                localStorage.removeItem(constants.SNAP_ATTEMPTS);
             }
         }
     }
@@ -121,7 +128,7 @@ class HomeComponent extends Component {
                     let translation;
                     try {
                         this.setState({ translation: res.data.translations });
-                        localStorage.setItem(SNAP_LANGUAGE_TRANSLATION, JSON.stringify(res.data.translations));
+                        localStorage.setItem(constants.SNAP_LANGUAGE_TRANSLATION, JSON.stringify(res.data.translations));
                     } catch (err) {
                         console.log('Error while parsing translations object to JSON.');
                     }
@@ -134,22 +141,18 @@ class HomeComponent extends Component {
     }
 
 
-    onSelectYes = () => {
-        console.log('Yes, user is at Barnes!');
-        navigator.mediaDevices.getUserMedia({
-            video: {
-                "facingMode": "environment",
-                "width": 1920,
-                "height": 1080
-            }
-        })
-            .then(videoStream => {
-                console.log('User permission recieved for camera access. Redirect user to /scan now.');
-                // Navigate to scan page
-                this.props.history.push({ pathname: '/scan' });
+    onSelectYes = async () => {
+        try {
+            // Attempt to access device camera
+            await navigator.mediaDevices.getUserMedia({ video: { "facingMode": "environment", "width": 1920, "height": 1080 } });
 
-            })
-            .catch(err => this.setState({ error: "An error occurred accessing the device camera" }));
+            // Navigate to the scan page
+            this.props.history.push({ pathname: '/scan' });
+        }
+
+        catch (error) {
+            this.setState({ error: "An error occurred accessing the device camera" })
+        }
     }
 
     onSelectNo = () => {
