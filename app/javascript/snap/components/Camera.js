@@ -173,7 +173,7 @@ class Camera extends Component {
 
         if (responseFound) {
             // Navigate to results page
-            this.props.history.push({ pathname: '/results', state: { result: response, snapCount: localStorage.getItem(constants.SNAP_ATTEMPTS) } });
+            this.props.history.push({ pathname: `/results/${response["data"]["records"][0].id}`, state: { result: response, snapCount: localStorage.getItem(constants.SNAP_ATTEMPTS) } });
         }
         else {
             this.handleSnapFailure();
@@ -237,7 +237,7 @@ class Camera extends Component {
 
 
             // Reset snap attemps count if last_snap_timestamp is 12 hours or before.
-            // this.resetSnapCounter();
+            this.resetSnapCounter();
         }
     }
 

@@ -16,7 +16,6 @@ class LanguageDropdown extends Component {
     }
 
     selectItem = (item) => {
-
         this.props.onSelectLanguage(item);
     }
 

@@ -50,6 +50,20 @@ class SearchRequestService {
 
         await axios.post(constants.STORE_SEARCHED_RESULT_URL, formData);
     }
+
+    submitBookmarksEmail = async (email) => {
+        const payload = {};
+        payload.email = email;
+        //payload.language = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || 'en';
+        await axios.post(constants.SUBMIT_BOOKMARKS_EMAIL_URL, payload);
+
+    }
+
+    saveLanguagePreference = async (lang) => {
+        const payload = {};
+        payload.language = lang;
+        await axios.post(constants.SAVE_LANGUAGE_PREFERENCE_URL, payload);
+    }
 }
 
 export { SearchRequestService };
