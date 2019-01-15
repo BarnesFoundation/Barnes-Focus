@@ -91,14 +91,6 @@ class HomeComponent extends Component {
     componentWillMount() {
         // Reset barnesfoc.us application if last_snap_timestamp is more than 24 hrs
         this.resetSnapApp();
-
-        //screen.lockOrientationUniversal = screen.lockOrientation || screen.mozLockOrientation || screen.msLockOrientation || screen.orientation.lock;
-
-        // screen.lockOrientationUniversal("portrait").then((result) => {
-        //     console.log('Successfully locked Screen to Portrait mode');
-        // }, (error) => {
-        //     console.log('Screen lock failed. ' + error);
-        // });
     }
 
     componentDidMount() {
@@ -116,31 +108,6 @@ class HomeComponent extends Component {
         }
     }
 
-    onSelectLanguage = (lang) => {
-        console.log('Selected lang changed in Home component : ' + JSON.stringify(lang));
-        this.setState({ selectedLanguage: lang });
-
-        /* axios.get('/api/translations?language=' + lang.code)
-            .then(response => {
-                console.log('successfully fetched translations.');
-                let res = response.data;
-                if (res.data.translations) {
-                    let translation;
-                    try {
-                        this.setState({ translation: res.data.translations });
-                        localStorage.setItem(constants.SNAP_LANGUAGE_TRANSLATION, JSON.stringify(res.data.translations));
-                    } catch (err) {
-                        console.log('Error while parsing translations object to JSON.');
-                    }
-
-                }
-            })
-            .catch(error => {
-                console.log('Error while fetching translations!');
-            }); */
-    }
-
-
     onSelectYes = async () => {
         try {
             // Attempt to access device camera
@@ -156,11 +123,10 @@ class HomeComponent extends Component {
     }
 
     onSelectNo = () => {
-        console.log('No, user is not at Barnes!');
         this.setState({ userAtBarnes: false });
     }
 
-    closeWindow = () => {
+    navigateBackToHome = () => {
         this.setState({ userAtBarnes: true });
     }
 
@@ -195,7 +161,7 @@ class HomeComponent extends Component {
                                 <a href="https://www.barnesfoundation.org/" target="_blank">Visit us online.</a>
                             </div>
                         </div>
-                        <div className="btn-close" onClick={this.closeWindow}>
+                        <div className="btn-close" onClick={this.navigateBackToHome}>
                             <img src={cross} alt="close" />
                         </div>
                     </div>
