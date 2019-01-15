@@ -62,7 +62,6 @@ class SnapResults extends Component {
       },
       langDropdownStyle: {
         position: 'fixed',
-        height: '80vh',
         opacity: 0
       },
       slideOverStyle: {
@@ -138,6 +137,18 @@ class SnapResults extends Component {
       console.log('Email already captured!');
       this.setState({ emailCaptured: true, emailCaptureAck: true });
     }
+
+    const selectedLangCode = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE);
+    if (selectedLangCode !== null) {
+      this.langOptions.map(option => {
+        if (option.code === selectedLangCode) {
+          option.selected = true;
+          this.setState({ selectedLanguage: option });
+        } else {
+          option.selected = false;
+        }
+      })
+    }
   }
 
   async componentWillReceiveProps(props) {
@@ -152,8 +163,10 @@ class SnapResults extends Component {
     }
   }
 
-  onSelectLanguage = (lang) => {
+  onSelectLanguage = async (lang) => {
     console.log('Selected lang changed in SnapResults component : ' + JSON.stringify(lang));
+    localStorage.setItem(constants.SNAP_LANGUAGE_PREFERENCE, lang.code);
+
     this.langOptions.map(option => {
       if (option.code === lang.code) {
         option.selected = true;
@@ -163,6 +176,11 @@ class SnapResults extends Component {
     })
     this.setState({ selectedLanguage: lang });
 
+    /** Save the user selected language in the server session and call the getArtworksInfo API again to refresh the page with translated result. */
+    let languageUpdated = await this.sr.saveLanguagePreference(lang.code);
+    let artworkInfo = await this.sr.getArtworkInformation(this.state.searchResults[0].id);
+    this.setState({ result: artworkInfo });
+    this.constructResultAndInRoomSlider(artworkInfo);
   }
 
   onSelectInRoomArt = (aitrId) => {
@@ -173,19 +191,18 @@ class SnapResults extends Component {
 
   componentDidMount() {
     console.log('SnapResults >> componentDidMount');
-    if (this.state.searchResults.length === 0) {
-      return;
-    }
     // Register scroll listener
     window.addEventListener('scroll', this._onScroll, true);
 
-    $("#result-card").attr("data-title", this.state.searchResults[0].title);
-    $("#result-card").attr("data-artist", this.state.searchResults[0].artist);
-    $("#result-card").attr("data-id", this.state.searchResults[0].id);
-    $("#result-card").attr("data-invno", this.state.searchResults[0].invno);
+    if (this.state.searchResults.length > 0) {
+      $("#result-card").attr("data-title", this.state.searchResults[0].title);
+      $("#result-card").attr("data-artist", this.state.searchResults[0].artist);
+      $("#result-card").attr("data-id", this.state.searchResults[0].id);
+      $("#result-card").attr("data-invno", this.state.searchResults[0].invno);
 
-    if (!this.state.searchResults[0].shortDescription) {
-      $("#result-card").attr("data-nodesc-invno", this.state.searchResults[0].invno);
+      if (!this.state.searchResults[0].shortDescription) {
+        $("#result-card").attr("data-nodesc-invno", this.state.searchResults[0].invno);
+      }
     }
   }
 
@@ -242,7 +259,6 @@ class SnapResults extends Component {
       this.setState({
         langDropdownStyle: {
           position: 'fixed',
-          top: '80vh',
           opacity: 0
         }
       });
@@ -251,7 +267,6 @@ class SnapResults extends Component {
       this.setState({
         langDropdownStyle: {
           position: 'fixed',
-          top: '80vh',
           opacity: 1
         }
       });
@@ -260,6 +275,7 @@ class SnapResults extends Component {
         langDropdownStyle: {
           position: 'relative',
           opacity: 1,
+          bottom: 0,
           right: 0
         }
       })
@@ -355,17 +371,7 @@ class SnapResults extends Component {
   onSubmitEmail = (email) => {
     console.log('Submitted email :: ' + email);
     this.setState({ email: email, emailCaptured: true, showEmailScreen: false });
-
-    const payload = {};
-    payload.email = email;
-    //payload.language = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) || 'en';
-    axios.post('/api/bookmarks', payload).then(response => {
-      console.log('Successfully submitted email!');
-    })
-      .catch(error => {
-        console.log('Error submitting bookmark!');
-      });
-
+    this.sr.submitBookmarksEmail(email);
   }
 
   handleScan = () => {
@@ -433,11 +439,13 @@ class SnapResults extends Component {
                   </div>
                   <div className="short-desc-container" ref={el => this.shortDescContainer = el}>
                     {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
-                    <div className="language-dropdown" style={this.state.langDropdownStyle}>
-                      <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
-                    </div>
                   </div>
                   <div className="share-wrapper">
+                    <div className="language-dropdown-wrapper">
+                      <div className="language-dropdown" style={this.state.langDropdownStyle}>
+                        <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+                      </div>
+                    </div>
                     <div id="share-it" className="btn-share-result" ref="target" onClick={this._onClickShare}>
                       <img src={share} alt="share" />
                       <span className="text-share">Share</span>
@@ -491,6 +499,7 @@ class SnapResults extends Component {
                     <img src={scan_button} alt="scan" />
                   </div>
                 </div>
+
 
                 {
                   parseInt(this.state.snapCount) >= 4 &&

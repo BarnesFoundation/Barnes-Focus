@@ -158,8 +158,7 @@ class HomeComponent extends Component {
     }
 
     closeWindow = () => {
-        console.log('window is closed');
-        close();
+        this.setState({ userAtBarnes: true });
     }
 
     render() {
