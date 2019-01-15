@@ -43,10 +43,10 @@
 .home-action {
     position: absolute;
     top: 290px;
-    width: 240px;
-    left: calc(50% - 120px);
+    width: 160px;
+    left: calc(50% - 80px);
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
 
     .action-btn {
         width: 60px;
@@ -88,6 +88,7 @@
 }
 
 .kf-text {
+    font-family: 'Calibre-Regular';
     position: absolute;
     width: 256px;
     height: 40px;
@@ -120,7 +121,9 @@
         a {
             color: #FFFFFF;
             bottom: 0;
-            text-decoration: underline;
+            text-decoration: none;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #fff;
         }
     }
 
