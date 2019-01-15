@@ -15,11 +15,12 @@ private
   end
 
   def validate_bookmark_entry image_id
-    session = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
-    bookmark = Bookmark.new( session_id: session.id, image_id: image_id )
+    session             = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
+    bookmark            = Bookmark.new( session_id: session.id, image_id: image_id )
     bookmark_with_email = Bookmark.where( session_id: session.id ).where.not( email: nil ).first
 
-    bookmark.email = bookmark_with_email.email if bookmark_with_email.present?
+    bookmark.email      = bookmark_with_email.email if bookmark_with_email.present?
+    bookmark.language   = session.lang_pref
     bookmark.save
   end
 end

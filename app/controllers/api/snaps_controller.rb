@@ -100,19 +100,17 @@ class Api::SnapsController < Api::BaseController
 
     ## Gets the image information for the specific id
     def get_image_information(image_id)
-      
       # Request the image information from Elastic Search
       image_info = EsCachedRecord.search(image_id)
 
       # If short description exists
-      if image_info[:shortDescription]
-
+      if image_info["shortDescription"]
         # Remove html tags
-        image_info[:shortDescription] = strip_tags(image_info[:shortDescription]).html_safe
+        image_info["shortDescription"] = strip_tags(image_info["shortDescription"]).html_safe
 
         # Translate if needed
-        if preferred_language.present? 
-          image_info[:shortDescription] = translate_text(image_info[:shortDescription]) 
+        if preferred_language.present?
+          image_info["shortDescription"] = translate_text(image_info["shortDescription"])
         end
       end
       return image_info
@@ -120,7 +118,8 @@ class Api::SnapsController < Api::BaseController
 
     ## Pulls the preferred language from the request
     def preferred_language
-      params["language"]
+      session             = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
+      return session.lang_pref || 'en'
     end
 
     ## Translates the given text to the preferred language

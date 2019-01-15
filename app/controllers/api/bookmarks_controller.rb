@@ -1,5 +1,5 @@
 class Api::BookmarksController < Api::BaseController
-  skip_before_action :verify_authenticity_token, only: %w(create)
+  skip_before_action :verify_authenticity_token, only: %w(create set_language)
 
   def index
   end
@@ -22,6 +22,31 @@ class Api::BookmarksController < Api::BaseController
       else
         wants.json do
           render json: { data: { errors: ["Email can't be blank"] }, message: '' }, status: 422
+        end
+      end
+    end
+  end
+
+  def set_language
+    language = bookmark_params[:language] || params[:language]
+
+    respond_to do | wants |
+      if language
+        session = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
+        if session
+          Bookmark.where( session_id: session.id ).update_all( language: language )
+          session.update_column(:lang_pref, language)
+          wants.json do
+            render json: { data: { errors: [] }, message: 'created' }, status: :created
+          end
+        else
+          wants.json do
+            render json: { data: { errors: [ 'Scanned history not found' ] }, message: 'not_found' }, status: 404
+          end
+        end
+      else
+        wants.html do
+          render json: { data: { errors: ['Language cannot be blank'] }, message: 'unprocessible_entity' }, status: 422
         end
       end
     end
