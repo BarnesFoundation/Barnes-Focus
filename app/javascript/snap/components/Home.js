@@ -5,9 +5,9 @@ import { compose } from 'redux';
 import withOrientation from './withOrientation';
 
 import home_background from 'images/barnes-v2-landing.png';
-import barnes_logo from 'images/barnes-logo.png';
-import barnes_kf_logo from 'images/barnes-knight-foundation-logo.png';
-import cross from 'images/cross.png';
+import barnes_logo from 'images/Barnes_logo.svg';
+import barnes_kf_logo from 'images/barnes-knight-foundation-logo.svg';
+import close_icon from 'images/cross.svg';
 
 import * as constants from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome, osVersion } from 'react-device-detect';
@@ -136,7 +136,7 @@ class HomeComponent extends Component {
                 <img src={home_background} alt="home_background" style={{ width: screen.width, height: screen.height }} />
                 {this.state.userAtBarnes && <div className="landing-screen">
                     <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
-                    <div className="user-loc-prompt">Are you at the Barnes?</div>
+                    <div className="user-loc-prompt">Are you at <br />the Barnes?</div>
                     <div className="home-action">
                         <button className="action-btn" onClick={this.onSelectYes}>
                             <span className="action-text">Yes</span>
@@ -158,11 +158,11 @@ class HomeComponent extends Component {
                                 The Barnes Focus app is meant for use at the Barnes. Please come visit us soon.
                             </div>
                             <div className="visit-online-link">
-                                <a href="https://www.barnesfoundation.org/" target="_blank">Visit us online.</a>
+                                <a href="https://www.barnesfoundation.org/" target="_blank">Visit us online</a>
                             </div>
                         </div>
                         <div className="btn-close" onClick={this.navigateBackToHome}>
-                            <img src={cross} alt="close" />
+                            <img src={close_icon} alt="close" />
                         </div>
                     </div>
                 }

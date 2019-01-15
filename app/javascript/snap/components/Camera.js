@@ -4,8 +4,6 @@ import { compose } from 'redux';
 import withOrientation from './withOrientation';
 import scan_button from 'images/scan-button.svg';
 import axios from 'axios';
-import { PulseLoader } from 'react-spinners';
-import barnes_logo from 'images/logo.svg';
 import * as constants from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import { cropPhoto } from './CameraHelper';
@@ -370,30 +368,6 @@ class Camera extends Component {
                         </div>
                     }
 
-                    {/* ========= Search in progress screen ============ */
-                        this.state.searchInProgress &&
-                        <div>
-                            <nav className="narbar header">
-                                <a className="navbar-brand">
-                                    <img src={barnes_logo} alt="Barnes" />
-                                </a>
-                            </nav>
-                            <div className="search-progress-container">
-                                <div className="snap-spinner">
-                                    <PulseLoader
-                                        color={'#999999'}
-                                        size={20}
-                                        margin={'5px'}
-                                        loading={this.state.searchInProgress}
-                                    />
-                                </div>
-                                <div className="content">
-                                    <h1>{(this.state.translation) ? this.state.translation.Snap_searching.text_1.translated_content : `Searching`}</h1>
-                                    <p>{(this.state.translation) ? this.state.translation.Snap_searching.text_2.translated_content : `Please wait while we search our database.`}</p>
-                                </div>
-                            </div>
-                        </div>
-                    }
                 </div>
             </div>
         );

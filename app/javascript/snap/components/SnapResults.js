@@ -14,7 +14,7 @@ import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
 import Popover from 'react-simple-popover';
 
-import cross from 'images/cross.png';
+import cross from 'images/cross.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
 
 

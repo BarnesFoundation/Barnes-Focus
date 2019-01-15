@@ -71,7 +71,7 @@ class EmailFooter extends Component {
                     </form>
                 </div>
                 <div className="email-disclaimer" style={{ top: disclaimerTop }}>
-                    <span>We will only use your email to send you the links to the works you've seen. You won't be joined to any other list.</span>
+                    We will only use your email to send you the links to the works you've seen. You won't be joined to any other list.
                 </div>
             </div>
         );

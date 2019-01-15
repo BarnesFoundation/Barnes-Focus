@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route, NavLink, Switch } from 'react-router-dom';
 
-import Header from '../components/Header';
 import Home from '../components/Home';
 import Camera from '../components/Camera';
 import SnapResults from '../components/SnapResults';
@@ -40,7 +39,6 @@ class AppRouter extends Component {
         return (
             <BrowserRouter>
                 <div>
-                    {/* <Header /> */}
                     <Switch>
                         <Route path="/" component={Home} exact={true} />
                         <Route path="/scan" component={Camera} exact={true} />
