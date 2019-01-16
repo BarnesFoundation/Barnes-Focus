@@ -9,7 +9,7 @@ const sliderSettings = {
     arrows: false,
     swipe: true,
     speed: 200,
-    centerPadding: '102px',
+    //centerPadding: '102px',
     cssEase: 'linear',
     mobileFirst: true,
     variableWidth: true,
@@ -107,7 +107,7 @@ class InRoomSlider extends Component {
                     {/* <img src={this.props.alsoInRoomResults[this.state.activeSlideIndex].art_url + this.sliderBackgroundCropParams} /> */}
                 </div>
 
-                <div className="slider-header"><h2>Also in this Room</h2></div>
+                <div className="slider-header h2">Also in this Room</div>
                 <div className="slider-container">
                     <Slider {...sliderSettings} beforeChange={this.beforeChangeHandler}>
                         {

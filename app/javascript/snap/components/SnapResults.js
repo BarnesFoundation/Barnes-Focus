@@ -8,13 +8,13 @@ import withOrientation from './withOrientation';
 import axios from 'axios';
 import share from 'images/share.svg';
 import scan_button from 'images/scan-button.svg';
-import checkmark from 'images/checkmark.png'
+import check_email_icon from 'images/check_email.svg';
 import InRoomSlider from './Slider';
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
 import Popover from 'react-simple-popover';
 
-import cross from 'images/cross.svg';
+import close_icon from 'images/cross.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
 
 
@@ -57,12 +57,10 @@ class SnapResults extends Component {
       activeSlideIndex: 0,
       blurValue: 5,
       isShortDescVisible: false,
+      isLanguageDropdownOpen: false,
+      isLanguageDropdownVisible: false,
       scanBtnStyle: {
         position: 'fixed'
-      },
-      langDropdownStyle: {
-        position: 'fixed',
-        opacity: 0
       },
       slideOverStyle: {
         position: 'fixed',
@@ -257,27 +255,15 @@ class SnapResults extends Component {
     /** animate language dropdown basen on shortDesc container position */
     if (visibleShortDescHeight < 0) {
       this.setState({
-        langDropdownStyle: {
-          position: 'fixed',
-          opacity: 0
-        }
+        isLanguageDropdownVisible: false
       });
-    }
-    else if (visibleShortDescHeight > 0 && visibleShortDescHeight <= shortDescElemHeight) {
+    } else if (visibleShortDescHeight > 60 && visibleShortDescHeight <= shortDescElemHeight) {
       this.setState({
-        langDropdownStyle: {
-          position: 'fixed',
-          opacity: 1
-        }
+        isLanguageDropdownVisible: true
       });
-    } else if (visibleShortDescHeight > shortDescElemHeight + 85) {
+    } else if (visibleShortDescHeight > shortDescElemHeight + 10) {
       this.setState({
-        langDropdownStyle: {
-          position: 'relative',
-          opacity: 1,
-          bottom: 0,
-          right: 0
-        }
+        isLanguageDropdownVisible: false
       })
     }
 
@@ -371,6 +357,11 @@ class SnapResults extends Component {
   onSubmitEmail = (email) => {
     console.log('Submitted email :: ' + email);
     this.setState({ email: email, emailCaptured: true, showEmailScreen: false });
+
+    // close the email success ack screen after 4 secs.
+    setTimeout(() => {
+      this.setState({ emailCaptureAck: true });
+    }, 4000);
     this.sr.submitBookmarksEmail(email);
   }
 
@@ -387,9 +378,13 @@ class SnapResults extends Component {
     this.setState({ emailCaptured: false, showEmailScreen: false });
   }
 
+  _onShowLanguageDropdown = (isOpen) => {
+    this.setState({ isLanguageDropdownOpen: isOpen });
+  }
+
   render() {
     let resultsContainerStyle = ((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) ? { filter: 'blur(10px)', transform: 'scale(1.1)' } : {};
-    let emailScreenCloseBtnTop = Math.floor(445 / 667 * screen.height) + 'px';
+    let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
     if (this.state.searchResults.length === 0) {
       return null;
     }
@@ -407,7 +402,7 @@ class SnapResults extends Component {
                     <div className="card-img-result">
                       <img src={this.state.searchResults[0].url} alt="match_image" />
                     </div>
-                    <div className="card-title">{this.state.searchResults[0].title}</div>
+                    <div className="card-title h1">{this.state.searchResults[0].title}</div>
                   </div>
                 </div>
                 <div className="card-body" ref={el => this.resultsContainer = el}>
@@ -438,13 +433,17 @@ class SnapResults extends Component {
                     </table>
                   </div>
                   <div className="short-desc-container" ref={el => this.shortDescContainer = el}>
-                    {this.state.searchResults[0].shortDescription && <div className="card-text">{this.state.searchResults[0].shortDescription}</div>}
+                    {this.state.searchResults[0].shortDescription && <div className="card-text paragraph">{this.state.searchResults[0].shortDescription}</div>}
                   </div>
                   <div className="share-wrapper">
                     <div className="language-dropdown-wrapper">
-                      <div className="language-dropdown" style={this.state.langDropdownStyle}>
-                        <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
-                      </div>
+                      {this.state.isLanguageDropdownOpen && <div className="language-dropdown-overlay"></div>}
+                      {
+                        this.state.isLanguageDropdownVisible &&
+                        <div className="language-dropdown">
+                          <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} onShowLanguageDropdown={this._onShowLanguageDropdown} />
+                        </div>
+                      }
                     </div>
                     <div id="share-it" className="btn-share-result" ref="target" onClick={this._onClickShare}>
                       <img src={share} alt="share" />
@@ -522,7 +521,7 @@ class SnapResults extends Component {
             <div className="email-popup-screen">
               <EmailForm isEmailScreen={true} onSubmitEmail={this.onSubmitEmail} />
               <div className="btn-close" onClick={this.closeWindow} style={{ position: `absolute`, top: `${emailScreenCloseBtnTop}` }}>
-                <img src={cross} alt="close" onClick={() => { this._closeEmailPopupScreen() }} />
+                <img src={close_icon} alt="close" onClick={() => { this._closeEmailPopupScreen() }} />
               </div>
             </div>
           </div>
@@ -534,7 +533,7 @@ class SnapResults extends Component {
           <div>
             <div className="email-success-screen">
               <div className="success-icon" onClick={() => this._emailSuccessAcknowledged()}>
-                <img src={checkmark} alt="email_success" />
+                <img src={check_email_icon} alt="email_success" />
               </div>
               <div className="success-message">
                 Thank you. After your visit, look for an email in your inbox with links to all the works of art you've seen today.

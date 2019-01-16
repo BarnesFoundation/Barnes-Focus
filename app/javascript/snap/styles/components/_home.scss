@@ -69,8 +69,6 @@
         height: 30px;
         left: -3px;
         top: 14px;
-        line-height: 25px;
-        font-size: 22px;
         text-align: center;
         color: #FFFFFF;
     }
@@ -88,15 +86,12 @@
 }
 
 .kf-text {
-    font-family: 'Calibre-Regular';
     position: absolute;
     width: 256px;
     height: 40px;
     left: calc(12% + 51px);
     bottom: 10.04%;
     line-height: 15px;
-    font-size: 14px;
-
     color: #FFFFFF;
 }
 
@@ -106,11 +101,7 @@
     height: 125px;
     left: calc(50% - 141px);
     top: 124px;
-
-    line-height: 25px;
-    font-size: 25px;
     text-align: center;
-
     color: #FFFFFF;
 
     .app-usage-msg {

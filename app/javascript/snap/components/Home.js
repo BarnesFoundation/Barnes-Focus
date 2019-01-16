@@ -139,21 +139,21 @@ class HomeComponent extends Component {
                     <div className="user-loc-prompt">Are you at <br />the Barnes?</div>
                     <div className="home-action">
                         <button className="action-btn" onClick={this.onSelectYes}>
-                            <span className="action-text">Yes</span>
+                            <span className="action-text h2">Yes</span>
                         </button>
                         <button className="action-btn" onClick={this.onSelectNo}>
-                            <span className="action-text">No</span>
+                            <span className="action-text h2">No</span>
                         </button>
                     </div>
                     <div className="kf-banner">
                         <img src={barnes_kf_logo} alt="knight_foundation_logo" className="kf-logo" />
-                        <div className="kf-text">The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation.</div>
+                        <div className="kf-text caption">The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation.</div>
                     </div>
                 </div>
                 }
                 {!this.state.userAtBarnes &&
                     <div>
-                        <div className="app-usage-alert">
+                        <div className="app-usage-alert h2">
                             <div className="app-usage-msg">
                                 The Barnes Focus app is meant for use at the Barnes. Please come visit us soon.
                             </div>

@@ -48,7 +48,7 @@ class EmailFooter extends Component {
         let disclaimerTop = (this.props.isEmailScreen) ? ((this.state.errors.email) ? '365px' : '300px') : '0px';
         return (
             <div className="email-container">
-                <div className="email-head">
+                <div className="email-head h2">
                     To receive all the artworks you are seeing today, please enter your email address.
                 </div>
                 <div className="email-input">
@@ -62,15 +62,15 @@ class EmailFooter extends Component {
                         </div>
                         {
                             this.state.errors.email === true &&
-                            <div className="email-input-error">
-                                Something doesn’t look right. Try entering your email again.
+                            <div className="email-input-error caption">
+                                Something doesn’t look right. <br /> Try entering your email again.
                             </div>
                         }
 
 
                     </form>
                 </div>
-                <div className="email-disclaimer" style={{ top: disclaimerTop }}>
+                <div className="email-disclaimer small-paragraph" style={{ top: disclaimerTop }}>
                     We will only use your email to send you the links to the works you've seen. You won't be joined to any other list.
                 </div>
             </div>

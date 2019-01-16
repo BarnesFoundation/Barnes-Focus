@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import Modal from 'react-modal';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_LANGUAGE_TRANSLATION } from './Constants';
+import dropdown_icon from 'images/dropdown.svg';
+import dropup_icon from 'images/dropup.svg';
+import check from 'images/check.svg';
 
 /** 
  * 
@@ -21,11 +22,13 @@ class LanguageDropdown extends Component {
 
     show = () => {
         this.setState({ listVisible: true });
+        this.props.onShowLanguageDropdown(true);
         document.addEventListener("click", this.hide);
     }
 
     hide = () => {
         this.setState({ listVisible: false });
+        this.props.onShowLanguageDropdown(false);
         document.removeEventListener("click", this.hide);
     }
 
@@ -50,14 +53,14 @@ class LanguageDropdown extends Component {
                         {this.props.selected.code}
                     </div>
                     {this.state.listVisible
-                        ? <i className="fa fa-angle-down"></i>
-                        : <i className="fa fa-angle-up"></i>
+                        ? <span><img src={dropup_icon} /></span>
+                        : <span><img src={dropdown_icon} /></span>
                     }
                 </div>
                 {this.state.listVisible && <ul className="dd-list">
                     {this.props.langOptions.map((item) => (
                         <li className="dd-list-item" key={item.code} onClick={() => this.selectItem(item)}>
-                            <span style={{ paddingRight: 10 }}>{item.name} </span>{item.selected && <i className="fa fa-check" aria-hidden="true"></i>}
+                            <span>{item.name}</span>{item.selected && <img src={check} />}
                         </li>
                     ))}
                 </ul>}

@@ -26,19 +26,15 @@
         width: 100vw;
         z-index: 1;
         overflow: hidden;
-        background: hsla(0,0%,100%,.3);
 
         .hint {
             position: absolute;
             width: 265px;
             height: 110px;
-            left: calc(50% - 142px);
+            left: calc(50% - 132px);
             top: 140px;
             text-align: center;
             span {
-                
-                line-height: 25px;
-                font-size: 24px;
                 text-align: center;       
                 color: #fff;
             }
