@@ -22,9 +22,44 @@ html, body {
     overflow-y:scroll;
 }
 
-// .app-container {
-//     //position: absolute;
-// }
+.h0 {
+    font-size: 40px;
+    line-height: 40px;
+}
+
+.h1 {
+    font-size: 30px;
+    line-height: 35px;
+}
+
+.h2 {
+    font-size: 25px;
+    line-height: 25px;
+    margin-bottom: 0;
+}
+
+.paragraph {
+    //font-family: 'Milo serif';
+    font-family: 'Calibre-Regular';
+    font-size: 18px;
+    line-height: 26px;
+}
+
+.small-paragraph {
+    font-family: 'Calibre-Regular';
+    font-size: 17px;
+    line-height: 20px;
+}
+
+.caption {
+     font-family: 'Calibre-Regular';
+    font-size: 14px;
+}
+
+::-webkit-input-placeholder  {
+  color: #FFF;
+  opacity: 0.65; 
+}
 
 h1 {
     font-size: 2.25rem;
@@ -80,6 +115,7 @@ p {
     height: 45px;
     right: 22px;
     bottom: 45px;
+    position: fixed;
     //background: #FFFFFF;
     //border: 2px solid rgba(0, 0, 0, 0.12);
     z-index: 99999;

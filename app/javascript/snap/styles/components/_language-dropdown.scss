@@ -1,3 +1,14 @@
+.language-dropdown-overlay {
+  position: fixed;
+  top:0;
+  left: 0;
+  right:0;
+  bottom: 0;
+  z-index: 0;
+  background: #000;
+  opacity: 0.1;
+}
+
 .dd-wrapper {
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -23,23 +34,19 @@
   cursor: default;
   position: relative;
   background-color: #fff;
-
-  .fa {
-      margin-right: 10px;
-      font-size: 22px;
-  } 
+  color: #6E6E6E;
 }
+
 .dd-header span {
   margin-right: 20px;
 }
+
 .dd-header-title {
+    font-family: 'Calibre-Regular';
     margin: 4px 6px;
     margin-left: 16px;
 }
-.angle-down {
-  color: #000;
-  margin-right: 20px;
-}
+
 .dd-list {
   z-index: 99999 !important;
   position: absolute;
@@ -56,6 +63,7 @@
   -webkit-overflow-scrolling: touch;
   bottom: 100%; // this ensures that the dropdown opens upwards.
 }
+
 .dd-list-item {
   width: 100%;
   font-size: 1rem;
@@ -67,26 +75,10 @@
   line-height: 35px;
   font-size: 16px;
   color: #282828;
-}
-.dd-list-item.selected {
-  color: #fff;
-}
 
-.dd-wrapper-single {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  position: relative;
-  width: 265px;
-}
-.dd-wrapper-single .dd-header {
-  border: 1px solid #ccc;
-}
-.dd-wrapper-single .dd-header .dd-header-name {
-  font-weight: 400;
-}
-.dd-wrapper-single .dd-list {
-  border: 1px solid #ccc;
-  border-top: none;
+  span {
+    font-family: 'Calibre-Regular';
+    display: inline-block;
+    width: 79px;
+  }
 }
