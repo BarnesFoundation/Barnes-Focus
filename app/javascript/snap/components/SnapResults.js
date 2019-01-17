@@ -255,7 +255,8 @@ class SnapResults extends Component {
     /** animate language dropdown basen on shortDesc container position */
     if (visibleShortDescHeight < 0) {
       this.setState({
-        isLanguageDropdownVisible: false
+        isLanguageDropdownVisible: false,
+        isLanguageDropdownOpen: false
       });
     } else if (visibleShortDescHeight > 60 && visibleShortDescHeight <= shortDescElemHeight) {
       this.setState({
@@ -263,7 +264,8 @@ class SnapResults extends Component {
       });
     } else if (visibleShortDescHeight > shortDescElemHeight + 10) {
       this.setState({
-        isLanguageDropdownVisible: false
+        isLanguageDropdownVisible: false,
+        isLanguageDropdownOpen: false
       })
     }
 

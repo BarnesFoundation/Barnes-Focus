@@ -8,6 +8,7 @@ import * as constants from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 import { cropPhoto } from './CameraHelper';
 import { SearchRequestService } from '../services/SearchRequestService';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 class Camera extends Component {
 
@@ -348,21 +349,33 @@ class Camera extends Component {
                         this.state.showVideo &&
                         <div>
                             <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
-                            {
-                                !this.state.matchError &&
-                                <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
+                            <ReactCSSTransitionGroup
+                                transitionName="fade"
+                                transitionEnterTimeout={500}
+                                transitionLeaveTimeout={100}>
+                                {
+                                    !this.state.matchError &&
+                                    <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
 
-                            }
-                            {this.state.matchError &&
-                                <div id="no-match-overlay" className="no-match-overlay">
-                                    <div className="hint h2">
-                                        <span>No results found. <br /> Use the scan button to <br /> focus on a work of art.</span>
+                                }
+                            </ReactCSSTransitionGroup>
+
+                            <ReactCSSTransitionGroup
+                                transitionName="fade"
+                                transitionEnterTimeout={500}
+                                transitionLeaveTimeout={100}>
+                                {this.state.matchError &&
+                                    <div id="no-match-overlay" className="no-match-overlay">
+                                        <div className="hint h2">
+                                            <span>No results found. <br /> Use the scan button to <br /> focus on a work of art.</span>
+                                        </div>
+                                        <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', bottom: '37px' }}>
+                                            <img src={scan_button} alt="scan" />
+                                        </div>
                                     </div>
-                                    <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', bottom: '37px' }}>
-                                        <img src={scan_button} alt="scan" />
-                                    </div>
-                                </div>
-                            }
+                                }
+                            </ReactCSSTransitionGroup>
+
 
                         </div>
                     }
