@@ -126,7 +126,7 @@ class Camera extends Component {
                     esResponse = matchData.esResponse;
                     referenceImageUrl = matchData.referenceImageUrl;
 
-                    // this.completeImageSearchRequest(searchSuccess, esResponse);
+                    this.completeImageSearchRequest(searchSuccess, esResponse);
                 }
 
                 else {
@@ -145,7 +145,7 @@ class Camera extends Component {
                 await this.sr.storeSearchedResult(searchSuccess, data, referenceImageUrl, esResponse, searchTime);
 
                 // Complete this image search attempt if we've received 9 responses or match was found
-                if ((this.responseCounter == 9) || (this.matchFound == true)) {
+                if (this.responseCounter == 9) {
                     this.completeImageSearchRequest(searchSuccess, esResponse);
                 }
             }
