@@ -106,18 +106,25 @@ class Camera extends Component {
 
         try {
             let response = await axios(requestConfig);
+
             // Increment our response counter
             this.responseCounter++;
+
             let searchTime = response.data.search_time;
+
             // If a match was found
             if (response.data.results.length > 0 && this.matchFound == false) {
                 this.processImageMatch(response, data, searchTime);
             }
-            // If we've received all responses and no match was found yet, process as a non-matched image
+
             else {
+
+                // Store the non-matched result
                 if (!this.matchFound) {
                     this.sr.storeSearchedResult(false, data, null, null, searchTime);
                 }
+
+                // Complete this image search attempt if we've received 9 response or done 9 attempts
                 if (!this.matchFound && (this.responseCounter == 9 || this.intervalExecutions == 9)) {
                     this.completeImageSearchRequest(false, null)
                 }
@@ -126,7 +133,8 @@ class Camera extends Component {
         catch (error) {
             // Store the image even if catchoom request fails.
             this.sr.storeSearchedResult(false, data, null, null, null);
-            // End the photo scan 
+
+            // Handle the scan failure
             if (this.intervalExecutions == 9) {
                 this.handleSnapFailure();
             }
@@ -149,25 +157,18 @@ class Camera extends Component {
                 let refImage = response.data.results[0].image.thumb_120;
 
                 // Show the search animation while retrieving artwork information
-                this.setState({ searchInProgress: true, showVideo: false });
+                this.setState({ showVideo: false });
                 this.artworkRetrieved = true;
                 let artworkInfo = await this.sr.getArtworkInformation(imageId);
-                this.setState({ searchInProgress: false });
 
                 this.sr.storeSearchedResult(true, data, refImage, artworkInfo, searchTime);
                 this.completeImageSearchRequest(true, artworkInfo);
-
             }
         };
     })();
 
     /** Processes the completion of an image search */
     completeImageSearchRequest(responseFound, response) {
-        console.log('You SHOULD see me for each scan session whether success or failure!');
-        // Turn off the search-in-progress animation
-        if (this.state.searchInProgress) {
-            this.setState({ searchInProgress: false });
-        }
 
         if (responseFound) {
             // Navigate to results page
@@ -181,8 +182,6 @@ class Camera extends Component {
     /** Transitions to an alert screen when no match is found */
     handleSnapFailure = () => {
         this.stopScan();
-        // Turn off search in-progress animation
-        if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
 
         if (!this.state.matchError) {
             this.setState({ matchError: true });
@@ -204,7 +203,6 @@ class Camera extends Component {
         }
 
         catch (error) {
-            console.log('Not allowed to access camera. Please check settings! ' + error);
             this.setState({ error: "An error occurred accessing the device camera" });
         }
     }
