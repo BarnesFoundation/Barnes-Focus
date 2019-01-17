@@ -26,6 +26,7 @@
         width: 100vw;
         z-index: 1;
         overflow: hidden;
+        //transition: opacity .25s linear;
 
         .hint {
             position: absolute;
@@ -51,31 +52,23 @@
     }
 }
 
-.search-progress-container {
-    height: 45vh;
-    padding: 5vw;
-
-    .snap-spinner {
-        padding: 10vh 0;
-    }
+/* result not found animation */
+.fade-enter {
+  opacity: 0;
 }
 
-.image-url{
-    float: left;
-    font-size: 18px;
-    font-weight: bold;
-    padding-top: 15px;
-    text-decoration: underline;
-    text-align: center;
+.fade-enter.fade-enter-active {
+  opacity: 1;
+  transition: opacity 500ms linear;
 }
 
-.snap-spinner {
-    text-align: center;
+.fade-leave {
+  opacity: 1;
 }
 
-.results {
-    font-size: 15px;
-
+.fade-leave.fade-leave-active {
+  opacity: 0;
+  transition: opacity 100ms linear;
 }
 
 
