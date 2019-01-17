@@ -30,7 +30,7 @@ class Camera extends Component {
     };
 
     // Set booleans and counter
-    artworkRetrieved = false; matchFound = false; responseCounter = 0; intervalExecutions;
+    matchFound = false; responseCounter = 0; intervalExecutions;
 
     track; camera_capabilities; camera_settings; scan; cropRect;
 
@@ -104,73 +104,78 @@ class Camera extends Component {
     submitSearchRequest = async (requestConfig) => {
 
         const { data } = requestConfig;
+        let response;
 
-        try {
-            let response = await axios(requestConfig);
-            // Increment our response counter
-            this.responseCounter++;
-            let searchTime = response.data.search_time;
-            // If a match was found
-            if (response.data.results.length > 0 && this.matchFound == false) {
-                this.processImageMatch(response, data, searchTime);
-            }
-            // If we've received all responses and no match was found yet, process as a non-matched image
-            else {
-                if (!this.matchFound) {
-                    this.sr.storeSearchedResult(false, data, null, null, searchTime);
+        let searchSuccess;
+        let referenceImageUrl = null;
+        let esResponse = null;
+        let searchTime = null;
+
+        if (this.matchFound == false) {
+
+            try {
+                // A match/no match will always have a search time
+                response = await axios(requestConfig);
+                searchTime = response.data.search_time;
+
+                // If a match was found
+                if (response.data.results.length > 0) {
+                    this.matchFound = true;
+                    let matchData = await this.processImageMatch(response);
+
+                    searchSuccess = true;
+                    esResponse = matchData.esResponse;
+                    referenceImageUrl = matchData.referenceImageUrl;
+
+                    // this.completeImageSearchRequest(searchSuccess, esResponse);
                 }
-                if (!this.matchFound && (this.responseCounter == 9 || this.intervalExecutions == 9)) {
-                    this.completeImageSearchRequest(false, null)
+
+                else {
+                    searchSuccess = false;
                 }
             }
-        }
-        catch (error) {
-            // Store the image even if catchoom request fails.
-            this.sr.storeSearchedResult(false, data, null, null, null);
-            // End the photo scan 
-            if (this.intervalExecutions == 9) {
-                this.handleSnapFailure();
+
+            catch (error) {
+                searchSuccess = false;
+            }
+
+            finally {
+                this.responseCounter++;
+
+                // Store the result, regardless of success or not
+                await this.sr.storeSearchedResult(searchSuccess, data, referenceImageUrl, esResponse, searchTime);
+
+                // Complete this image search attempt if we've received 9 responses or match was found
+                if ((this.responseCounter == 9) || (this.matchFound == true)) {
+                    this.completeImageSearchRequest(searchSuccess, esResponse);
+                }
             }
         }
     }
 
     /** Closure function so that a image match response is processed only once */
-    processImageMatch = ((response, data, searchTime) => {
+    processImageMatch = ((response) => {
         let executed = false;
-        return async (response, data, searchTime) => {
+        return async (response) => {
             if (!executed) {
                 executed = true;
 
-                this.matchFound = true;
-
-                this.stopScan();
-
                 // Get the image id
                 let imageId = response.data.results[0].item.name
-                let refImage = response.data.results[0].image.thumb_120;
+                let referenceImageUrl = response.data.results[0].image.thumb_120;
 
-                // Show the search animation while retrieving artwork information
-                this.setState({ searchInProgress: true, showVideo: false });
-                this.artworkRetrieved = true;
+                // Retrieve artwork information
                 let artworkInfo = await this.sr.getArtworkInformation(imageId);
-                this.setState({ searchInProgress: false });
 
-                this.sr.storeSearchedResult(true, data, refImage, artworkInfo, searchTime);
-                this.completeImageSearchRequest(true, artworkInfo);
-
+                return { esResponse: artworkInfo, referenceImageUrl: referenceImageUrl };
             }
         };
     })();
 
     /** Processes the completion of an image search */
-    completeImageSearchRequest(responseFound, response) {
-        console.log('You SHOULD see me for each scan session whether success or failure!');
-        // Turn off the search-in-progress animation
-        if (this.state.searchInProgress) {
-            this.setState({ searchInProgress: false });
-        }
+    completeImageSearchRequest(searchSuccess, response) {
 
-        if (responseFound) {
+        if (searchSuccess) {
             // Navigate to results page
             this.props.history.push({ pathname: `/results/${response["data"]["records"][0].id}`, state: { result: response, snapCount: localStorage.getItem(constants.SNAP_ATTEMPTS) } });
         }
@@ -182,8 +187,6 @@ class Camera extends Component {
     /** Transitions to an alert screen when no match is found */
     handleSnapFailure = () => {
         this.stopScan();
-        // Turn off search in-progress animation
-        if (this.state.searchInProgress) { this.setState({ searchInProgress: false }); }
 
         if (!this.state.matchError) {
             this.setState({ matchError: true });
@@ -205,7 +208,6 @@ class Camera extends Component {
         }
 
         catch (error) {
-            console.log('Not allowed to access camera. Please check settings! ' + error);
             this.setState({ error: "An error occurred accessing the device camera" });
         }
     }
@@ -213,7 +215,6 @@ class Camera extends Component {
     componentDidUpdate() {
         this.matchFound = false;
         this.responseCounter = 0;
-        this.artworkRetrieved = false;
 
         // When video is able to be captured
         if (this.state.showVideo && this.state.videoStream && !this.state.matchError) {
