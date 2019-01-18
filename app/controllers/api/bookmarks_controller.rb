@@ -29,6 +29,7 @@ class Api::BookmarksController < Api::BaseController
 
   def set_language
     language = bookmark_params[:language] || params[:language]
+    language = language.downcase
 
     respond_to do | wants |
       if language

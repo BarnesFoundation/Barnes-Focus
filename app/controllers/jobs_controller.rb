@@ -55,6 +55,7 @@ class JobsController < ApplicationController
         if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
           language = latest_bookmark_entry.language
           language = language || 'en'
+          language = language.downcase
           els_arr = Array.new
 
           bukmarks.each { | obj |
