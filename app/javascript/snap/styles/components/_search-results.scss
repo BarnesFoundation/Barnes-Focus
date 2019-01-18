@@ -18,7 +18,7 @@
 
         .card-img-container {
             position: absolute;
-            filter: blur(10px);
+            filter: blur(25px);
             transform: scale(1.1);
             height: 100%;
             img {
@@ -178,45 +178,7 @@
     text-align: center;
 }
 
-/* Slick sider customization for scale and animation*/
 
-// Need position relative and a base z index
-.slick-slide {
-    position: relative;
-    z-index: 6;
-}
-// Set center to high zindex
-.slick-active {
-    z-index: 999; // or any high #
-    margin: 0 15px;
-}
-// Target slide after center to keep stacking
-.slick-active + .slick-slide {
-    z-index: 8;
-}
-
-
-.slick-list {
-    padding: 0px 80px !important;
-    margin: 0 -15px;
-}
-
-.slick-slide {
-    margin: 50px 15px;
-    img {
-        opacity: 0.7;
-    }
-}
-
-.slick-active img{
-    -moz-transform:scale(1.13);
-    -ms-transform:scale(1.13);
-    -o-transform:scale(1.13);
-    -webkit-transform:scale(1.13);
-    transform:scale(1.13);
-    opacity:1;
-    transition: all .2s ease-in-out;
-}
 
 .cross-fade-leave {
   opacity: 1;

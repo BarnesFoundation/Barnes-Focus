@@ -1,25 +1,21 @@
 import React, { Component } from 'react';
 import Slider from 'react-slick';
 import CrossfadeImage from 'react-crossfade-image';
-import { ART_WORK_INFO_URL } from './Constants';
-import axios from 'axios';
 
 const sliderSettings = {
     className: "slider-container",
     arrows: false,
     swipe: true,
     speed: 200,
-    //centerPadding: '102px',
+    centerMode: true,
+    centerPadding: `${(screen.width - 260) / 2}px`,
     cssEase: 'linear',
     mobileFirst: true,
-    variableWidth: true,
+    variableWidth: false,
     slidesToShow: 1,
     slidesToScroll: 1
 };
 
-/** 
- * withRouter HOC provides props with location, history and match objects
-*/
 class InRoomSlider extends Component {
 
     constructor(props) {

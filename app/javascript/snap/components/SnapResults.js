@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router';
 import { compose } from 'redux';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
@@ -19,7 +19,6 @@ import { SearchRequestService } from '../services/SearchRequestService';
 
 
 const fb_app_id = '349407548905454';
-
 /** 
  * withRouter HOC provides props with location, history and match objects
 */
@@ -182,7 +181,7 @@ class SnapResults extends Component {
   }
 
   onSelectInRoomArt = (aitrId) => {
-    this.props.history.push({ pathname: `/results/${aitrId}` });
+    this.props.history.push({ pathname: `/artwork/${aitrId}` });
     let searchContainer = document.getElementById('search-result');
     searchContainer.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" });
   }

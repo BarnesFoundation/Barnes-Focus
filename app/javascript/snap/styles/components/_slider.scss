@@ -9,7 +9,6 @@
     }
 
     .slider-header {
-        //padding-top: 50px;
         line-height: 25px;
         z-index: 99;
         position: absolute;
@@ -23,7 +22,47 @@
         position: absolute;
         width: 100%;
         top:35px;
-        z-index: 9999 !important;    
+        z-index: 9999 !important;   
+        height: 100%;
+
+        /* Slick sider customization for scale and animation*/
+
+        // Need position relative and a base z index
+        .slick-slide {
+            position: relative;
+            z-index: 6;
+        }
+        // Set center to high zindex
+        .slick-active {
+            z-index: 999; // or any high #
+        }
+        // Target slide after center to keep stacking
+        .slick-active + .slick-slide {
+            z-index: 8;
+        }
+
+        .slick-list {
+            padding-top: 30px !important;
+            padding-bottom: 30px !important;
+        }
+
+        .slick-slide {
+            img {
+                opacity: 0.7;
+                margin: 15px;
+            }
+        }
+
+        .slick-active img{
+            -moz-transform:scale(1.13);
+            -ms-transform:scale(1.13);
+            -o-transform:scale(1.13);
+            -webkit-transform:scale(1.13);
+            transform:scale(1.13);
+            opacity:1;
+            transition: all .2s ease-in-out;
+        }
+
     }
 
     .footer-text {
