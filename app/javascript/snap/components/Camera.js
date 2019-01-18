@@ -21,10 +21,10 @@ class Camera extends Component {
     responseCounter;
     intervalExecutions
 
-    track; 
-    camera_capabilities; 
-    camera_settings; 
-    scan; 
+    track;
+    camera_capabilities;
+    camera_settings;
+    scan;
     cropRect;
 
 
@@ -360,23 +360,29 @@ class Camera extends Component {
     }
 
     render() {
+
+        const { showVideo, matchError } = this.state;
+
         let videoStyle = {
             filter: `blur(25px)`,
             transform: `scale(1.2)`
         }
+
+
         return (
+
             <div className="camera-container" >
                 <div className="camera">
                     {
-                        this.state.showVideo &&
+                        showVideo &&
                         <div>
                             <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
                             {
-                                !this.state.matchError &&
+                                !matchError &&
                                 <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
 
                             }
-                            {this.state.matchError &&
+                            {matchError &&
                                 <div id="no-match-overlay" className="no-match-overlay">
                                     <div className="hint h2">
                                         <span>No results found. <br /> Use the scan button to <br /> focus on a work of art.</span>
