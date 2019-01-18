@@ -11,27 +11,49 @@ import { SearchRequestService } from '../services/SearchRequestService';
 
 class Camera extends Component {
 
-    sr = new SearchRequestService();
+    sr;
+    translation;
+    snapAttempts;
 
-    translationObj = localStorage.getItem(constants.SNAP_LANGUAGE_TRANSLATION);
+    state;
 
-    // Set state variables
-    state = {
-        videoStream: null,
-        frontCamera: false,
-        showVideo: true,
-        searchInProgress: false,
-        snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 0,
-        translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
-        cameraPermission: false,
-        scanSeqId: Date.now(),
-        matchError: false
-    };
+    matchFound;
+    responseCounter;
+    intervalExecutions
 
-    // Set booleans and counter
-    matchFound = false; responseCounter = 0; intervalExecutions;
+    track; 
+    camera_capabilities; 
+    camera_settings; 
+    scan; 
+    cropRect;
 
-    track; camera_capabilities; camera_settings; scan; cropRect;
+
+    constructor() {
+        super();
+
+        this.sr = new SearchRequestService();
+
+        // Get from local storage
+        this.translation = localStorage.getItem(constants.SNAP_LANGUAGE_TRANSLATION);
+        this.snapAttempts = localStorage.getItem(constants.SNAP_ATTEMPTS) || 0;
+
+        // Set state variables
+        this.state = {
+            videoStream: null,
+            frontCamera: false,
+            showVideo: true,
+            searchInProgress: false,
+            snapAttempts: this.snapAttempts,
+            translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
+            cameraPermission: false,
+            scanSeqId: Date.now(),
+            matchError: false
+        };
+
+        // Set flag and counter
+        this.matchFound = false;
+        this.responseCounter = 0;
+    }
 
     resetSnapCounter = () => {
         let last_snap_timestamp = parseInt(localStorage.getItem(constants.SNAP_LAST_TIMESTAMP));
@@ -142,7 +164,7 @@ class Camera extends Component {
                 this.responseCounter++;
 
                 // Store the result, regardless of success or not
-                await this.sr.storeSearchedResult(searchSuccess, data, referenceImageUrl, esResponse, searchTime);
+                this.sr.storeSearchedResult(searchSuccess, data, referenceImageUrl, esResponse, searchTime);
 
                 // Complete this image search attempt if we've received 9 responses or match was found
                 if (this.responseCounter == 9) {
