@@ -1,10 +1,22 @@
 class Api::TranslationsController < Api::BaseController
+  skip_before_action :verify_authenticity_token, only: %w(index)
+
   def index
-    @translations = Translation.search(params[:language])
+    session = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
 
     respond_to do | wants |
-      wants.json do
-        render json: { data: { translations: @translations }, message: '' }, status: :ok
+      if session
+        language = session.lang_pref ? session.lang_pref.downcase : 'en'
+
+        @translations = Translation.search(language)
+
+        wants.json do
+          render json: { data: { translations: @translations }, message: '' }, status: :ok
+        end
+      else
+        wants.json do
+          render json: { data: { errors: ['Session not found'] }, message: 'not_found' }, status: 404
+        end
       end
     end
   end
