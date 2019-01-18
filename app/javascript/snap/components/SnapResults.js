@@ -15,6 +15,7 @@ import EmailForm from './EmailForm';
 import Popover from 'react-simple-popover';
 
 import close_icon from 'images/cross.svg';
+import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
 
 
@@ -436,6 +437,10 @@ class SnapResults extends Component {
                   <div className="short-desc-container" ref={el => this.shortDescContainer = el}>
                     {this.state.searchResults[0].shortDescription && <div className="card-text paragraph">{this.state.searchResults[0].shortDescription}</div>}
                   </div>
+                  {
+                    this.state.selectedLanguage.code !== 'En' &&
+                    <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                  }
                   <div className="share-wrapper">
                     <div className="language-dropdown-wrapper">
                       {this.state.isLanguageDropdownOpen && <div className="language-dropdown-overlay"></div>}
