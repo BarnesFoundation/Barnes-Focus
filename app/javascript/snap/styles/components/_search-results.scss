@@ -178,7 +178,23 @@
     text-align: center;
 }
 
+.google-translate-disclaimer {
+    padding-top: 10px;
+    padding-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    font-family: Calibre-Regular;
+    line-height: 19px;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    color: #B4B4B4;
 
+    span {
+        display: inline-block;
+        width: 110px;
+        margin-right:4px;
+    }
+}
 
 .cross-fade-leave {
   opacity: 1;

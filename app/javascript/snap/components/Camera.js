@@ -12,27 +12,47 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 class Camera extends Component {
 
-    sr = new SearchRequestService();
+    sr;
+    translation;
+    snapAttempts;
 
-    translationObj = localStorage.getItem(constants.SNAP_LANGUAGE_TRANSLATION);
+    matchFound;
+    responseCounter;
+    intervalExecutions
 
-    // Set state variables
-    state = {
-        videoStream: null,
-        frontCamera: false,
-        showVideo: true,
-        searchInProgress: false,
-        snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 0,
-        translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
-        cameraPermission: false,
-        scanSeqId: Date.now(),
-        matchError: false
-    };
+    track;
+    camera_capabilities;
+    camera_settings;
+    scan;
+    cropRect;
 
-    // Set booleans and counter
-    matchFound = false; responseCounter = 0; intervalExecutions;
 
-    track; camera_capabilities; camera_settings; scan; cropRect;
+    constructor() {
+        super();
+
+        this.sr = new SearchRequestService();
+
+        // Get from local storage
+        this.translation = localStorage.getItem(constants.SNAP_LANGUAGE_TRANSLATION);
+        this.snapAttempts = localStorage.getItem(constants.SNAP_ATTEMPTS) || 0;
+
+        // Set state variables
+        this.state = {
+            videoStream: null,
+            frontCamera: false,
+            showVideo: true,
+            searchInProgress: false,
+            snapAttempts: this.snapAttempts,
+            translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
+            cameraPermission: false,
+            scanSeqId: Date.now(),
+            matchError: false
+        };
+
+        // Set flag and counter
+        this.matchFound = false;
+        this.responseCounter = 0;
+    }
 
     resetSnapCounter = () => {
         let last_snap_timestamp = parseInt(localStorage.getItem(constants.SNAP_LAST_TIMESTAMP));
@@ -143,7 +163,7 @@ class Camera extends Component {
                 this.responseCounter++;
 
                 // Store the result, regardless of success or not
-                await this.sr.storeSearchedResult(searchSuccess, data, referenceImageUrl, esResponse, searchTime);
+                this.sr.storeSearchedResult(searchSuccess, data, referenceImageUrl, esResponse, searchTime);
 
                 // Complete this image search attempt if we've received 9 responses or match was found
                 if (this.responseCounter == 9) {
@@ -339,15 +359,21 @@ class Camera extends Component {
     }
 
     render() {
+
+        const { showVideo, matchError } = this.state;
+
         let videoStyle = {
             filter: `blur(25px)`,
             transform: `scale(1.2)`
         }
+
+
         return (
+
             <div className="camera-container" >
                 <div className="camera">
                     {
-                        this.state.showVideo &&
+                        showVideo &&
                         <div>
                             <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
                             <ReactCSSTransitionGroup
@@ -355,7 +381,7 @@ class Camera extends Component {
                                 transitionEnterTimeout={500}
                                 transitionLeaveTimeout={100}>
                                 {
-                                    !this.state.matchError &&
+                                    !matchError &&
                                     <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
 
                                 }
@@ -365,7 +391,7 @@ class Camera extends Component {
                                 transitionName="fade"
                                 transitionEnterTimeout={500}
                                 transitionLeaveTimeout={100}>
-                                {this.state.matchError &&
+                                {matchError &&
                                     <div id="no-match-overlay" className="no-match-overlay">
                                         <div className="hint h2">
                                             <span>No results found. <br /> Use the scan button to <br /> focus on a work of art.</span>
