@@ -99,6 +99,8 @@ class Camera extends Component {
             // Get the the present image in the canvas and crop the image
             let canvas = this.getVideoCanvas();
 
+            if (!canvas) return null;
+
             canvas.toBlob(async (imageBlob) => {
 
                 if (process.env.CROP_IMAGE === 'TRUE') {
@@ -197,7 +199,7 @@ class Camera extends Component {
 
         if (searchSuccess) {
             // Navigate to results page
-            this.props.history.push({ pathname: `/artwork/${response["data"]["records"][0].id}`, state: { result: response, snapCount: localStorage.getItem(constants.SNAP_ATTEMPTS) } });
+            this.props.history.push({ pathname: `/artwork/${response["data"]["records"][0].id}`, state: { result: response } });
         }
         else {
             this.handleSnapFailure();
@@ -215,6 +217,7 @@ class Camera extends Component {
     }
 
     async componentDidMount() {
+        console.log('camera >> componentDidMount');
         // Fetch the device camera
         try {
             const videoStream = await navigator.mediaDevices.getUserMedia({
@@ -238,7 +241,7 @@ class Camera extends Component {
 
         // When video is able to be captured
         if (this.state.showVideo && this.state.videoStream && !this.state.matchError) {
-            console.log('Component updated');
+            console.log('camera >> componentDidUpdate');
 
             this.video.srcObject = this.state.videoStream;
 
@@ -261,13 +264,26 @@ class Camera extends Component {
         }
     }
 
+    componentWillUnmount() {
+        console.log('camera >> componentWillUnmount');
+        this.video.pause();
+        this.video.removeAttribute('src');
+        this.video.load();
+        this.setState({
+            videoStream: null,
+            showVideo: false
+        });
+    }
+
     /** Gets the video drawn onto the canvas */
     getVideoCanvas = () => {
 
         // Get the canvas
         let canvas = this.getCanvas();
-        const context = canvas.getContext("2d");
 
+        if (!this.video || !canvas) return null;
+
+        const context = canvas.getContext("2d");
         if (isIOS || !this.camera_capabilities) {
 
             // Draw rectangle
@@ -302,7 +318,7 @@ class Camera extends Component {
     /** Gets a blank canvas of same size as the video */
     getCanvas = () => {
         const video = this.video;
-        if (!video.videoHeight) return null;
+        if (video && !video.videoHeight) return null;
 
         if (!this.ctx) {
             const canvas = document.createElement('canvas');
@@ -322,6 +338,8 @@ class Camera extends Component {
 
     /** Draws the portion of the video visible within the preview onto a canvas, in a loop. */
     drawVideoPreview = () => {
+        if (!this.vpreview) return null;
+
         let previewCanvas = this.vpreview;
         let previewContext = previewCanvas.getContext('2d');
         let previewBox = this.vpreview.getBoundingClientRect();

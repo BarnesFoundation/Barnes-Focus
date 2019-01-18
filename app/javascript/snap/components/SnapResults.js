@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { compose } from 'redux';
+import posed from "react-pose";
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 import * as constants from './Constants';
@@ -20,6 +21,39 @@ import { SearchRequestService } from '../services/SearchRequestService';
 
 
 const fb_app_id = '349407548905454';
+
+const Child = posed.div({
+  enter: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 400,
+      ease: "linear"
+    }
+  },
+  exit: { y: 50, opacity: 0 }
+});
+
+const Container = posed.div({
+  enter: {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    staggerChildren: 400,
+    transition: {
+      duration: 200,
+      ease: "linear"
+    }
+  },
+  exit: {
+    y: 50,
+    scale: 0.75,
+    opacity: 0,
+    staggerChildren: 200,
+    staggerDirection: -1,
+    transition: { duration: 150 }
+  }
+});
 /** 
  * withRouter HOC provides props with location, history and match objects
 */
@@ -47,7 +81,7 @@ class SnapResults extends Component {
     ];
 
     this.state = {
-      ...props.location.state,  // these properties are passed on from Camera component. Contains {result, snapCount}
+      ...props.location.state,  // these properties are passed on from Camera component. Contains {result, snapAttempts}
       sharePopoverIsOpen: false,
       showEmailScreen: false,
       emailCaptured: false,
@@ -68,6 +102,7 @@ class SnapResults extends Component {
       },
       showSliderOverlay: true,
       email: localStorage.getItem(constants.SNAP_USER_EMAIL) || '',
+      snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 1,
       errors: {
         email: false
       },
@@ -77,6 +112,7 @@ class SnapResults extends Component {
 
     this.scrollInProgress = false;
     this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+
   }
 
   constructResultAndInRoomSlider = (search_result) => {
@@ -117,18 +153,18 @@ class SnapResults extends Component {
   async componentWillMount() {
     console.log('SnapResults >> componentWillMount');
     let imageId = this.props.match.params.imageId;
-    if (imageId) {
+    if (this.state.result) {
+      this.constructResultAndInRoomSlider(this.state.result);
+    } else if (imageId) {
       let artworkInfo = await this.sr.getArtworkInformation(imageId);
       this.setState({ result: artworkInfo });
       this.constructResultAndInRoomSlider(artworkInfo);
-    } else {
-      this.constructResultAndInRoomSlider(this.state.result);
     }
 
     /**
      * If the number of scans equals 4, show the screen to capture user email.
      */
-    if (parseInt(this.state.snapCount) === 4) {
+    if (parseInt(this.state.snapAttempts) === 4) {
       this.setState({ showEmailScreen: true });
     }
     if (localStorage.getItem(constants.SNAP_USER_EMAIL) !== null) {
@@ -146,18 +182,6 @@ class SnapResults extends Component {
           option.selected = false;
         }
       })
-    }
-  }
-
-  async componentWillReceiveProps(props) {
-    console.log('SnapResults >> componentWillReceiveProps');
-    let imageId = props.match.params.imageId;
-    if (imageId) {
-      let artworkInfo = await this.sr.getArtworkInformation(imageId);
-      this.setState({ result: artworkInfo });
-      this.constructResultAndInRoomSlider(artworkInfo);
-    } else {
-      this.constructResultAndInRoomSlider(this.state.result);
     }
   }
 
@@ -182,9 +206,8 @@ class SnapResults extends Component {
   }
 
   onSelectInRoomArt = (aitrId) => {
+    localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
     this.props.history.push({ pathname: `/artwork/${aitrId}` });
-    let searchContainer = document.getElementById('search-result');
-    searchContainer.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" });
   }
 
   componentDidMount() {
@@ -247,8 +270,9 @@ class SnapResults extends Component {
       })
     }
 
-    let shortDescElemTop = this.shortDescContainer.getBoundingClientRect().y;
-    let shortDescElemHeight = this.shortDescContainer.getBoundingClientRect().bottom - this.shortDescContainer.getBoundingClientRect().top;
+    let shortDescBoundingRect = this.shortDescContainer.getBoundingClientRect();
+    let shortDescElemTop = shortDescBoundingRect.y;
+    let shortDescElemHeight = shortDescBoundingRect.bottom - shortDescBoundingRect.top;
     let currentShortDescScrollOffset = h - shortDescElemTop;
     let visibleShortDescHeight = Math.floor(currentShortDescScrollOffset);
 
@@ -392,7 +416,7 @@ class SnapResults extends Component {
     }
     return (
       <div>
-        <div className="container-fluid search-container" id="search-result" style={resultsContainerStyle}>
+        <Container className="container-fluid search-container" id="search-result" style={resultsContainerStyle}>
           <div className="row">
             <div className="col-12 col-md-12">
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
@@ -401,13 +425,13 @@ class SnapResults extends Component {
                     <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" />
                   </div>
                   <div className="card-img-overlay">
-                    <div className="card-img-result">
+                    <Child className="card-img-result">
                       <img src={this.state.searchResults[0].url} alt="match_image" />
-                    </div>
+                    </Child>
                     <div className="card-title h1">{this.state.searchResults[0].title}</div>
                   </div>
                 </div>
-                <div className="card-body" ref={el => this.resultsContainer = el}>
+                <Child className="card-body" ref={el => this.resultsContainer = el}>
                   <div className="card-info">
                     <table className="detail-table">
                       <tbody>
@@ -434,7 +458,7 @@ class SnapResults extends Component {
                       </tbody>
                     </table>
                   </div>
-                  <div className="short-desc-container" ref={el => this.shortDescContainer = el}>
+                  <div className="short-desc-container" ref={elem => this.shortDescContainer = elem}>
                     {this.state.searchResults[0].shortDescription && <div className="card-text paragraph">{this.state.searchResults[0].shortDescription}</div>}
                   </div>
                   {
@@ -471,7 +495,7 @@ class SnapResults extends Component {
                       </div>
                     </Popover>
                   </div>
-                </div>
+                </Child>
 
                 {this.state.showSliderOverlay && <div id="slider-overlay" style={{ height: '540px', width: '100%', background: 'transparent', content: '' }}></div>}
 
@@ -507,7 +531,7 @@ class SnapResults extends Component {
 
 
                 {
-                  parseInt(this.state.snapCount) >= 4 &&
+                  parseInt(this.state.snapAttempts) >= 4 &&
                   !this.state.emailCaptured &&
                   !this.state.showEmailScreen &&
                   <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} />
@@ -518,7 +542,7 @@ class SnapResults extends Component {
 
             </div>
           </div>
-        </div>
+        </Container>
 
 
         {
