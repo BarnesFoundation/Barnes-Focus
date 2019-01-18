@@ -4,8 +4,7 @@ import { BrowserRouter, Route, NavLink, Switch } from 'react-router-dom';
 import Home from '../components/Home';
 import Camera from '../components/Camera';
 import SnapResults from '../components/SnapResults';
-import SnapNotFound from '../components/SnapNotFound';
-import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, SNAP_ATTEMPTS, SNAP_APP_RESET_INTERVAL } from '../components/Constants';
+import * as constants from '../components/Constants';
 
 class AppRouter extends Component {
 
@@ -19,13 +18,13 @@ class AppRouter extends Component {
 
     defaultResetIfSessionAlive = () => {
         console.log('App reset interval lapsed. App will now reset.');
-        localStorage.removeItem(SNAP_LANGUAGE_PREFERENCE);
-        localStorage.removeItem(SNAP_USER_EMAIL);
-        localStorage.removeItem(SNAP_ATTEMPTS);
+        localStorage.removeItem(constants.SNAP_LANGUAGE_PREFERENCE);
+        localStorage.removeItem(constants.SNAP_USER_EMAIL);
+        localStorage.removeItem(constants.SNAP_ATTEMPTS);
     }
 
     componentDidMount() {
-        var intervalId = setInterval(this.defaultResetIfSessionAlive, SNAP_APP_RESET_INTERVAL);
+        var intervalId = setInterval(this.defaultResetIfSessionAlive, constants.SNAP_APP_RESET_INTERVAL);
         // store intervalId in the state so it can be accessed later:
         this.setState({ intervalId: intervalId });
     }
@@ -40,10 +39,9 @@ class AppRouter extends Component {
             <BrowserRouter>
                 <div>
                     <Switch>
-                        <Route path="/" component={Home} exact={true} />
-                        <Route path="/scan" component={Camera} exact={true} />
-                        <Route path="/results/:imageId?" component={SnapResults} />
-                        <Route path="/not-found" component={SnapNotFound} exact={true} />
+                        <Route path="/" component={Home} exact={true} key="home" />
+                        <Route path="/scan" component={Camera} exact={true} key="scan" />
+                        <Route path="/artwork/:imageId?" component={SnapResults} key="artwork" />
                     </Switch>
                 </div>
             </BrowserRouter>
