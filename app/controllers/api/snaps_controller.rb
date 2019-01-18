@@ -124,6 +124,7 @@ class Api::SnapsController < Api::BaseController
 
     ## Translates the given text to the preferred language
     def translate_text(short_description)
+      return short_description if preferred_language && preferred_language.downcase == 'en'
       
       # Configure language translator
       translator = GoogleTranslate.new preferred_language
