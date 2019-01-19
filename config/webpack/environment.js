@@ -13,7 +13,8 @@ environment.plugins.prepend('Provide', new webpack.ProvidePlugin({
         'IMAGE_ENGINE',
         'CROP_IMAGE',
         'CATCHOOM_ACCESS_TOKEN',
-        'CATCHOOM_REQUEST_URL'
+        'CATCHOOM_REQUEST_URL',
+        'APP_VERSION'
     ]) // this makes sure that these are accessible as env variables to react
 )
 

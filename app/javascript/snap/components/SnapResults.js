@@ -13,6 +13,7 @@ import check_email_icon from 'images/check_email.svg';
 import InRoomSlider from './Slider';
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
+import Footer from './Footer';
 import Popover from 'react-simple-popover';
 
 import close_icon from 'images/cross.svg';
@@ -286,7 +287,7 @@ class SnapResults extends Component {
       this.setState({
         isLanguageDropdownVisible: true
       });
-    } else if (visibleShortDescHeight > shortDescElemHeight + 10) {
+    } else if (visibleShortDescHeight > shortDescElemHeight + 90) {
       this.setState({
         isLanguageDropdownVisible: false,
         isLanguageDropdownOpen: false
@@ -416,7 +417,7 @@ class SnapResults extends Component {
     }
     return (
       <div>
-        <Container className="container-fluid search-container" id="search-result" style={resultsContainerStyle}>
+        <Container className="container-fluid search-container" id="search-result" style={resultsContainerStyle} initialPose="exit" pose="enter">
           <div className="row">
             <div className="col-12 col-md-12">
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
@@ -462,6 +463,7 @@ class SnapResults extends Component {
                     {this.state.searchResults[0].shortDescription && <div className="card-text paragraph">{this.state.searchResults[0].shortDescription}</div>}
                   </div>
                   {
+                    this.state.searchResults[0].shortDescription &&
                     this.state.selectedLanguage.code !== 'En' &&
                     <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
                   }
@@ -503,10 +505,6 @@ class SnapResults extends Component {
                   this.state.alsoInRoomResults.length > 0 &&
                   <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
                     <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt}></InRoomSlider>
-                    <div className="footer-text">
-                      <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
-                      <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
-                    </div>
                   </div>
                 }
 
@@ -515,10 +513,6 @@ class SnapResults extends Component {
                   <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
                     <div className="slider-background" style={{ filter: `blur(20px)` }}>
                       <img src={this.state.searchResults[0].url + this.sliderBackgroundCropParams} />
-                    </div>
-                    <div className="footer-text">
-                      <span>&copy; {new Date().getFullYear()} Barnes Foundation</span>
-                      <a href="https://www.barnesfoundation.org/terms"><span>Legals</span></a>
                     </div>
                   </div>
                 }
@@ -537,6 +531,7 @@ class SnapResults extends Component {
                   <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} />
                 }
 
+                <Footer />
 
               </div>
 
