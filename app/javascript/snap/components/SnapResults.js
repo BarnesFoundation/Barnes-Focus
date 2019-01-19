@@ -111,9 +111,7 @@ class SnapResults extends Component {
       translation: (translationObj) ? JSON.parse(translationObj) : null
     }
 
-    this.scrollInProgress = false;
     this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
-
   }
 
   constructResultAndInRoomSlider = (search_result) => {
@@ -213,6 +211,7 @@ class SnapResults extends Component {
 
   componentDidMount() {
     console.log('SnapResults >> componentDidMount');
+    this.scrollInProgress = false;
     // Register scroll listener
     window.addEventListener('scroll', this._onScroll, true);
 
@@ -237,6 +236,11 @@ class SnapResults extends Component {
    * All the fancy scroll animation goes here.
    */
   handleScroll = () => {
+    if (!this.resultsContainer || !this.shortDescContainer) {
+      this.scrollInProgress = false;
+      return;
+    }
+
     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     let resultsContainerBottom = Math.floor(h - this.resultsContainer.getBoundingClientRect().bottom);
 
