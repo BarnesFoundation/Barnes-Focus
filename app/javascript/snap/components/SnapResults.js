@@ -71,14 +71,14 @@ class SnapResults extends Component {
 
     this.langOptions = [
       { name: 'English', code: 'En', selected: true },
-      { name: 'Spanish', code: 'Es', selected: false },
-      { name: 'French', code: 'Fr', selected: false },
+      { name: 'Español', code: 'Es', selected: false },
+      { name: 'Français', code: 'Fr', selected: false },
       { name: 'Deutsch', code: 'De', selected: false },
-      { name: 'Italian', code: 'It', selected: false },
-      { name: 'Russian', code: 'Ru', selected: false },
-      { name: 'Chinese', code: 'Zh', selected: false },
-      { name: 'Japanese', code: 'Ja', selected: false },
-      { name: 'Korean', code: 'Ko', selected: false }
+      { name: 'Italiano', code: 'It', selected: false },
+      { name: 'русский', code: 'Ru', selected: false },
+      { name: '中文', code: 'Zh', selected: false },
+      { name: '日本語', code: 'Ja', selected: false },
+      { name: '한국어', code: 'Ko', selected: false }
     ];
 
     this.state = {
