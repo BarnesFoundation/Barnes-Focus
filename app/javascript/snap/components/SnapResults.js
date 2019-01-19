@@ -55,6 +55,24 @@ const Container = posed.div({
     transition: { duration: 150 }
   }
 });
+
+const PopupAnimation = posed.div({
+  enter: {
+    y: 0,
+    opacity: 1,
+    delay: 300,
+    transition: {
+      y: { type: 'spring', stiffness: 1000, damping: 15 },
+      default: { duration: 300 }
+    }
+  },
+  exit: {
+    y: 50,
+    opacity: 0,
+    transition: { duration: 150 }
+  }
+});
+
 /** 
  * withRouter HOC provides props with location, history and match objects
 */
@@ -546,13 +564,14 @@ class SnapResults extends Component {
 
         {
           this.state.showEmailScreen &&
+          !this.state.emailCaptured &&
           <div>
-            <div className="email-popup-screen">
+            <PopupAnimation className="email-popup-screen" initialPose="exit" pose="enter">
               <EmailForm isEmailScreen={true} onSubmitEmail={this.onSubmitEmail} />
               <div className="btn-close" onClick={this.closeWindow} style={{ position: `absolute`, top: `${emailScreenCloseBtnTop}` }}>
                 <img src={close_icon} alt="close" onClick={() => { this._closeEmailPopupScreen() }} />
               </div>
-            </div>
+            </PopupAnimation>
           </div>
         }
 
@@ -560,14 +579,14 @@ class SnapResults extends Component {
           this.state.emailCaptured &&
           !this.state.emailCaptureAck &&
           <div>
-            <div className="email-success-screen">
+            <PopupAnimation className="email-success-screen" initialPose="exit" pose="enter">
               <div className="success-icon" onClick={() => this._emailSuccessAcknowledged()}>
                 <img src={check_email_icon} alt="email_success" />
               </div>
               <div className="success-message">
                 Thank you. After your visit, look for an email in your inbox with links to all the works of art you've seen today.
               </div>
-            </div>
+            </PopupAnimation>
           </div>
         }
 
