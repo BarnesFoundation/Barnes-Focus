@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import { SNAP_USER_EMAIL } from './Constants';
 
 class EmailFooter extends Component {
@@ -53,7 +52,6 @@ class EmailFooter extends Component {
                 </div>
                 <div className="email-input">
                     <form onSubmit={this.submitBookMark}>
-
                         <div className="input-group">
                             <input type="email" placeholder="Email address" className='form-control' name="email" value={this.state.email} onChange={this.handleEmailInput} />
                             <div className="input-group-append">
@@ -66,8 +64,6 @@ class EmailFooter extends Component {
                                 Something doesn’t look right. <br /> Try entering your email again.
                             </div>
                         }
-
-
                     </form>
                 </div>
                 <div className="email-disclaimer small-paragraph" style={{ top: disclaimerTop }}>
