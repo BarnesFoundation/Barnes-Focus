@@ -6,7 +6,7 @@ import withOrientation from './withOrientation';
 
 import home_background from 'images/barnes-v2-landing.png';
 import barnes_logo from 'images/Barnes_logo.svg';
-import barnes_kf_logo from 'images/barnes-knight-foundation-logo.svg';
+import kf_logo from 'images/knight-foundation-logo.svg';
 import close_icon from 'images/cross.svg';
 
 import * as constants from './Constants';
@@ -146,8 +146,8 @@ class HomeComponent extends Component {
                         </button>
                     </div>
                     <div className="kf-banner">
-                        <img src={barnes_kf_logo} alt="knight_foundation_logo" className="kf-logo" />
-                        <div className="kf-text caption">The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation.</div>
+                        <img src={kf_logo} alt="knight_foundation_logo" className="kf-logo" />
+                        <div className="kf-text caption">{constants.KNIGHT_FOUNDATION_CREDIT_TEXT}</div>
                     </div>
                 </div>
                 }
