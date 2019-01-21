@@ -124,17 +124,17 @@ class Api::SnapsController < Api::BaseController
 
     ## Translates the given text to the preferred language
     def translate_text(short_description)
-      return short_description if preferred_language && preferred_language.downcase == 'en'
-      
-      # Configure language translator
-      translator = GoogleTranslate.new preferred_language
-
       # Strip unwanted content
       begin
-          document = Nokogiri::HTML(translator.translate(short_description))
-          document.remove_namespaces!
-          short_description = document.xpath("//p")[0].content
-          short_description = translator.translate(short_description) if short_description.nil?
+        document = Nokogiri::HTML(short_description)
+        document.remove_namespaces!
+        short_description = document.xpath("//p")[0].content
+
+        return short_description if preferred_language && preferred_language.downcase == 'en'
+
+        # Configure language translator
+        translator = GoogleTranslate.new preferred_language
+        short_description = translator.translate(short_description) if !short_description.nil?
       rescue Exception => error
         p error
         short_description = short_description if short_description
