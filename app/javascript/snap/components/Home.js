@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 
 import withOrientation from './withOrientation';
+import withTranslation from './withTranslation';
 
 import home_background from 'images/barnes-v2-landing.png';
 import barnes_logo from 'images/Barnes_logo.svg';
@@ -32,6 +33,7 @@ class HomeComponent extends Component {
      * @memberof HomeComponent
      */
     resetSnapApp = () => {
+        console.log('Try to reset app when home page loads.');
 
         // Get last snap timestamp from local storage
         let lastSnapTimestamp = parseInt(localStorage.getItem(constants.SNAP_LAST_TIMESTAMP));
@@ -137,6 +139,7 @@ class HomeComponent extends Component {
                 {this.state.userAtBarnes && <div className="landing-screen">
                     <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
                     <div className="user-loc-prompt">Are you at <br />the Barnes?</div>
+                    {/* <div className="user-loc-prompt">{this.props.getTranslation('Welcome_screen', 'text_1')}</div> */}
                     <div className="home-action">
                         <button className="action-btn" onClick={this.onSelectYes}>
                             <span className="action-text h2">Yes</span>
@@ -174,6 +177,7 @@ class HomeComponent extends Component {
 
 export default compose(
     withOrientation,
+    withTranslation,
     withRouter
 )(HomeComponent);
 

@@ -9,6 +9,7 @@ export const ART_WORK_INFO_URL = '/api/snaps/getArtworkInformation?imageId=';
 export const STORE_SEARCHED_RESULT_URL = '/api/snaps/storeSearchedResult';
 export const SUBMIT_BOOKMARKS_EMAIL_URL = '/api/bookmarks';
 export const SAVE_LANGUAGE_PREFERENCE_URL = '/api/bookmarks/set_language';
+export const APP_TRANSLATIONS_URL = '/api/translations';
 export const KNIGHT_FOUNDATION_CREDIT_TEXT = 'The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.';
 /**
  * snap v2 constants
