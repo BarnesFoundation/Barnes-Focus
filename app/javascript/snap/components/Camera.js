@@ -211,7 +211,6 @@ class Camera extends Component {
 
     /** Processes the completion of an image search */
     completeImageSearchRequest(searchSuccess, response) {
-
         if (searchSuccess) {
             // Navigate to results page
             this.props.history.push({ pathname: `/artwork/${response["data"]["records"][0].id}`, state: { result: response } });
