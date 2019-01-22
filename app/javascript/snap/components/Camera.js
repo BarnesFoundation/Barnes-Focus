@@ -91,7 +91,7 @@ class Camera extends Component {
             }
 
             else {
-                if (!this.matchFound) {
+                if (this.matchFound == false) {
                     this.scanner();
                 }
             }
@@ -114,7 +114,6 @@ class Camera extends Component {
         const imageBlob = await new Promise((resolve) => {
 
             canvas.toBlob(async (blob) => {
-
                 if (process.env.CROP_IMAGE === 'TRUE') {
 
                     window.URL = window.URL || window.webkitURL;
