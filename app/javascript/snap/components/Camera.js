@@ -405,6 +405,7 @@ class Camera extends Component {
         console.log('Back to scan mode');
         this.setState({ matchError: false, scanSeqId: Date.now() });
         this.capturePhotoShots();
+        requestAnimationFrame(this.drawVideoPreview);
     }
 
     render() {
