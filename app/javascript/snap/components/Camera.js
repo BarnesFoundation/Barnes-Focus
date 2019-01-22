@@ -84,42 +84,56 @@ class Camera extends Component {
         this.stopScan();
 
         // Capture a photo scan every third of a second
-        this.scan = setInterval((this.scanner), 1000 / 3);
+        this.scan = setInterval(() => {
+
+            if (this.intervalExecutions == 9) {
+                this.stopScan();
+            }
+
+            else {
+                if (this.matchFound == false) {
+                    this.scanner();
+                }
+            }
+
+        }, 1000 / 3);
     }
 
     /** Contains the logic for capturing scans */
-    scanner = () => {
+    scanner = async () => {
+
         this.intervalExecutions++;
-        if (this.intervalExecutions == 9) {
-            this.stopScan();
-        }
-        // Only capture if a match hasn't already been found
-        if (!this.matchFound) {
 
-            // Get the the present image in the canvas and crop the image
-            let canvas = this.getVideoCanvas();
+        // Get image in canvas
+        let canvas = this.getVideoCanvas();
 
-            if (!canvas) return null;
+        if (!canvas) return null;
 
-            canvas.toBlob(async (imageBlob) => {
+        // Get the blob from canvas
+        let start = Date.now();
+        const imageBlob = await new Promise((resolve) => {
 
+            canvas.toBlob(async (blob) => {
                 if (process.env.CROP_IMAGE === 'TRUE') {
 
                     window.URL = window.URL || window.webkitURL;
-                    let imageUri = window.URL.createObjectURL(imageBlob);
-                    let imageCrop = await cropPhoto(imageUri);
+                    let imageUri = window.URL.createObjectURL(blob);
+                    let imageBlob = await cropPhoto(imageUri);
 
                     window.URL.revokeObjectURL(imageUri);
-                    const requestConfig = this.sr.prepareRequest(imageCrop, this.state.scanSeqId);
-                    this.submitSearchRequest(requestConfig);
+                    resolve(imageBlob);
                 }
 
                 else {
-                    const requestConfig = this.sr.prepareRequest(imageCrop, this.state.scanSeqId);
-                    this.submitSearchRequest(requestConfig);
+                    resolve(blob);
                 }
             }, 'image/jpeg');
-        }
+        });
+        let end = Date.now();
+
+        console.log('Blob creation time: ' + (end - start) + ' ms');
+        const requestConfig = this.sr.prepareRequest(imageBlob, this.state.scanSeqId);
+        this.submitSearchRequest(requestConfig);
     }
 
     /** Submits the image search request to the server */
@@ -196,7 +210,6 @@ class Camera extends Component {
 
     /** Processes the completion of an image search */
     completeImageSearchRequest(searchSuccess, response) {
-
         if (searchSuccess) {
             // Navigate to results page
             this.props.history.push({ pathname: `/artwork/${response["data"]["records"][0].id}`, state: { result: response } });
