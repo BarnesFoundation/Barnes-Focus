@@ -218,6 +218,15 @@ class Camera extends Component {
 
     async componentDidMount() {
         console.log('camera >> componentDidMount');
+        let previewBox = this.vpreview.getBoundingClientRect();
+
+        this.cropRect = {
+            x: Math.floor(previewBox.x),
+            y: Math.floor(previewBox.y),
+            width: Math.floor(previewBox.width),
+            height: Math.floor(previewBox.height)
+        }
+
         // Fetch the device camera
         try {
             const videoStream = await navigator.mediaDevices.getUserMedia({
@@ -277,10 +286,8 @@ class Camera extends Component {
 
     /** Gets the video drawn onto the canvas */
     getVideoCanvas = () => {
-
         // Get the canvas
         let canvas = this.getCanvas();
-
         if (!this.video || !canvas) return null;
 
         const context = canvas.getContext("2d");
@@ -303,12 +310,10 @@ class Camera extends Component {
             if (x > 0 && y > 0) {
                 context.drawImage(tempCanvas, Math.floor(x), Math.floor(y), canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
             }
-
             else {
                 context.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
             }
         }
-
         else {
             context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
         }
@@ -336,37 +341,50 @@ class Camera extends Component {
         return canvas;
     }
 
+    /** Return a temporary canvas and context for drawing the video */
+    getTempPreviewCanvas = () => {
+        const rect = this.video.getBoundingClientRect();
+        if (!this.tempCanvas) {
+            let tempCanvas = document.createElement('canvas');
+            let tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = rect.width;
+            tempCanvas.height = rect.height;
+
+            this.tempCanvas = tempCanvas;
+            this.tempCtx = tempCtx;
+        }
+        const { tempCanvas, tempCtx } = this;
+        return { tempCanvas, tempCtx };
+    }
+    /** Returns the preview canvas and its context for drawing preview */
+    getPreviewCanvas = () => {
+        if (!this.previewCanvas) {
+            let previewCanvas = this.vpreview;
+            let previewContext = previewCanvas.getContext('2d');
+            previewCanvas.width = this.cropRect.width;
+            previewCanvas.height = this.cropRect.height;
+
+            this.previewCanvas = previewCanvas;
+            this.previewContext = previewContext;
+        }
+
+        const { previewCanvas, previewContext } = this;
+        return { previewCanvas, previewContext };
+    }
+
     /** Draws the portion of the video visible within the preview onto a canvas, in a loop. */
     drawVideoPreview = () => {
         if (!this.vpreview) return null;
 
-        let previewCanvas = this.vpreview;
-        let previewContext = previewCanvas.getContext('2d');
-        let previewBox = this.vpreview.getBoundingClientRect();
+        let { previewCanvas, previewContext } = this.getPreviewCanvas();
+        let { tempCanvas, tempCtx } = this.getTempPreviewCanvas();
 
-        let rect = this.video.getBoundingClientRect();
-        let tempCanvas = document.createElement('canvas');
-        let tempCtx = tempCanvas.getContext('2d');
-
-        // Draw the video onto a temporary canvas
-        tempCanvas.width = rect.width;
-        tempCanvas.height = rect.height;
         tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
-
-        this.cropRect = {
-            x: Math.floor(previewBox.x),
-            y: Math.floor(previewBox.y),
-            width: Math.floor(previewBox.width),
-            height: Math.floor(previewBox.height)
-        }
-
-        previewCanvas.width = this.cropRect.width;
-        previewCanvas.height = this.cropRect.height;
-
         previewContext.drawImage(tempCanvas, this.cropRect.x, this.cropRect.y, this.cropRect.width, this.cropRect.height, 0, 0, previewCanvas.width, previewCanvas.height);
 
-        requestAnimationFrame(this.drawVideoPreview);
-
+        setTimeout(() => {
+            requestAnimationFrame(this.drawVideoPreview);
+        }, 10);
     }
 
     /** Transitions the alert screen back to camera focus when scan button is clicked */
