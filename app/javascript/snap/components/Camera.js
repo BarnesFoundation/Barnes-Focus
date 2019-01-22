@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 import withOrientation from './withOrientation';
+import withTranslation from './withTranslation';
 import scan_button from 'images/scan-button.svg';
 import axios from 'axios';
 import * as constants from './Constants';
@@ -273,8 +274,8 @@ class Camera extends Component {
                     this.track = this.state.videoStream.getVideoTracks()[0];
                     this.camera_capabilities = this.track.getCapabilities();
                     this.camera_settings = this.track.getSettings();
-                    requestAnimationFrame(this.drawVideoPreview);
                     this.capturePhotoShots();
+                    requestAnimationFrame(this.drawVideoPreview);
                 })
                 .catch((error) => {
                     console.log('Cannot auto play video stream! ' + error);
@@ -369,28 +370,20 @@ class Camera extends Component {
         const { tempCanvas, tempCtx } = this;
         return { tempCanvas, tempCtx };
     }
-    /** Returns the preview canvas and its context for drawing preview */
-    getPreviewCanvas = () => {
-        if (!this.previewCanvas) {
-            let previewCanvas = this.vpreview;
-            let previewContext = previewCanvas.getContext('2d');
-            previewCanvas.width = this.cropRect.width;
-            previewCanvas.height = this.cropRect.height;
-
-            this.previewCanvas = previewCanvas;
-            this.previewContext = previewContext;
-        }
-
-        const { previewCanvas, previewContext } = this;
-        return { previewCanvas, previewContext };
-    }
 
     /** Draws the portion of the video visible within the preview onto a canvas, in a loop. */
     drawVideoPreview = () => {
         if (!this.vpreview) return null;
 
-        let { previewCanvas, previewContext } = this.getPreviewCanvas();
         let { tempCanvas, tempCtx } = this.getTempPreviewCanvas();
+
+        let previewCanvas = this.vpreview;
+        let previewContext = previewCanvas.getContext('2d');
+        previewCanvas.width = this.cropRect.width;
+        previewCanvas.height = this.cropRect.height;
+
+        this.previewCanvas = previewCanvas;
+        this.previewContext = previewContext;
 
         tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
         previewContext.drawImage(tempCanvas, this.cropRect.x, this.cropRect.y, this.cropRect.width, this.cropRect.height, 0, 0, previewCanvas.width, previewCanvas.height);
@@ -404,8 +397,6 @@ class Camera extends Component {
     handleScan = () => {
         console.log('Back to scan mode');
         this.setState({ matchError: false, scanSeqId: Date.now() });
-        this.capturePhotoShots();
-        requestAnimationFrame(this.drawVideoPreview);
     }
 
     render() {
@@ -417,9 +408,7 @@ class Camera extends Component {
             transform: `scale(1.2)`
         }
 
-
         return (
-
             <div className="camera-container" >
                 <div className="camera">
                     {
@@ -433,7 +422,6 @@ class Camera extends Component {
                                 {
                                     !matchError &&
                                     <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
-
                                 }
                             </ReactCSSTransitionGroup>
 
@@ -444,7 +432,7 @@ class Camera extends Component {
                                 {matchError &&
                                     <div id="no-match-overlay" className="no-match-overlay">
                                         <div className="hint h2">
-                                            <span>No results found. <br /> Use the scan button to <br /> focus on a work of art.</span>
+                                            <span>{this.props.getTranslation('No_Result_page', 'text_1')} <br /> {this.props.getTranslation('No_Result_page', 'text_2')}</span>
                                         </div>
                                         <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', bottom: '37px' }}>
                                             <img src={scan_button} alt="scan" />
@@ -465,5 +453,6 @@ class Camera extends Component {
 
 export default compose(
     withOrientation,
+    withTranslation,
     withRouter
 )(Camera);
