@@ -138,14 +138,14 @@ class HomeComponent extends Component {
                 <img src={home_background} alt="home_background" style={{ width: screen.width, height: screen.height }} />
                 {this.state.userAtBarnes && <div className="landing-screen">
                     <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
-                    <div className="user-loc-prompt">Are you at <br />the Barnes?</div>
-                    {/* <div className="user-loc-prompt">{this.props.getTranslation('Welcome_screen', 'text_1')}</div> */}
+                    {/* <div className="user-loc-prompt">Are you at <br />the Barnes?</div> */}
+                    <div className="user-loc-prompt">{this.props.getTranslation('Welcome_screen', 'text_1')}</div>
                     <div className="home-action">
                         <button className="action-btn" onClick={this.onSelectYes}>
-                            <span className="action-text h2">Yes</span>
+                            <span className="action-text h2">{this.props.getTranslation('Welcome_screen', 'text_2')}</span>
                         </button>
                         <button className="action-btn" onClick={this.onSelectNo}>
-                            <span className="action-text h2">No</span>
+                            <span className="action-text h2">{this.props.getTranslation('Welcome_screen', 'text_3')}</span>
                         </button>
                     </div>
                     <div className="kf-banner">
@@ -158,10 +158,11 @@ class HomeComponent extends Component {
                     <div>
                         <div className="app-usage-alert h2">
                             <div className="app-usage-msg">
-                                The Barnes Focus app is meant for use at the Barnes. Please come visit us soon.
+                                <span>{this.props.getTranslation('Visit_soon', 'text_1')}</span>
+                                <span> {this.props.getTranslation('Visit_soon', 'text_2')}</span>
                             </div>
                             <div className="visit-online-link">
-                                <a href="https://www.barnesfoundation.org/" target="_blank">Visit us online</a>
+                                <a href="https://www.barnesfoundation.org/" target="_blank">{this.props.getTranslation('Visit_soon', 'text_3')}</a>
                             </div>
                         </div>
                         <div className="btn-close" onClick={this.navigateBackToHome}>
