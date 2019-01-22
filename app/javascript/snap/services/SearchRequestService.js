@@ -12,11 +12,11 @@ class SearchRequestService {
         let url = constants.CATCHOOM_REQUEST_URL;
         let headers = { 'Content-Type': 'multipart/form-data' };
 
-        // Append the form data
+        // Set the form data
         let data = new FormData();
-        data.append('token', token);
-        data.append('image', imageData, 'temp_image.jpg');
-        data.append('scanSeqId', scanSeqId);
+        data.set('token', token);
+        data.set('image', imageData, 'temp_image.jpg');
+        data.set('scanSeqId', scanSeqId);
 
         const axiosConfig = {
             method: 'post',
