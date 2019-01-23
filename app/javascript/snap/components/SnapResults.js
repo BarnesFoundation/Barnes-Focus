@@ -14,7 +14,7 @@ import InRoomSlider from './Slider';
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
 import Footer from './Footer';
-import Popover from 'react-simple-popover';
+import { Popover, PopoverBody } from 'reactstrap';
 
 import close_icon from 'images/cross.svg';
 import google_logo from 'images/google_translate.svg';
@@ -382,13 +382,13 @@ class SnapResults extends Component {
         })
         .catch((error) => console.log('Error sharing', error));
     } else {
-      this.setState({ sharePopoverIsOpen: true });
+      this.toggleShareModal();
     }
 
   }
 
-  closeShareModal = () => {
-    this.setState({ sharePopoverIsOpen: false });
+  toggleShareModal = () => {
+    this.setState({ sharePopoverIsOpen: !this.state.sharePopoverIsOpen });
   }
 
   resetExperience = () => {
@@ -494,24 +494,22 @@ class SnapResults extends Component {
                         </div>
                       }
                     </div>
-                    <div id="share-it" className="btn-share-result" ref="target" onClick={this._onClickShare}>
+
+                    <div id="share-it" className="btn-share-result" ref={(node) => { this.target = node }} onClick={this._onClickShare}>
                       <img src={share} alt="share" />
                       <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
                     </div>
-                    <Popover
-                      placement='top'
-                      container={this}
-                      target={this.refs.target}
-                      show={this.state.sharePopoverIsOpen}
-                      onHide={this.closeShareModal} >
-                      <div className="share d-flex justify-content-around">
-                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
-                          <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
-                        </a>
-                        <a data-id={constants.SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
-                          <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
-                        </a>
-                      </div>
+                    <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
+                      <PopoverBody>
+                        <div className="share">
+                          <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                            <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
+                          </a>
+                          <a data-id={constants.SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
+                            <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
+                          </a>
+                        </div>
+                      </PopoverBody>
                     </Popover>
                   </div>
                 </Child>
