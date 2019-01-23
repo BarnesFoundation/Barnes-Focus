@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Slider from 'react-slick';
 import CrossfadeImage from 'react-crossfade-image';
+import withTranslation from './withTranslation';
 
 const sliderSettings = {
     className: "slider-container",
@@ -103,7 +104,7 @@ class InRoomSlider extends Component {
                     {/* <img src={this.props.alsoInRoomResults[this.state.activeSlideIndex].art_url + this.sliderBackgroundCropParams} /> */}
                 </div>
 
-                <div className="slider-header h2">Also in this Room</div>
+                <div className="slider-header h2">{this.props.getTranslation('Result_page', 'text_2')}</div>
                 <div className="slider-container">
                     <Slider {...sliderSettings} beforeChange={this.beforeChangeHandler}>
                         {
@@ -118,4 +119,4 @@ class InRoomSlider extends Component {
     }
 }
 
-export default InRoomSlider;
+export default withTranslation(InRoomSlider);

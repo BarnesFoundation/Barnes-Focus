@@ -14,7 +14,6 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 class Camera extends Component {
 
     sr;
-    translation;
     snapAttempts;
 
     matchFound;
@@ -32,9 +31,6 @@ class Camera extends Component {
         super();
 
         this.sr = new SearchRequestService();
-
-        // Get from local storage
-        this.translation = localStorage.getItem(constants.SNAP_LANGUAGE_TRANSLATION);
         this.snapAttempts = localStorage.getItem(constants.SNAP_ATTEMPTS) || 0;
 
         // Set state variables
@@ -44,7 +40,6 @@ class Camera extends Component {
             showVideo: true,
             searchInProgress: false,
             snapAttempts: this.snapAttempts,
-            translation: (this.translationObj) ? JSON.parse(this.translationObj) : null,
             cameraPermission: false,
             scanSeqId: Date.now(),
             matchError: false
