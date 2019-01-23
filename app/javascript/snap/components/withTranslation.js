@@ -1,8 +1,6 @@
 
 import React from 'react';
-import axios from 'axios';
 import { SearchRequestService } from '../services/SearchRequestService';
-import { APP_TRANSLATIONS_URL } from './Constants';
 
 const withTranslation = WrappedComponent => {
     return class WithTranslation extends React.Component {
@@ -32,7 +30,6 @@ const withTranslation = WrappedComponent => {
             return (
                 <div>
                     {this.state.loaded && <WrappedComponent {...this.props} getTranslation={this.getTranslation} />}
-
                 </div>
             );
         }

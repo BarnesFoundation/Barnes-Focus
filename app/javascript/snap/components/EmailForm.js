@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { SNAP_USER_EMAIL } from './Constants';
 
+import withTranslation from './withTranslation';
+
 class EmailFooter extends Component {
 
     constructor(props) {
@@ -48,12 +50,12 @@ class EmailFooter extends Component {
         return (
             <div className="email-container">
                 <div className="email-head h2">
-                    To receive all the artworks you are seeing today, please enter your email address.
+                    {this.props.getTranslation('Bookmark_capture', 'text_1')}
                 </div>
                 <div className="email-input">
                     <form onSubmit={this.submitBookMark}>
                         <div className="input-group">
-                            <input type="email" placeholder="Email address" className='form-control' name="email" value={this.state.email} onChange={this.handleEmailInput} />
+                            <input type="email" placeholder={this.props.getTranslation('Bookmark_capture', 'text_2')} className='form-control' name="email" value={this.state.email} onChange={this.handleEmailInput} />
                             <div className="input-group-append">
                                 <button className="btn btn-outline-secondary" type="button" onClick={() => this._saveEmail()}>Save</button>
                             </div>
@@ -67,11 +69,11 @@ class EmailFooter extends Component {
                     </form>
                 </div>
                 <div className="email-disclaimer small-paragraph" style={{ top: disclaimerTop }}>
-                    We will only use your email to send you the links to the works you've seen. You won't be joined to any other list.
+                    {this.props.getTranslation('Bookmark_capture', 'text_3')}
                 </div>
             </div>
         );
     }
 }
 
-export default EmailFooter;
+export default withTranslation(EmailFooter);

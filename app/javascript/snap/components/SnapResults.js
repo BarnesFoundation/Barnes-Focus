@@ -6,7 +6,7 @@ import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-de
 
 import * as constants from './Constants';
 import withOrientation from './withOrientation';
-import axios from 'axios';
+import withTranslation from './withTranslation';
 import share from 'images/share.svg';
 import scan_button from 'images/scan-button.svg';
 import check_email_icon from 'images/check_email.svg';
@@ -40,7 +40,7 @@ const Container = posed.div({
     y: 0,
     opacity: 1,
     scale: 1,
-    staggerChildren: 400,
+    //staggerChildren: 100,
     transition: {
       duration: 200,
       ease: "linear"
@@ -83,8 +83,6 @@ class SnapResults extends Component {
     super(props);
     console.log('SnapResults >> constructor');
 
-    let translationObj = localStorage.getItem(constants.SNAP_LANGUAGE_TRANSLATION);
-
     this.sr = new SearchRequestService();
 
     this.langOptions = [
@@ -100,7 +98,7 @@ class SnapResults extends Component {
     ];
 
     this.state = {
-      ...props.location.state,  // these properties are passed on from Camera component. Contains {result, snapAttempts}
+      ...props.location.state,  // these properties are passed on from Camera component. Contains {result}
       sharePopoverIsOpen: false,
       showEmailScreen: false,
       emailCaptured: false,
@@ -125,8 +123,7 @@ class SnapResults extends Component {
       errors: {
         email: false
       },
-      selectedLanguage: this.langOptions[0],
-      translation: (translationObj) ? JSON.parse(translationObj) : null
+      selectedLanguage: this.langOptions[0]
     }
 
     this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
@@ -142,7 +139,6 @@ class SnapResults extends Component {
         let cropParams = '?crop=faces,entropy&fit=crop&w=' + w;
 
         const art_obj = search_result["data"]["records"][0];
-        //console.log(art_obj);
         result['id'] = art_obj.id;
         result['title'] = art_obj.title;
         result['shortDescription'] = art_obj.shortDescription;
@@ -400,7 +396,6 @@ class SnapResults extends Component {
     localStorage.removeItem(constants.SNAP_USER_EMAIL);
     localStorage.removeItem(constants.SNAP_ATTEMPTS);
     localStorage.removeItem(constants.SNAP_LANGUAGE_TRANSLATION);
-    this.setState({ translation: null });
   }
 
   onSubmitEmail = (email) => {
@@ -501,7 +496,7 @@ class SnapResults extends Component {
                     </div>
                     <div id="share-it" className="btn-share-result" ref="target" onClick={this._onClickShare}>
                       <img src={share} alt="share" />
-                      <span className="text-share">Share</span>
+                      <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
                     </div>
                     <Popover
                       placement='top'
@@ -584,7 +579,7 @@ class SnapResults extends Component {
                 <img src={check_email_icon} alt="email_success" />
               </div>
               <div className="success-message">
-                Thank you. After your visit, look for an email in your inbox with links to all the works of art you've seen today.
+                {this.props.getTranslation('Bookmark_capture', 'text_4')}
               </div>
             </PopupAnimation>
           </div>
@@ -597,5 +592,6 @@ class SnapResults extends Component {
 
 export default compose(
   withOrientation,
+  withTranslation,
   withRouter
 )(SnapResults);
