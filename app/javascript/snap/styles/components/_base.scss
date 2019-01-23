@@ -61,6 +61,19 @@ html, body {
   opacity: 0.65; 
 }
 
+.popover {
+    max-width: 120px !important;
+    width: 120px !important;
+    padding: 5px;
+
+    .share {
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+
+
 h1 {
     font-size: 2.25rem;
     margin-bottom: 0.78125rem;
