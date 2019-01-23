@@ -32,19 +32,6 @@ class LanguageDropdown extends Component {
         document.removeEventListener("click", this.hide);
     }
 
-    renderListItems = () => {
-        var items = [];
-        for (var i = 0; i < this.props.langOptions.length; i++) {
-            var item = this.props.langOptions[i];
-            items.push(
-                <div key={item.code} onClick={() => this.selectItem(item)}>
-                    <span style={{ paddingRight: 10 }}>{item.name} </span>{item.selected && <i class="fa fa-check" aria-hidden="true"></i>}
-                </div>
-            );
-        }
-        return items;
-    }
-
     render = () => {
         return (
             <div className="dd-wrapper">
