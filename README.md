@@ -10,6 +10,20 @@
 * Migration: `rake db:migrate`
 * Note: You must have a PSQL server running for the above rake commands to run successfully
 
+## About rake db:seed
+In V1, for in-app translations, we used to run `rake db:seed` command followed by `rake db:migrate` (on new env). This did few things for us:
+ - Populate `translations` database table
+
+With V2, since most of the screens are new and so are texts on screen, `rake db:seed` is no longer required. Here's what we can do:
+
+### What if I have translations table already populated with V1 data?
+In case, if your `translations` table contains data from `rake db:seed` command. Here's what you can do:
+ - From rails console: `Translation.delete_all`
+ - Run this rake task: `rake data:regenrate_translations`
+
+### What if I am setting up Barnes App in new ENV?
+In this case, we just have to run `rake data:regenrate_translations`
+
 # To Start Server in background
 `foreman start -f Procfile.dev -p 3000`
 
