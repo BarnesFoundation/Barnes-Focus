@@ -266,7 +266,7 @@ class SnapResults extends Component {
     //console.log('Results container bottom :: ' + resultsContainerBottom + ' && blur:: ' + blur);
 
     /** animate slider background and scan button based on results container bottom position */
-    if (resultsContainerBottom < 540) {
+    if (resultsContainerBottom <= 540) {
       this.setState({
         slideOverStyle: {
           position: 'fixed',
@@ -429,6 +429,8 @@ class SnapResults extends Component {
   render() {
     let resultsContainerStyle = ((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) ? { filter: 'blur(10px)', transform: 'scale(1.1)' } : {};
     let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
+    let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `60px`, left: `calc(50% - 30px)` }
+
     if (this.state.searchResults.length === 0) {
       return null;
     }
@@ -514,7 +516,7 @@ class SnapResults extends Component {
                   </div>
                 </Child>
 
-                {this.state.showSliderOverlay && <div id="slider-overlay" style={{ height: '540px', width: '100%', background: 'transparent', content: '' }}></div>}
+                {this.state.showSliderOverlay && <div id="slider-overlay" style={{ height: '540px', width: '100%', background: 'transparent' }}></div>}
 
                 {
                   this.state.alsoInRoomResults.length > 0 &&
@@ -546,7 +548,7 @@ class SnapResults extends Component {
                   <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} />
                 }
 
-                <Footer />
+                <Footer footerStyle={footerStyle} />
 
               </div>
 

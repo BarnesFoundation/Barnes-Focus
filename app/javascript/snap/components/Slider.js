@@ -55,11 +55,11 @@ class InRoomSlider extends Component {
         this.clientY = e.touches[0].clientY - this.firstClientY;
 
         // Vertical scrolling does not work when you start swiping horizontally.
-        if (Math.abs(this.clientX) > minValue && e.cancelable) {
-            e.preventDefault();
-            e.returnValue = false;
-            return false;
-        }
+        // if (Math.abs(this.clientX) > minValue && e.cancelable) {
+        //     e.preventDefault();
+        //     e.returnValue = false;
+        //     return false;
+        // }
 
 
     }
