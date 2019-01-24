@@ -10,7 +10,7 @@ class ImageUploadJob < ApplicationJob
       @photo = @album.photos.find_by id: photo_id
 
       if @photo
-        unless @photo.searched_image_blob.blank?
+        if !@photo.searched_image_blob.blank?
           image_data = Base64.decode64(@photo.searched_image_blob['data:image/jpeg;base64,'.length .. -1])
           file_name = "#{Rails.root.join('tmp') }/#{SecureRandom.hex}.png"
           stored_image_url = ''
