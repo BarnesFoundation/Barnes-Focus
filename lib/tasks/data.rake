@@ -173,4 +173,52 @@ namespace :data do
       unique_identifier: 'text_2'
     )
   end
+
+  desc "adding more texts to translations"
+  task add_more_to_translations: :environment do
+    screen_1 = Translation.find_by(screen_text: "Welcome_screen", display_order: 1)
+    Translation.create(
+      screen_text: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+      parent_id: screen_1.id,
+      english_translation: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+      unique_identifier: 'text_4'
+    )
+
+    screen_5 = Translation.find_by(screen_text: "Bookmark_capture", display_order: 5)
+    Translation.create(
+      screen_text: "Something doesn't look right. Try entering your email again.",
+      parent_id: screen_5.id,
+      english_translation: "Something doesn't look right. Try entering your email again.",
+      unique_identifier: 'text_5'
+    )
+
+    screen_6 = Translation.find_or_create_by(screen_text: "About", display_order: 6)
+    Translation.create(
+      screen_text: "About",
+      parent_id: screen_6.id,
+      english_translation: "About",
+      unique_identifier: 'text_1'
+    )
+
+    Translation.create(
+      screen_text: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+      parent_id: screen_6.id,
+      english_translation: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+      unique_identifier: 'text_2'
+    )
+
+    Translation.create(
+      screen_text: "Version 2.0",
+      parent_id: screen_6.id,
+      english_translation: "Version 2.0",
+      unique_identifier: 'text_3'
+    )
+
+    Translation.create(
+      screen_text: "Terms & Conditions",
+      parent_id: screen_6.id,
+      english_translation: "Terms & Conditions",
+      unique_identifier: 'text_4'
+    )
+  end
 end
