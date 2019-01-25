@@ -29,7 +29,7 @@ class HomeComponent extends Component {
 
     /**
      * Check if last_snap_timestamp is more than 24 hrs. If true, reset all user preferences.
-     * 
+     *
      * @memberof HomeComponent
      */
     resetSnapApp = () => {
@@ -55,22 +55,21 @@ class HomeComponent extends Component {
         }
     }
 
-    /* checkForGetUserMedia = () => {
-        console.log('iOS was detected');
-        ReactModal.setAppElement('#app');
-
+    checkForGetUserMedia = () => {
+      // ReactModal.setAppElement('#app');
+      
+        let iOSVersion = parseInt(osVersion);
         // navigator.mediaDevices.getUserMedia() is only supported on iOS > 11.0 and only on Safari (not Chrome, Firefox, etc.)
-        if (isIOS && (osVersion <= 11.0)) {
+        if ((iOSVersion <= 11.0)) {
             if (!isSafari) {
-                
             }
         }
 
         // If they're not on iOS 11, it doesn't matter what browser they're using, navigator.mediaDevices.getUserMedia() will return undefined
-        else {
-            
-        } 
-    } */
+        // else {
+        //
+        // }
+    }
 
     componentWillMount() {
         // Reset barnesfoc.us application if last_snap_timestamp is more than 24 hrs
@@ -78,6 +77,10 @@ class HomeComponent extends Component {
     }
 
     componentDidMount() {
+        if (isIOS){
+          this.checkForGetUserMedia();
+        }
+
         if ('orientation' in screen) {
             screen.orientation.addEventListener('change', (e) => {
                 console.log('current orientation :: ' + screen.orientation.type);
@@ -163,4 +166,3 @@ export default compose(
     withTranslation,
     withRouter
 )(HomeComponent);
-
