@@ -28,39 +28,34 @@ class InRoomSlider extends Component {
 
         this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
         this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
-
-        /* this.swipeX;
-        this.firstClientX */
+        this.touchThreshold = 5;
     }
 
     componentDidMount() {
-        window.addEventListener('touchstart', this._touchStart);
-        window.addEventListener('touchmove', this._onTouchMove, { passive: false });
+        const slider = document.getElementById('aitr-slider');
+        slider.addEventListener('touchstart', this._touchStart);
+        slider.addEventListener('touchmove', this._onTouchMove, { passive: false });
     }
 
     componentWillUnmount() {
-        window.removeEventListener('touchstart', this._touchStart);
-        window.removeEventListener('touchmove', this._onTouchMove, { passive: false });
+        const slider = document.getElementById('aitr-slider');
+        slider.removeEventListener('touchstart', this._touchStart);
+        slider.removeEventListener('touchmove', this._onTouchMove, { passive: false });
     }
 
     _touchStart = (e) => {
         this.firstClientX = e.touches[0].clientX;
-        this.firstClientY = e.touches[0].clientY;
     }
 
     _onTouchMove = (e) => {
-        const minValue = 5; // threshold
-
-        this.clientX = e.touches[0].clientX - this.firstClientX;
-        this.clientY = e.touches[0].clientY - this.firstClientY;
-
-        // Vertical scrolling does not work when you start swiping horizontally.
-        // if (Math.abs(this.clientX) > minValue && e.cancelable) {
-        //     e.preventDefault();
-        //     e.returnValue = false;
-        //     return false;
-        // }
-
+        // only prevent touch on horizontal scroll (for horizontal carousel)
+        // this allows the users to scroll vertically past the carousel when touching the carousel
+        // this also stabilizes the horizontal scroll somewhat, decreasing vertical scroll while horizontal scrolling
+        const clientX = e.touches[0].clientX - this.firstClientX;
+        const horizontalScroll = Math.abs(clientX) > this.touchThreshold;
+        if (horizontalScroll && e.cancelable) {
+            e.preventDefault();
+        }
 
     }
 
@@ -105,7 +100,7 @@ class InRoomSlider extends Component {
                 </div>
 
                 <div className="slider-header h2">{this.props.getTranslation('Result_page', 'text_2')}</div>
-                <div className="slider-container">
+                <div className="slider-container" id="aitr-slider">
                     <Slider {...sliderSettings} beforeChange={this.beforeChangeHandler}>
                         {
                             this.props.alsoInRoomResults.map((record, index) =>
