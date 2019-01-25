@@ -63,7 +63,7 @@ class EmailFooter extends Component {
                         {
                             this.state.errors.email === true &&
                             <div className="email-input-error caption">
-                                Something doesn’t look right. <br /> Try entering your email again.
+                                {this.props.getTranslation('Bookmark_capture', 'text_5')}
                             </div>
                         }
                     </form>

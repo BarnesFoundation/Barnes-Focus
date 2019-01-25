@@ -225,6 +225,21 @@ class Camera extends Component {
 
     }
 
+    playVideo = () => {
+        this.video.play()
+            .then(() => {
+
+                this.track = this.state.videoStream.getVideoTracks()[0];
+                this.camera_capabilities = this.track.getCapabilities();
+                this.camera_settings = this.track.getSettings();
+                this.capturePhotoShots();
+                requestAnimationFrame(this.drawVideoPreview);
+            })
+            .catch((error) => {
+                console.log('Cannot auto play video stream! ' + error);
+            });
+    }
+
     async componentDidMount() {
         console.log('camera >> componentDidMount');
         let previewBox = this.vpreview.getBoundingClientRect();
@@ -263,19 +278,9 @@ class Camera extends Component {
 
             this.video.srcObject = this.state.videoStream;
 
-            this.video.play()
-                .then(() => {
-
-                    this.track = this.state.videoStream.getVideoTracks()[0];
-                    this.camera_capabilities = this.track.getCapabilities();
-                    this.camera_settings = this.track.getSettings();
-                    this.capturePhotoShots();
-                    requestAnimationFrame(this.drawVideoPreview);
-                })
-                .catch((error) => {
-                    console.log('Cannot auto play video stream! ' + error);
-                });
-
+            setTimeout(() => {
+                this.playVideo();
+            }, 50);
 
             // Reset snap attemps count if last_snap_timestamp is 12 hours or before.
             this.resetSnapCounter();
