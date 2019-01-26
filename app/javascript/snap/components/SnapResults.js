@@ -157,6 +157,8 @@ class SnapResults extends Component {
         roomRecords = search_result["data"]["roomRecords"];
       }
 
+      this.slideOverAnimationThreshold = (roomRecords.length > 0) ? 540 : 0;
+
       this.setState({ searchResults: [].concat(result), alsoInRoomResults: roomRecords });
     } else {
       this.setState({ error: "No records found!" });
@@ -266,7 +268,7 @@ class SnapResults extends Component {
     //console.log('Results container bottom :: ' + resultsContainerBottom);
 
     /** animate slider background and scan button based on results container bottom position */
-    if (resultsContainerBottom <= 540) {
+    if (resultsContainerBottom <= this.slideOverAnimationThreshold) {
       this.setState({
         slideOverStyle: {
           position: 'fixed',
@@ -279,13 +281,15 @@ class SnapResults extends Component {
       })
     }
     else {
+      let scanBtnStyle = { position: 'absolute' };
+      if (this.slideOverAnimationThreshold === 0) {
+        scanBtnStyle.bottom = 0;
+      }
       this.setState({
         slideOverStyle: {
           position: 'relative'
         },
-        scanBtnStyle: {
-          position: 'absolute'
-        },
+        scanBtnStyle: scanBtnStyle,
         showSliderOverlay: false
       })
     }
@@ -517,21 +521,15 @@ class SnapResults extends Component {
                   </div>
                 </Child>
 
-                {this.state.showSliderOverlay && <div id="slider-overlay"></div>}
+                {
+                  this.state.showSliderOverlay &&
+                  this.state.alsoInRoomResults.length > 0 &&
+                  <div id="slider-overlay"></div>}
 
                 {
                   this.state.alsoInRoomResults.length > 0 &&
                   <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
                     <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt}></InRoomSlider>
-                  </div>
-                }
-
-                {
-                  this.state.alsoInRoomResults.length === 0 &&
-                  <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
-                    <div className="slider-background" style={{ filter: `blur(20px)` }}>
-                      <img src={this.state.searchResults[0].url + this.sliderBackgroundCropParams} />
-                    </div>
                   </div>
                 }
 
