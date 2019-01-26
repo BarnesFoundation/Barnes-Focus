@@ -99,6 +99,16 @@ p {
     font-family: 'Calibre-Regular';
 } 
 
+.landscape-wrapper {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    filter: blur(25px);
+    transform: scale(1.2);
+}
+
 .scan-wrapper {
     top:0;
     right:0;
