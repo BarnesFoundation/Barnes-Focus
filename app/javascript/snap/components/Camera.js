@@ -226,7 +226,7 @@ class Camera extends Component {
     }
 
     playVideo = () => {
-        this.video.play()
+        this.video && this.video.play()
             .then(() => {
 
                 this.track = this.state.videoStream.getVideoTracks()[0];
@@ -292,10 +292,6 @@ class Camera extends Component {
         this.video.pause();
         this.video.removeAttribute('src');
         this.video.load();
-        this.setState({
-            videoStream: null,
-            showVideo: false
-        });
     }
 
     /** Gets the video drawn onto the canvas */

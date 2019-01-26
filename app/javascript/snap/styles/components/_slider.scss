@@ -1,5 +1,15 @@
+#slider-overlay {
+    height: 540px;
+    width: 100%;
+    background: transparent; 
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+}
+
 .slider-wrapper {
     height: 540px;
+    width: 100%;
     overflow: hidden;
     position: relative;
 
