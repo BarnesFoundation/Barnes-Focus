@@ -524,7 +524,8 @@ class SnapResults extends Component {
                 {
                   this.state.showSliderOverlay &&
                   this.state.alsoInRoomResults.length > 0 &&
-                  <div id="slider-overlay"></div>}
+                  <div id="slider-overlay"></div>
+                }
 
                 {
                   this.state.alsoInRoomResults.length > 0 &&

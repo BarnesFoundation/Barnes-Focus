@@ -95,21 +95,6 @@ class HomeComponent extends Component {
         this.resetSnapApp();
     }
 
-    componentDidMount() {
-        if ('orientation' in screen) {
-            screen.orientation.addEventListener('change', (e) => {
-                console.log('current orientation :: ' + screen.orientation.type);
-                if (screen.orientation.type !== 'portrait-primary') {
-                    console.log('The app is best viewed on Portrait mode');
-                } else {
-
-                }
-            });
-        } else {
-            console.log('Orientation API not supported');
-        }
-    }
-
     onSelectYes = async () => {
         try {
             // Attempt to access device camera
