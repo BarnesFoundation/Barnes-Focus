@@ -8,7 +8,10 @@ import Camera from '../components/Camera';
 import SnapResults from '../components/SnapResults';
 import * as constants from '../components/Constants';
 
-const RouteContainer = posed.div();
+const RouteContainer = posed.div({
+    enter: { opacity: 1, delay: 0, beforeChildren: true },
+    exit: { opacity: 0.99 }
+});
 
 const Routes = () => (
     <Route

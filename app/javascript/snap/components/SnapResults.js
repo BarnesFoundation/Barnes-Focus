@@ -256,14 +256,14 @@ class SnapResults extends Component {
     }
 
     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    let resultsContainerBottom = Math.floor(h - this.resultsContainer.getBoundingClientRect().bottom);
+    let resultsContainerBottom = Math.ceil(h - this.resultsContainer.getBoundingClientRect().bottom);
 
     /** animate blur based on results container bottom position */
     let blur = Math.floor(resultsContainerBottom / 35);
     if (blur >= 0 && blur <= 15) {
       this.setState({ blurValue: 5 + blur });
     }
-    //console.log('Results container bottom :: ' + resultsContainerBottom + ' && blur:: ' + blur);
+    //console.log('Results container bottom :: ' + resultsContainerBottom);
 
     /** animate slider background and scan button based on results container bottom position */
     if (resultsContainerBottom <= 540) {
@@ -277,7 +277,8 @@ class SnapResults extends Component {
         },
         showSliderOverlay: true
       })
-    } else {
+    }
+    else {
       this.setState({
         slideOverStyle: {
           position: 'relative'
@@ -516,7 +517,7 @@ class SnapResults extends Component {
                   </div>
                 </Child>
 
-                {this.state.showSliderOverlay && <div id="slider-overlay" style={{ height: '540px', width: '100%', background: 'transparent' }}></div>}
+                {this.state.showSliderOverlay && <div id="slider-overlay"></div>}
 
                 {
                   this.state.alsoInRoomResults.length > 0 &&
