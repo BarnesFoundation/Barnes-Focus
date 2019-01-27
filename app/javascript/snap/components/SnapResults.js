@@ -24,36 +24,30 @@ import { SearchRequestService } from '../services/SearchRequestService';
 const fb_app_id = '349407548905454';
 
 const Child = posed.div({
-  enter: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      duration: 400,
-      ease: "linear"
-    }
-  },
+  enter: { y: 0, opacity: 1 },
   exit: { y: 50, opacity: 0 }
 });
 
 const Container = posed.div({
-  enter: {
+  enter: { staggerChildren: 50 },
+  exit: { staggerChildren: 20, staggerDirection: -1 },
+  grow: {
     y: 0,
     opacity: 1,
     scale: 1,
-    //staggerChildren: 100,
     transition: {
       duration: 200,
       ease: "linear"
     }
   },
-  exit: {
-    y: 50,
-    scale: 0.75,
+  shrink: {
+    y: 10,
+    scale: 0.9,
     opacity: 0,
-    staggerChildren: 200,
-    staggerDirection: -1,
-    transition: { duration: 150 }
-  }
+    transition: { duration: 100 }
+  },
+  closed: { x: `${screen.width}px` },
+  open: { x: "0px" }
 });
 
 const PopupAnimation = posed.div({
@@ -453,7 +447,7 @@ class SnapResults extends Component {
                     <Child className="card-img-result">
                       <img src={this.state.searchResults[0].url} alt="match_image" />
                     </Child>
-                    <div className="card-title h1">{this.state.searchResults[0].title}</div>
+                    <Child className="card-title h1">{this.state.searchResults[0].title}</Child>
                   </div>
                 </div>
                 <Child className="card-body" ref={el => this.resultsContainer = el}>
