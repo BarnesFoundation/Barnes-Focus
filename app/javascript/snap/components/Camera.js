@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import posed from "react-pose";
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
 import scan_button from 'images/scan-button.svg';
@@ -10,6 +11,12 @@ import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-de
 import { cropPhoto } from './CameraHelper';
 import { SearchRequestService } from '../services/SearchRequestService';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
+
+const Container = posed.div({
+    enter: { y: 0, opacity: 1 },
+    exit: { y: 50, opacity: 0 }
+});
 
 class Camera extends Component {
 
@@ -369,7 +376,9 @@ class Camera extends Component {
 
     /** Draws the portion of the video visible within the preview onto a canvas, in a loop. */
     drawVideoPreview = () => {
-        if (!this.vpreview) return null;
+        if (!this.vpreview || this.state.matchError) {
+            return null
+        };
 
         let { tempCanvas, tempCtx } = this.getTempPreviewCanvas();
 
@@ -378,10 +387,10 @@ class Camera extends Component {
         previewCanvas.width = this.cropRect.width;
         previewCanvas.height = this.cropRect.height;
 
-        this.previewCanvas = previewCanvas;
-        this.previewContext = previewContext;
-
+        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
         tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
+
+        previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
         previewContext.drawImage(tempCanvas, this.cropRect.x, this.cropRect.y, this.cropRect.width, this.cropRect.height, 0, 0, previewCanvas.width, previewCanvas.height);
 
         setTimeout(() => {
@@ -405,7 +414,7 @@ class Camera extends Component {
         }
 
         return (
-            <div className="camera-container" >
+            <Container className="camera-container" initialPose="exit" pose="enter">
                 <div className="camera">
                     {
                         showVideo &&
@@ -442,7 +451,7 @@ class Camera extends Component {
                     }
 
                 </div>
-            </div>
+            </Container>
         );
     }
 }
