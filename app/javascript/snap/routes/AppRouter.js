@@ -20,7 +20,6 @@ const Routes = () => (
                 <RouteContainer key={location.pathname}>
                     <Switch location={location}>
                         <Route path="/" component={Home} exact={true} key="home" />
-                        <Route path="/about" component={About} exact={true} key="about" />
                         <Route path="/scan" component={Camera} exact={true} key="scan" />
                         <Route path="/artwork/:imageId?" component={SnapResults} key="artwork" />
                     </Switch>
