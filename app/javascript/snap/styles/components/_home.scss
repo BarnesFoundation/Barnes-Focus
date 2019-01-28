@@ -122,6 +122,17 @@
     
 }
 
+.browser-modal {
+    position: absolute;
+    width: 282px;
+    height: 125px;
+    left: calc(50% - 141px);
+    top: 124px;
+    text-align: center;
+    color: #FFFFFF;
+    z-index: 1;
+}
+
 .btn-close {
     position: absolute;
     bottom: 62px;
