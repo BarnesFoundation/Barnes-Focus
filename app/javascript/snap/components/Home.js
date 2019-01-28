@@ -13,6 +13,7 @@ import close_icon from 'images/cross.svg';
 import * as constants from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome, osVersion } from 'react-device-detect';
 
+import { UnsupportedDialog } from './UnsupportedDialog';
 
 
 class HomeComponent extends Component {
@@ -23,7 +24,9 @@ class HomeComponent extends Component {
         this.state = {
             snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 0,
             selectedLanguage: '',
-            userAtBarnes: true
+            userAtBarnes: true,
+            unsupportedIOSVersion: null,
+            unsupportedIOSBrowser: null,
         }
     }
 
@@ -56,19 +59,21 @@ class HomeComponent extends Component {
     }
 
     checkForGetUserMedia = () => {
-      // ReactModal.setAppElement('#app');
-      
-        let iOSVersion = parseInt(osVersion);
+        const iOSVersion = parseFloat(osVersion);
+
         // navigator.mediaDevices.getUserMedia() is only supported on iOS > 11.0 and only on Safari (not Chrome, Firefox, etc.)
-        if ((iOSVersion <= 11.0)) {
+        if (iOSVersion >= parseFloat('11.0')) {
             if (!isSafari) {
+                console.log('User is on iOS ' + iOSVersion + ' but not on Safari');
+                this.setState({ unsupportedIOSBrowser: true });
             }
         }
 
         // If they're not on iOS 11, it doesn't matter what browser they're using, navigator.mediaDevices.getUserMedia() will return undefined
-        // else {
-        //
-        // }
+        else {
+            console.log('User is on iOS ' + iOSVersion + ' which is less than 11.0');
+            this.setState({ unsupportedIOSVersion: true });
+        }
     }
 
     componentWillMount() {
@@ -77,8 +82,8 @@ class HomeComponent extends Component {
     }
 
     componentDidMount() {
-        if (isIOS){
-          this.checkForGetUserMedia();
+        if (isIOS) {
+            this.checkForGetUserMedia();
         }
 
         if ('orientation' in screen) {
@@ -118,8 +123,13 @@ class HomeComponent extends Component {
     }
 
     render() {
+
+        const { unsupportedIOSBrowser, unsupportedIOSVersion } = this.state;
+
         return (
             <div className="home-wrapper" id="home-wrapper">
+                {(unsupportedIOSBrowser) ? <UnsupportedDialog unsupportedIOSBrowser={true}/> : null}
+                {(unsupportedIOSVersion) ? <UnsupportedDialog unsupportedIOSVersion={true}/> : null}
                 <img src={home_background} alt="home_background" style={{ width: screen.width, height: screen.height }} />
                 {this.state.userAtBarnes && <div className="landing-screen">
                     <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
