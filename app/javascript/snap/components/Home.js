@@ -85,19 +85,6 @@ class HomeComponent extends Component {
         if (isIOS) {
             this.checkForGetUserMedia();
         }
-
-        if ('orientation' in screen) {
-            screen.orientation.addEventListener('change', (e) => {
-                console.log('current orientation :: ' + screen.orientation.type);
-                if (screen.orientation.type !== 'portrait-primary') {
-                    console.log('The app is best viewed on Portrait mode');
-                } else {
-
-                }
-            });
-        } else {
-            console.log('Orientation API not supported');
-        }
     }
 
     onSelectYes = async () => {
@@ -125,11 +112,11 @@ class HomeComponent extends Component {
     render() {
 
         const { unsupportedIOSBrowser, unsupportedIOSVersion } = this.state;
-
+        let homeContainerStyle = (unsupportedIOSBrowser || unsupportedIOSVersion) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
         return (
-            <div className="home-wrapper" id="home-wrapper">
-                {(unsupportedIOSBrowser) ? <UnsupportedDialog unsupportedIOSBrowser={true}/> : null}
-                {(unsupportedIOSVersion) ? <UnsupportedDialog unsupportedIOSVersion={true}/> : null}
+            <div className="home-wrapper" id="home-wrapper" style={homeContainerStyle}>
+                {(unsupportedIOSBrowser) ? <UnsupportedDialog unsupportedIOSBrowser={true} /> : null}
+                {(unsupportedIOSVersion) ? <UnsupportedDialog unsupportedIOSVersion={true} /> : null}
                 <img src={home_background} alt="home_background" style={{ width: screen.width, height: screen.height }} />
                 {this.state.userAtBarnes && <div className="landing-screen">
                     <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
