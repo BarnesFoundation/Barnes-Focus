@@ -14,6 +14,7 @@ import InRoomSlider from './Slider';
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
 import Footer from './Footer';
+import About from './About';
 import { Popover, PopoverBody } from 'reactstrap';
 
 import close_icon from 'images/cross.svg';
@@ -95,6 +96,7 @@ class SnapResults extends Component {
       ...props.location.state,  // these properties are passed on from Camera component. Contains {result}
       sharePopoverIsOpen: false,
       showEmailScreen: false,
+      showAboutScreen: false,
       emailCaptured: false,
       emailCaptureAck: false,
       searchResults: [],
@@ -321,6 +323,14 @@ class SnapResults extends Component {
     }
   }
 
+  _onClickAbout = () => {
+    this.setState({ showAboutScreen: true });
+  }
+
+  _onCloseAbout = () => {
+    this.setState({ showAboutScreen: false });
+  }
+
   nativeAppShareWithWebFallback = (e) => {
     const socialMediaType = e.currentTarget.dataset.id
     this.setState({ sharePopoverIsOpen: false });
@@ -426,7 +436,7 @@ class SnapResults extends Component {
   }
 
   render() {
-    let resultsContainerStyle = ((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) ? { filter: 'blur(10px)', transform: 'scale(1.1)' } : {};
+    let resultsContainerStyle = (((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) || this.state.showAboutScreen) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
     let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
     let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `60px`, left: `calc(50% - 30px)` }
 
@@ -542,7 +552,7 @@ class SnapResults extends Component {
                   <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} />
                 }
 
-                <Footer footerStyle={footerStyle} />
+                <Footer footerStyle={footerStyle} onClickAbout={this._onClickAbout} />
 
               </div>
 
@@ -576,6 +586,13 @@ class SnapResults extends Component {
                 {this.props.getTranslation('Bookmark_capture', 'text_4')}
               </div>
             </PopupAnimation>
+          </div>
+        }
+
+        {
+          this.state.showAboutScreen &&
+          <div>
+            <About onCloseAbout={this._onCloseAbout} />
           </div>
         }
 

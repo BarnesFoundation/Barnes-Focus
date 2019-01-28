@@ -23,7 +23,6 @@ class AboutComponent extends Component {
     render() {
         return (
             <div className="about-wrapper">
-                <img src={home_background} alt="home_background" style={{ width: screen.width, height: screen.height }} />
                 <div>
                     <div className="kf-logo">
                         <img src={kf_logo} />
@@ -39,7 +38,7 @@ class AboutComponent extends Component {
                             <a href="https://www.barnesfoundation.org/terms" target="_blank">Terms & Conditions</a>
                         </div>
                     </div>
-                    <div className="btn-close" onClick={this.navigateBack}>
+                    <div className="btn-close" onClick={this.props.onCloseAbout}>
                         <img src={close_icon} alt="close" />
                     </div>
                 </div>
