@@ -81,8 +81,6 @@ class HomeComponent extends Component {
         this.resetSnapApp();
     }
 
-<<<<<<< HEAD
-=======
     componentDidMount() {
         if (isIOS) {
             this.checkForGetUserMedia();
@@ -102,7 +100,6 @@ class HomeComponent extends Component {
         }
     }
 
->>>>>>> unsupported-dialog
     onSelectYes = async () => {
         try {
             // Attempt to access device camera
