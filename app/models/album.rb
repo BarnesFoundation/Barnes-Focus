@@ -8,6 +8,11 @@ class Album < ApplicationRecord
     scope :recent, ->(per_page) { order("id desc").limit(per_page || 10) }
     scope :succeed, -> { joins(:photos).merge(Photo.successful_attempt) }
 
+    def self.failed_attempts
+        ids = all.pluck(:id) - succeed.pluck(:album_id)
+        where(id: ids)
+    end
+
 protected
     def set_name
         self.name = "Album: #{unique_identifier}"
