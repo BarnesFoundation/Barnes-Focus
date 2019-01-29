@@ -4,9 +4,7 @@ ActiveAdmin.register Album, as: 'Scanned Sessions' do
 
     scope :all, default: true
     scope :succeed
-    scope :failed do |r|
-        Kaminari.paginate_array(Album.all - Album.succeed)
-    end
+    scope :failed_attempts
 
     index default: true do
         id_column
