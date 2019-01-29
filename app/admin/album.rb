@@ -1,6 +1,12 @@
 ActiveAdmin.register Album, as: 'Scanned Sessions' do
     actions :all, except: [:new, :edit, :destroy]
-    config.per_page = 10
+    config.per_page = [25,50,100,200]
+
+    scope :all, default: true
+    scope :succeed
+    scope :failed do |r|
+        Kaminari.paginate_array(Album.all - Album.succeed)
+    end
 
     index default: true do
         id_column
