@@ -15,27 +15,33 @@ class ImportScannedSessionsJob < ApplicationJob
             @query = Album.all
         end
 
-        @query = @query.where("session_id IS NOT NULL").order("session_id DESC")
+        @query = @query.order("albums.id DESC")
         filename = "#{SecureRandom.hex}-scanned-sessions.csv"
 
         CSV.open( "#{Rails.root}/tmp/#{filename}", 'w' ) do |csv|
-            csv.add_row ["session_id", "s3_url_scanned_image", "catchoom_image_url", "image_id", "art_url", "imageSecret", "ensembleIndex"]
+            csv.add_row ["scanned_session_id", "user_session_id", "s3_url_scanned_image", "catchoom_image_url", "image_id", "art_url", "imageSecret", "ensembleIndex"]
 
             @query.each do | album |
                 session             = ActiveRecord::SessionStore::Session.find_by_id(album.session_id)
                 album.photos.each do | photo |
-                    es_data = (photo.es_response.nil? || photo.es_response.blank?) ? nil : JSON.parse(photo.es_response)["data"]["records"][0]
-                    values = [
-                        session.session_id,
-                        photo.searched_image_s3_url,
-                        photo.result_image_url,
-                        es_data.nil? ? '' : es_data["id"],
-                        es_data.nil? ? '' : es_data["art_url"],
-                        es_data.nil? ? '' : es_data["imageSecret"],
-                        es_data.nil? ? '' : es_data["ensembleIndex"]
-                    ]
+                    begin
+                        es_data = (photo.es_response.nil? || photo.es_response.blank?) ? nil : JSON.parse(photo.es_response)["data"]["records"][0]
+                        values = [
+                            album.id,
+                            session.present? ? session.session_id : nil,
+                            photo.searched_image_s3_url,
+                            photo.result_image_url,
+                            es_data.nil? ? nil : es_data["id"],
+                            es_data.nil? ? nil : es_data["art_url"],
+                            es_data.nil? ? nil : es_data["imageSecret"],
+                            es_data.nil? ? nil : es_data["ensembleIndex"]
+                        ]
 
-                    csv.add_row values
+                        csv.add_row values
+                    rescue JSON::ParserError
+                        p 'unable to parse photo object as it does not contain valid json data'
+                        next
+                    end
                 end
             end
         end
