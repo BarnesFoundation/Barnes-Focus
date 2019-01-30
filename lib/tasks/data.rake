@@ -63,98 +63,98 @@ namespace :data do
       unique_identifier: 'text_2'
     )
 
-    screen_3_2 = Translation.find_or_create_by(screen_text: "Result_page_Language_Selector", display_order: 4)
+    screen_4 = Translation.find_or_create_by(screen_text: "Result_page_Language_Selector", display_order: 4)
     Translation.create(
       screen_text: "English",
-      parent_id: screen_3_2.id,
+      parent_id: screen_4.id,
       english_translation: "English",
       unique_identifier: 'text_1'
     )
     Translation.create(
       screen_text: "Español",
-      parent_id: screen_3_2.id,
+      parent_id: screen_4.id,
       english_translation: "Spanish",
       unique_identifier: 'text_2'
     )
     Translation.create(
       screen_text: "Français",
-      parent_id: screen_3_2.id,
+      parent_id: screen_4.id,
       english_translation: "French",
       unique_identifier: 'text_3'
     )
     Translation.create(
       screen_text: "Deutsch",
-      parent_id: screen_3_2.id,
+      parent_id: screen_4.id,
       english_translation: "German",
       unique_identifier: 'text_4'
     )
     Translation.create(
       screen_text: "Italiano",
-      parent_id: screen_3_2.id,
+      parent_id: screen_4.id,
       english_translation: "Italian",
       unique_identifier: 'text_5'
     )
     Translation.create(
       screen_text: "Русский",
-      parent_id: screen_3_2.id,
+      parent_id: screen_4.id,
       english_translation: "Russian",
       unique_identifier: 'text_6'
     )
     Translation.create(
       screen_text: "中文",
-      parent_id: screen_3_2.id,
+      parent_id: screen_4.id,
       english_translation: "Chinese",
       unique_identifier: 'text_7'
     )
     Translation.create(
       screen_text: "日本語",
-      parent_id: screen_3_2.id,
+      parent_id: screen_4.id,
       english_translation: "Japanese",
       unique_identifier: 'text_8'
     )
     Translation.create(
       screen_text: "한국어",
-      parent_id: screen_3_2.id,
+      parent_id: screen_4.id,
       english_translation: "Korean",
       unique_identifier: 'text_9'
     )
 
-    screen_4 = Translation.find_or_create_by(screen_text: "No_Result_page", display_order: 5)
+    screen_5 = Translation.find_or_create_by(screen_text: "No_Result_page", display_order: 5)
     Translation.create(
       screen_text: "No results found.",
-      parent_id: screen_4.id,
+      parent_id: screen_5.id,
       english_translation: "No results found.",
       unique_identifier: 'text_1'
     )
     Translation.create(
       screen_text: "Use the scan button to focus on a work of art.",
-      parent_id: screen_4.id,
+      parent_id: screen_5.id,
       english_translation: "Use the scan button to focus on a work of art.",
       unique_identifier: 'text_2'
     )
 
-    screen_5 = Translation.find_or_create_by(screen_text: "Bookmark_capture", display_order: 5)
+    screen_6 = Translation.find_or_create_by(screen_text: "Bookmark_capture", display_order: 6)
     Translation.create(
       screen_text: "To receive all the artworks you are seeing today, please enter your email address.",
-      parent_id: screen_5.id,
+      parent_id: screen_6.id,
       english_translation: "To receive all the artworks you are seeing today, please enter your email address.",
       unique_identifier: 'text_1'
     )
     Translation.create(
       screen_text: "Email address",
-      parent_id: screen_5.id,
+      parent_id: screen_6.id,
       english_translation: "Email address",
       unique_identifier: 'text_2'
     )
     Translation.create(
       screen_text: "We will only use your email to send you the links to the works you've seen. You won't be joined to any other list.",
-      parent_id: screen_5.id,
+      parent_id: screen_6.id,
       english_translation: "We will only use your email to send you the links to the works you've seen. You won't be joined to any other list.",
       unique_identifier: 'text_3'
     )
     Translation.create(
       screen_text: "Thank you. After your visit, look for an email in your inbox with links to all the works of art you've seen today.",
-      parent_id: screen_5.id,
+      parent_id: screen_6.id,
       english_translation: "Thank you. After your visit, look for an email in your inbox with links to all the works of art you've seen today.",
       unique_identifier: 'text_4'
     )
@@ -184,41 +184,74 @@ namespace :data do
       unique_identifier: 'text_4'
     )
 
-    screen_5 = Translation.find_by(screen_text: "Bookmark_capture", display_order: 5)
+    screen_6 = Translation.find_by(screen_text: "Bookmark_capture", display_order: 6)
     Translation.create(
       screen_text: "Something doesn't look right. Try entering your email again.",
-      parent_id: screen_5.id,
+      parent_id: screen_6.id,
       english_translation: "Something doesn't look right. Try entering your email again.",
       unique_identifier: 'text_5'
     )
 
-    screen_6 = Translation.find_or_create_by(screen_text: "About", display_order: 6)
+    screen_7 = Translation.find_or_create_by(screen_text: "About", display_order: 7)
     Translation.create(
       screen_text: "About",
-      parent_id: screen_6.id,
+      parent_id: screen_7.id,
       english_translation: "About",
       unique_identifier: 'text_1'
     )
 
     Translation.create(
       screen_text: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
-      parent_id: screen_6.id,
+      parent_id: screen_7.id,
       english_translation: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
       unique_identifier: 'text_2'
     )
 
     Translation.create(
       screen_text: "Version 2.0",
-      parent_id: screen_6.id,
+      parent_id: screen_7.id,
       english_translation: "Version 2.0",
       unique_identifier: 'text_3'
     )
 
     Translation.create(
       screen_text: "Terms & Conditions",
-      parent_id: screen_6.id,
+      parent_id: screen_7.id,
       english_translation: "Terms & Conditions",
       unique_identifier: 'text_4'
     )
+  end
+
+  namespace :translations do
+    desc "add translation for UnSupported OS/ Browser screen"
+    task for_browser_screen: :environment do
+      screen_8 = Translation.find_or_create_by(screen_text: "UnSupported_OS_Browser_Screen", display_order: 8)
+
+      Translation.create(
+        screen_text: "Please use Safari while we work on compatibility with other browsers.",
+        parent_id: screen_8.id,
+        english_translation: "Please use Safari while we work on compatibility with other browsers.",
+        unique_identifier: 'text_1'
+      )
+
+      Translation.create(
+        screen_text: "We're sorry, the version of iOS on your iPhone is not supported.",
+        parent_id: screen_8.id,
+        english_translation: "We're sorry, the version of iOS on your iPhone is not supported.",
+        unique_identifier: 'text_2'
+      )
+    end
+
+    desc "add translation for Orientation error screen"
+    task for_error_screen: :environment do
+      screen_9 = Translation.find_or_create_by(screen_text: "Orientation_Error_Screen", display_order: 9)
+
+      Translation.create(
+        screen_text: "This app is best viewed in Portrait mode.",
+        parent_id: screen_9.id,
+        english_translation: "This app is best viewed in Portrait mode.",
+        unique_identifier: 'text_1'
+      )
+    end
   end
 end

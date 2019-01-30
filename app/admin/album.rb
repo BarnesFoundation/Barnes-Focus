@@ -110,4 +110,20 @@ ActiveAdmin.register Album, as: 'Scanned Sessions' do
             end
         end
     end
+
+    controller do
+        def index
+            index! do | wants |
+                wants.csv do
+                    ImportScannedSessionsJob.perform_later(params[:scope])
+                    flash[:notice] = "Your request for CSV is in queue. You'll receive an email with a link to CSV"
+                    redirect_to '/admin/scanned_sessions'
+                end
+                wants.xml do
+                    flash[:error] = "XML downloads are currently not supported. Try CSV donwload instead!"
+                    redirect_to '/admin/scanned_sessions'
+                end
+            end
+        end
+    end
 end
