@@ -13,7 +13,7 @@ import close_icon from 'images/cross.svg';
 import * as constants from './Constants';
 import { isIOS, isAndroid, isSafari, isFirefox, isChrome, osVersion } from 'react-device-detect';
 
-import { UnsupportedDialog } from './UnsupportedDialog';
+import UnsupportedDialog from './UnsupportedDialog';
 
 
 class HomeComponent extends Component {
@@ -95,8 +95,8 @@ class HomeComponent extends Component {
             // Navigate to the scan page
             this.props.history.push({ pathname: '/scan' });
         }
-
         catch (error) {
+            console.log('An error occurred while accessing the device camera');
             this.setState({ error: "An error occurred accessing the device camera" })
         }
     }
