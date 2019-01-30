@@ -21,8 +21,6 @@ gem 'aasm'
 gem 'aws-sdk',  '~> 2'
 gem 'active_elastic_job'
 gem 'elasticsearch'
-gem 'delayed_job'
-gem 'delayed_job_active_record'
 gem "daemons"
 gem 'activeadmin'
 gem 'devise'

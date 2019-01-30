@@ -1,6 +1,10 @@
 ActiveAdmin.register Album, as: 'Scanned Sessions' do
     actions :all, except: [:new, :edit, :destroy]
-    config.per_page = 10
+    config.per_page = [25,50,100,200]
+
+    scope :all, default: true
+    scope :succeed
+    scope :failed_attempts
 
     index default: true do
         id_column
@@ -103,6 +107,22 @@ ActiveAdmin.register Album, as: 'Scanned Sessions' do
             row :unique_identifier
             row :created_at do
                 resource.created_at.present? ? ApplicationHelper.date_time_in_eastern( resource.created_at ) : nil
+            end
+        end
+    end
+
+    controller do
+        def index
+            index! do | wants |
+                wants.csv do
+                    ImportScannedSessionsJob.perform_later(params[:scope])
+                    flash[:notice] = "Your request for CSV is in queue. You'll receive an email with a link to CSV"
+                    redirect_to '/admin/scanned_sessions'
+                end
+                wants.xml do
+                    flash[:error] = "XML downloads are currently not supported. Try CSV donwload instead!"
+                    redirect_to '/admin/scanned_sessions'
+                end
             end
         end
     end

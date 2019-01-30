@@ -14,6 +14,7 @@ import InRoomSlider from './Slider';
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
 import Footer from './Footer';
+import About from './About';
 import { Popover, PopoverBody } from 'reactstrap';
 
 import close_icon from 'images/cross.svg';
@@ -24,36 +25,30 @@ import { SearchRequestService } from '../services/SearchRequestService';
 const fb_app_id = '349407548905454';
 
 const Child = posed.div({
-  enter: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      duration: 400,
-      ease: "linear"
-    }
-  },
+  enter: { y: 0, opacity: 1 },
   exit: { y: 50, opacity: 0 }
 });
 
 const Container = posed.div({
-  enter: {
+  enter: { staggerChildren: 50 },
+  exit: { staggerChildren: 20, staggerDirection: -1 },
+  grow: {
     y: 0,
     opacity: 1,
     scale: 1,
-    //staggerChildren: 100,
     transition: {
       duration: 200,
       ease: "linear"
     }
   },
-  exit: {
-    y: 50,
-    scale: 0.75,
+  shrink: {
+    y: 10,
+    scale: 0.9,
     opacity: 0,
-    staggerChildren: 200,
-    staggerDirection: -1,
-    transition: { duration: 150 }
-  }
+    transition: { duration: 100 }
+  },
+  closed: { x: `${screen.width}px` },
+  open: { x: "0px" }
 });
 
 const PopupAnimation = posed.div({
@@ -101,6 +96,7 @@ class SnapResults extends Component {
       ...props.location.state,  // these properties are passed on from Camera component. Contains {result}
       sharePopoverIsOpen: false,
       showEmailScreen: false,
+      showAboutScreen: false,
       emailCaptured: false,
       emailCaptureAck: false,
       searchResults: [],
@@ -156,6 +152,8 @@ class SnapResults extends Component {
       if (search_result["data"]["roomRecords"].length > 0) {
         roomRecords = search_result["data"]["roomRecords"];
       }
+
+      this.slideOverAnimationThreshold = (roomRecords.length > 0) ? 540 : 0;
 
       this.setState({ searchResults: [].concat(result), alsoInRoomResults: roomRecords });
     } else {
@@ -256,17 +254,17 @@ class SnapResults extends Component {
     }
 
     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    let resultsContainerBottom = Math.floor(h - this.resultsContainer.getBoundingClientRect().bottom);
+    let resultsContainerBottom = Math.ceil(h - this.resultsContainer.getBoundingClientRect().bottom);
 
     /** animate blur based on results container bottom position */
     let blur = Math.floor(resultsContainerBottom / 35);
     if (blur >= 0 && blur <= 15) {
       this.setState({ blurValue: 5 + blur });
     }
-    //console.log('Results container bottom :: ' + resultsContainerBottom + ' && blur:: ' + blur);
+    //console.log('Results container bottom :: ' + resultsContainerBottom);
 
     /** animate slider background and scan button based on results container bottom position */
-    if (resultsContainerBottom <= 540) {
+    if (resultsContainerBottom <= this.slideOverAnimationThreshold) {
       this.setState({
         slideOverStyle: {
           position: 'fixed',
@@ -277,14 +275,17 @@ class SnapResults extends Component {
         },
         showSliderOverlay: true
       })
-    } else {
+    }
+    else {
+      let scanBtnStyle = { position: 'absolute' };
+      if (this.slideOverAnimationThreshold === 0) {
+        scanBtnStyle.bottom = 0;
+      }
       this.setState({
         slideOverStyle: {
           position: 'relative'
         },
-        scanBtnStyle: {
-          position: 'absolute'
-        },
+        scanBtnStyle: scanBtnStyle,
         showSliderOverlay: false
       })
     }
@@ -320,6 +321,14 @@ class SnapResults extends Component {
       requestAnimationFrame(this.handleScroll)
       this.scrollInProgress = true;
     }
+  }
+
+  _onClickAbout = () => {
+    this.setState({ showAboutScreen: true });
+  }
+
+  _onCloseAbout = () => {
+    this.setState({ showAboutScreen: false });
   }
 
   nativeAppShareWithWebFallback = (e) => {
@@ -427,7 +436,7 @@ class SnapResults extends Component {
   }
 
   render() {
-    let resultsContainerStyle = ((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) ? { filter: 'blur(10px)', transform: 'scale(1.1)' } : {};
+    let resultsContainerStyle = (((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) || this.state.showAboutScreen) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
     let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
     let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `60px`, left: `calc(50% - 30px)` }
 
@@ -448,7 +457,7 @@ class SnapResults extends Component {
                     <Child className="card-img-result">
                       <img src={this.state.searchResults[0].url} alt="match_image" />
                     </Child>
-                    <div className="card-title h1">{this.state.searchResults[0].title}</div>
+                    <Child className="card-title h1">{this.state.searchResults[0].title}</Child>
                   </div>
                 </div>
                 <Child className="card-body" ref={el => this.resultsContainer = el}>
@@ -516,21 +525,16 @@ class SnapResults extends Component {
                   </div>
                 </Child>
 
-                {this.state.showSliderOverlay && <div id="slider-overlay" style={{ height: '540px', width: '100%', background: 'transparent' }}></div>}
+                {
+                  this.state.showSliderOverlay &&
+                  this.state.alsoInRoomResults.length > 0 &&
+                  <div id="slider-overlay"></div>
+                }
 
                 {
                   this.state.alsoInRoomResults.length > 0 &&
                   <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
                     <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt}></InRoomSlider>
-                  </div>
-                }
-
-                {
-                  this.state.alsoInRoomResults.length === 0 &&
-                  <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
-                    <div className="slider-background" style={{ filter: `blur(20px)` }}>
-                      <img src={this.state.searchResults[0].url + this.sliderBackgroundCropParams} />
-                    </div>
                   </div>
                 }
 
@@ -548,7 +552,7 @@ class SnapResults extends Component {
                   <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} />
                 }
 
-                <Footer footerStyle={footerStyle} />
+                <Footer footerStyle={footerStyle} onClickAbout={this._onClickAbout} />
 
               </div>
 
@@ -582,6 +586,13 @@ class SnapResults extends Component {
                 {this.props.getTranslation('Bookmark_capture', 'text_4')}
               </div>
             </PopupAnimation>
+          </div>
+        }
+
+        {
+          this.state.showAboutScreen &&
+          <div>
+            <About onCloseAbout={this._onCloseAbout} />
           </div>
         }
 

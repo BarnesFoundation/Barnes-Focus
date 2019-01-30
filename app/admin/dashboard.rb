@@ -6,7 +6,7 @@ ActiveAdmin.register_page "Dashboard" do
     columns do
       column do
         panel 'Recent Searches' do
-          render 'albums', { albums: Album.recent }
+          render 'albums', { albums: Album.recent(params[:per_page] || 10) }
         end
       end
     end
