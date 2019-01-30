@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190130075447) do
+ActiveRecord::Schema.define(version: 20190130131110) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,21 +59,6 @@ ActiveRecord::Schema.define(version: 20190130075447) do
     t.index ["session_id"], name: "index_bookmarks_on_session_id"
   end
 
-  create_table "delayed_jobs", force: :cascade do |t|
-    t.integer "priority", default: 0, null: false
-    t.integer "attempts", default: 0, null: false
-    t.text "handler", null: false
-    t.text "last_error"
-    t.datetime "run_at"
-    t.datetime "locked_at"
-    t.datetime "failed_at"
-    t.string "locked_by"
-    t.string "queue"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
-  end
-
   create_table "es_cached_records", force: :cascade do |t|
     t.string "image_id", null: false
     t.jsonb "es_data"
@@ -109,16 +94,6 @@ ActiveRecord::Schema.define(version: 20190130075447) do
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
-  create_table "snap_search_results", force: :cascade do |t|
-    t.string "searched_image_url"
-    t.text "api_response"
-    t.text "es_response"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "response_time"
-    t.text "searched_image_data"
-  end
-
   create_table "subscriptions", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.boolean "is_subscribed", default: false
@@ -126,20 +101,6 @@ ActiveRecord::Schema.define(version: 20190130075447) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_subscriptions_on_email"
     t.index ["is_subscribed"], name: "index_subscriptions_on_is_subscribed"
-  end
-
-  create_table "training_records", force: :cascade do |t|
-    t.integer "identifier"
-    t.string "image_url"
-    t.string "title"
-    t.string "artist"
-    t.string "accession"
-    t.string "aasm_state"
-    t.text "pastec_response"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["aasm_state"], name: "index_training_records_on_aasm_state"
-    t.index ["identifier"], name: "index_training_records_on_identifier", unique: true
   end
 
   create_table "translations", force: :cascade do |t|
