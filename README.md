@@ -24,6 +24,7 @@ In case, if your `translations` table contains data from `rake db:seed` command.
 	- `rake data:add_more_to_translations`
 	- `rake data:translations:for_browser_screen`
 	- `rake data:translations:for_error_screen`
+    - `rake data:translations:for_artworkinfo_screen`
 
 ### What if I am setting up Barnes App in new ENV?
 In this case, we just have to run above 4 rake tasks

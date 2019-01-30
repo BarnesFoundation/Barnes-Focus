@@ -19,7 +19,8 @@ class EsCachedRecord < ApplicationRecord
     'objRightsTypeID',
     'creditLine',
     'room',
-    'ensembleIndex'
+    'ensembleIndex',
+    'curatorialApproval'
   ]
 
   ## Determines whether a cached record has expired data or not
@@ -52,9 +53,18 @@ class EsCachedRecord < ApplicationRecord
     else
       searched_data = es_cached_record.es_data
     end
-    
-    # Build the image url for the record
-    searched_data['art_url'] = Image.imgix_url(searched_data['id'], searched_data['imageSecret']) unless searched_data.nil? # for s3 use ~> Image.s3_url(searched_data['id'], searched_data['imageSecret'])
+
+    unless searched_data.nil?
+      # Show Disclaimer
+      if searched_data.has_key?("curatorialApproval") && searched_data['curatorialApproval'] == 'false'
+        searched_data['disclaimer'] = 'Please note that not all records are complete as research on the collection is ongoing.'
+      else
+        searched_data['disclaimer'] = nil
+      end
+
+      # Build the image url for the record
+      searched_data['art_url'] = Image.imgix_url(searched_data['id'], searched_data['imageSecret'])
+    end
 
     return searched_data
   end
@@ -62,7 +72,8 @@ class EsCachedRecord < ApplicationRecord
   ## Retrieves the object data from elastic search for a provided image id
   def self.connect_with_es_endpoint image_id
     # Query elastic search and extract the desired fields
-    searched_data = BarnesElasticSearch.instance.get_object(image_id).slice(*@es_fields)
+    searched_data = BarnesElasticSearch.instance.get_object(image_id)
+    searched_data = searched_data.slice(*@es_fields) unless searched_data.nil?
 
     return searched_data
   end
