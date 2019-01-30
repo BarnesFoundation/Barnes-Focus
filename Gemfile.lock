@@ -90,11 +90,6 @@ GEM
     concurrent-ruby (1.1.1)
     crass (1.0.4)
     daemons (1.2.6)
-    delayed_job (4.1.4)
-      activesupport (>= 3.0, < 5.2)
-    delayed_job_active_record (4.1.2)
-      activerecord (>= 3.0, < 5.2)
-      delayed_job (>= 3.0, < 5)
     devise (4.4.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -369,8 +364,6 @@ DEPENDENCIES
   byebug
   coffee-rails (~> 4.2)
   daemons
-  delayed_job
-  delayed_job_active_record
   devise
   dotenv-rails
   elasticsearch
