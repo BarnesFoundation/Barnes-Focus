@@ -103,6 +103,7 @@
     top: 124px;
     text-align: center;
     color: #FFFFFF;
+    z-index: 1;
 
     .app-usage-msg {
          margin-bottom: 40px;
@@ -119,6 +120,17 @@
     }
 
     
+}
+
+.browser-modal {
+    position: absolute;
+    width: 282px;
+    height: 125px;
+    left: calc(50% - 141px);
+    top: 124px;
+    text-align: center;
+    color: #FFFFFF;
+    z-index: 1;
 }
 
 .btn-close {

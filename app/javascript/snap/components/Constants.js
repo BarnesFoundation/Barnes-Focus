@@ -5,6 +5,7 @@
 export const CATCHOOM_ACCESS_TOKEN = process.env.CATCHOOM_ACCESS_TOKEN;
 export const CATCHOOM_REQUEST_URL = process.env.CATCHOOM_REQUEST_URL;
 export const APP_VERSION = process.env.APP_VERSION;
+export const UNSUPPORTED_ORIENTATION_ALERT_MESSAGE = 'This app is best viewed in Portrait mode.';
 export const ART_WORK_INFO_URL = '/api/snaps/getArtworkInformation?imageId=';
 export const STORE_SEARCHED_RESULT_URL = '/api/snaps/storeSearchedResult';
 export const SUBMIT_BOOKMARKS_EMAIL_URL = '/api/bookmarks';

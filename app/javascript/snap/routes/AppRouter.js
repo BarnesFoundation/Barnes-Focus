@@ -8,7 +8,10 @@ import Camera from '../components/Camera';
 import SnapResults from '../components/SnapResults';
 import * as constants from '../components/Constants';
 
-const RouteContainer = posed.div();
+const RouteContainer = posed.div({
+    enter: { opacity: 1, delay: 0, beforeChildren: true },
+    exit: { opacity: 0.99 }
+});
 
 const Routes = () => (
     <Route
@@ -17,7 +20,6 @@ const Routes = () => (
                 <RouteContainer key={location.pathname}>
                     <Switch location={location}>
                         <Route path="/" component={Home} exact={true} key="home" />
-                        <Route path="/about" component={About} exact={true} key="about" />
                         <Route path="/scan" component={Camera} exact={true} key="scan" />
                         <Route path="/artwork/:imageId?" component={SnapResults} key="artwork" />
                     </Switch>

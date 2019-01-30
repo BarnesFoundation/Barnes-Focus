@@ -99,6 +99,16 @@ p {
     font-family: 'Calibre-Regular';
 } 
 
+.landscape-wrapper {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    filter: blur(25px);
+    transform: scale(1.2);
+}
+
 .scan-wrapper {
     top:0;
     right:0;
@@ -160,9 +170,13 @@ p {
         font-family: 'Calibre-Regular';
         font-size: 16px;
         text-align: center;
-        color: #B4B4B4;        
+        color: #B4B4B4 !important;        
     }
     
+}
+
+.ReactModal__Overlay {
+    background-color: rgba(128, 128, 128, 0.12) !important;
 }
 
 // /* smartphone (landscape) */

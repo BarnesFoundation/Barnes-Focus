@@ -49,6 +49,8 @@ class JobsController < ApplicationController
       bookmarks.group_by(&:email).each do | mail, bukmarks |
         next if mail.blank?
 
+        unique_arts           = Hash.new
+        unique_arts[mail]     = Array.new
         latest_bookmark_entry = bukmarks.first
         time_in_seconds       = ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].present? ? ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].to_i : 10800
 
@@ -59,10 +61,12 @@ class JobsController < ApplicationController
           els_arr = Array.new
 
           bukmarks.each { | obj |
+            next if unique_arts[mail].include?(obj.image_id)
             els_obj = BarnesElasticSearch.instance.get_object(obj.image_id)
 
             next if els_obj.nil?
             els_arr.push els_obj
+            unique_arts[mail].push obj.image_id
           }
 
           begin

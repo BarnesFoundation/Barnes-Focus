@@ -1,7 +1,18 @@
+#slider-overlay {
+    height: 540px;
+    width: 100%;
+    background: transparent; 
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+}
+
 .slider-wrapper {
     height: 540px;
+    width: 100%;
     overflow: hidden;
-    position: relative;
+    //position: relative;
+    transition: position 300ms ease;
 
     .slider-background {
         z-index: 1;
