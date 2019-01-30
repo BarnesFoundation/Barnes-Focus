@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190115121440) do
+ActiveRecord::Schema.define(version: 20190130075447) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,6 +37,9 @@ ActiveRecord::Schema.define(version: 20190115121440) do
     t.string "unique_identifier", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "session_id"
+    t.index ["session_id"], name: "index_albums_on_session_id"
+    t.index ["unique_identifier", "session_id"], name: "index_albums_on_unique_identifier_and_session_id"
     t.index ["unique_identifier"], name: "index_albums_on_unique_identifier"
   end
 
