@@ -253,5 +253,41 @@ namespace :data do
         unique_identifier: 'text_1'
       )
     end
+
+    desc "add translations for artwork info page"
+    task for_artworkinfo_screen: :environment do
+      screen_3 = Translation.find_by(screen_text: "Result_page", display_order: 3)
+
+      Translation.create(
+        screen_text: "Artist",
+        parent_id: screen_3.id,
+        english_translation: "Artist",
+        unique_identifier: 'text_3'
+      )
+      Translation.create(
+        screen_text: "Title",
+        parent_id: screen_3.id,
+        english_translation: "Title",
+        unique_identifier: 'text_4'
+      )
+      Translation.create(
+        screen_text: "Date",
+        parent_id: screen_3.id,
+        english_translation: "Date",
+        unique_identifier: 'text_5'
+      )
+      Translation.create(
+        screen_text: "Medium",
+        parent_id: screen_3.id,
+        english_translation: "Medium",
+        unique_identifier: 'text_6'
+      )
+      Translation.create(
+        screen_text: "Dimensions",
+        parent_id: screen_3.id,
+        english_translation: "Dimensions",
+        unique_identifier: 'text_7'
+      )
+    end
   end
 end
