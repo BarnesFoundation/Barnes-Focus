@@ -25,26 +25,31 @@ import { SearchRequestService } from '../services/SearchRequestService';
 const fb_app_id = '349407548905454';
 
 const Child = posed.div({
-  enter: { y: 0, opacity: 1 },
-  exit: { y: 50, opacity: 0 }
-});
-
-const Container = posed.div({
-  enter: { staggerChildren: 50 },
-  exit: { staggerChildren: 20, staggerDirection: -1 },
-  grow: {
+  enter: {
     y: 0,
     opacity: 1,
-    scale: 1,
     transition: {
       duration: 200,
       ease: "linear"
     }
   },
-  shrink: {
+  exit: { y: 50, opacity: 0 }
+});
+
+const Container = posed.div({
+  enter: {
+    y: 0,
+    opacity: 1,
+    staggerChildren: 400,
+    transition: {
+      duration: 200,
+      ease: "linear"
+    }
+  },
+  exit: {
     y: 10,
-    scale: 0.9,
     opacity: 0,
+    staggerChildren: 100,
     transition: { duration: 100 }
   },
   closed: { x: `${screen.width}px` },
@@ -147,6 +152,7 @@ class SnapResults extends Component {
         result['invno'] = art_obj.invno;
         result['displayDate'] = art_obj.displayDate;
         result['dimensions'] = art_obj.dimensions;
+        result['curatorialApproval'] = (art_obj.curatorialApproval === "false") ? false : true;
       }
 
       if (search_result["data"]["roomRecords"].length > 0) {
@@ -436,13 +442,12 @@ class SnapResults extends Component {
   }
 
   render() {
-    let resultsContainerStyle = (((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) || this.state.showAboutScreen) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
-    let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
-    let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `60px`, left: `calc(50% - 30px)` }
-
     if (this.state.searchResults.length === 0) {
       return null;
     }
+    let resultsContainerStyle = (((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) || this.state.showAboutScreen) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
+    let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
+    let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `60px`, left: `calc(50% - 30px)` };
     return (
       <div>
         <Container className="container-fluid search-container" id="search-result" style={resultsContainerStyle} initialPose="exit" pose="enter">
@@ -457,7 +462,7 @@ class SnapResults extends Component {
                     <Child className="card-img-result">
                       <img src={this.state.searchResults[0].url} alt="match_image" />
                     </Child>
-                    <Child className="card-title h1">{this.state.searchResults[0].title}</Child>
+                    <div className="card-title h1">{this.state.searchResults[0].title}</div>
                   </div>
                 </div>
                 <Child className="card-body" ref={el => this.resultsContainer = el}>
@@ -484,6 +489,12 @@ class SnapResults extends Component {
                           <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_7')}:</td>
                           <td className="text-left item-info">{this.state.searchResults[0].dimensions}</td>
                         </tr>
+                        {
+                          !this.state.searchResults[0].curatorialApproval &&
+                          <tr>
+                            <td colspan="2" className="curatorial-approval-disclaimer">Please note that not all records are complete as research on the collection is ongoing.</td>
+                          </tr>
+                        }
                       </tbody>
                     </table>
                   </div>
@@ -533,9 +544,9 @@ class SnapResults extends Component {
 
                 {
                   this.state.alsoInRoomResults.length > 0 &&
-                  <div id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
+                  <Child id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
                     <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt}></InRoomSlider>
-                  </div>
+                  </Child>
                 }
 
                 <div className="scan-wrapper">
