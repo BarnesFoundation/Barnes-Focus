@@ -55,13 +55,6 @@ class EsCachedRecord < ApplicationRecord
     end
 
     unless searched_data.nil?
-      # Show Disclaimer
-      if searched_data.has_key?("curatorialApproval") && searched_data['curatorialApproval'] == 'false'
-        searched_data['disclaimer'] = 'Please note that not all records are complete as research on the collection is ongoing.'
-      else
-        searched_data['disclaimer'] = nil
-      end
-
       # Build the image url for the record
       searched_data['art_url'] = Image.imgix_url(searched_data['id'], searched_data['imageSecret'])
     end
