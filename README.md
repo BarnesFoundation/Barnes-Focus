@@ -19,12 +19,13 @@ With V2, since most of the screens are new and so are texts on screen, `rake db:
 ### What if I have translations table already populated with V1 data?
 In case, if your `translations` table contains data from `rake db:seed` command. Here's what you can do:
  - From rails console: `Translation.delete_all`
- - Run these rake tasks:
+ - Run these rake tasks (IMP: Follow the sequence & To-Do: Can be clubbed into 1 big task):
 	- `rake data:regenrate_translations`
 	- `rake data:add_more_to_translations`
 	- `rake data:translations:for_browser_screen`
 	- `rake data:translations:for_error_screen`
     - `rake data:translations:for_artworkinfo_screen`
+    - `rake data:translations:content_changes`
 
 ### What if I am setting up Barnes App in new ENV?
 In this case, we just have to run above 4 rake tasks
