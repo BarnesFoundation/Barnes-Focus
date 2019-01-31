@@ -289,5 +289,52 @@ namespace :data do
         unique_identifier: 'text_7'
       )
     end
+
+    desc "content change as per A17 feedback"
+    task content_changes: :environment do
+      screen_5 = Translation.find_by(screen_text: "No_Result_page", display_order: 5)
+
+      txt_5_1 = Translation.find_by(parent_id: screen_5.id, unique_identifier: 'text_1')
+      txt_5_1.update_attributes(
+        screen_text: "No results found. Use the",
+        english_translation: "No results found. Use the"
+      )
+
+      txt_5_2 = Translation.find_by(parent_id: screen_5.id, unique_identifier: 'text_2')
+      txt_5_2.update_attributes(
+        screen_text: "scan button to focus on a",
+        english_translation: "scan button to focus on a"
+      )
+
+      Translation.create(
+        screen_text: "work of art.",
+        parent_id: screen_5.id,
+        english_translation: "work of art.",
+        unique_identifier: 'text_3'
+      )
+
+      screen_6 = Translation.find_by(screen_text: "Bookmark_capture", display_order: 6)
+
+      screen_6_5 = Translation.find_by(parent_id: screen_6.id, unique_identifier: 'text_5')
+      screen_6_5.update_attributes(
+        screen_text: "Something doesn't look right. Try entering your",
+        english_translation: "Something doesn't look right. Try entering your"
+      )
+
+      Translation.create(
+        screen_text: "email again.",
+        parent_id: screen_6.id,
+        english_translation: "email again.",
+        unique_identifier: 'text_6'
+      )
+
+      screen_1 = Translation.find_by(screen_text: "Welcome_screen", display_order: 1)
+
+      screen_1_4 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_4')
+      screen_1_4.update_attributes(
+        screen_text: "The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation.",
+        english_translation: "The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation."
+      )
+    end
   end
 end
