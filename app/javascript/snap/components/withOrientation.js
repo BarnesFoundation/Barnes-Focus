@@ -18,7 +18,13 @@ const withOrientation = WrappedComponent =>
             this.CAMERA_SCREEN = '/scan';
             this.RESULTS_SCREEN = '/artwork';
 
-            this.translations = JSON.parse(localStorage.getItem(SNAP_LANGUAGE_TRANSLATION)) || null;
+            let translations = null;
+            try {
+                translations = JSON.parse(localStorage.getItem(SNAP_LANGUAGE_TRANSLATION));
+            } catch (error) {
+                console.log('Error while parsing translation json.');
+            }
+            this.translations = translations;
         }
 
         componentDidMount() {
