@@ -465,23 +465,23 @@ class SnapResults extends Component {
                     <table className="detail-table">
                       <tbody>
                         <tr>
-                          <td className="text-left item-label">Artist:</td>
+                          <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
                           <td className="text-left item-info">{this.state.searchResults[0].artist}</td>
                         </tr>
                         <tr>
-                          <td className="text-left item-label">Title:</td>
+                          <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_4')}:</td>
                           <td className="text-left item-info">{this.state.searchResults[0].title}</td>
                         </tr>
                         <tr>
-                          <td className="text-left item-label">Date:</td>
+                          <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_5')}:</td>
                           <td className="text-left item-info">{this.state.searchResults[0].displayDate}</td>
                         </tr>
                         <tr>
-                          <td className="text-left item-label">Medium:</td>
+                          <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_6')}:</td>
                           <td className="text-left item-info">{this.state.searchResults[0].medium}</td>
                         </tr>
                         <tr>
-                          <td className="text-left item-label">Dimensions:</td>
+                          <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_7')}:</td>
                           <td className="text-left item-info">{this.state.searchResults[0].dimensions}</td>
                         </tr>
                       </tbody>
