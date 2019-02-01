@@ -21,9 +21,7 @@ import close_icon from 'images/cross.svg';
 import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
 
-
-const fb_app_id = '349407548905454';
-
+/** React pose animation config */
 const Child = posed.div({
   enter: {
     y: 0,
@@ -337,6 +335,11 @@ class SnapResults extends Component {
     this.setState({ showAboutScreen: false });
   }
 
+  getFacebookShareUrl = () => {
+    let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
+    return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare)
+  }
+
   nativeAppShareWithWebFallback = (e) => {
     const socialMediaType = e.currentTarget.dataset.id
     this.setState({ sharePopoverIsOpen: false });
@@ -360,12 +363,6 @@ class SnapResults extends Component {
         //appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
         webFallbackURL = 'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
 
-        window.open(webFallbackURL, '_blank');
-        break;
-      }
-      case constants.SOCIAL_MEDIA_FACEBOOK: {
-        webFallbackURL = 'https://www.facebook.com/dialog/share?app_id=' + fb_app_id + '&display=popup&href=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
-        //webFallbackURL = 'http://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
         window.open(webFallbackURL, '_blank');
         break;
       }
@@ -528,7 +525,7 @@ class SnapResults extends Component {
                           <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
                             <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
                           </a>
-                          <a data-id={constants.SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
+                          <a target="_blank" href={this.getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
                             <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
                           </a>
                         </div>
