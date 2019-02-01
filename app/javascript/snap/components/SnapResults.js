@@ -492,7 +492,8 @@ class SnapResults extends Component {
                         {
                           !this.state.searchResults[0].curatorialApproval &&
                           <tr>
-                            <td colspan="2" className="curatorial-approval-disclaimer">Please note that not all records are complete as research on the collection is ongoing.</td>
+                            <td className="text-left item-label">Disclaimer:</td>
+                            <td className="text-left item-info">Please note that not all records are complete as research on the collection is ongoing.</td>
                           </tr>
                         }
                       </tbody>
