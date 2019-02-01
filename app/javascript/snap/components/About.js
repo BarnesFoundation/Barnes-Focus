@@ -29,13 +29,13 @@ class AboutComponent extends Component {
                     </div>
                     <div className="about-text h2">
                         <div className="kf-credit-line">
-                            {constants.KNIGHT_FOUNDATION_CREDIT_TEXT}
+                            {this.props.getTranslation('About', 'text_2')}
                         </div>
                         <div className="app-version">
-                            Version {constants.APP_VERSION}
+                            {this.props.getTranslation('About', 'text_3')}
                         </div>
                         <div className="terms-and-conditions">
-                            <a href="https://www.barnesfoundation.org/terms" target="_blank">Terms & Conditions</a>
+                            <a href="https://www.barnesfoundation.org/terms" target="_blank">{this.props.getTranslation('About', 'text_4')}</a>
                         </div>
                     </div>
                     <div className="btn-close" onClick={this.props.onCloseAbout}>

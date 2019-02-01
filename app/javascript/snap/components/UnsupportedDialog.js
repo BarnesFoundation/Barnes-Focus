@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactModal from 'react-modal';
+import withTranslation from './withTranslation';
 
 class UnsupportedDialog extends Component {
 
@@ -18,7 +19,7 @@ class UnsupportedDialog extends Component {
                 <ReactModal isOpen={true} className="Modal">
                     <div className="browser-modal">
                         <div className="safari-text h2">
-                            Please use Safari while we work on compatibility with other browsers.
+                            {this.props.getTranslation('UnSupported_OS_Browser_Screen', 'text_1')}
                         </div>
                     </div>
                 </ReactModal>
@@ -31,7 +32,7 @@ class UnsupportedDialog extends Component {
                 <ReactModal isOpen={true} className="Modal">
                     <div className="browser-modal">
                         <div className="safari-text h2">
-                            We're sorry, the version of iOS on your iPhone is not supported.
+                            {this.props.getTranslation('UnSupported_OS_Browser_Screen', 'text_2')}
                         </div>
                     </div>
                 </ReactModal>
@@ -40,4 +41,4 @@ class UnsupportedDialog extends Component {
     }
 }
 
-export { UnsupportedDialog }
+export default withTranslation(UnsupportedDialog);
