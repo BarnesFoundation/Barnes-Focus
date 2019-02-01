@@ -77,8 +77,6 @@ html, body {
     }
 }
 
-
-
 h1 {
     font-size: 2.25rem;
     margin-bottom: 0.78125rem;
@@ -90,8 +88,6 @@ h1 {
         font-size: 1.4rem;
     }
 }
-
-
 
 h2 {
     line-height: 25px;
@@ -150,18 +146,15 @@ p {
     float: right;
 }
 
+.share {
+    .fa {
+        color: #282828;
+    }
+}
+
 .content {
     text-align: center;
     padding: 0 5vw;
-}
-
-.snap-text-muted {
-    color: #8C8C8D;
-    font-size: 0.875rem !important;
-}
-
-.opaque {
-    opacity: 0.2 !important;
 }
 
 .btn-outline-secondary:focus, 
