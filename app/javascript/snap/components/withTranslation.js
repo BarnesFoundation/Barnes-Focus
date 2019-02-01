@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { SearchRequestService } from '../services/SearchRequestService';
+import { SNAP_LANGUAGE_TRANSLATION } from './Constants';
 
 const withTranslation = WrappedComponent => {
     return class WithTranslation extends React.Component {
@@ -19,6 +20,7 @@ const withTranslation = WrappedComponent => {
             console.log('WithTranslation >> componentWillMount. Load the translations here');
             let translations = await this.sr.getAppTranslations();
             this.setState({ translations: translations, loaded: true });
+            localStorage.setItem(SNAP_LANGUAGE_TRANSLATION, JSON.stringify(translations));
 
         }
 

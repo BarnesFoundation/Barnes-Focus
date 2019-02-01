@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import landscape_bg from 'images/barnes-landscape-background.png';
 import { isIOS, isSafari } from 'react-device-detect';
-import { UNSUPPORTED_ORIENTATION_ALERT_MESSAGE } from './Constants';
+import { UNSUPPORTED_ORIENTATION_ALERT_MESSAGE, SNAP_LANGUAGE_TRANSLATION } from './Constants';
 
 const withOrientation = WrappedComponent =>
     class WithOrientation extends Component {
@@ -17,6 +17,14 @@ const withOrientation = WrappedComponent =>
             this.HOME_SCREEN = '/';
             this.CAMERA_SCREEN = '/scan';
             this.RESULTS_SCREEN = '/artwork';
+
+            let translations = null;
+            try {
+                translations = JSON.parse(localStorage.getItem(SNAP_LANGUAGE_TRANSLATION));
+            } catch (error) {
+                console.log('Error while parsing translation json.');
+            }
+            this.translations = translations;
         }
 
         componentDidMount() {
@@ -63,7 +71,7 @@ const withOrientation = WrappedComponent =>
                             <img src={landscape_bg} alt="landscape_bg" style={{ width: width, height: height }} />
                             <div className="app-usage-alert" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                 <div className="app-usage-msg h2">
-                                    {UNSUPPORTED_ORIENTATION_ALERT_MESSAGE}
+                                    {(this.translations) ? this.translations['Orientation_Error_Screen']['text_1'].translated_content : UNSUPPORTED_ORIENTATION_ALERT_MESSAGE}
                                 </div>
                             </div>
                         </div>
@@ -76,7 +84,7 @@ const withOrientation = WrappedComponent =>
                         <div>
                             <div className="app-usage-alert" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                 <div className="app-usage-msg h2">
-                                    {UNSUPPORTED_ORIENTATION_ALERT_MESSAGE}
+                                    {(this.translations) ? this.translations['Orientation_Error_Screen']['text_1'].translated_content : UNSUPPORTED_ORIENTATION_ALERT_MESSAGE}
                                 </div>
                             </div>
                             <div className="landscape-wrapper">
@@ -89,5 +97,6 @@ const withOrientation = WrappedComponent =>
             )
         }
     }
+
 
 export default withOrientation;
