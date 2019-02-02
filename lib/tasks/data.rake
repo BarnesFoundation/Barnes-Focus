@@ -296,20 +296,20 @@ namespace :data do
 
       txt_5_1 = Translation.find_by(parent_id: screen_5.id, unique_identifier: 'text_1')
       txt_5_1.update_attributes(
-        screen_text: "No results found. Use the",
-        english_translation: "No results found. Use the"
+        screen_text: "No results found.",
+        english_translation: "No results found."
       )
 
       txt_5_2 = Translation.find_by(parent_id: screen_5.id, unique_identifier: 'text_2')
       txt_5_2.update_attributes(
-        screen_text: "scan button to focus on a",
-        english_translation: "scan button to focus on a"
+        screen_text: "Use the scan button to",
+        english_translation: "Use the scan button to"
       )
 
       Translation.create(
-        screen_text: "work of art.",
+        screen_text: "focus on a work of art.",
         parent_id: screen_5.id,
-        english_translation: "work of art.",
+        english_translation: "focus on a work of art.",
         unique_identifier: 'text_3'
       )
 

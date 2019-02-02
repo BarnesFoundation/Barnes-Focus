@@ -22,6 +22,11 @@ import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
 
 /** React pose animation config */
+const BackgroundImg = posed.div({
+  enter: { opacity: 1 },
+  exit: { opacity: 0 }
+});
+
 const Child = posed.div({
   enter: {
     y: 0,
@@ -31,7 +36,10 @@ const Child = posed.div({
       ease: "linear"
     }
   },
-  exit: { y: 50, opacity: 0 }
+  exit: {
+    y: 50,
+    opacity: 0
+  }
 });
 
 const Container = posed.div({
@@ -449,15 +457,15 @@ class SnapResults extends Component {
             <div className="col-12 col-md-12">
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
                 <div className="card-top-container">
-                  <div className="card-img-container">
-                    <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" />
-                  </div>
-                  <div className="card-img-overlay">
-                    <Child className="card-img-result">
+                  <BackgroundImg className="card-img-container">
+                    <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image_background" onLoad={this._onBackgroundImageLoad} />
+                  </BackgroundImg>
+                  <Child className="card-img-overlay">
+                    <div className="card-img-result">
                       <img src={this.state.searchResults[0].url} alt="match_image" />
-                    </Child>
+                    </div>
                     <div className="card-title h1">{this.state.searchResults[0].title}</div>
-                  </div>
+                  </Child>
                 </div>
                 <Child className="card-body" ref={el => this.resultsContainer = el}>
                   <div className="card-info">
@@ -555,7 +563,9 @@ class SnapResults extends Component {
                   parseInt(this.state.snapAttempts) >= 4 &&
                   !this.state.emailCaptured &&
                   !this.state.showEmailScreen &&
-                  <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} />
+                  <Child>
+                    <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} />
+                  </Child>
                 }
 
                 <Footer footerStyle={footerStyle} onClickAbout={this._onClickAbout} />
@@ -565,7 +575,6 @@ class SnapResults extends Component {
             </div>
           </div>
         </Container>
-
 
         {
           this.state.showEmailScreen &&
