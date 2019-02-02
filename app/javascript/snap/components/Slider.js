@@ -26,8 +26,8 @@ class InRoomSlider extends Component {
             activeSlideIndex: 0
         }
 
-        this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
-        this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+        this.sliderCropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&h=230&w=230';
+        this.sliderBackgroundCropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
         this.touchThreshold = 5;
     }
 

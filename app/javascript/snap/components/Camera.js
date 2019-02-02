@@ -14,8 +14,14 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 
 const Container = posed.div({
-    enter: { y: 0, opacity: 1 },
-    exit: { y: 50, opacity: 0 }
+    enter: { opacity: 1 },
+    exit: {
+        opacity: 0,
+        transition: {
+            duration: 400,
+            ease: "linear"
+        }
+    }
 });
 
 class Camera extends Component {
