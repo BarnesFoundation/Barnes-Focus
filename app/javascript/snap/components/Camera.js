@@ -15,13 +15,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 const Container = posed.div({
     enter: { opacity: 1 },
-    exit: {
-        opacity: 0,
-        transition: {
-            duration: 400,
-            ease: "linear"
-        }
-    }
+    exit: { opacity: 0 }
 });
 
 class Camera extends Component {
@@ -426,24 +420,23 @@ class Camera extends Component {
                         showVideo &&
                         <div>
                             <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
-                            <ReactCSSTransitionGroup
-                                transitionName="fade"
-                                transitionEnterTimeout={500}
-                                transitionLeaveTimeout={100}>
-                                {
-                                    !matchError &&
-                                    <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
-                                }
-                            </ReactCSSTransitionGroup>
+                            {
+                                !matchError &&
+                                <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
+                            }
 
                             <ReactCSSTransitionGroup
                                 transitionName="fade"
                                 transitionEnterTimeout={500}
                                 transitionLeaveTimeout={100}>
-                                {matchError &&
+                                {
+                                    matchError &&
                                     <div id="no-match-overlay" className="no-match-overlay">
                                         <div className="hint h2">
-                                            <span>{this.props.getTranslation('No_Result_page', 'text_1')} <br /> {this.props.getTranslation('No_Result_page', 'text_2')}</span>
+                                            <span>{this.props.getTranslation('No_Result_page', 'text_1')} <br />
+                                                {this.props.getTranslation('No_Result_page', 'text_2')}<br />
+                                                {this.props.getTranslation('No_Result_page', 'text_3')}
+                                            </span>
                                         </div>
                                         <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', bottom: '37px' }}>
                                             <img src={scan_button} alt="scan" />
