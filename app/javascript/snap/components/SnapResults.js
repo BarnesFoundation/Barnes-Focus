@@ -450,7 +450,7 @@ class SnapResults extends Component {
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
                 <div className="card-top-container">
                   <div className="card-img-container">
-                    <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image_background" />
+                    <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" />
                   </div>
                   <div className="card-img-overlay">
                     <Child className="card-img-result">
