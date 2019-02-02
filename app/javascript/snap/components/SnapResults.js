@@ -27,7 +27,7 @@ const Child = posed.div({
     y: 0,
     opacity: 1,
     transition: {
-      duration: 200,
+      duration: 400,
       ease: "linear"
     }
   },
@@ -36,7 +36,6 @@ const Child = posed.div({
 
 const Container = posed.div({
   enter: {
-    y: 0,
     opacity: 1,
     staggerChildren: 400,
     transition: {
@@ -45,7 +44,6 @@ const Container = posed.div({
     }
   },
   exit: {
-    y: 10,
     opacity: 0,
     staggerChildren: 100,
     transition: { duration: 100 }
@@ -125,7 +123,6 @@ class SnapResults extends Component {
       selectedLanguage: this.langOptions[0]
     }
 
-    this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
   }
 
   constructResultAndInRoomSlider = (search_result) => {
@@ -135,7 +132,7 @@ class SnapResults extends Component {
       if (search_result["data"]["records"].length > 0) {
 
         let w = screen.width;
-        let cropParams = '?crop=faces,entropy&fit=crop&w=' + w;
+        let cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
 
         const art_obj = search_result["data"]["records"][0];
         result['id'] = art_obj.id;
@@ -453,7 +450,7 @@ class SnapResults extends Component {
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
                 <div className="card-top-container">
                   <div className="card-img-container">
-                    <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" />
+                    <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image_background" />
                   </div>
                   <div className="card-img-overlay">
                     <Child className="card-img-result">

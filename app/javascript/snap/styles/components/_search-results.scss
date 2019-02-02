@@ -19,8 +19,8 @@
         .card-img-container {
             position: absolute;
             filter: blur(25px);
-            transform: scale(1.1);
-            height: 125%;
+            transform: scale(1.2);
+            height: calc(100% + 100px);
             img {
                 height: 100%;
                 z-index: 100;
