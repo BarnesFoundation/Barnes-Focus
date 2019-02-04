@@ -9,7 +9,7 @@ import SnapResults from '../components/SnapResults';
 import * as constants from '../components/Constants';
 
 const RouteContainer = posed.div({
-    enter: { opacity: 1, delay: 300, beforeChildren: true },
+    enter: { opacity: 1, delay: 0, beforeChildren: true },
     exit: { opacity: 0 }
 });
 
