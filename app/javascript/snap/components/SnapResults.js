@@ -20,9 +20,10 @@ import { Popover, PopoverBody } from 'reactstrap';
 import close_icon from 'images/cross.svg';
 import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
+import ProgressiveImage from 'react-progressive-image';
 
 /** React pose animation config */
-const BackgroundImg = posed.div({
+const Fade = posed.div({
   enter: { opacity: 1 },
   exit: { opacity: 0 }
 });
@@ -45,8 +46,8 @@ const Child = posed.div({
 const Container = posed.div({
   enter: {
     opacity: 1,
-    staggerChildren: 400,
-    delayChildren: 400
+    staggerChildren: 300,
+    delayChildren: 200
   },
   exit: {
     opacity: 0
@@ -115,6 +116,7 @@ class SnapResults extends Component {
         position: 'fixed',
         bottom: '0'
       },
+      bgImageStyle: {},
       showSliderOverlay: true,
       email: localStorage.getItem(constants.SNAP_USER_EMAIL) || '',
       snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 1,
@@ -134,6 +136,7 @@ class SnapResults extends Component {
 
         let w = screen.width;
         let cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
+        let lowQualityParams = '?q=0&auto=compress';
 
         const art_obj = search_result["data"]["records"][0];
         result['id'] = art_obj.id;
@@ -144,6 +147,7 @@ class SnapResults extends Component {
         result['locations'] = art_obj.locations;
         result['medium'] = art_obj.medium;
         result['url'] = art_obj.art_url;
+        result['url_low_quality'] = art_obj.art_url + lowQualityParams;
         result['bg_url'] = art_obj.art_url + cropParams;
         result['invno'] = art_obj.invno;
         result['displayDate'] = art_obj.displayDate;
@@ -223,11 +227,24 @@ class SnapResults extends Component {
     this.props.history.push({ pathname: `/artwork/${aitrId}` });
   }
 
+  updateBackgroundStyle = () => {
+    let { top, bottom } = this.resultsContainer.getBoundingClientRect();
+    let artworkBgBottom = this.artworkBackgroundContainer.getBoundingClientRect().bottom;
+    if (artworkBgBottom > bottom) {
+      this.setState({ bgImageStyle: { minHeight: (Math.floor(top) + 50) } });
+    }
+
+  }
+
   componentDidMount() {
     console.log('SnapResults >> componentDidMount');
     this.scrollInProgress = false;
     // Register scroll listener
     window.addEventListener('scroll', this._onScroll, true);
+
+    setTimeout(() => {
+      requestAnimationFrame(this.updateBackgroundStyle);
+    }, 500);
 
     if (this.state.searchResults.length > 0) {
       $("#result-card").attr("data-title", this.state.searchResults[0].title);
@@ -440,6 +457,8 @@ class SnapResults extends Component {
     if (this.state.searchResults.length === 0) {
       return null;
     }
+    let { bgImageStyle } = this.state;
+
     let resultsContainerStyle = (((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) || this.state.showAboutScreen) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
     let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
     let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `60px`, left: `calc(50% - 30px)` };
@@ -450,12 +469,15 @@ class SnapResults extends Component {
             <div className="col-12 col-md-12">
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
                 <div className="card-top-container">
-                  <BackgroundImg className="card-img-container">
-                    <img className="card-img-top" src={this.state.searchResults[0].url} alt="match_image_background" onLoad={this._onBackgroundImageLoad} />
-                  </BackgroundImg>
+                  <Fade className="card-img-container" ref={el => this.artworkBackgroundContainer = el} style={bgImageStyle}>
+                    <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" onLoad={this._onBackgroundImageLoad} />
+                  </Fade>
                   <Child className="card-img-overlay">
                     <div className="card-img-result">
-                      <img src={this.state.searchResults[0].url} alt="match_image" />
+                      <ProgressiveImage src={this.state.searchResults[0].url} placeholder={this.state.searchResults[0].url_low_quality}>
+                        {src => <img src={src} alt="match_image" />}
+                      </ProgressiveImage>
+                      {/* <img src={this.state.searchResults[0].url} alt="match_image" /> */}
                     </div>
                     <div className="card-title h1">{this.state.searchResults[0].title}</div>
                   </Child>
@@ -550,7 +572,6 @@ class SnapResults extends Component {
                     <img src={scan_button} alt="scan" />
                   </div>
                 </div>
-
 
                 {
                   parseInt(this.state.snapAttempts) >= 4 &&
