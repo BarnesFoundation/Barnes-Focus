@@ -20,6 +20,7 @@
             position: absolute;
             filter: blur(25px);
             transform: scale(1.2);
+            min-height: 90vh;
             height: calc(100% + 100px);
             img {
                 height: 100%;
