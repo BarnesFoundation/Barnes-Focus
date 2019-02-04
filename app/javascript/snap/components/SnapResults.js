@@ -46,18 +46,11 @@ const Container = posed.div({
   enter: {
     opacity: 1,
     staggerChildren: 400,
-    transition: {
-      duration: 200,
-      ease: "linear"
-    }
+    delayChildren: 400
   },
   exit: {
-    opacity: 0,
-    staggerChildren: 100,
-    transition: { duration: 100 }
-  },
-  closed: { x: `${screen.width}px` },
-  open: { x: "0px" }
+    opacity: 0
+  }
 });
 
 const PopupAnimation = posed.div({
