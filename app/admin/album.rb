@@ -1,4 +1,5 @@
 ActiveAdmin.register Album, as: 'Scanned Sessions' do
+    remove_filter :photos
     actions :all, except: [:new, :edit, :destroy]
     config.per_page = [25,50,100,200]
 
