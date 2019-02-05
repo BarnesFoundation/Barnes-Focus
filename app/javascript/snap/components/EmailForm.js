@@ -61,7 +61,8 @@ class EmailFooter extends Component {
                         {
                             this.state.errors.email === true &&
                             <div className="email-input-error caption">
-                                {this.props.getTranslation('Bookmark_capture', 'text_5')}
+                                {this.props.getTranslation('Bookmark_capture', 'text_5')} <br />
+                                {this.props.getTranslation('Bookmark_capture', 'text_6')}
                             </div>
                         }
                     </form>

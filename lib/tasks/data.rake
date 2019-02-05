@@ -201,9 +201,9 @@ namespace :data do
     )
 
     Translation.create(
-      screen_text: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+      screen_text: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
       parent_id: screen_7.id,
-      english_translation: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+      english_translation: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
       unique_identifier: 'text_2'
     )
 
@@ -332,8 +332,8 @@ namespace :data do
 
       screen_1_4 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_4')
       screen_1_4.update_attributes(
-        screen_text: "The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation.",
-        english_translation: "The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation."
+        screen_text: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+        english_translation: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes."
       )
     end
   end
