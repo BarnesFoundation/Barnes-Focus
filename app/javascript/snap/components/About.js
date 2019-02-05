@@ -3,7 +3,6 @@ import { withRouter } from 'react-router-dom';
 
 import { compose } from 'redux';
 import withOrientation from './withOrientation';
-import withTranslation from './withTranslation';
 
 import home_background from 'images/barnes-v2-landing.png';
 import kf_logo from 'images/knight-foundation-logo.svg';
@@ -51,6 +50,5 @@ class AboutComponent extends Component {
 
 export default compose(
     withOrientation,
-    withTranslation,
     withRouter
 )(AboutComponent);
