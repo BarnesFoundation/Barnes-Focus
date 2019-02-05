@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { SNAP_USER_EMAIL } from './Constants';
 
-import withTranslation from './withTranslation';
-
 class EmailFooter extends Component {
 
     constructor(props) {
@@ -76,4 +74,4 @@ class EmailFooter extends Component {
     }
 }
 
-export default withTranslation(EmailFooter);
+export default EmailFooter;

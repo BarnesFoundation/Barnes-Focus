@@ -134,7 +134,7 @@ class Camera extends Component {
         });
         let end = Date.now();
 
-        console.log('Blob creation time: ' + (end - start) + ' ms');
+        //console.log('Blob creation time: ' + (end - start) + ' ms');
         const requestConfig = this.sr.prepareRequest(imageBlob, this.state.scanSeqId);
         this.submitSearchRequest(requestConfig);
     }

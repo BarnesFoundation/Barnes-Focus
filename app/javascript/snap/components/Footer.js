@@ -1,5 +1,4 @@
 import React from 'react';
-import withTranslation from './withTranslation';
 
 const Footer = (props) => (
     <div className="footer-text" style={props.footerStyle} >
@@ -9,4 +8,4 @@ const Footer = (props) => (
     </div>
 );
 
-export default withTranslation(Footer);
+export default Footer;

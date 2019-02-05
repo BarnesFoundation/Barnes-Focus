@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Slider from 'react-slick';
 import CrossfadeImage from 'react-crossfade-image';
-import withTranslation from './withTranslation';
 
 const sliderSettings = {
     className: "slider-container",
@@ -114,4 +113,4 @@ class InRoomSlider extends Component {
     }
 }
 
-export default withTranslation(InRoomSlider);
+export default InRoomSlider;
