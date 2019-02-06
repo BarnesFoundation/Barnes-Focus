@@ -317,12 +317,12 @@ namespace :data do
 
       screen_6_5 = Translation.find_by(parent_id: screen_6.id, unique_identifier: 'text_5')
       screen_6_5.update_attributes(
-        screen_text: "Something doesn't look right. Try entering your",
-        english_translation: "Something doesn't look right. Try entering your"
+        screen_text: "Something doesn't look right.",
+        english_translation: "Something doesn't look right."
       )
 
       Translation.create(
-        screen_text: "email again.",
+        screen_text: "Try entering your email again.",
         parent_id: screen_6.id,
         english_translation: "email again.",
         unique_identifier: 'text_6'
@@ -334,6 +334,35 @@ namespace :data do
       screen_1_4.update_attributes(
         screen_text: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
         english_translation: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes."
+      )
+    end
+
+    desc "stabilising translations"
+    task welcome_and_disclaimer_changes: :environment do
+      screen_1 = Translation.find_by(screen_text: "Welcome_screen", display_order: 1)
+
+      translation_1_1 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_1')
+      translation_1_1.update_attributes(screen_text: "Are you at", english_translation: "Are you at")
+
+      translation_1_3 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_3')
+      translation_1_3.update_attributes(unique_identifier: 'text_4')
+
+      translation_1_2 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_2')
+      translation_1_2.update_attributes(unique_identifier: 'text_3')
+
+      Translation.create(
+        screen_text: "the Barnes?",
+        parent_id: screen_1.id,
+        english_translation: "the Barnes?",
+        unique_identifier: 'text_2'
+      )
+
+      screen_3 = Translation.find_by(screen_text: "Result_page", display_order: 3)
+      Translation.create(
+        screen_text: "Please note that not all records are complete as research on the collection is ongoing.",
+        parent_id: screen_3.id,
+        english_translation: "Please note that not all records are complete as research on the collection is ongoing.",
+        unique_identifier: 'text_8'
       )
     end
   end
