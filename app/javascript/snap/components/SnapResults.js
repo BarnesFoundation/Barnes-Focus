@@ -516,8 +516,8 @@ class SnapResults extends Component {
                         {
                           !this.state.searchResults[0].curatorialApproval &&
                           <tr>
-                            <td className="text-left item-label">Disclaimer:</td>
-                            <td className="text-left item-info">Please note that not all records are complete as research on the collection is ongoing.</td>
+                            <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_8')}:</td>
+                            <td className="text-left item-info">{this.props.getTranslation('Result_page', 'text_9')}</td>
                           </tr>
                         }
                       </tbody>

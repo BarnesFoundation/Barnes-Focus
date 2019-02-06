@@ -55,7 +55,7 @@ class EmailFooter extends Component {
                         <div className="input-group">
                             <input type="email" placeholder={this.props.getTranslation('Bookmark_capture', 'text_2')} className='form-control' name="email" value={this.state.email} onChange={this.handleEmailInput} />
                             <div className="input-group-append">
-                                <button className="btn btn-outline-secondary" id="bookmark-submit" type="button" onClick={() => this._saveEmail()}>Save</button>
+                                <button className="btn btn-outline-secondary" id="bookmark-submit" type="button" onClick={() => this._saveEmail()}>{this.props.getTranslation('Bookmark_capture', 'text_7')}</button>
                             </div>
                         </div>
                         {
