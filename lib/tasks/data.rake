@@ -324,7 +324,7 @@ namespace :data do
       Translation.create(
         screen_text: "Try entering your email again.",
         parent_id: screen_6.id,
-        english_translation: "email again.",
+        english_translation: "Try entering your email again.",
         unique_identifier: 'text_6'
       )
 
@@ -359,10 +359,25 @@ namespace :data do
 
       screen_3 = Translation.find_by(screen_text: "Result_page", display_order: 3)
       Translation.create(
+        screen_text: "Disclaimer",
+        parent_id: screen_3.id,
+        english_translation: "Disclaimer",
+        unique_identifier: 'text_8'
+      )
+
+      Translation.create(
         screen_text: "Please note that not all records are complete as research on the collection is ongoing.",
         parent_id: screen_3.id,
         english_translation: "Please note that not all records are complete as research on the collection is ongoing.",
-        unique_identifier: 'text_8'
+        unique_identifier: 'text_9'
+      )
+      
+      screen_6 = Translation.find_by(screen_text: "Bookmark_capture", display_order: 6)
+      Translation.create(
+        screen_text: "Save",
+        parent_id: screen_6.id,
+        english_translation: "Save",
+        unique_identifier: 'text_7'
       )
     end
   end

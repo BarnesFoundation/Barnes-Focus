@@ -121,18 +121,21 @@ class HomeComponent extends Component {
                 {this.state.userAtBarnes && <div className="landing-screen">
                     <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
                     {/* <div className="user-loc-prompt">Are you at <br />the Barnes?</div> */}
-                    <div className="user-loc-prompt">{this.props.getTranslation('Welcome_screen', 'text_1')}</div>
+                    <div className="user-loc-prompt">
+                        {this.props.getTranslation('Welcome_screen', 'text_1')} <br />
+                        {this.props.getTranslation('Welcome_screen', 'text_2')}
+                    </div>
                     <div className="home-action">
                         <button className="action-btn" onClick={this.onSelectYes}>
-                            <span className="action-text h2">{this.props.getTranslation('Welcome_screen', 'text_2')}</span>
+                            <span className="action-text h2">{this.props.getTranslation('Welcome_screen', 'text_3')}</span>
                         </button>
                         <button className="action-btn" onClick={this.onSelectNo}>
-                            <span className="action-text h2">{this.props.getTranslation('Welcome_screen', 'text_3')}</span>
+                            <span className="action-text h2">{this.props.getTranslation('Welcome_screen', 'text_4')}</span>
                         </button>
                     </div>
                     <div className="kf-banner">
                         <img src={kf_logo} alt="knight_foundation_logo" className="kf-logo" />
-                        <div className="kf-text caption">{constants.KNIGHT_FOUNDATION_CREDIT_TEXT}</div>
+                        <div className="kf-text caption">{this.props.getTranslation('About', 'text_2')}</div>
                     </div>
                 </div>
                 }
