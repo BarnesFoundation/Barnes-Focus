@@ -135,6 +135,7 @@ class SnapResults extends Component {
       if (search_result["data"]["records"].length > 0) {
 
         let w = screen.width;
+        let artUrlParams = '?w=' + (w - 80);
         let cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
         let lowQualityParams = '?q=0&auto=compress';
 
@@ -146,7 +147,7 @@ class SnapResults extends Component {
         result['classification'] = art_obj.classification;
         result['locations'] = art_obj.locations;
         result['medium'] = art_obj.medium;
-        result['url'] = art_obj.art_url;
+        result['url'] = art_obj.art_url + artUrlParams;
         result['url_low_quality'] = art_obj.art_url + lowQualityParams;
         result['bg_url'] = art_obj.art_url + cropParams;
         result['invno'] = art_obj.invno;
