@@ -214,8 +214,16 @@ class Camera extends Component {
     /** Processes the completion of an image search */
     completeImageSearchRequest(searchSuccess, response) {
         if (searchSuccess) {
-            // Navigate to results page
-            this.props.history.push({ pathname: `/artwork/${response["data"]["records"][0].id}`, state: { result: response } });
+            const w = screen.width;
+            let artUrl = response["data"]["records"][0].art_url;
+            // load the match image background first so that it gets cached for faster display.
+            let matchImage = this.loadImage(artUrl + '?w=' + (w - 80));
+            let matchImageBg = this.loadImage(artUrl + '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w);
+
+            Promise.all([matchImage, matchImageBg]).then(() => {
+                // Navigate to results page
+                this.props.history.push({ pathname: `/artwork/${response["data"]["records"][0].id}`, state: { result: response } });
+            });
         }
         else {
             this.handleSnapFailure();
@@ -230,6 +238,19 @@ class Camera extends Component {
             this.setState({ matchError: true });
         }
 
+    }
+
+    loadImage = (url) => {
+        return new Promise((resolve, reject) => {
+            // Create a new image from JavaScript
+            let image = new Image();
+            // Bind an event listener on the load to call the `resolve` function
+            image.onload = resolve;
+            // If the image fails to be downloaded, we don't want the whole system
+            // to collapse so we `resolve` instead of `reject`, even on error
+            image.onerror = resolve;
+            image.src = url;
+        });
     }
 
     playVideo = () => {

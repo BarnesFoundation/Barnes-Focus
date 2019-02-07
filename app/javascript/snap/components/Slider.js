@@ -36,6 +36,12 @@ class InRoomSlider extends Component {
         const slider = document.getElementById('aitr-slider');
         slider.addEventListener('touchstart', this._touchStart);
         slider.addEventListener('touchmove', this._onTouchMove, { passive: false });
+
+        /** cache AitR backgroud images for smoother transition */
+        this.props.alsoInRoomResults.map((record, index) => {
+            let image = new Image();
+            image.src = this.props.alsoInRoomResults[index].art_url + this.sliderBackgroundCropParams;
+        });
     }
 
     componentWillUnmount() {
@@ -105,7 +111,7 @@ class InRoomSlider extends Component {
                             this.props.alsoInRoomResults.map((record, index) =>
                                 <div key={record.id} onClick={() => this._handleOnClick(record.id)}>
                                     {/* <img src={record.art_url + this.sliderCropParams} /> */}
-                                    <ProgressiveImage src={record.art_url + this.cropParamsHQ} placeholder={record.art_url + this.sliderCropParams}>
+                                    <ProgressiveImage delay={2000} src={record.art_url + this.cropParamsHQ} placeholder={record.art_url + this.sliderCropParams}>
                                         {src => <img src={src} alt="aitr_image" />}
                                     </ProgressiveImage>
                                 </div>
