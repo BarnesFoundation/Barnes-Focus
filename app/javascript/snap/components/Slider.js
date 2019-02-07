@@ -29,6 +29,7 @@ class InRoomSlider extends Component {
         this.cropParamsHQ = '?crop=faces,entropy&fit=crop&h=230&w=230';
         this.sliderCropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&h=230&w=230';
         this.sliderBackgroundCropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+        this.matchImageParam = '?w=' + (screen.width - 80);
         this.touchThreshold = 5;
     }
 
@@ -39,8 +40,11 @@ class InRoomSlider extends Component {
 
         /** cache AitR backgroud images for smoother transition */
         this.props.alsoInRoomResults.map((record, index) => {
-            let image = new Image();
-            image.src = this.props.alsoInRoomResults[index].art_url + this.sliderBackgroundCropParams;
+            let aitrMatchImage = new Image();
+            let aitrBGImage = new Image();
+
+            aitrMatchImage.src = this.props.alsoInRoomResults[index].art_url + this.matchImageParam;
+            aitrBGImage.src = this.props.alsoInRoomResults[index].art_url + this.sliderBackgroundCropParams;
         });
     }
 
