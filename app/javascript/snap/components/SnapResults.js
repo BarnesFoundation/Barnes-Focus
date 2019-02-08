@@ -23,11 +23,6 @@ import { SearchRequestService } from '../services/SearchRequestService';
 import ProgressiveImage from 'react-progressive-image';
 
 /** React pose animation config */
-const Fade = posed.div({
-  enter: { opacity: 1 },
-  exit: { opacity: 0 }
-});
-
 const Child = posed.div({
   enter: {
     y: 0,
@@ -477,9 +472,9 @@ class SnapResults extends Component {
             <div className="col-12 col-md-12">
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
                 <div className="card-top-container">
-                  <Fade className="card-img-container" ref={el => this.artworkBackgroundContainer = el} style={bgImageStyle}>
+                  <div className="card-img-container" ref={el => this.artworkBackgroundContainer = el} style={bgImageStyle}>
                     <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" />
-                  </Fade>
+                  </div>
                   <Child className="card-img-overlay">
                     <div className="card-img-result">
                       <ProgressiveImage src={this.state.searchResults[0].url} placeholder={this.state.searchResults[0].url_low_quality}>
