@@ -20,40 +20,32 @@ import { Popover, PopoverBody } from 'reactstrap';
 import close_icon from 'images/cross.svg';
 import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
+import ProgressiveImage from 'react-progressive-image';
 
-
-const fb_app_id = '349407548905454';
-
+/** React pose animation config */
 const Child = posed.div({
   enter: {
     y: 0,
     opacity: 1,
     transition: {
-      duration: 200,
-      ease: "linear"
-    }
-  },
-  exit: { y: 50, opacity: 0 }
-});
-
-const Container = posed.div({
-  enter: {
-    y: 0,
-    opacity: 1,
-    staggerChildren: 400,
-    transition: {
-      duration: 200,
+      duration: 400,
       ease: "linear"
     }
   },
   exit: {
-    y: 10,
-    opacity: 0,
-    staggerChildren: 100,
-    transition: { duration: 100 }
+    y: 50,
+    opacity: 0
+  }
+});
+
+const Container = posed.div({
+  enter: {
+    opacity: 1,
+    staggerChildren: 300
   },
-  closed: { x: `${screen.width}px` },
-  open: { x: "0px" }
+  exit: {
+    opacity: 0
+  }
 });
 
 const PopupAnimation = posed.div({
@@ -104,6 +96,7 @@ class SnapResults extends Component {
       showAboutScreen: false,
       emailCaptured: false,
       emailCaptureAck: false,
+      bgLoaded: false,
       searchResults: [],
       alsoInRoomResults: [],
       activeSlideIndex: 0,
@@ -118,6 +111,7 @@ class SnapResults extends Component {
         position: 'fixed',
         bottom: '0'
       },
+      bgImageStyle: {},
       showSliderOverlay: true,
       email: localStorage.getItem(constants.SNAP_USER_EMAIL) || '',
       snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 1,
@@ -127,7 +121,6 @@ class SnapResults extends Component {
       selectedLanguage: this.langOptions[0]
     }
 
-    this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
   }
 
   constructResultAndInRoomSlider = (search_result) => {
@@ -137,7 +130,9 @@ class SnapResults extends Component {
       if (search_result["data"]["records"].length > 0) {
 
         let w = screen.width;
-        let cropParams = '?crop=faces,entropy&fit=crop&w=' + w;
+        let artUrlParams = '?w=' + (w - 80);
+        let cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
+        let lowQualityParams = '?q=0&auto=compress';
 
         const art_obj = search_result["data"]["records"][0];
         result['id'] = art_obj.id;
@@ -147,7 +142,8 @@ class SnapResults extends Component {
         result['classification'] = art_obj.classification;
         result['locations'] = art_obj.locations;
         result['medium'] = art_obj.medium;
-        result['url'] = art_obj.art_url;
+        result['url'] = art_obj.art_url + artUrlParams;
+        result['url_low_quality'] = art_obj.art_url + lowQualityParams;
         result['bg_url'] = art_obj.art_url + cropParams;
         result['invno'] = art_obj.invno;
         result['displayDate'] = art_obj.displayDate;
@@ -202,6 +198,10 @@ class SnapResults extends Component {
     }
   }
 
+  onBackgroundImageLoad = () => {
+    this.setState({ bgLoaded: true });
+  }
+
   onSelectLanguage = async (lang) => {
     console.log('Selected lang changed in SnapResults component : ' + JSON.stringify(lang));
     localStorage.setItem(constants.SNAP_LANGUAGE_PREFERENCE, lang.code);
@@ -227,6 +227,18 @@ class SnapResults extends Component {
     this.props.history.push({ pathname: `/artwork/${aitrId}` });
   }
 
+  /** this is done to make sure the background image doesn't overflow the tombstone bottom, 
+   * since we are showing fillscreen background when page loads */
+  updateBackgroundStyle = () => {
+    if (this.state.bgLoaded && this.resultsContainer) {
+      let { top, bottom } = this.resultsContainer.getBoundingClientRect();
+      let artworkBgBottom = this.artworkBackgroundContainer.getBoundingClientRect().bottom;
+      if (artworkBgBottom > bottom) {
+        this.setState({ bgImageStyle: { minHeight: (Math.floor(top) + 50) } });
+      }
+    }
+  }
+
   componentDidMount() {
     console.log('SnapResults >> componentDidMount');
     this.scrollInProgress = false;
@@ -243,6 +255,12 @@ class SnapResults extends Component {
         $("#result-card").attr("data-nodesc-invno", this.state.searchResults[0].invno);
       }
     }
+  }
+
+  componentDidUpdate() {
+    setTimeout(() => {
+      requestAnimationFrame(this.updateBackgroundStyle);
+    }, 500);
   }
 
   componentWillUnmount() {
@@ -337,6 +355,11 @@ class SnapResults extends Component {
     this.setState({ showAboutScreen: false });
   }
 
+  getFacebookShareUrl = () => {
+    let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
+    return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare)
+  }
+
   nativeAppShareWithWebFallback = (e) => {
     const socialMediaType = e.currentTarget.dataset.id
     this.setState({ sharePopoverIsOpen: false });
@@ -360,12 +383,6 @@ class SnapResults extends Component {
         //appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
         webFallbackURL = 'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
 
-        window.open(webFallbackURL, '_blank');
-        break;
-      }
-      case constants.SOCIAL_MEDIA_FACEBOOK: {
-        webFallbackURL = 'https://www.facebook.com/dialog/share?app_id=' + fb_app_id + '&display=popup&href=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
-        //webFallbackURL = 'http://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare) + '&redirect_uri=' + encodeURIComponent(window.location.href);
         window.open(webFallbackURL, '_blank');
         break;
       }
@@ -441,13 +458,13 @@ class SnapResults extends Component {
     this.setState({ isLanguageDropdownOpen: isOpen });
   }
 
-  render() {
-    if (this.state.searchResults.length === 0) {
-      return null;
-    }
+
+  renderResult = () => {
+    let { bgImageStyle } = this.state;
     let resultsContainerStyle = (((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) || this.state.showAboutScreen) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
     let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
     let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `60px`, left: `calc(50% - 30px)` };
+
     return (
       <div>
         <Container className="container-fluid search-container" id="search-result" style={resultsContainerStyle} initialPose="exit" pose="enter">
@@ -455,15 +472,18 @@ class SnapResults extends Component {
             <div className="col-12 col-md-12">
               <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
                 <div className="card-top-container">
-                  <div className="card-img-container">
+                  <div className="card-img-container" ref={el => this.artworkBackgroundContainer = el} style={bgImageStyle}>
                     <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" />
                   </div>
-                  <div className="card-img-overlay">
-                    <Child className="card-img-result">
-                      <img src={this.state.searchResults[0].url} alt="match_image" />
-                    </Child>
+                  <Child className="card-img-overlay">
+                    <div className="card-img-result">
+                      <ProgressiveImage src={this.state.searchResults[0].url} placeholder={this.state.searchResults[0].url_low_quality}>
+                        {src => <img src={src} alt="match_image" />}
+                      </ProgressiveImage>
+                      {/* <img src={this.state.searchResults[0].url} alt="match_image" /> */}
+                    </div>
                     <div className="card-title h1">{this.state.searchResults[0].title}</div>
-                  </div>
+                  </Child>
                 </div>
                 <Child className="card-body" ref={el => this.resultsContainer = el}>
                   <div className="card-info">
@@ -492,8 +512,8 @@ class SnapResults extends Component {
                         {
                           !this.state.searchResults[0].curatorialApproval &&
                           <tr>
-                            <td className="text-left item-label">Disclaimer:</td>
-                            <td className="text-left item-info">Please note that not all records are complete as research on the collection is ongoing.</td>
+                            <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_8')}:</td>
+                            <td className="text-left item-info">{this.props.getTranslation('Result_page', 'text_9')}</td>
                           </tr>
                         }
                       </tbody>
@@ -517,7 +537,6 @@ class SnapResults extends Component {
                         </div>
                       }
                     </div>
-
                     <div id="share-it" className="btn-share-result" ref={(node) => { this.target = node }} onClick={this._onClickShare}>
                       <img src={share} alt="share" />
                       <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
@@ -528,7 +547,7 @@ class SnapResults extends Component {
                           <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
                             <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
                           </a>
-                          <a data-id={constants.SOCIAL_MEDIA_FACEBOOK} onClick={this.nativeAppShareWithWebFallback}>
+                          <a target="_blank" href={this.getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
                             <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
                           </a>
                         </div>
@@ -536,49 +555,42 @@ class SnapResults extends Component {
                     </Popover>
                   </div>
                 </Child>
-
                 {
                   this.state.showSliderOverlay &&
                   this.state.alsoInRoomResults.length > 0 &&
                   <div id="slider-overlay"></div>
                 }
-
                 {
                   this.state.alsoInRoomResults.length > 0 &&
                   <Child id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
-                    <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt}></InRoomSlider>
+                    <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt} getTranslation={this.props.getTranslation}></InRoomSlider>
                   </Child>
                 }
-
                 <div className="scan-wrapper">
                   <div className="scan-button" onClick={this.handleScan} style={this.state.scanBtnStyle}>
                     <img src={scan_button} alt="scan" />
                   </div>
                 </div>
-
-
                 {
                   parseInt(this.state.snapAttempts) >= 4 &&
                   !this.state.emailCaptured &&
                   !this.state.showEmailScreen &&
-                  <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} />
+                  <div>
+                    <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
+                  </div>
                 }
-
-                <Footer footerStyle={footerStyle} onClickAbout={this._onClickAbout} />
-
+                <Footer footerStyle={footerStyle} onClickAbout={this._onClickAbout} getTranslation={this.props.getTranslation} />
               </div>
-
             </div>
           </div>
         </Container>
-
 
         {
           this.state.showEmailScreen &&
           !this.state.emailCaptured &&
           <div>
             <PopupAnimation className="email-popup-screen" initialPose="exit" pose="enter">
-              <EmailForm isEmailScreen={true} onSubmitEmail={this.onSubmitEmail} />
+              <EmailForm isEmailScreen={true} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
               <div className="btn-close" onClick={this.closeWindow} style={{ position: `absolute`, top: `${emailScreenCloseBtnTop}` }}>
                 <img src={close_icon} alt="close" onClick={() => { this._closeEmailPopupScreen() }} />
               </div>
@@ -604,10 +616,27 @@ class SnapResults extends Component {
         {
           this.state.showAboutScreen &&
           <div>
-            <About onCloseAbout={this._onCloseAbout} />
+            <About onCloseAbout={this._onCloseAbout} getTranslation={this.props.getTranslation} />
           </div>
         }
+      </div>
 
+    );
+  }
+
+  render() {
+    if (this.state.searchResults.length === 0) {
+      return null;
+    }
+
+    return (
+      <div>
+        {!this.state.bgLoaded &&
+          <div style={{ visibility: `hidden` }}>
+            <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" onLoad={this.onBackgroundImageLoad} />
+          </div>
+        }
+        {this.state.bgLoaded && this.renderResult()}
       </div>
     );
   }

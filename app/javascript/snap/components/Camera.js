@@ -14,8 +14,8 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 
 const Container = posed.div({
-    enter: { y: 0, opacity: 1 },
-    exit: { y: 50, opacity: 0 }
+    enter: { opacity: 1 },
+    exit: { opacity: 0 }
 });
 
 class Camera extends Component {
@@ -134,7 +134,7 @@ class Camera extends Component {
         });
         let end = Date.now();
 
-        console.log('Blob creation time: ' + (end - start) + ' ms');
+        //console.log('Blob creation time: ' + (end - start) + ' ms');
         const requestConfig = this.sr.prepareRequest(imageBlob, this.state.scanSeqId);
         this.submitSearchRequest(requestConfig);
     }
@@ -214,8 +214,16 @@ class Camera extends Component {
     /** Processes the completion of an image search */
     completeImageSearchRequest(searchSuccess, response) {
         if (searchSuccess) {
-            // Navigate to results page
-            this.props.history.push({ pathname: `/artwork/${response["data"]["records"][0].id}`, state: { result: response } });
+            const w = screen.width;
+            let artUrl = response["data"]["records"][0].art_url;
+            // load the match image background first so that it gets cached for faster display.
+            let matchImage = this.loadImage(artUrl + '?w=' + (w - 80));
+            let matchImageBg = this.loadImage(artUrl + '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w);
+
+            Promise.all([matchImage, matchImageBg]).then(() => {
+                // Navigate to results page
+                this.props.history.push({ pathname: `/artwork/${response["data"]["records"][0].id}`, state: { result: response } });
+            });
         }
         else {
             this.handleSnapFailure();
@@ -230,6 +238,19 @@ class Camera extends Component {
             this.setState({ matchError: true });
         }
 
+    }
+
+    loadImage = (url) => {
+        return new Promise((resolve, reject) => {
+            // Create a new image from JavaScript
+            let image = new Image();
+            // Bind an event listener on the load to call the `resolve` function
+            image.onload = resolve;
+            // If the image fails to be downloaded, we don't want the whole system
+            // to collapse so we `resolve` instead of `reject`, even on error
+            image.onerror = resolve;
+            image.src = url;
+        });
     }
 
     playVideo = () => {
@@ -420,24 +441,23 @@ class Camera extends Component {
                         showVideo &&
                         <div>
                             <video id="video" ref={c => this.video = c} width="100%" autoPlay playsInline muted style={videoStyle} />
-                            <ReactCSSTransitionGroup
-                                transitionName="fade"
-                                transitionEnterTimeout={500}
-                                transitionLeaveTimeout={100}>
-                                {
-                                    !matchError &&
-                                    <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
-                                }
-                            </ReactCSSTransitionGroup>
+                            {
+                                !matchError &&
+                                <canvas id="video-preview" ref={el => this.vpreview = el}></canvas>
+                            }
 
                             <ReactCSSTransitionGroup
                                 transitionName="fade"
                                 transitionEnterTimeout={500}
                                 transitionLeaveTimeout={100}>
-                                {matchError &&
+                                {
+                                    matchError &&
                                     <div id="no-match-overlay" className="no-match-overlay">
                                         <div className="hint h2">
-                                            <span>{this.props.getTranslation('No_Result_page', 'text_1')} <br /> {this.props.getTranslation('No_Result_page', 'text_2')}</span>
+                                            <span>{this.props.getTranslation('No_Result_page', 'text_1')} <br />
+                                                {this.props.getTranslation('No_Result_page', 'text_2')}<br />
+                                                {this.props.getTranslation('No_Result_page', 'text_3')}
+                                            </span>
                                         </div>
                                         <div className="scan-button" onClick={this.handleScan} style={{ position: 'absolute', bottom: '37px' }}>
                                             <img src={scan_button} alt="scan" />

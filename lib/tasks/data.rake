@@ -201,9 +201,9 @@ namespace :data do
     )
 
     Translation.create(
-      screen_text: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+      screen_text: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
       parent_id: screen_7.id,
-      english_translation: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+      english_translation: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
       unique_identifier: 'text_2'
     )
 
@@ -296,20 +296,20 @@ namespace :data do
 
       txt_5_1 = Translation.find_by(parent_id: screen_5.id, unique_identifier: 'text_1')
       txt_5_1.update_attributes(
-        screen_text: "No results found. Use the",
-        english_translation: "No results found. Use the"
+        screen_text: "No results found.",
+        english_translation: "No results found."
       )
 
       txt_5_2 = Translation.find_by(parent_id: screen_5.id, unique_identifier: 'text_2')
       txt_5_2.update_attributes(
-        screen_text: "scan button to focus on a",
-        english_translation: "scan button to focus on a"
+        screen_text: "Use the scan button to",
+        english_translation: "Use the scan button to"
       )
 
       Translation.create(
-        screen_text: "work of art.",
+        screen_text: "focus on a work of art.",
         parent_id: screen_5.id,
-        english_translation: "work of art.",
+        english_translation: "focus on a work of art.",
         unique_identifier: 'text_3'
       )
 
@@ -317,14 +317,14 @@ namespace :data do
 
       screen_6_5 = Translation.find_by(parent_id: screen_6.id, unique_identifier: 'text_5')
       screen_6_5.update_attributes(
-        screen_text: "Something doesn't look right. Try entering your",
-        english_translation: "Something doesn't look right. Try entering your"
+        screen_text: "Something doesn't look right.",
+        english_translation: "Something doesn't look right."
       )
 
       Translation.create(
-        screen_text: "email again.",
+        screen_text: "Try entering your email again.",
         parent_id: screen_6.id,
-        english_translation: "email again.",
+        english_translation: "Try entering your email again.",
         unique_identifier: 'text_6'
       )
 
@@ -332,8 +332,52 @@ namespace :data do
 
       screen_1_4 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_4')
       screen_1_4.update_attributes(
-        screen_text: "The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation.",
-        english_translation: "The Barnes Foundation collection online is made possible by generous support from The John S. and James L. Knight Foundation."
+        screen_text: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
+        english_translation: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes."
+      )
+    end
+
+    desc "stabilising translations"
+    task welcome_and_disclaimer_changes: :environment do
+      screen_1 = Translation.find_by(screen_text: "Welcome_screen", display_order: 1)
+
+      translation_1_1 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_1')
+      translation_1_1.update_attributes(screen_text: "Are you at", english_translation: "Are you at")
+
+      translation_1_3 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_3')
+      translation_1_3.update_attributes(unique_identifier: 'text_4')
+
+      translation_1_2 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_2')
+      translation_1_2.update_attributes(unique_identifier: 'text_3')
+
+      Translation.create(
+        screen_text: "the Barnes?",
+        parent_id: screen_1.id,
+        english_translation: "the Barnes?",
+        unique_identifier: 'text_2'
+      )
+
+      screen_3 = Translation.find_by(screen_text: "Result_page", display_order: 3)
+      Translation.create(
+        screen_text: "Disclaimer",
+        parent_id: screen_3.id,
+        english_translation: "Disclaimer",
+        unique_identifier: 'text_8'
+      )
+
+      Translation.create(
+        screen_text: "Please note that not all records are complete as research on the collection is ongoing.",
+        parent_id: screen_3.id,
+        english_translation: "Please note that not all records are complete as research on the collection is ongoing.",
+        unique_identifier: 'text_9'
+      )
+      
+      screen_6 = Translation.find_by(screen_text: "Bookmark_capture", display_order: 6)
+      Translation.create(
+        screen_text: "Save",
+        parent_id: screen_6.id,
+        english_translation: "Save",
+        unique_identifier: 'text_7'
       )
     end
   end
