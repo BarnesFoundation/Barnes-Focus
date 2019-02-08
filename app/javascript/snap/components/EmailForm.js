@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { SNAP_USER_EMAIL } from './Constants';
 
-import withTranslation from './withTranslation';
-
 class EmailFooter extends Component {
 
     constructor(props) {
@@ -57,13 +55,14 @@ class EmailFooter extends Component {
                         <div className="input-group">
                             <input type="email" placeholder={this.props.getTranslation('Bookmark_capture', 'text_2')} className='form-control' name="email" value={this.state.email} onChange={this.handleEmailInput} />
                             <div className="input-group-append">
-                                <button className="btn btn-outline-secondary" id="bookmark-submit" type="button" onClick={() => this._saveEmail()}>Save</button>
+                                <button className="btn btn-outline-secondary" id="bookmark-submit" type="button" onClick={() => this._saveEmail()}>{this.props.getTranslation('Bookmark_capture', 'text_7')}</button>
                             </div>
                         </div>
                         {
                             this.state.errors.email === true &&
                             <div className="email-input-error caption">
-                                {this.props.getTranslation('Bookmark_capture', 'text_5')}
+                                {this.props.getTranslation('Bookmark_capture', 'text_5')} <br />
+                                {this.props.getTranslation('Bookmark_capture', 'text_6')}
                             </div>
                         }
                     </form>
@@ -76,4 +75,4 @@ class EmailFooter extends Component {
     }
 }
 
-export default withTranslation(EmailFooter);
+export default EmailFooter;

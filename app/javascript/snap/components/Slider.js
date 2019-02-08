@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Slider from 'react-slick';
 import CrossfadeImage from 'react-crossfade-image';
-import withTranslation from './withTranslation';
+import ProgressiveImage from 'react-progressive-image';
 
 const sliderSettings = {
     className: "slider-container",
@@ -26,8 +26,10 @@ class InRoomSlider extends Component {
             activeSlideIndex: 0
         }
 
-        this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
-        this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+        this.cropParamsHQ = '?crop=faces,entropy&fit=crop&h=230&w=230';
+        this.sliderCropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&h=230&w=230';
+        this.sliderBackgroundCropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
+        this.matchImageParam = '?w=' + (screen.width - 80);
         this.touchThreshold = 5;
     }
 
@@ -35,6 +37,15 @@ class InRoomSlider extends Component {
         const slider = document.getElementById('aitr-slider');
         slider.addEventListener('touchstart', this._touchStart);
         slider.addEventListener('touchmove', this._onTouchMove, { passive: false });
+
+        /** cache AitR backgroud images for smoother transition */
+        this.props.alsoInRoomResults.map((record, index) => {
+            let aitrMatchImage = new Image();
+            let aitrBGImage = new Image();
+
+            aitrMatchImage.src = this.props.alsoInRoomResults[index].art_url + this.matchImageParam;
+            aitrBGImage.src = this.props.alsoInRoomResults[index].art_url + this.sliderBackgroundCropParams;
+        });
     }
 
     componentWillUnmount() {
@@ -74,8 +85,6 @@ class InRoomSlider extends Component {
 
     _handleOnClick = (id) => {
         console.log('Also in room id = ' + id);
-        this.sliderCropParams = '?crop=faces,entropy&fit=crop&h=230&w=230';
-        this.sliderBackgroundCropParams = '?crop=faces,entropy&fit=crop&h=540&w=' + screen.width;
         this.setState({ activeSlideIndex: 0 });
         this.props.onSelectInRoomArt(id);
     }
@@ -104,7 +113,12 @@ class InRoomSlider extends Component {
                     <Slider {...sliderSettings} beforeChange={this.beforeChangeHandler}>
                         {
                             this.props.alsoInRoomResults.map((record, index) =>
-                                <div key={index} onClick={() => this._handleOnClick(record.id)}><img src={record.art_url + this.sliderCropParams} /></div>
+                                <div key={record.id} onClick={() => this._handleOnClick(record.id)}>
+                                    {/* <img src={record.art_url + this.sliderCropParams} /> */}
+                                    <ProgressiveImage delay={2000} src={record.art_url + this.cropParamsHQ} placeholder={record.art_url + this.sliderCropParams}>
+                                        {src => <img src={src} alt="aitr_image" />}
+                                    </ProgressiveImage>
+                                </div>
                             )
                         }
                     </Slider>
@@ -114,4 +128,4 @@ class InRoomSlider extends Component {
     }
 }
 
-export default withTranslation(InRoomSlider);
+export default InRoomSlider;
