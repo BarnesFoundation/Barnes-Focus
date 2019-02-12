@@ -176,14 +176,6 @@ namespace :data do
 
   desc "adding more texts to translations"
   task add_more_to_translations: :environment do
-    screen_1 = Translation.find_by(screen_text: "Welcome_screen", display_order: 1)
-    Translation.create(
-      screen_text: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
-      parent_id: screen_1.id,
-      english_translation: "The Barnes Focus app is generously supported by the Knight Foundation through the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
-      unique_identifier: 'text_4'
-    )
-
     screen_6 = Translation.find_by(screen_text: "Bookmark_capture", display_order: 6)
     Translation.create(
       screen_text: "Something doesn't look right. Try entering your email again.",
@@ -326,14 +318,6 @@ namespace :data do
         parent_id: screen_6.id,
         english_translation: "Try entering your email again.",
         unique_identifier: 'text_6'
-      )
-
-      screen_1 = Translation.find_by(screen_text: "Welcome_screen", display_order: 1)
-
-      screen_1_4 = Translation.find_by(parent_id: screen_1.id, unique_identifier: 'text_4')
-      screen_1_4.update_attributes(
-        screen_text: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes.",
-        english_translation: "Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes."
       )
     end
 
