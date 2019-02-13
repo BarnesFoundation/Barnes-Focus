@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import { Textfit } from 'react-textfit';
 
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
@@ -127,10 +128,18 @@ class HomeComponent extends Component {
                     </div>
                     <div className="home-action">
                         <button className="action-btn" onClick={this.onSelectYes}>
-                            <span className="action-text h2">{this.props.getTranslation('Welcome_screen', 'text_3')}</span>
+                            <span className="action-text h2">
+                                <Textfit mode="single" max="25">
+                                    {this.props.getTranslation('Welcome_screen', 'text_3')}
+                                </Textfit>
+                            </span>
                         </button>
                         <button className="action-btn" onClick={this.onSelectNo}>
-                            <span className="action-text h2">{this.props.getTranslation('Welcome_screen', 'text_4')}</span>
+                            <span className="action-text h2">
+                                <Textfit mode="single" max="25">
+                                    {this.props.getTranslation('Welcome_screen', 'text_4')}
+                                </Textfit>
+                            </span>
                         </button>
                     </div>
                     <div className="kf-banner">
