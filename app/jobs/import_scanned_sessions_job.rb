@@ -20,7 +20,7 @@ class ImportScannedSessionsJob < ApplicationJob
             filename = "#{SecureRandom.hex}-scanned-sessions.csv"
 
             CSV.open( "#{Rails.root}/tmp/#{filename}", 'w' ) do |csv|
-                csv.add_row ["scanned_session_id", "user_session_id", "s3_url_scanned_image", "catchoom_image_url", "image_id", "art_url", "imageSecret", "ensembleIndex"]
+                csv.add_row ["scanned_session_id", "user_session_id", "s3_url_scanned_image", "catchoom_image_url", "image_id", "art_url", "imageSecret", "ensembleIndex", "created_at"]
 
                 @query.each do | album |
                     session             = ActiveRecord::SessionStore::Session.find_by_id(album.session_id)
@@ -35,7 +35,8 @@ class ImportScannedSessionsJob < ApplicationJob
                                 es_data.nil? ? nil : es_data["id"],
                                 es_data.nil? ? nil : es_data["art_url"],
                                 es_data.nil? ? nil : es_data["imageSecret"],
-                                es_data.nil? ? nil : es_data["ensembleIndex"]
+                                es_data.nil? ? nil : es_data["ensembleIndex"],
+                                photo.created_at.strftime("%Y-%m-%d %H:%M:%S.%L")
                             ]
 
                             csv.add_row values
