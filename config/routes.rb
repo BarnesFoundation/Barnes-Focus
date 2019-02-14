@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   post 'jobs/update_es_cache'             => 'jobs/update_es_cache'
   post 'jobs/send_bookmarks_email'        => 'jobs/send_bookmarks_email'
   post 'jobs/clear_sessions'              => 'jobs/clear_sessions'
+  post 'jobs/cleanup_bookmarks'           => 'jobs/cleanup_bookmarks'
   get '*path', to:  "pages#home"
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
