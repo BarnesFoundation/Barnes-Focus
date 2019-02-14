@@ -113,7 +113,7 @@ class InRoomSlider extends Component {
                     <Slider {...sliderSettings} beforeChange={this.beforeChangeHandler}>
                         {
                             this.props.alsoInRoomResults.map((record, index) =>
-                                <div key={record.id} onClick={() => this._handleOnClick(record.id)}>
+                                <div key={record.id} onClick={() => this._handleOnClick(record.id)} id={record.id}>
                                     {/* <img src={record.art_url + this.sliderCropParams} /> */}
                                     <ProgressiveImage delay={2000} src={record.art_url + this.cropParamsHQ} placeholder={record.art_url + this.sliderCropParams}>
                                         {src => <img src={src} alt="aitr_image" />}
