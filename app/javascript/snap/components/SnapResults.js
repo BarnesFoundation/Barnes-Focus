@@ -529,7 +529,9 @@ class SnapResults extends Component {
                     </div>
                     <div id="share-it" className="btn-share-result" ref={(node) => { this.target = node }} onClick={this._onClickShare}>
                       <img src={share} alt="share" />
-                      <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
+                      <span className="text-share">
+                        {this.props.getTranslation('Result_page', 'text_1')}
+                      </span>
                     </div>
                     <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
                       <PopoverBody>

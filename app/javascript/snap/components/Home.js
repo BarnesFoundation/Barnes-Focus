@@ -114,6 +114,7 @@ class HomeComponent extends Component {
 
         const { unsupportedIOSBrowser, unsupportedIOSVersion } = this.state;
         let homeContainerStyle = (unsupportedIOSBrowser || unsupportedIOSVersion) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
+        let visitOnlineLinkStyle = (localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) === 'Ja') ? { fontSize: `18px` } : {};
         return (
             <div className="home-wrapper" id="home-wrapper" style={homeContainerStyle}>
                 {(unsupportedIOSBrowser) ? <UnsupportedDialog unsupportedIOSBrowser={true} /> : null}
@@ -129,14 +130,14 @@ class HomeComponent extends Component {
                     <div className="home-action">
                         <button className="action-btn" onClick={this.onSelectYes}>
                             <span className="action-text h2">
-                                <Textfit mode="single" max="25">
+                                <Textfit mode="single" max={25}>
                                     {this.props.getTranslation('Welcome_screen', 'text_3')}
                                 </Textfit>
                             </span>
                         </button>
                         <button className="action-btn" onClick={this.onSelectNo}>
                             <span className="action-text h2">
-                                <Textfit mode="single" max="25">
+                                <Textfit mode="single" max={25}>
                                     {this.props.getTranslation('Welcome_screen', 'text_4')}
                                 </Textfit>
                             </span>
@@ -155,7 +156,7 @@ class HomeComponent extends Component {
                                 <span>{this.props.getTranslation('Visit_soon', 'text_1')}</span>
                                 <span> {this.props.getTranslation('Visit_soon', 'text_2')}</span>
                             </div>
-                            <div className="visit-online-link">
+                            <div className="visit-online-link" style={visitOnlineLinkStyle}>
                                 <a href="https://www.barnesfoundation.org/" target="_blank">{this.props.getTranslation('Visit_soon', 'text_3')}</a>
                             </div>
                         </div>
