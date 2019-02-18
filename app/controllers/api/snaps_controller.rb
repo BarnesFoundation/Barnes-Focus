@@ -106,7 +106,7 @@ private
     image_info = EsCachedRecord.search(image_id)
 
     # If short description exists
-    if image_info["shortDescription"]
+    if !image_info.nil? && image_info["shortDescription"]
       # Remove html tags
       image_info["shortDescription"] = strip_tags(image_info["shortDescription"]).html_safe
 

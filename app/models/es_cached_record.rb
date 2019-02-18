@@ -82,7 +82,7 @@ class EsCachedRecord < ApplicationRecord
 
     @es_cached_record = find_by image_id: image_id
 
-    if @es_cached_record
+    if @es_cached_record && @es_cached_record.es_data.present?
       given_value = @es_cached_record.es_data[ "ensembleIndex" ]
 
       if given_value.present? && (!given_value.to_i.eql?(0) || !given_value.blank?)
