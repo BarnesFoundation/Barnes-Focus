@@ -14,7 +14,7 @@ class ImportScannedSessionsJob < ApplicationJob
                 @query = @query.order("albums.id DESC")
                 @dump_type = "succeeded scans"
             when "failed_attempts"
-                @query = Album.failed_scans
+                @query = Album.failed_scans # return ids
                 @dump_type = "failed scans"
             else
                 @query = Album.all
@@ -28,8 +28,8 @@ class ImportScannedSessionsJob < ApplicationJob
                 csv.add_row ["scanned_session_id", "user_session_id", "s3_url_scanned_image", "catchoom_image_url", "image_id", "art_url", "imageSecret", "ensembleIndex", "created_at"]
 
                 if @query.is_a?(Array)
-                    @query.in_groups_of(1000, false) {|albums|
-                        albums.each do | album |
+                    @query.in_groups_of(1000, false) {|album_ids|
+                        Album.where(id: album_ids).find_each do | album |
                             csv.add_row fetch_row_data(album)
                         end
                     }
