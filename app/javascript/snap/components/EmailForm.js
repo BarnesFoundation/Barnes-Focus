@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { SNAP_USER_EMAIL } from './Constants';
+import { SNAP_USER_EMAIL, SNAP_LANGUAGE_PREFERENCE } from './Constants';
 
 class EmailFooter extends Component {
 
@@ -45,6 +45,7 @@ class EmailFooter extends Component {
 
     render() {
         let disclaimerTop = (this.props.isEmailScreen) ? ((this.state.errors.email) ? '365px' : '300px') : '0px';
+        let emailErrorFontStyle = (localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru') ? { fontSize: `12px` } : {};
         return (
             <div className="email-container">
                 <div className="email-head h2">
@@ -60,7 +61,7 @@ class EmailFooter extends Component {
                         </div>
                         {
                             this.state.errors.email === true &&
-                            <div className="email-input-error caption">
+                            <div className="email-input-error caption" style={emailErrorFontStyle}>
                                 {this.props.getTranslation('Bookmark_capture', 'text_5')} <br />
                                 {this.props.getTranslation('Bookmark_capture', 'text_6')}
                             </div>

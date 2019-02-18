@@ -45,6 +45,9 @@
             color: #FFFFFF;
             width: 295px;
             top: 104px;
+            height: 96px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .email-input {
