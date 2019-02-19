@@ -97,7 +97,10 @@
                 margin-bottom: 60px;
 
                 .btn-share-result {
-                    width: 95px;
+                    min-width: 95px;
+                    width: fit-content;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                     height: 45px;
                     border: 2px solid rgba(0, 0, 0, 0.12);
                     border-radius: 100px;

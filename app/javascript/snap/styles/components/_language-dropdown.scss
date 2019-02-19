@@ -67,7 +67,7 @@
 .dd-list-item {
   width: 100%;
   font-size: 1rem;
-  padding: 0 0 0 19px;
+  padding: 0;
   cursor: default;
   display: inline-block;
   white-space: nowrap;
@@ -76,9 +76,11 @@
   font-size: 16px;
   color: #282828;
 
-  span {
+  .language-select-s {
     font-family: 'Calibre-Regular';
     display: inline-block;
-    width: 79px;
+    width: 100%;
+    padding: 0 0 0 19px;
+
   }
 }

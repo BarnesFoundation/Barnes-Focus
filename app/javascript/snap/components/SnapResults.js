@@ -244,17 +244,6 @@ class SnapResults extends Component {
     this.scrollInProgress = false;
     // Register scroll listener
     window.addEventListener('scroll', this._onScroll, true);
-
-    if (this.state.searchResults.length > 0) {
-      $("#result-card").attr("data-title", this.state.searchResults[0].title);
-      $("#result-card").attr("data-artist", this.state.searchResults[0].artist);
-      $("#result-card").attr("data-id", this.state.searchResults[0].id);
-      $("#result-card").attr("data-invno", this.state.searchResults[0].invno);
-
-      if (!this.state.searchResults[0].shortDescription) {
-        $("#result-card").attr("data-nodesc-invno", this.state.searchResults[0].invno);
-      }
-    }
   }
 
   componentDidUpdate() {
@@ -463,26 +452,27 @@ class SnapResults extends Component {
     let { bgImageStyle } = this.state;
     let resultsContainerStyle = (((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) || this.state.showAboutScreen) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
     let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
-    let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `60px`, left: `calc(50% - 30px)` };
+    let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `80px`, left: `calc(50% - 40px)` };
 
+    let artwork = this.state.searchResults[0];
     return (
       <div>
         <Container className="container-fluid search-container" id="search-result" style={resultsContainerStyle} initialPose="exit" pose="enter">
           <div className="row">
             <div className="col-12 col-md-12">
-              <div id="result-card" className="card" data-title="" data-artist="" data-id="" data-invno="" data-nodesc-invno="">
+              <div id="result-card" className="card" data-title={artwork.title} data-artist={artwork.artist} data-id={artwork.id} data-invno={artwork.invno} data-nodesc-invno={(!artwork.shortDescription) ? artwork.invno : ''}>
                 <div className="card-top-container">
                   <div className="card-img-container" ref={el => this.artworkBackgroundContainer = el} style={bgImageStyle}>
-                    <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" />
+                    <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" />
                   </div>
                   <Child className="card-img-overlay">
                     <div className="card-img-result">
-                      <ProgressiveImage src={this.state.searchResults[0].url} placeholder={this.state.searchResults[0].url_low_quality}>
+                      <ProgressiveImage src={artwork.url} placeholder={artwork.url_low_quality}>
                         {src => <img src={src} alt="match_image" />}
                       </ProgressiveImage>
-                      {/* <img src={this.state.searchResults[0].url} alt="match_image" /> */}
+                      {/* <img src={artwork.url} alt="match_image" /> */}
                     </div>
-                    <div className="card-title h1">{this.state.searchResults[0].title}</div>
+                    <div className="card-title h1">{artwork.title}</div>
                   </Child>
                 </div>
                 <Child className="card-body" ref={el => this.resultsContainer = el}>
@@ -491,26 +481,26 @@ class SnapResults extends Component {
                       <tbody>
                         <tr>
                           <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
-                          <td className="text-left item-info">{this.state.searchResults[0].artist}</td>
+                          <td className="text-left item-info">{artwork.artist}</td>
                         </tr>
                         <tr>
                           <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_4')}:</td>
-                          <td className="text-left item-info">{this.state.searchResults[0].title}</td>
+                          <td className="text-left item-info">{artwork.title}</td>
                         </tr>
                         <tr>
                           <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_5')}:</td>
-                          <td className="text-left item-info">{this.state.searchResults[0].displayDate}</td>
+                          <td className="text-left item-info">{artwork.displayDate}</td>
                         </tr>
                         <tr>
                           <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_6')}:</td>
-                          <td className="text-left item-info">{this.state.searchResults[0].medium}</td>
+                          <td className="text-left item-info">{artwork.medium}</td>
                         </tr>
                         <tr>
                           <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_7')}:</td>
-                          <td className="text-left item-info">{this.state.searchResults[0].dimensions}</td>
+                          <td className="text-left item-info">{artwork.dimensions}</td>
                         </tr>
                         {
-                          !this.state.searchResults[0].curatorialApproval &&
+                          !artwork.curatorialApproval &&
                           <tr>
                             <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_8')}:</td>
                             <td className="text-left item-info">{this.props.getTranslation('Result_page', 'text_9')}</td>
@@ -520,10 +510,10 @@ class SnapResults extends Component {
                     </table>
                   </div>
                   <div className="short-desc-container" ref={elem => this.shortDescContainer = elem}>
-                    {this.state.searchResults[0].shortDescription && <div className="card-text paragraph">{this.state.searchResults[0].shortDescription}</div>}
+                    {artwork.shortDescription && <div className="card-text paragraph">{artwork.shortDescription}</div>}
                   </div>
                   {
-                    this.state.searchResults[0].shortDescription &&
+                    artwork.shortDescription &&
                     this.state.selectedLanguage.code !== 'En' &&
                     <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
                   }
@@ -539,7 +529,9 @@ class SnapResults extends Component {
                     </div>
                     <div id="share-it" className="btn-share-result" ref={(node) => { this.target = node }} onClick={this._onClickShare}>
                       <img src={share} alt="share" />
-                      <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
+                      <span className="text-share">
+                        {this.props.getTranslation('Result_page', 'text_1')}
+                      </span>
                     </div>
                     <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
                       <PopoverBody>

@@ -9,3 +9,6 @@ cron:
  - name: "delete all sessions that have not been updated in the last 7 days"
    url: "/jobs/clear_sessions"
    schedule: "0 5 * * *"
+ - name: "Daily job to delete from bookmarks where entries are more than 30 days old"
+   url: "/jobs/cleanup_bookmarks"
+   schedule: "0 6 * * *"

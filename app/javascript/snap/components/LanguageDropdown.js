@@ -3,8 +3,8 @@ import dropdown_icon from 'images/dropdown.svg';
 import dropup_icon from 'images/dropup.svg';
 import check from 'images/check.svg';
 
-/** 
- * 
+/**
+ *
 */
 class LanguageDropdown extends Component {
 
@@ -47,7 +47,7 @@ class LanguageDropdown extends Component {
                 {this.state.listVisible && <ul className="dd-list">
                     {this.props.langOptions.map((item) => (
                         <li className="dd-list-item" key={item.code} onClick={() => this.selectItem(item)}>
-                            <span>{item.name}</span>{item.selected && <img src={check} />}
+                            <span className="language-select-s">{item.name}</span>{item.selected && <img src={check} />}
                         </li>
                     ))}
                 </ul>}
