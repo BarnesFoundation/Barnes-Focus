@@ -116,7 +116,7 @@ class InRoomSlider extends Component {
                                 <div key={record.id} onClick={() => this._handleOnClick(record.id)}>
                                     {/* <img src={record.art_url + this.sliderCropParams} /> */}
                                     <ProgressiveImage delay={2000} src={record.art_url + this.cropParamsHQ} placeholder={record.art_url + this.sliderCropParams}>
-                                        {src => <img src={src} alt="aitr_image" />}
+                                        {src => <img src={src} id={'aitr-card-' + record.id} alt="aitr_image" />}
                                     </ProgressiveImage>
                                 </div>
                             )
