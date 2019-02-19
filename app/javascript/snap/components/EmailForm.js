@@ -46,9 +46,10 @@ class EmailFooter extends Component {
     render() {
         let disclaimerTop = (this.props.isEmailScreen) ? ((this.state.errors.email) ? '365px' : '300px') : '0px';
         let emailErrorFontStyle = (localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru') ? { fontSize: `12px` } : {};
+        let emailHeadFontStyle = (localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru') ? { fontSize: `18px` } : {};
         return (
             <div className="email-container">
-                <div className="email-head h2">
+                <div className="email-head h2" style={emailHeadFontStyle}>
                     {this.props.getTranslation('Bookmark_capture', 'text_1')}
                 </div>
                 <div className="email-input">
