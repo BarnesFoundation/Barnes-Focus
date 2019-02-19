@@ -452,7 +452,7 @@ class SnapResults extends Component {
     let { bgImageStyle } = this.state;
     let resultsContainerStyle = (((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) || this.state.showAboutScreen) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
     let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
-    let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `60px`, left: `calc(50% - 30px)` };
+    let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `80px`, left: `calc(50% - 40px)` };
 
     let artwork = this.state.searchResults[0];
     return (
