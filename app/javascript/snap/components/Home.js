@@ -28,6 +28,7 @@ class HomeComponent extends Component {
             userAtBarnes: true,
             unsupportedIOSVersion: null,
             unsupportedIOSBrowser: null,
+            getUserMediaError: false
         }
     }
 
@@ -98,7 +99,7 @@ class HomeComponent extends Component {
         }
         catch (error) {
             console.log('An error occurred while accessing the device camera');
-            this.setState({ error: "An error occurred accessing the device camera" })
+            this.setState({ error: "An error occurred accessing the device camera", getUserMediaError: true, userAtBarnes: false });
         }
     }
 
@@ -108,6 +109,10 @@ class HomeComponent extends Component {
 
     navigateBackToHome = () => {
         this.setState({ userAtBarnes: true });
+    }
+
+    _onClickCloseUserMediaErrorScreen = () => {
+        this.setState({ getUserMediaError: false, userAtBarnes: true });
     }
 
     render() {
@@ -120,36 +125,41 @@ class HomeComponent extends Component {
                 {(unsupportedIOSBrowser) ? <UnsupportedDialog unsupportedIOSBrowser={true} /> : null}
                 {(unsupportedIOSVersion) ? <UnsupportedDialog unsupportedIOSVersion={true} /> : null}
                 <img src={home_background} alt="home_background" style={{ width: screen.width, height: screen.height }} />
-                {this.state.userAtBarnes && <div className="landing-screen">
-                    <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
-                    {/* <div className="user-loc-prompt">Are you at <br />the Barnes?</div> */}
-                    <div className="user-loc-prompt">
-                        {this.props.getTranslation('Welcome_screen', 'text_1')} <br />
-                        {this.props.getTranslation('Welcome_screen', 'text_2')}
+                {
+                    this.state.userAtBarnes &&
+                    !this.state.getUserMediaError &&
+                    <div className="landing-screen">
+                        <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
+                        {/* <div className="user-loc-prompt">Are you at <br />the Barnes?</div> */}
+                        <div className="user-loc-prompt">
+                            {this.props.getTranslation('Welcome_screen', 'text_1')} <br />
+                            {this.props.getTranslation('Welcome_screen', 'text_2')}
+                        </div>
+                        <div className="home-action">
+                            <button className="action-btn" onClick={this.onSelectYes}>
+                                <span className="action-text h2">
+                                    <Textfit mode="single" max={25}>
+                                        {this.props.getTranslation('Welcome_screen', 'text_3')}
+                                    </Textfit>
+                                </span>
+                            </button>
+                            <button className="action-btn" onClick={this.onSelectNo}>
+                                <span className="action-text h2">
+                                    <Textfit mode="single" max={25}>
+                                        {this.props.getTranslation('Welcome_screen', 'text_4')}
+                                    </Textfit>
+                                </span>
+                            </button>
+                        </div>
+                        <div className="kf-banner">
+                            <img src={kf_logo} alt="knight_foundation_logo" className="kf-logo" />
+                            <div className="kf-text caption">{this.props.getTranslation('About', 'text_2')}</div>
+                        </div>
                     </div>
-                    <div className="home-action">
-                        <button className="action-btn" onClick={this.onSelectYes}>
-                            <span className="action-text h2">
-                                <Textfit mode="single" max={25}>
-                                    {this.props.getTranslation('Welcome_screen', 'text_3')}
-                                </Textfit>
-                            </span>
-                        </button>
-                        <button className="action-btn" onClick={this.onSelectNo}>
-                            <span className="action-text h2">
-                                <Textfit mode="single" max={25}>
-                                    {this.props.getTranslation('Welcome_screen', 'text_4')}
-                                </Textfit>
-                            </span>
-                        </button>
-                    </div>
-                    <div className="kf-banner">
-                        <img src={kf_logo} alt="knight_foundation_logo" className="kf-logo" />
-                        <div className="kf-text caption">{this.props.getTranslation('About', 'text_2')}</div>
-                    </div>
-                </div>
                 }
-                {!this.state.userAtBarnes &&
+                {
+                    !this.state.userAtBarnes &&
+                    !this.state.getUserMediaError &&
                     <div>
                         <div className="app-usage-alert h2">
                             <div className="app-usage-msg">
@@ -161,6 +171,22 @@ class HomeComponent extends Component {
                             </div>
                         </div>
                         <div className="btn-close" onClick={this.navigateBackToHome}>
+                            <img src={close_icon} alt="close" />
+                        </div>
+                    </div>
+                }
+
+                {
+                    this.state.getUserMediaError &&
+                    !this.state.userAtBarnes &&
+                    <div>
+                        <div className="app-usage-alert h2">
+                            <div className="app-usage-msg">
+                                {isIOS && <span>{constants.GET_USER_MEDIA_ERROR_IOS}</span>}
+                                {isAndroid && <span>{constants.GET_USER_MEDIA_ERROR_ANDROID}</span>}
+                            </div>
+                        </div>
+                        <div className="btn-close" onClick={this._onClickCloseUserMediaErrorScreen}>
                             <img src={close_icon} alt="close" />
                         </div>
                     </div>
