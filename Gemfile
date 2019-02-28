@@ -37,6 +37,7 @@ gem 'nokogiri'
 gem 'redis'
 gem 'activerecord-session_store'
 gem 'owlcarousel-rails'
+gem 'pg_csv'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

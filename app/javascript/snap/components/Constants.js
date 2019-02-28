@@ -12,6 +12,8 @@ export const SUBMIT_BOOKMARKS_EMAIL_URL = '/api/bookmarks';
 export const SAVE_LANGUAGE_PREFERENCE_URL = '/api/bookmarks/set_language';
 export const APP_TRANSLATIONS_URL = '/api/translations';
 export const KNIGHT_FOUNDATION_CREDIT_TEXT = 'Barnes Focus was created by the Knight Center for Digital Innovation in Audience Engagement at the Barnes.';
+export const GET_USER_MEDIA_ERROR_IOS = 'This app requires camera access. Go to Settings > Safari > Camera & Microphone Access to allow, then refresh and try again.';
+export const GET_USER_MEDIA_ERROR_ANDROID = `This app requires camera access. Go to \u22ee > Settings > Site Settings > Camera. Tap on "barnesfoc.us", then hit Reset and try again.`;
 /**
  * snap v2 constants
  * ===== END =======
