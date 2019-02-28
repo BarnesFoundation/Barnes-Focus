@@ -214,6 +214,84 @@ namespace :data do
     )
   end
 
+  def stream_query_rows(sql_query, options="WITH CSV HEADER")
+    conn = ActiveRecord::Base.connection.raw_connection
+    conn.copy_data "COPY (#{sql_query}) TO STDOUT #{options};" do
+      while row = conn.get_copy_data
+        yield row
+      end
+    end
+  end
+
+  namespace :scanned_sessions do
+    task export: :environment do
+      sql = "SELECT albums.id, albums.session_id, photos.searched_image_s3_url AS s3_url_scanned_image, photos.result_image_url AS catchoom_image_url,
+          (CASE WHEN photos.es_response = 'undefined'
+          THEN NULL
+          ELSE (((photos.es_response::json->>'data')::json->>'records')::json->>0)::json->>'id'
+          END) AS image_id,
+          (CASE WHEN photos.es_response = 'undefined'
+          THEN NULL
+          ELSE (((photos.es_response::json->>'data')::json->>'records')::json->>0)::json->>'art_url'
+          END) AS art_url,
+          (CASE WHEN photos.es_response = 'undefined'
+          THEN NULL
+          ELSE (((photos.es_response::json->>'data')::json->>'records')::json->>0)::json->>'imageSecret'
+          END) AS imageSecret,
+          (CASE WHEN photos.es_response = 'undefined'
+          THEN NULL
+          ELSE (((photos.es_response::json->>'data')::json->>'records')::json->>0)::json->>'ensembleIndex'
+          END) AS ensembleIndex, photos.created_at
+        FROM albums
+        JOIN photos ON albums.id = photos.album_id
+        LEFT OUTER JOIN sessions ON albums.session_id = sessions.id
+        ORDER BY albums.id DESC"
+
+      stream_query_rows(sql, "WITH CSV HEADER") do |row_from_db|
+        p row_from_db
+        csv << row_from_db
+      end
+    end
+
+    task export_to_csv: :environment do
+      start_time = Time.now.utc
+      sql = "SELECT albums.id, albums.session_id, photos.searched_image_s3_url AS s3_url_scanned_image, photos.result_image_url AS catchoom_image_url,
+          (CASE WHEN photos.es_response = 'undefined'
+          THEN NULL
+          ELSE (((photos.es_response::json->>'data')::json->>'records')::json->>0)::json->>'id'
+          END) AS image_id,
+          (CASE WHEN photos.es_response = 'undefined'
+          THEN NULL
+          ELSE (((photos.es_response::json->>'data')::json->>'records')::json->>0)::json->>'art_url'
+          END) AS art_url,
+          (CASE WHEN photos.es_response = 'undefined'
+          THEN NULL
+          ELSE (((photos.es_response::json->>'data')::json->>'records')::json->>0)::json->>'imageSecret'
+          END) AS imageSecret,
+          (CASE WHEN photos.es_response = 'undefined'
+          THEN NULL
+          ELSE (((photos.es_response::json->>'data')::json->>'records')::json->>0)::json->>'ensembleIndex'
+          END) AS ensembleIndex, photos.created_at
+        FROM albums
+        JOIN photos ON albums.id = photos.album_id
+        LEFT OUTER JOIN sessions ON albums.session_id = sessions.id
+        ORDER BY albums.id DESC
+      "
+
+      file = "#{SecureRandom.hex}-scanned-sessions.csv"
+
+      PgCsv.new(:sql => sql).export(file, :header => true)
+
+      f = S3Store.new( File.open(file) ).store
+      file_url = f.url
+      File.delete(file)
+
+      end_time = Time.now.utc
+      total_copy_time = end_time - start_time
+      p "Total time consumed by the copy SQL (in HH:MM:SS): #{Time.at(total_copy_time.round.abs).utc.strftime '%H:%M:%S'}"
+    end
+  end
+
   namespace :translations do
     desc "add translation for UnSupported OS/ Browser screen"
     task for_browser_screen: :environment do
