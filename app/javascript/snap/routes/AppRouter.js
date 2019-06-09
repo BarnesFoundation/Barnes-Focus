@@ -6,6 +6,7 @@ import Home from '../components/Home';
 import About from '../components/About';
 import Camera from '../components/Camera';
 import SnapResults from '../components/SnapResults';
+import Artwork from '../components/Artwork';
 import * as constants from '../components/Constants';
 
 const RouteContainer = posed.div({
@@ -21,7 +22,7 @@ const Routes = () => (
                     <Switch location={location}>
                         <Route path="/" component={Home} exact={true} key="home" />
                         <Route path="/scan" component={Camera} exact={true} key="scan" />
-                        <Route path="/artwork/:imageId?" component={SnapResults} key="artwork" />
+                        <Route path="/artwork/:imageId?" component={Artwork} key="artwork" />
                     </Switch>
                 </RouteContainer>
             </PoseGroup>
