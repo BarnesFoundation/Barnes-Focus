@@ -78,6 +78,40 @@ class Api::SnapsController < Api::BaseController
     end
   end
 
+  def find_stories_by_object_id
+    @stories = StoryFetcher.new.find_by_object_id params[:object_id].to_i
+
+    respond_to do | wants |
+      wants.json do
+        render json: {
+          data: {
+            success: true,
+            stories: @stories
+          },
+          message: 'ok'
+        },
+        status: :ok
+      end
+    end
+  end
+
+  def find_stories_by_room_id
+    @stories = StoryFetcher.new.find_by_room_id params[:room_id].to_i
+
+    respond_to do | wants |
+      wants.json do
+        render json: {
+          data: {
+            success: true,
+            stories: @stories
+          },
+          message: 'ok'
+        },
+        status: :ok
+      end
+    end
+  end
+
 ###### Mark all subsequent methods as private methods ######
 private
 
