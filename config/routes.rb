@@ -13,6 +13,8 @@ Rails.application.routes.draw do
         get :getArtworkInformation
         get 'languages'
         get :similar_arts
+        get :find_stories_by_object_id
+        get :find_stories_by_room_id
       end
     end
     resources :bookmarks, only: [:index, :create] do
