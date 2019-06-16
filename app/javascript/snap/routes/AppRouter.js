@@ -3,10 +3,8 @@ import { BrowserRouter, Route, NavLink, Switch } from 'react-router-dom';
 import posed, { PoseGroup } from "react-pose";
 
 import Home from '../components/Home';
-import About from '../components/About';
 import Camera from '../components/Camera';
-import SnapResults from '../components/SnapResults';
-import Artwork from '../components/Artwork';
+import FocusResult from '../components/FocusResult';
 import * as constants from '../components/Constants';
 
 const RouteContainer = posed.div({
@@ -22,7 +20,7 @@ const Routes = () => (
                     <Switch location={location}>
                         <Route path="/" component={Home} exact={true} key="home" />
                         <Route path="/scan" component={Camera} exact={true} key="scan" />
-                        <Route path="/artwork/:imageId?" component={Artwork} key="artwork" />
+                        <Route path="/artwork/:imageId?" component={FocusResult} key="artwork" />
                     </Switch>
                 </RouteContainer>
             </PoseGroup>

@@ -20,8 +20,6 @@ import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
 import ProgressiveImage from 'react-progressive-image';
 
-
-
 /** 
  * withRouter HOC provides props with location, history and match objects
 */
@@ -31,7 +29,6 @@ class Artwork extends Component {
     constructor(props) {
         super(props);
         console.log('Artwork >> constructor');
-
         this.sr = new SearchRequestService();
 
         this.langOptions = [
@@ -47,57 +44,7 @@ class Artwork extends Component {
         ];
 
         this.state = {
-            //...props.location.state,  // these properties are passed on from Camera component. Contains {result}
-            result: {
-                "api_data": [
-                ],
-                "data": {
-                    "records": [
-                        {
-                            "id": 7007,
-                            "room": "Main Room",
-                            "invno": "BF14",
-                            "title": "Cup of Chocolate (Femme prenant du chocolat)",
-                            "medium": "Oil on canvas",
-                            "people": "Pierre-Auguste Renoir",
-                            "locations": "Barnes Foundation (Philadelphia), Collection Gallery, Main Room, North Wall",
-                            "creditLine": "",
-                            "dimensions": "Overall: 21 5/16 x 25 5/8 in. (54.1 x 65.1 cm)",
-                            "displayDate": "c. 1912",
-                            "imageSecret": "0ZAwvN86FoAq13N8",
-                            "ensembleIndex": "1",
-                            "classification": "Paintings",
-                            "shortDescription": "Figures sitting at café tables were a frequent subject for impressionist painters interested in the bustling public life of modern Paris. This canvas, however, does not quite fit into that category. Renoir painted it well after his impressionist years were over, when he was living in the rural countryside of southern France. The painting shows a casually dressed figure stirring a cup of hot chocolate; lost in reverie, slumping forward, she is conveys dreamy inwardness rather than public sociability. The model is Gabrielle Renard, who worked as a nursemaid for the Renoir family and often modeled for the artist; here she is probably posing in his studio. Notice how many colors make up the white tablecloth—purple, green, blue—and how Renoir uses soft, delicate brushstrokes to create the appearance of velvety flesh. ",
-                            "art_url": "https://barnes-images.imgix.net/7007_0ZAwvN86FoAq13N8_b.jpg"
-                        }
-                    ],
-                    "roomRecords": [
-                        {
-                            "id": 6964,
-                            "art_url": "https://barnes-images.imgix.net/6964_RehDRhZC5bQtSnko_b.jpg"
-                        },
-                        {
-                            "id": 7020,
-                            "art_url": "https://barnes-images.imgix.net/7020_f2wbizJUVJhRvCyC_b.jpg"
-                        },
-                        {
-                            "id": 7010,
-                            "art_url": "https://barnes-images.imgix.net/7010_eOCFXaKIIpWBFGrc_b.jpg"
-                        },
-                        {
-                            "id": 7019,
-                            "art_url": "https://barnes-images.imgix.net/7019_nfDkcKrMa9lLxn1W_b.jpg"
-                        },
-                        {
-                            "id": 6981,
-                            "art_url": "https://barnes-images.imgix.net/6981_BlvD0VojmGU5ETzC_b.jpg"
-                        }
-                    ],
-                    "message": "Result found"
-                },
-                "success": true,
-                "requestComplete": true
-            },
+            result: props.result,
             sharePopoverIsOpen: false,
             showEmailScreen: false,
             showAboutScreen: false,
@@ -240,10 +187,10 @@ class Artwork extends Component {
     updateBackgroundStyle = () => {
         if (this.state.bgLoaded && this.resultsContainer) {
             let { top, bottom } = this.resultsContainer.getBoundingClientRect();
-            let artworkBgBottom = this.artworkBackgroundContainer.getBoundingClientRect().bottom;
-            if (artworkBgBottom > bottom) {
-                this.setState({ bgImageStyle: { minHeight: (Math.floor(top) + 50) } });
-            }
+            //let artworkBgBottom = this.artworkBackgroundContainer.getBoundingClientRect().bottom;
+            // if (artworkBgBottom > bottom) {
+            //     this.setState({ bgImageStyle: { minHeight: (Math.floor(top) + 50) } });
+            // }
         }
     }
 
@@ -557,6 +504,7 @@ class Artwork extends Component {
 
                                         </div>
                                     </div>
+
                                 </div>
 
 
@@ -565,15 +513,7 @@ class Artwork extends Component {
                                         <img src={scan_button} alt="scan" />
                                     </div>
                                 </div>
-                                {
-                                    parseInt(this.state.snapAttempts) >= 4 &&
-                                    !this.state.emailCaptured &&
-                                    !this.state.showEmailScreen &&
-                                    <div>
-                                        <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
-                                    </div>
-                                }
-                                <Footer footerStyle={footerStyle} onClickAbout={this._onClickAbout} getTranslation={this.props.getTranslation} />
+
                             </div>
                         </div>
                     </div>
