@@ -74,6 +74,17 @@ class SearchRequestService {
             console.log('An error occurred while retrieving the translations from the server');
         }
     }
+
+    getStoryItems = async (imageId) => {
+        try {
+            let response = await axios.get(constants.STORIES_URL + imageId);
+            return response.data;
+        }
+
+        catch (error) {
+            console.log('An error occurred while retrieving the artwork information from the server');
+        }
+    }
 }
 
 export { SearchRequestService };
