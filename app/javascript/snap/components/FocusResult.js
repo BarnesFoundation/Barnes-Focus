@@ -72,7 +72,9 @@ class FocusResult extends Component {
                 },
                 null
             ],
-            index: 0
+            index: 0,
+            prevIndex: -1,
+            scrollDir: 'UP'
 
         }
 
@@ -97,7 +99,8 @@ class FocusResult extends Component {
 
         const story = this.state.stories[index];
         const shouldRender = (index < this.state.stories.length - 1) ? true : false;
-        return (shouldRender) ? <StoryItem isFirstItem={(this.state.index === 0) ? true : false} story={story} style={style} /> : null;
+        console.log('index = ' + index + ' && render = ' + shouldRender);
+        return (shouldRender) ? <StoryItem isFirstItem={(this.state.index === 0) ? true : false} key={index} story={story} style={style} /> : null;
     }
 
     toggle = e =>
@@ -105,8 +108,8 @@ class FocusResult extends Component {
             index: state.index === 3 ? 3 : state.index + 1,
         }));
 
-    swiped = (e, deltaX, deltaY, isFlick, velocity) => {
-        console.log("You Swiped...", e, deltaX, deltaY, isFlick, velocity)
+    swiped = (e) => {
+        //console.log("You Swiped...", e, deltaX, deltaY, isFlick, velocity)
 
         const artwork = document.getElementById('focussed-artwork-body');
         const storyContainer = document.getElementById('story-item-container');
@@ -116,19 +119,21 @@ class FocusResult extends Component {
         const resultsContainerBottom = Math.ceil(h - artwork.getBoundingClientRect().bottom);
         const storyContainerBottom = Math.ceil(h - storyContainer.getBoundingClientRect().bottom);
 
-        console.log('resultsContainerBottom :: ' + resultsContainerBottom);
-        console.log('storyContainerBottom :: ' + storyContainerBottom);
+        //console.log('resultsContainerBottom :: ' + resultsContainerBottom);
+        //console.log('storyContainerBottom :: ' + storyContainerBottom);
 
         // when focussed artwork card is visible, index is 0
         if (this.state.index === 0) {
-            console.log('You are swiping focussed artwork');
+            //console.log('You are swiping focussed artwork');
             if (resultsContainerBottom >= 0) {
                 this.setState(state => ({
-                    index: 1
+                    index: 1,
+                    prevIndex: 0,
+                    scrollDir: 'UP'
                 }));
             }
         } else {
-            console.log('You are swiping story item with dir = ' + e.dir);
+            //console.log('You are swiping story item with dir = ' + e.dir);
 
             const newIndex = (e.dir === 'Up') ?
                 ((this.state.index !== (this.state.stories.length - 1)) ? (this.state.index + 1) : this.state.index) :
@@ -138,7 +143,9 @@ class FocusResult extends Component {
 
             if (newIndex !== this.state.index) {
                 this.setState(state => ({
-                    index: newIndex
+                    index: newIndex,
+                    prevIndex: state.index,
+                    scrollDir: (e.dir === 'Up') ? 'UP' : 'DOWN'
                 }));
             }
 
@@ -168,22 +175,34 @@ class FocusResult extends Component {
     }
 
     render() {
-        const zIndexCurrent = 100 * this.state.index;
+
+        const { index, prevIndex, scrollDir, result } = this.state;
+
+        const zIndexCurrent = 100 * index;
         const zIndexPrev = zIndexCurrent - 100;
-        console.log(this.state.index);
+        console.log('prevIndex, index, scrollDir :: ' + prevIndex, index, scrollDir);
+
+
+        let yFrom, yEnter, yLeave;
+        if (scrollDir === 'UP') {
+            yFrom = 100, yEnter = 83, yLeave = 0;
+        } else {
+            yFrom = 0, yEnter = 83; yLeave = 100;
+        }
+
         return (
             <Swipeable
                 onSwiped={this.swiped}>
-                <Artwork result={this.state.result} />
+                <Artwork result={result} />
 
                 <div className="story-container" id="story-item-container">
                     <Transition
                         native
                         unique
                         items={this.state.index}
-                        from={{ opacity: 1, transform: 'translate3d(0,100%,0)' }}
-                        enter={{ opacity: 1, zIndex: zIndexCurrent, borderRadius: `40px`, transform: 'translate3d(0,83%,0)' }}
-                        leave={{ opacity: 1, zIndex: zIndexPrev, borderRadius: `0px`, transform: 'translate3d(0, 0%,0)' }}
+                        from={{ opacity: 1, transform: `translate3d(0,${yFrom}%,0)` }}
+                        enter={{ opacity: 1, zIndex: zIndexCurrent, borderRadius: `40px`, transform: `translate3d(0,${yEnter}%,0)` }}
+                        leave={{ opacity: 1, zIndex: zIndexPrev, borderRadius: `0px`, transform: `translate3d(0, ${yLeave}%, 0)` }}
                     >
                         {index => style => (
                             <animated.div className="story-item" style={{ ...style }} >
