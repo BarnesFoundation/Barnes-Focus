@@ -224,6 +224,8 @@ class Artwork extends Component {
         let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
         let resultsContainerBottom = Math.ceil(h - this.resultsContainer.getBoundingClientRect().bottom);
 
+        //console.log('resultsContainerBottom :: ' + resultsContainerBottom);
+
         /** animate blur based on results container bottom position */
         let blur = Math.floor(resultsContainerBottom / 35);
         if (blur >= 0 && blur <= 15) {
@@ -432,7 +434,7 @@ class Artwork extends Component {
                                         <div className="card-title h1">{artwork.title}</div>
                                     </div>
                                 </div>
-                                <div className="card-body" ref={el => this.resultsContainer = el}>
+                                <div className="card-body" id="focussed-artwork-body" ref={el => this.resultsContainer = el}>
                                     <div className="short-desc-container" ref={elem => this.shortDescContainer = elem}>
                                         {artwork.shortDescription && <div className="card-text paragraph">{artwork.shortDescription}</div>}
                                     </div>

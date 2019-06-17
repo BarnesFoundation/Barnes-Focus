@@ -69,7 +69,8 @@ class FocusResult extends Component {
                     "short_para": "Renoir died in 1919, leaving behind more the 700 canvasses in his Cagnes-sur-Mer studio. Eager for a glimpse, Barnes travelled there in 1921 -a visit he later described as \" one of the most delightful experiences I ever had.\". He would eventually buy 41 studio painings from the Renoir sons.",
                     "info": "Odalisque with Tea Set (Odalisque á la théiére)",
                     "artist": "Pierre-Auguste Renoir."
-                }
+                },
+                null
             ],
             index: 0
 
@@ -93,8 +94,10 @@ class FocusResult extends Component {
     }
 
     renderStoryItem = (index, style) => {
+
         const story = this.state.stories[index];
-        return <StoryItem story={story} style={style} />
+        const shouldRender = (index < this.state.stories.length - 1) ? true : false;
+        return (shouldRender) ? <StoryItem isFirstItem={(this.state.index === 0) ? true : false} story={story} style={style} /> : null;
     }
 
     toggle = e =>
@@ -105,9 +108,43 @@ class FocusResult extends Component {
     swiped = (e, deltaX, deltaY, isFlick, velocity) => {
         console.log("You Swiped...", e, deltaX, deltaY, isFlick, velocity)
 
-        const targetClass = e.event.target.className.split(' ');
-        console.log(targetClass);
-        if (e.dir = 'Up') {
+        const artwork = document.getElementById('focussed-artwork-body');
+        const storyContainer = document.getElementById('story-item-container');
+
+        const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+        const resultsContainerBottom = Math.ceil(h - artwork.getBoundingClientRect().bottom);
+        const storyContainerBottom = Math.ceil(h - storyContainer.getBoundingClientRect().bottom);
+
+        console.log('resultsContainerBottom :: ' + resultsContainerBottom);
+        console.log('storyContainerBottom :: ' + storyContainerBottom);
+
+        // when focussed artwork card is visible, index is 0
+        if (this.state.index === 0) {
+            console.log('You are swiping focussed artwork');
+            if (resultsContainerBottom >= 0) {
+                this.setState(state => ({
+                    index: 1
+                }));
+            }
+        } else {
+            console.log('You are swiping story item with dir = ' + e.dir);
+
+            const newIndex = (e.dir === 'Up') ?
+                ((this.state.index !== (this.state.stories.length - 1)) ? (this.state.index + 1) : this.state.index) :
+                (this.state.index - 1);
+
+            console.log('newIndex = ' + newIndex);
+
+            if (newIndex !== this.state.index) {
+                this.setState(state => ({
+                    index: newIndex
+                }));
+            }
+
+        }
+
+        /* if (e.dir = 'Up') {
             if (targetClass.includes('story-img')) {
                 this.setState(state => ({
                     index: state.index === 3 ? 3 : state.index + 1,
@@ -127,7 +164,7 @@ class FocusResult extends Component {
                     index: 0,
                 }));
             }
-        }
+        } */
     }
 
     render() {
@@ -139,17 +176,17 @@ class FocusResult extends Component {
                 onSwiped={this.swiped}>
                 <Artwork result={this.state.result} />
 
-                <div className="story-container">
+                <div className="story-container" id="story-item-container">
                     <Transition
                         native
                         unique
                         items={this.state.index}
                         from={{ opacity: 1, transform: 'translate3d(0,100%,0)' }}
-                        enter={{ opacity: 1, zIndex: zIndexCurrent, borderRadius: `40px 40px 0 0`, transform: 'translate3d(0,80%,0)' }}
+                        enter={{ opacity: 1, zIndex: zIndexCurrent, borderRadius: `40px`, transform: 'translate3d(0,83%,0)' }}
                         leave={{ opacity: 1, zIndex: zIndexPrev, borderRadius: `0px`, transform: 'translate3d(0, 0%,0)' }}
                     >
                         {index => style => (
-                            <animated.div className="story-item" style={{ ...style }} onClick={this.toggle}>
+                            <animated.div className="story-item" style={{ ...style }} >
                                 {this.renderStoryItem(index, style)}
                             </animated.div>
                         )}
