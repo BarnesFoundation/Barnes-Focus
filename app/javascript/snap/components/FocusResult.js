@@ -96,6 +96,9 @@ class FocusResult extends Component {
     }
 
     renderStoryItem = (index, style) => {
+        if(index === -1) {
+            return null;
+        }
 
         const story = this.state.stories[index];
         const shouldRender = (index < this.state.stories.length - 1) ? true : false;
@@ -180,7 +183,9 @@ class FocusResult extends Component {
 
         const zIndexCurrent = 100 * index;
         const zIndexPrev = zIndexCurrent - 100;
+        const down = (scrollDir === 'DOWN') ? true : false;
         console.log('prevIndex, index, scrollDir :: ' + prevIndex, index, scrollDir);
+
 
 
         let yFrom, yEnter, yLeave;
@@ -205,9 +210,19 @@ class FocusResult extends Component {
                         leave={{ opacity: 1, zIndex: zIndexPrev, borderRadius: `0px`, transform: `translate3d(0, ${yLeave}%, 0)` }}
                     >
                         {index => style => (
-                            <animated.div className="story-item" style={{ ...style }} >
-                                {this.renderStoryItem(index, style)}
-                            </animated.div>
+                            <div>
+                                {
+                                    down &&
+                                    (index > 0) && 
+                                    <animated.div className="story-item" style={{ opacity: 1, zIndex: zIndexCurrent -1, borderRadius: `0px`, transform: `translate3d(0, 0%, 0)` }} >
+                                        {this.renderStoryItem(index-1, style)}
+                                    </animated.div>
+                                }
+
+                                <animated.div className="story-item" style={{ ...style }} >
+                                    {this.renderStoryItem(index, style)}
+                                </animated.div>
+                            </div>
                         )}
                     </Transition>
 
