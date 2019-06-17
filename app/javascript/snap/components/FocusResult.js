@@ -153,28 +153,6 @@ class FocusResult extends Component {
             }
 
         }
-
-        /* if (e.dir = 'Up') {
-            if (targetClass.includes('story-img')) {
-                this.setState(state => ({
-                    index: state.index === 3 ? 3 : state.index + 1,
-                }));
-            } else {
-                this.setState(state => ({
-                    index: 0,
-                }));
-            }
-        } else {
-            if (targetClass.includes('story-img')) {
-                this.setState(state => ({
-                    index: state.index === 0 ? 0 : state.index - 1,
-                }));
-            } else {
-                this.setState(state => ({
-                    index: 0,
-                }));
-            }
-        } */
     }
 
     render() {
@@ -185,8 +163,6 @@ class FocusResult extends Component {
         const zIndexPrev = zIndexCurrent - 100;
         const down = (scrollDir === 'DOWN') ? true : false;
         console.log('prevIndex, index, scrollDir :: ' + prevIndex, index, scrollDir);
-
-
 
         let yFrom, yEnter, yLeave;
         if (scrollDir === 'UP') {
@@ -201,6 +177,14 @@ class FocusResult extends Component {
                 <Artwork result={result} />
 
                 <div className="story-container" id="story-item-container">
+                    {/** this is to make sure that previous story item is back when we swipe down within story items. React spring doesn't keep track of previous item during transition */}
+                    {
+                        down &&
+                        (index > 0) &&
+                        <div className="story-item" style={{ opacity: 1, zIndex: zIndexCurrent - 1, borderRadius: `0px`, transform: `translate3d(0, 0%, 0)` }} >
+                            {this.renderStoryItem(index - 1, {})}
+                        </div>
+                    }
                     <Transition
                         native
                         unique
@@ -210,19 +194,9 @@ class FocusResult extends Component {
                         leave={{ opacity: 1, zIndex: zIndexPrev, borderRadius: `0px`, transform: `translate3d(0, ${yLeave}%, 0)` }}
                     >
                         {index => style => (
-                            <div>
-                                {
-                                    down &&
-                                    (index > 0) && 
-                                    <animated.div className="story-item" style={{ opacity: 1, zIndex: zIndexCurrent -1, borderRadius: `0px`, transform: `translate3d(0, 0%, 0)` }} >
-                                        {this.renderStoryItem(index-1, style)}
-                                    </animated.div>
-                                }
-
-                                <animated.div className="story-item" style={{ ...style }} >
-                                    {this.renderStoryItem(index, style)}
-                                </animated.div>
-                            </div>
+                            <animated.div className="story-item" style={{ ...style }} >
+                                {this.renderStoryItem(index, style)}
+                            </animated.div>
                         )}
                     </Transition>
 
