@@ -22,13 +22,11 @@ class LanguageDropdown extends Component {
 
     show = () => {
         this.setState({ listVisible: true });
-        this.props.onShowLanguageDropdown(true);
         document.addEventListener("click", this.hide);
     }
 
     hide = () => {
         this.setState({ listVisible: false });
-        this.props.onShowLanguageDropdown(false);
         document.removeEventListener("click", this.hide);
     }
 

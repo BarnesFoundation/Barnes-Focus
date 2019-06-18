@@ -33,6 +33,11 @@ export const SNAP_LAST_TIMESTAMP = 'barnes.snap.timestamp';
 export const SNAP_COUNT_RESET_INTERVAL = 43200000;
 export const SNAP_APP_RESET_INTERVAL = 86400000;
 
+export const SCROLL_DIR = {
+    DOWN: 'DOWN',
+    UP: 'UP'
+}
+
 export const GA_EVENT_CATEGORY = {
     SNAP: 'snap',
     SOCIAL: 'social',
