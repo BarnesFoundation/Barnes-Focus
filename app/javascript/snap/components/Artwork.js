@@ -31,18 +31,6 @@ class Artwork extends Component {
         console.log('Artwork >> constructor');
         this.sr = new SearchRequestService();
 
-        this.langOptions = [
-            { name: 'English', code: 'En', selected: true },
-            { name: 'Español', code: 'Es', selected: false },
-            { name: 'Français', code: 'Fr', selected: false },
-            { name: 'Deutsch', code: 'De', selected: false },
-            { name: 'Italiano', code: 'It', selected: false },
-            { name: 'русский', code: 'Ru', selected: false },
-            { name: '中文', code: 'Zh', selected: false },
-            { name: '日本語', code: 'Ja', selected: false },
-            { name: '한국어', code: 'Ko', selected: false }
-        ];
-
         this.state = {
             result: props.result,
             sharePopoverIsOpen: false,
@@ -72,10 +60,11 @@ class Artwork extends Component {
             errors: {
                 email: false
             },
-            selectedLanguage: this.langOptions[0]
+            selectedLanguage: props.selectedLanguage
         }
 
     }
+
 
     constructResultAndInRoomSlider = (search_result) => {
         if (search_result["success"]) {
@@ -140,42 +129,12 @@ class Artwork extends Component {
             this.setState({ emailCaptured: true, emailCaptureAck: true });
         }
 
-        const selectedLangCode = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE);
-        if (selectedLangCode !== null) {
-            this.langOptions.map(option => {
-                if (option.code === selectedLangCode) {
-                    option.selected = true;
-                    this.setState({ selectedLanguage: option });
-                } else {
-                    option.selected = false;
-                }
-            })
-        }
     }
 
     onBackgroundImageLoad = () => {
         this.setState({ bgLoaded: true });
     }
 
-    onSelectLanguage = async (lang) => {
-        console.log('Selected lang changed in Artwork component : ' + JSON.stringify(lang));
-        localStorage.setItem(constants.SNAP_LANGUAGE_PREFERENCE, lang.code);
-
-        this.langOptions.map(option => {
-            if (option.code === lang.code) {
-                option.selected = true;
-            } else {
-                option.selected = false;
-            }
-        })
-        this.setState({ selectedLanguage: lang });
-
-        /** Save the user selected language in the server session and call the getArtworksInfo API again to refresh the page with translated result. */
-        let languageUpdated = await this.sr.saveLanguagePreference(lang.code);
-        let artworkInfo = await this.sr.getArtworkInformation(this.state.searchResults[0].id);
-        this.setState({ result: artworkInfo });
-        this.constructResultAndInRoomSlider(artworkInfo);
-    }
 
     onSelectInRoomArt = (aitrId) => {
         localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
@@ -202,6 +161,7 @@ class Artwork extends Component {
     }
 
     componentDidUpdate() {
+        console.log('Artwork >> componentDidUpdate');
         setTimeout(() => {
             requestAnimationFrame(this.updateBackgroundStyle);
         }, 500);
@@ -210,6 +170,14 @@ class Artwork extends Component {
     componentWillUnmount() {
         // Un-register scroll listener
         window.removeEventListener('scroll', this._onScroll);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log('Artwork >> componentWillReceiveProps');
+        this.setState({ result: nextProps.result, selectedLanguage: nextProps.selectedLanguage });
+        if (this.state.selectedLanguage.code !== nextProps.selectedLanguage.code) {
+            this.constructResultAndInRoomSlider(nextProps.result);
+        }
     }
 
     /**
@@ -423,7 +391,7 @@ class Artwork extends Component {
                             <div id="result-card" className="card" data-title={artwork.title} data-artist={artwork.artist} data-id={artwork.id} data-invno={artwork.invno} data-nodesc-invno={(!artwork.shortDescription) ? artwork.invno : ''}>
                                 <div className="card-top-container">
                                     <div className="card-img-overlay">
-                                        <div className="card-header h1">Focussed Artwork</div>
+                                        <div className="card-header h1">Focused Artwork</div>
                                         <div className="card-img-result">
                                             <ProgressiveImage src={artwork.url} placeholder={artwork.url_low_quality}>
                                                 {src => <img src={src} alt="match_image" />}
@@ -499,9 +467,8 @@ class Artwork extends Component {
                                             </PopoverBody>
                                         </Popover>
                                         <div className="language-dropdown-wrapper">
-                                            {this.state.isLanguageDropdownOpen && <div className="language-dropdown-overlay"></div>}
                                             <div className="language-dropdown">
-                                                <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} onShowLanguageDropdown={this._onShowLanguageDropdown} />
+                                                <LanguageDropdown langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} onShowLanguageDropdown={this._onShowLanguageDropdown} />
                                             </div>
 
                                         </div>
