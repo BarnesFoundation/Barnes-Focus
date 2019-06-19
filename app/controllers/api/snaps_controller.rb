@@ -79,14 +79,15 @@ class Api::SnapsController < Api::BaseController
   end
 
   def find_stories_by_object_id
-    @stories = StoryFetcher.new.find_by_object_id params[:object_id].to_i
+    @story = StoryFetcher.new.find_by_object_id params[:object_id].to_i
 
     respond_to do | wants |
       wants.json do
         render json: {
           data: {
             success: true,
-            stories: @stories
+            total: @story[:total],
+            content: @story[:content]
           },
           message: 'ok'
         },
@@ -96,14 +97,15 @@ class Api::SnapsController < Api::BaseController
   end
 
   def find_stories_by_room_id
-    @stories = StoryFetcher.new.find_by_room_id params[:room_id].to_i
+    @story = StoryFetcher.new.find_by_room_id params[:room_id].to_i
 
     respond_to do | wants |
       wants.json do
         render json: {
           data: {
             success: true,
-            stories: @stories
+            total: @story[:total],
+            content: @story[:content]
           },
           message: 'ok'
         },
@@ -130,6 +132,7 @@ private
       # Get the image information for the image id
       response[:data][:records] << get_image_information(image_id)
       response[:data][:roomRecords] = get_similar_artworks(image_id)
+      response[:data][:show_story] = has_story?(image_id)
     end
     return response
   end
@@ -184,6 +187,11 @@ private
     viewed_images = session[ :user_scanned_history ] && !session[ :user_scanned_history ].blank? ? JSON.parse( session[ :user_scanned_history ] ) : []
     similar_arts = EsCachedRecord.find_similar_arts image_id, viewed_images
     return similar_arts
+  end
+
+  ## Fetch story from GraphQL
+  def has_story?(image_id)
+    StoryFetcher.new.has_related_stories?(image_id)
   end
 
   def fetch_session
