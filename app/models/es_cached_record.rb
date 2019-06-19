@@ -20,7 +20,11 @@ class EsCachedRecord < ApplicationRecord
     'creditLine',
     'room',
     'ensembleIndex',
-    'curatorialApproval'
+    'curatorialApproval',
+    'birthDate',
+    'deathDate',
+    'nationality',
+    'culture'
   ]
 
   ## Determines whether a cached record has expired data or not
