@@ -148,7 +148,8 @@ class FocusResult extends Component {
                 "short_para": "Renoir died in 1919, leaving behind more the 700 canvasses in his Cagnes-sur-Mer studio. Eager for a glimpse, Barnes travelled there in 1921 -a visit he later described as \" one of the most delightful experiences I ever had.\". He would eventually buy 41 studio painings from the Renoir sons.",
                 "info": "Odalisque with Tea Set (Odalisque á la théiére)",
                 "artist": "Pierre-Auguste Renoir."
-            }
+            },
+            null
         ];
     }
 
@@ -241,7 +242,6 @@ class FocusResult extends Component {
             yFrom = 0, yEnter = 83; yLeave = 100;
         }
 
-
         return (
             <Swipeable
                 onSwiping={this.swiping}
@@ -256,7 +256,7 @@ class FocusResult extends Component {
                         <div className="story-item-nav row">
                             <div className="col-8 story-question">Why so many Renoirs?</div>
                             <div className="col-4 language-dropdown">
-                                <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+                                <LanguageDropdown isStoryItemDropDown={true} langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
                             </div>
                         </div>
                     }
@@ -275,6 +275,7 @@ class FocusResult extends Component {
                         from={{ opacity: 1, transform: `translate3d(0,${yFrom}%,0)` }}
                         enter={{ opacity: 1, zIndex: zIndexCurrent, borderRadius: `40px`, transform: `translate3d(0,${yEnter}%,0)` }}
                         leave={{ opacity: 1, zIndex: zIndexPrev, borderRadius: `0px`, transform: `translate3d(0, ${yLeave}%, 0)` }}
+                    // config={{ mass: 1, tension: 50, friction: 5 }}
                     >
                         {index => style => (
                             <animated.div className="story-item" style={{ ...style }} >
