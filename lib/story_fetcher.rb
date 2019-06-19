@@ -113,14 +113,13 @@ class StoryFetcher
       next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
       object_id = "objectID#{i.to_s}"
 
-      art_info = ("objectID1" == object_id && searched_object_id == story_attrs[object_id]) ? EsCachedRecord.find_by(image_id: story_attrs["alternativeHeroImageObjectID"]) : EsCachedRecord.find_by(image_id: story_attrs["objectID"+i.to_s])
+      art_info = ("objectID1" == object_id && searched_object_id == story_attrs[object_id]) ? EsCachedRecord.search(story_attrs["alternativeHeroImageObjectID"]) : EsCachedRecord.search(story_attrs["objectID"+i.to_s])
 
       h = {
         "image_id"        => story_attrs[object_id],
         "short_paragraph" => story_attrs["shortParagraph"+i.to_s],
         "long_paragraph"  => story_attrs["longParagraph"+i.to_s],
-        "art_url"         =>  Image.imgix_url(art_info.es_data['id'], art_info.es_data['imageSecret']),
-        "art_info"        => art_info.es_data
+        "detail"          => art_info
       }
 
       content["stories"].push h
