@@ -21,7 +21,7 @@ html, body {
     -webkit-overflow-scrolling: touch;
     overflow-y:scroll;
     scroll-behavior: smooth;
-    background-color: rgba(160, 112, 70, 0.5);
+    //background-color: rgba(160, 112, 70, 0.5);
 }
 
 .h0 {
@@ -123,9 +123,11 @@ p {
 .scan-button {
     width: 60px;
     height: 60px;
-    left: calc(80% - 30px);
+    right: 24px;
     bottom: 37px;
     z-index: 99999;
+    position: fixed;
+    box-shadow: rgba(0, 0, 0, 0.42);
 }
 
 // .language-dropdown-wrapper {
@@ -147,7 +149,7 @@ p {
 // }
 
 .language-dropdown {
-    width: 68px;
+    width: 120px;
     height: 45px;
     z-index: 99999;
 }

@@ -1,5 +1,7 @@
 import React from 'react';
 import { animated, config } from 'react-spring/renderprops';
+import LanguageDropdown from '../components/LanguageDropdown';
+import { throws } from 'assert';
 
 
 class StoryItem extends React.Component {
@@ -19,6 +21,10 @@ class StoryItem extends React.Component {
     componentWillUnmount() {
         // Un-register scroll listener
         this.cardRef.current.removeEventListener('scroll', this._onScroll);
+    }
+
+    getArtUrl = () => {
+        return this.props.story.detail.art_url + `?crop=faces,entropy&fit=crop&w=` + screen.width + `&h=` + screen.height;
     }
 
     /**
@@ -44,14 +50,20 @@ class StoryItem extends React.Component {
     }
 
     render() {
+        const { story } = this.props;
+        console.log('StoryItem >> render');
         return (
-            <div className="card" style={{ width: `100%` }} ref={this.cardRef}>
-                <img className="card-img-top" src={this.props.story.art_url} alt="story_item" style={{ width: `100%` }} />
+            <div className="card story-item" ref={this.cardRef}>
+                <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
+                <div className="story-item-nav">
+                    <div className="col-8 story-nav-question">Why so many Renoirs?</div>
+                    <div className="col-4 language-dropdown">
+                        <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
+                    </div>
+                </div>
                 <div className="card-img-overlay">
-                    {this.props.isFirstItem && <div className="story-question">Why so many Renoirs?</div>}
-                    <p className="story-title">{this.props.story.title}</p>
-                    <p className="story-text">{this.props.story.short_para}</p>
-                    <p className="story-footer">{this.props.story.info} <br /> {this.props.story.artist}</p>
+                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                    <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
                 </div>
             </div>
 
