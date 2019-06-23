@@ -2,10 +2,17 @@ import React, { Component } from 'react';
 import dropdown_icon from 'images/dropdown.svg';
 import dropup_icon from 'images/dropup.svg';
 import check from 'images/check.svg';
+import up_gray from 'images/up_gray_1x.png';
+import up_white from 'images/up_wht_1x.png';
+import down_gray from 'images/down_gray_1x.png';
+import down_white from 'images/down_wht_1x.png';
 
 /**
  *
 */
+const DROP_UP = 'UP';
+const DROP_DOWN = 'DOWN';
+
 class LanguageDropdown extends Component {
 
     constructor(props) {
@@ -14,6 +21,7 @@ class LanguageDropdown extends Component {
         this.state = {
             listVisible: false
         }
+
     }
 
     selectItem = (item) => {
@@ -30,16 +38,28 @@ class LanguageDropdown extends Component {
         document.removeEventListener("click", this.hide);
     }
 
+    getDropdownIcon = (dir) => {
+        if (this.props.isStoryItemDropDown) {
+            return (dir === DROP_UP) ? up_white : down_white;
+        } else {
+            return (dir === DROP_UP) ? up_gray : down_gray;
+        }
+    }
+
+    getDropdownText = (selected) => {
+        return (this.props.isStoryItemDropDown) ? selected.code : selected.name;
+    }
+
     render = () => {
         return (
             <div className="dd-wrapper">
                 <div className="dd-header" onClick={this.show}>
                     <div className="dd-header-title">
-                        {this.props.selected.code}
+                        {this.getDropdownText(this.props.selected)}
                     </div>
                     {this.state.listVisible
-                        ? <span><img src={dropup_icon} /></span>
-                        : <span><img src={dropdown_icon} /></span>
+                        ? <span><img src={this.getDropdownIcon(DROP_UP)} /></span>
+                        : <span><img src={this.getDropdownIcon(DROP_DOWN)} /></span>
                     }
                 </div>
                 {this.state.listVisible && <ul className="dd-list">

@@ -117,13 +117,17 @@
 .email-container {
             padding: 50px 30px 22px;
             position: relative;
+            background-color: #353535;
+            border-top-left-radius: 40px;
+            border-top-right-radius: 40px;
+            color: #fff;
             
             .email-head {
                 width: 320px;
                 left: calc(50% - 160px);
                 position: relative;
                 text-align: center;
-                color: #000000;
+                color: #fff;
             }
 
             .email-input {       
@@ -171,7 +175,7 @@
             }
 
             .email-disclaimer {
-                color: #6E6E6E;
+                color: #fff;
                 padding-top: 20px;
                 text-align: center;
                 letter-spacing: 0.01em;

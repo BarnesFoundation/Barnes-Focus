@@ -7,7 +7,8 @@ import * as constants from './Constants';
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
 import share from 'images/share.svg';
-import scan_button from 'images/scan-button.svg';
+import posed from "react-pose";
+
 import check_email_icon from 'images/check_email.svg';
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
@@ -19,10 +20,53 @@ import close_icon from 'images/cross.svg';
 import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
 import ProgressiveImage from 'react-progressive-image';
+import { Timeline, Tween } from 'react-gsap';
+import { Controller, Scene } from 'react-scrollmagic';
+import styled from 'styled-components';
+import { flattenDeep, filter, debounce } from 'lodash';
+import StoryItem from '../components/StoryItem';
+import scan_button from 'images/scan-button.svg';
+import { Transition, animated } from 'react-spring/renderprops';
+
 
 /** 
  * withRouter HOC provides props with location, history and match objects
 */
+const SectionWipesStyled = styled.div`
+  overflow: hidden;
+  .panel {
+    height: 100vh;
+    width: 100vw;
+  }  
+`;
+
+
+/** React pose animation config */
+const Child = posed.div({
+    enter: {
+        y: 0,
+        opacity: 1,
+        transition: {
+            duration: 400,
+            ease: "linear"
+        }
+    },
+    exit: {
+        y: 50,
+        opacity: 0
+    }
+});
+
+const Container = posed.div({
+    enter: {
+        opacity: 1,
+        staggerChildren: 300
+    },
+    exit: {
+        opacity: 0
+    }
+});
+
 class Artwork extends Component {
 
 
@@ -31,11 +75,22 @@ class Artwork extends Component {
         console.log('Artwork >> constructor');
         this.sr = new SearchRequestService();
 
+        this.langOptions = [
+            { name: 'English', code: 'En', selected: true },
+            { name: 'Español', code: 'Es', selected: false },
+            { name: 'Français', code: 'Fr', selected: false },
+            { name: 'Deutsch', code: 'De', selected: false },
+            { name: 'Italiano', code: 'It', selected: false },
+            { name: 'русский', code: 'Ru', selected: false },
+            { name: '中文', code: 'Zh', selected: false },
+            { name: '日本語', code: 'Ja', selected: false },
+            { name: '한국어', code: 'Ko', selected: false }
+        ];
+
         this.state = {
-            result: props.result,
+            ...props.location.state,
             sharePopoverIsOpen: false,
             showEmailScreen: false,
-            showAboutScreen: false,
             emailCaptured: false,
             emailCaptureAck: false,
             bgLoaded: false,
@@ -49,10 +104,6 @@ class Artwork extends Component {
             scanBtnStyle: {
                 position: 'fixed'
             },
-            slideOverStyle: {
-                position: 'fixed',
-                bottom: '0'
-            },
             bgImageStyle: {},
             showSliderOverlay: true,
             email: localStorage.getItem(constants.SNAP_USER_EMAIL) || '',
@@ -60,8 +111,13 @@ class Artwork extends Component {
             errors: {
                 email: false
             },
-            selectedLanguage: props.selectedLanguage
+            triggerEmailScreen: false,
+            artworkVScrollOffset: 0,
+            artworkVScrollDuration: 0
         }
+
+
+        this.artworkRef = null;
 
     }
 
@@ -73,7 +129,7 @@ class Artwork extends Component {
             if (search_result["data"]["records"].length > 0) {
 
                 let w = screen.width;
-                let artUrlParams = '?w=' + (w - 80);
+                let artUrlParams = '?w=' + (w - 120);
                 let cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
                 let topCropParams = '?q=0&auto=compress&crop=top&fit=crop&h=75&w=' + w;
                 let lowQualityParams = '?q=0&auto=compress';
@@ -99,36 +155,111 @@ class Artwork extends Component {
                 roomRecords = search_result["data"]["roomRecords"];
             }
 
-            this.slideOverAnimationThreshold = (roomRecords.length > 0) ? 540 : 0;
-
-            this.setState({ searchResults: [].concat(result), alsoInRoomResults: roomRecords });
+            //this.slideOverAnimationThreshold = (roomRecords.length > 0) ? 540 : 0;
+            return {
+                artwork: result,
+                roomRecords: roomRecords
+            }
         } else {
-            this.setState({ error: "No records found!" });
+            return {
+                artwork: {},
+                roomRecords: []
+            }
         }
     }
 
     async componentWillMount() {
         console.log('Artwork >> componentWillMount');
-        let imageId = this.props.match.params.imageId;
-        if (this.state.result) {
-            this.constructResultAndInRoomSlider(this.state.result);
-        } else if (imageId) {
-            let artworkInfo = await this.sr.getArtworkInformation(imageId);
-            this.setState({ result: artworkInfo });
-            this.constructResultAndInRoomSlider(artworkInfo);
+
+        let imageId = (this.state.result) ? this.state.result.data.records[0].id : this.props.match.params.imageId;
+        const selectedLang = await this.getSelectedLanguage();
+        const stories = await this.setupStory(imageId);
+        const emailCaptured = localStorage.getItem(constants.SNAP_USER_EMAIL) !== null;
+
+        if (!this.state.result) {
+            const artworkInfo = await this.sr.getArtworkInformation(imageId);
+            const { artwork, roomRecords } = this.constructResultAndInRoomSlider(artworkInfo);
+            this.setState({
+                selectedLanguage: selectedLang[0],
+                stories: stories,
+                result: artworkInfo,
+                showStory: artworkInfo.show_story,
+                artwork: artwork,
+                roomRecords: roomRecords,
+                emailCaptured: emailCaptured,
+                emailCaptureAck: emailCaptured
+            });
+
+        } else {
+            const { artwork, roomRecords } = this.constructResultAndInRoomSlider(this.state.result);
+            this.setState({
+                selectedLanguage: selectedLang[0],
+                stories: stories,
+                showStory: this.state.result.data.show_story,
+                artwork: artwork,
+                roomRecords: roomRecords,
+                emailCaptured: emailCaptured,
+                emailCaptureAck: emailCaptured
+            });
+
         }
 
-        /**
-         * If the number of scans equals 4, show the screen to capture user email.
-         */
-        if (parseInt(this.state.snapAttempts) === 4) {
-            this.setState({ showEmailScreen: true });
-        }
-        if (localStorage.getItem(constants.SNAP_USER_EMAIL) !== null) {
-            console.log('Email already captured!');
-            this.setState({ emailCaptured: true, emailCaptureAck: true });
-        }
+    }
 
+    getSelectedLanguage = async () => {
+        const selectedLangCode = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE);
+        if (selectedLangCode !== null) {
+            this.langOptions.map(option => {
+                if (option.code === selectedLangCode) {
+                    option.selected = true;
+                } else {
+                    option.selected = false;
+                }
+            })
+        }
+        return filter(this.langOptions, lang => lang.selected === true);
+    }
+
+    onSelectLanguage = async (lang) => {
+        console.log('Selected lang changed in Artwork >> : ' + JSON.stringify(lang));
+        localStorage.setItem(constants.SNAP_LANGUAGE_PREFERENCE, lang.code);
+
+        const imageId = this.getFocusedArtworkImageId();
+
+        this.langOptions.map(option => {
+            if (option.code === lang.code) {
+                option.selected = true;
+            } else {
+                option.selected = false;
+            }
+        })
+
+        /** Save the user selected language in the server session and call the getArtworksInfo API again to refresh the page with translated result. */
+        const languageUpdated = await this.sr.saveLanguagePreference(lang.code);
+        const artworkInfo = await this.sr.getArtworkInformation(imageId);
+        const stories = await this.setupStory(imageId);
+        const { artwork, roomRecords } = this.constructResultAndInRoomSlider(artworkInfo);
+        this.setState({
+            result: artworkInfo,
+            selectedLanguage: lang,
+            stories: stories,
+            artwork: artwork,
+            roomRecords: roomRecords
+        });
+    }
+
+    getFocusedArtworkImageId = () => {
+        const imageId = (this.state.result) ? this.state.result.data.records[0].id : this.props.match.params.imageId;
+        return imageId;
+    }
+
+    setupStory = async (imageId) => {
+        let stories_data = await this.sr.getStoryItems(imageId);
+        if (stories_data.data.total > 0) {
+            return stories_data.data.content.stories;
+        } else {
+            return [];
+        }
     }
 
     onBackgroundImageLoad = () => {
@@ -141,18 +272,6 @@ class Artwork extends Component {
         this.props.history.push({ pathname: `/artwork/${aitrId}` });
     }
 
-    /** this is done to make sure the background image doesn't overflow the tombstone bottom, 
-     * since we are showing fillscreen background when page loads */
-    updateBackgroundStyle = () => {
-        if (this.state.bgLoaded && this.resultsContainer) {
-            let { top, bottom } = this.resultsContainer.getBoundingClientRect();
-            //let artworkBgBottom = this.artworkBackgroundContainer.getBoundingClientRect().bottom;
-            // if (artworkBgBottom > bottom) {
-            //     this.setState({ bgImageStyle: { minHeight: (Math.floor(top) + 50) } });
-            // }
-        }
-    }
-
     componentDidMount() {
         console.log('Artwork >> componentDidMount');
         this.scrollInProgress = false;
@@ -160,73 +279,34 @@ class Artwork extends Component {
         window.addEventListener('scroll', this._onScroll, true);
     }
 
-    componentDidUpdate() {
-        console.log('Artwork >> componentDidUpdate');
-        setTimeout(() => {
-            requestAnimationFrame(this.updateBackgroundStyle);
-        }, 500);
-    }
-
     componentWillUnmount() {
         // Un-register scroll listener
         window.removeEventListener('scroll', this._onScroll);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        console.log('Artwork >> componentWillReceiveProps');
-        this.setState({ result: nextProps.result, selectedLanguage: nextProps.selectedLanguage });
-        if (this.state.selectedLanguage.code !== nextProps.selectedLanguage.code) {
-            this.constructResultAndInRoomSlider(nextProps.result);
-        }
     }
 
     /**
      * All the fancy scroll animation goes here.
      */
     handleScroll = () => {
-        if (!this.resultsContainer || !this.shortDescContainer) {
+        if (!this.artworkRef || !this.shortDescContainer) {
             this.scrollInProgress = false;
             return;
         }
 
-        let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-        let resultsContainerBottom = Math.ceil(h - this.resultsContainer.getBoundingClientRect().bottom);
+        const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+        let resultsContainerBottom = Math.ceil(h - this.artworkRef.getBoundingClientRect().bottom);
+        console.log('resultsContainerBottom :: ' + resultsContainerBottom);
 
-        //console.log('resultsContainerBottom :: ' + resultsContainerBottom);
-
-        /** animate blur based on results container bottom position */
-        let blur = Math.floor(resultsContainerBottom / 35);
-        if (blur >= 0 && blur <= 15) {
-            this.setState({ blurValue: 5 + blur });
-        }
-        //console.log('Results container bottom :: ' + resultsContainerBottom);
-
-        /** animate slider background and scan button based on results container bottom position */
-        if (resultsContainerBottom <= this.slideOverAnimationThreshold) {
-            this.setState({
-                slideOverStyle: {
-                    position: 'fixed',
-                    bottom: '0'
-                },
-                scanBtnStyle: {
-                    position: 'fixed'
-                },
-                showSliderOverlay: true
-            })
-        }
-        else {
-            let scanBtnStyle = { position: 'absolute' };
-            if (this.slideOverAnimationThreshold === 0) {
-                scanBtnStyle.bottom = 0;
+        if (resultsContainerBottom >= 0) {
+            if (!this.state.triggerEmailScreen) {
+                this.setState({ triggerEmailScreen: true });
             }
-            this.setState({
-                slideOverStyle: {
-                    position: 'relative'
-                },
-                scanBtnStyle: scanBtnStyle,
-                showSliderOverlay: false
-            })
+        } else {
+            if (this.state.triggerEmailScreen) {
+                this.setState({ triggerEmailScreen: false });
+            }
         }
+
 
         let shortDescBoundingRect = this.shortDescContainer.getBoundingClientRect();
         let shortDescElemTop = shortDescBoundingRect.y;
@@ -234,43 +314,18 @@ class Artwork extends Component {
         let currentShortDescScrollOffset = h - shortDescElemTop;
         let visibleShortDescHeight = Math.floor(currentShortDescScrollOffset);
 
-        /** animate language dropdown basen on shortDesc container position */
-        if (visibleShortDescHeight < 0) {
-            this.setState({
-                isLanguageDropdownVisible: false,
-                isLanguageDropdownOpen: false
-            });
-        } else if (visibleShortDescHeight > 60 && visibleShortDescHeight <= shortDescElemHeight) {
-            this.setState({
-                isLanguageDropdownVisible: true
-            });
-        } else if (visibleShortDescHeight > shortDescElemHeight + 90) {
-            this.setState({
-                isLanguageDropdownVisible: false,
-                isLanguageDropdownOpen: false
-            })
-        }
-
         this.scrollInProgress = false;
     }
 
     _onScroll = (event) => {
         if (!this.scrollInProgress) {
-            requestAnimationFrame(this.handleScroll)
+            requestAnimationFrame(debounce(this.handleScroll, 20))
             this.scrollInProgress = true;
         }
     }
 
-    _onClickAbout = () => {
-        this.setState({ showAboutScreen: true });
-    }
-
-    _onCloseAbout = () => {
-        this.setState({ showAboutScreen: false });
-    }
-
     getFacebookShareUrl = () => {
-        let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
+        let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
         return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare)
     }
 
@@ -280,20 +335,20 @@ class Artwork extends Component {
 
         let appUriScheme;
         let webFallbackURL;
-        let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
+        let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
 
         switch (socialMediaType) {
             case constants.SOCIAL_MEDIA_TWITTER: {
 
                 let hashtag = 'barnesfoundation';
 
-                let title_author = this.state.searchResults[0].title;
-                if (this.state.searchResults[0].artist) {
-                    title_author += ' by ' + this.state.searchResults[0].artist;
-                    hashtag += ',' + this.state.searchResults[0].artist.split(' ').join('').split('-').join('');
+                let title_author = this.state.artwork.title;
+                if (this.state.artwork.artist) {
+                    title_author += ' by ' + this.state.artwork.artist;
+                    hashtag += ',' + this.state.artwork.artist.split(' ').join('').split('-').join('');
                 }
                 title_author = title_author.split(' ').join('+');
-                //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.searchResults[0].id;
+                //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.artwork.id;
                 //appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
                 webFallbackURL = 'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
 
@@ -308,13 +363,13 @@ class Artwork extends Component {
     _onClickShare = () => {
 
         if (navigator.share) {
-            let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.searchResults[0].id;
+            let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
             let hashtag = '#barnesfoundation';
 
-            let title_author = this.state.searchResults[0].title;
-            if (this.state.searchResults[0].artist) {
-                title_author += ' by ' + this.state.searchResults[0].artist;
-                hashtag += ' #' + this.state.searchResults[0].artist.split(' ').join('');
+            let title_author = this.state.artwork.title;
+            if (this.state.artwork.artist) {
+                title_author += ' by ' + this.state.artwork.artist;
+                hashtag += ' #' + this.state.artwork.artist.split(' ').join('');
             }
             title_author = title_author + '. ';
 
@@ -368,151 +423,221 @@ class Artwork extends Component {
         this.setState({ emailCaptured: false, showEmailScreen: false });
     }
 
-    _onShowLanguageDropdown = (isOpen) => {
-        this.setState({ isLanguageDropdownOpen: isOpen });
+    getArtworkScrollOffset = () => {
+
     }
 
+    setArtworkRef = (elem) => {
+        if (elem) {
+            this.artworkRef = elem;
+            console.log('setArtworkRef == ' + this.artworkRef);
 
-    renderResult = () => {
-        let { bgImageStyle } = this.state;
-        let resultsContainerStyle = (((this.state.showEmailScreen || this.state.emailCaptured) && !this.state.emailCaptureAck) || this.state.showAboutScreen) ? { filter: 'blur(10px)', transform: 'scale(1.2)' } : {};
-        let emailScreenCloseBtnTop = Math.floor(455 / 667 * screen.height) + 'px';
-        let footerStyle = (parseInt(this.state.snapAttempts) >= 4 && !this.state.emailCaptured && !this.state.showEmailScreen) ? {} : { position: 'fixed', bottom: `8px`, padding: 0, width: `80px`, left: `calc(50% - 40px)` };
+            const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-        let artwork = this.state.searchResults[0];
+
+            const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - h), 0);
+            const artworkVScrollDuration = Math.ceil(((artworkVScrollOffset + 60) / h) * 100);
+            this.setState({ artworkVScrollOffset, artworkVScrollDuration })
+
+        }
+    }
+
+    renderArtwork = () => {
+        const { artwork } = this.state;
         return (
-            <div>
-                <div className="container-fluid artwork-container" id="search-result">
-                    <div className="row">
-                        <div className="artwork-top-bg">
-                            <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" />
-                        </div>
-                        <div className="col-12 col-md-12">
-                            <div id="result-card" className="card" data-title={artwork.title} data-artist={artwork.artist} data-id={artwork.id} data-invno={artwork.invno} data-nodesc-invno={(!artwork.shortDescription) ? artwork.invno : ''}>
-                                <div className="card-top-container">
-                                    <div className="card-img-overlay">
-                                        <div className="card-header h1">Focused Artwork</div>
-                                        <div className="card-img-result">
-                                            <ProgressiveImage src={artwork.url} placeholder={artwork.url_low_quality}>
-                                                {src => <img src={src} alt="match_image" />}
-                                            </ProgressiveImage>
-                                            {/* <img src={artwork.url} alt="match_image" /> */}
-                                        </div>
-                                        <div className="card-artist h2">{artwork.artist}</div>
-                                        <div className="card-title h1">{artwork.title}</div>
+            <Container className="container-fluid artwork-container" id="search-result" initialPose="exit" pose="enter">
+                <div className="row">
+                    <div className="artwork-top-bg">
+                        <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" />
+                    </div>
+                    <div className="col-12 col-md-12">
+                        <div id="result-card" className="card" data-title={artwork.title} data-artist={artwork.artist} data-id={artwork.id} data-invno={artwork.invno} data-nodesc-invno={(!artwork.shortDescription) ? artwork.invno : ''}>
+                            <div className="card-top-container">
+                                <div className="card-img-overlay">
+                                    <div className="card-header h1">Focused Artwork</div>
+                                    <div className="card-img-result">
+                                        <ProgressiveImage src={artwork.url} placeholder={artwork.url_low_quality}>
+                                            {src => <img src={src} alt="match_image" />}
+                                        </ProgressiveImage>
+                                        {/* <img src={artwork.url} alt="match_image" /> */}
                                     </div>
+                                    <div className="card-artist">{artwork.artist}</div>
+                                    <div className="card-title">{artwork.title}</div>
                                 </div>
-                                <div className="card-body" id="focussed-artwork-body" ref={el => this.resultsContainer = el}>
-                                    <div className="short-desc-container" ref={elem => this.shortDescContainer = elem}>
-                                        {artwork.shortDescription && <div className="card-text paragraph">{artwork.shortDescription}</div>}
-                                    </div>
-                                    {
-                                        artwork.shortDescription &&
-                                        this.state.selectedLanguage.code !== 'En' &&
-                                        <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
-                                    }
-                                    <div className="card-info">
-                                        <table className="detail-table">
-                                            <tbody>
+                            </div>
+                            <div className="card-body" id="focussed-artwork-body" ref={this.setArtworkRef}>
+                                <div className="short-desc-container" ref={elem => this.shortDescContainer = elem}>
+                                    {artwork.shortDescription && <div className="card-text paragraph">{artwork.shortDescription}</div>}
+                                </div>
+                                {
+                                    artwork.shortDescription &&
+                                    this.state.selectedLanguage.code !== 'En' &&
+                                    <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                }
+                                <div className="card-info">
+                                    <table className="detail-table">
+                                        <tbody>
+                                            <tr>
+                                                <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
+                                                <td className="text-left item-info">{artwork.artist}</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_4')}:</td>
+                                                <td className="text-left item-info">{artwork.title}</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_5')}:</td>
+                                                <td className="text-left item-info">{artwork.displayDate}</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_6')}:</td>
+                                                <td className="text-left item-info">{artwork.medium}</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_7')}:</td>
+                                                <td className="text-left item-info">{artwork.dimensions}</td>
+                                            </tr>
+                                            {
+                                                !artwork.curatorialApproval &&
                                                 <tr>
-                                                    <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
-                                                    <td className="text-left item-info">{artwork.artist}</td>
+                                                    <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_8')}:</td>
+                                                    <td className="text-left item-info">{this.props.getTranslation('Result_page', 'text_9')}</td>
                                                 </tr>
-                                                <tr>
-                                                    <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_4')}:</td>
-                                                    <td className="text-left item-info">{artwork.title}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_5')}:</td>
-                                                    <td className="text-left item-info">{artwork.displayDate}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_6')}:</td>
-                                                    <td className="text-left item-info">{artwork.medium}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_7')}:</td>
-                                                    <td className="text-left item-info">{artwork.dimensions}</td>
-                                                </tr>
-                                                {
-                                                    !artwork.curatorialApproval &&
-                                                    <tr>
-                                                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_8')}:</td>
-                                                        <td className="text-left item-info">{this.props.getTranslation('Result_page', 'text_9')}</td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
 
-
-                                    <div className="share-wrapper">
-
-                                        <div id="share-it" className="btn-share-result" ref={(node) => { this.target = node }} onClick={this._onClickShare}>
-                                            <img src={share} alt="share" />
-                                            <span className="text-share">
-                                                {this.props.getTranslation('Result_page', 'text_1')}
-                                            </span>
+                                <div className="share-wrapper">
+                                    <div className="language-dropdown-wrapper">
+                                        <div className="language-dropdown">
+                                            <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
                                         </div>
-                                        <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
-                                            <PopoverBody>
-                                                <div className="share">
-                                                    <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
-                                                        <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a target="_blank" href={this.getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
-                                                        <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
-                                                    </a>
-                                                </div>
-                                            </PopoverBody>
-                                        </Popover>
-                                        <div className="language-dropdown-wrapper">
-                                            <div className="language-dropdown">
-                                                <LanguageDropdown langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} onShowLanguageDropdown={this._onShowLanguageDropdown} />
+                                    </div>
+                                    <div id="share-it" className="btn-share-result" ref={(node) => { this.target = node }} onClick={this._onClickShare}>
+                                        <img src={share} alt="share" />
+                                        <span className="text-share">
+                                            {this.props.getTranslation('Result_page', 'text_1')}
+                                        </span>
+                                    </div>
+                                    <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
+                                        <PopoverBody>
+                                            <div className="share">
+                                                <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                                                    <i className="fa fa-lg fa-twitter" aria-hidden="true"></i>
+                                                </a>
+                                                <a target="_blank" href={this.getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
+                                                    <i className="fa fa-lg fa-facebook" aria-hidden="true"></i>
+                                                </a>
                                             </div>
-
-                                        </div>
-                                    </div>
-
-                                </div>
-
-
-                                <div className="scan-wrapper">
-                                    <div className="scan-button" onClick={this.handleScan} style={this.state.scanBtnStyle}>
-                                        <img src={scan_button} alt="scan" />
-                                    </div>
+                                        </PopoverBody>
+                                    </Popover>
                                 </div>
 
                             </div>
                         </div>
                     </div>
                 </div>
+            </Container>
+        );
+    }
 
+    renderEmailScreen = () => {
+        const { showStory, triggerEmailScreen } = this.state;
+        console.log(triggerEmailScreen);
 
-
-
-
+        return (
+            <div>
                 {
-                    this.state.showAboutScreen &&
-                    <div>
-                        <About onCloseAbout={this._onCloseAbout} getTranslation={this.props.getTranslation} />
-                    </div>
+                    (!showStory || stories.length === 0) &&
+                    <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
+                    // <Transition
+                    //     native
+                    //     items={triggerEmailScreen}
+                    //     from={{ transform: `translate3d(0,83%,0)` }}
+                    //     enter={{ transform: `translate3d(0,50%,0)` }}
+                    //     leave={{ transform: `translate3d(0, 83%, 0)` }}
+                    // // config={{ mass: 1, tension: 50, friction: 5 }}
+                    // >
+                    //     {triggerEmailScreen => triggerEmailScreen && (props =>
+                    //         <animated.div style={props}>
+                    //             <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
+                    //         </animated.div>
+                    //     )}
+                    // </Transition>
                 }
             </div>
+        )
+    };
+
+    renderResult = () => {
+        const { stories, showStory, artworkVScrollOffset, artworkVScrollDuration } = this.state;
+        console.log('artworkVScrollOffset ====== ' + artworkVScrollOffset);
+        console.log('artworkVScrollDuration ====== ' + artworkVScrollDuration);
+        return (
+            <SectionWipesStyled>
+                <Controller globalSceneOptions={{ triggerHook: 'onLeave' }}>
+                    <Scene duration="100%" indicators pin>
+                        {(progress) => (
+                            <div className="panel">
+                                <Timeline
+                                    totalProgress={progress}
+                                    paused>
+                                    <Tween
+                                        from={{ y: '-0%' }}
+                                        to={{ y: -artworkVScrollOffset }}
+                                    >
+                                        {this.renderArtwork()}
+                                    </Tween>
+                                </Timeline>
+                            </div>
+                        )}
+                    </Scene>
+                    {
+                        stories.map((story, index) =>
+                            <Scene indicators pin key={`storyitem${index + 1}`}>
+                                <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={{ zIndex: 100 * `${index + 2}` }}>
+                                    <StoryItem isFirstItem={(index === 0) ? true : false} story={story} langOptions={this.langOptions} selectedLanguage={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+                                </div>
+                            </Scene>
+                        )
+                    }
+                    <div id="email-trigger" style={{ visibility: 'hidden', position: 'fixed' }}></div>
+                    <Scene triggerHook="onEnter" offset="-500" duration="50%" indicators pin>
+                        <div className="panel panel-email">
+                            <Timeline>
+                                <Tween
+                                    from={{ y: '-0%' }}
+                                    to={{ y: '-55%' }}
+                                >
+                                    {this.renderEmailScreen()}
+                                </Tween>
+                            </Timeline>
+                        </div>
+
+                    </Scene>
+                </Controller>
+                <div className="scan-wrapper">
+                    <div className="scan-button" onClick={this.handleScan}>
+                        <img src={scan_button} alt="scan" />
+                    </div>
+                </div>
+
+            </SectionWipesStyled>
 
         );
     }
 
     render() {
-        if (this.state.searchResults.length === 0) {
+
+        if (!this.state.artwork) {
             return null;
         }
-
         return (
             <div>
                 {!this.state.bgLoaded &&
                     <div style={{ visibility: `hidden` }}>
-                        <img className="card-img-top" src={this.state.searchResults[0].bg_url} alt="match_image_background" onLoad={this.onBackgroundImageLoad} />
+                        <img className="card-img-top" src={this.state.artwork.bg_url} alt="match_image_background" onLoad={this.onBackgroundImageLoad} />
                     </div>
                 }
                 {this.state.bgLoaded && this.renderResult()}

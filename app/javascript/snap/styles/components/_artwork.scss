@@ -37,7 +37,7 @@
         }
 
         .card-img-overlay {
-            padding: 0px 40px;
+            padding: 0px 60px;
             height: auto;
             position: relative;
 
@@ -62,17 +62,26 @@
                 position: relative;
                 padding-top:30px;
                 text-align: center;
-                color: #333;
-                opacity: 0.75;
+                color: gray;
+                opacity: 1;
                 text-transform: uppercase;
                 font-size: 16px;
+                line-height: 18px;
+                font-weight: 500;
+                letter-spacing: 0.75px;
+                font-family: 'Calibre-Regular';
             }
 
             .card-title {
                 position: relative;
                 margin: 0 -15px;
                 text-align: center;
-                color: #333;
+                color: rgba(0.21, 0.21, 0.21, 1);
+                font-size: 22px;
+                line-height: 26px;
+                letter-spacing: 0.11px;
+                font-family: 'Calibre-Regular';
+
             }
         }
 
@@ -119,7 +128,7 @@
             }
 
             .share-wrapper {
-                margin-bottom: 60px;
+                margin-bottom: 20px;
                 display: flex;
                 justify-content: space-evenly;
 

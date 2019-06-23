@@ -6,14 +6,21 @@ import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
 
 import { SearchRequestService } from '../services/SearchRequestService';
+import scan_button from 'images/scan-button.svg';
 
 import Artwork from '../components/Artwork';
 import StoryItem from '../components/StoryItem';
-import LanguageDropdown from '../components/LanguageDropdown';
+
 import { Transition, animated } from 'react-spring/renderprops';
 import { Swipeable } from 'react-swipeable';
 import * as constants from './Constants';
 import { flattenDeep, filter } from 'lodash';
+import { Controller, Scene } from 'react-scrollmagic';
+import styled from 'styled-components';
+import { Timeline, Tween } from 'react-gsap';
+import Sticky from 'react-sticky-el';
+
+
 
 /** 
  * withRouter HOC provides props with location, history and match objects
@@ -21,6 +28,16 @@ import { flattenDeep, filter } from 'lodash';
 const swipeableConfig = {
     delta: 10
 };
+
+const SectionWipesStyled = styled.div`
+  overflow: hidden;
+
+  .panel {
+    height: 100vh;
+    width: 100vw;
+  }
+  
+`;
 
 class FocusResult extends Component {
 
@@ -45,6 +62,7 @@ class FocusResult extends Component {
 
         this.state = {
             ...props.location.state,  // these properties are passed on from Camera component. Contains {result}
+            stories: [],
             index: 0,
             prevIndex: -1,
             scrollDir: constants.SCROLL_DIR.UP,
@@ -58,7 +76,29 @@ class FocusResult extends Component {
     async componentWillMount() {
         console.log('FocusResult >> componentWillMount');
         let imageId = (this.state.result) ? this.state.result.data.records[0].id : this.props.match.params.imageId;
+        const selectedLang = await this.getSelectedLanguage();
+        const stories = await this.setupStory(imageId);
 
+        if (!this.state.result) {
+            const artworkInfo = await this.sr.getArtworkInformation(imageId);
+            this.setState({ selectedLanguage: selectedLang[0], stories: stories, result: artworkInfo, showStory: artworkInfo.show_story });
+        } else {
+            this.setState(
+                { selectedLanguage: selectedLang[0], stories: stories, showStory: this.state.result.data.show_story }
+            );
+        }
+
+
+    }
+
+    componentDidMount() {
+        console.log('FocusResult >> componentDidMount');
+
+        console.log('height of story card 0 = ' + document.getElementById('story-card-0'));
+        console.log('height of story card 1 = ' + document.getElementById('story-card-1'));
+    }
+
+    getSelectedLanguage = async () => {
         const selectedLangCode = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE);
         if (selectedLangCode !== null) {
             this.langOptions.map(option => {
@@ -69,12 +109,9 @@ class FocusResult extends Component {
                 }
             })
         }
-
-        const selectedLang = filter(this.langOptions, lang => lang.selected === true);
-        const stories = await this.setupStory(imageId);
-        this.setState({ selectedLanguage: selectedLang[0], stories: stories });
-
+        return filter(this.langOptions, lang => lang.selected === true);
     }
+
 
     onSelectLanguage = async (lang) => {
         console.log('Selected lang changed in FocusResult component : ' + JSON.stringify(lang));
@@ -103,53 +140,117 @@ class FocusResult extends Component {
     }
 
     setupStory = async (imageId) => {
-        console.log('imageid = ' + imageId);
-        let w = screen.width;
-        let h = screen.height;
-        //return await this.sr.getStoryItems(imageId);
+        let stories_data = await this.sr.getStoryItems(imageId);
+
+        // if (stories_data.data.total > 0) {
+        //     return stories_data.data.content.stories;
+        // } else {
+        //     return [];
+        // }
+
         return [
             {
-                "id": 6964,
-                "show": true,
-                "height": 823,
-                "art_url": "https://barnes-images.imgix.net/6964_RehDRhZC5bQtSnko_b.jpg?q=0&auto=compress&crop=faces,entropy&fit=crop&w=" + w + "&h=" + h,
-                "title": "Mother and Child",
-                "short_para": "Between 1912 and 19591, Albert C. Barnes amassed an astonishing 181 works by Pierre- Auguste Renoir. It is the largest collection in the world.",
-                "info": "Young Mother (Juene mére), 1881.",
-                "artist": "Pierre-Auguste Renoir."
-
+                "image_id": "5198",
+                "short_paragraph": {
+                    "html": "Between 1912 and 1951,Albert C.Barnes amassed an astonishing 181 works by Pierre - Auguste Renoir.It is the largest collection in the world."
+                },
+                "long_paragraph": {
+                    "html": "Albert Barnes bought his first painting by Renoir in 1912. He was immediately hooked.“I am convinced that I cannot get too many Renoirs, he announced to his friend,Leo Stein.By the time of his death in 1951,Barnes amassed an astounding 181 works by the artist— the largest is his joy in painting the real life of red - blooded people.”He bought this Mother and Child in 1920."
+                },
+                "detail": {
+                    "id": 5198,
+                    "art_url": "https://barnes-images.imgix.net/5198_65Hrs55ZBnJWPjr1_b.jpg",
+                    "room": "Room 13",
+                    "invno": "BF15",
+                    "title": "Young Mother (Jeune mère)",
+                    "medium": "Oil on canvas",
+                    "people": "Pierre-Auguste Renoir",
+                    "locations": "Barnes Foundation (Philadelphia), Collection Gallery, Room 13, North Wall",
+                    "creditLine": "",
+                    "dimensions": "Overall: 47 3/4 x 33 3/4 in. (121.3 x 85.7 cm)",
+                    "displayDate": "1881",
+                    "imageSecret": "65Hrs55ZBnJWPjr1",
+                    "ensembleIndex": "49",
+                    "classification": "Paintings",
+                    "shortDescription": "Renoir painted this scene of a peasant girl holding a child during a trip to Naples in 1881. Dissatisfied with his drawing skills, he had travelled to Italy to study the ancient frescoes and Italian Renaissance masters; the paintings of Raphael in particular had a simplicity and grandeur� that Renoir sought to achieve in his own work.One can see the Italian painter 's influence here, in the balanced arrangement of the rosy-cheeked figures and the gentle interaction between them. It is almost as if Renoir has created a modern, secular take on the Madonna and Child subject.",
+                    "curatorialApproval": "true"
+                }
             },
             {
-                "id": 7020,
-                "show": false,
-                "height": 823,
-                "art_url": "https://barnes-images.imgix.net/7020_f2wbizJUVJhRvCyC_b.jpg?q=0&auto=compress&crop=faces,entropy&fit=crop&w=" + w + "&h=" + h,
-                "title": "Seated Nude",
-                "short_para": "Renoir is best known for his impressionist paintings made during the 1870s. Barnes vastly preferred Renoir's latest canvases, however, because they seemed modern and classical at the same time. The 1910 nude is a good example.",
-                "info": "Bather Drying Herself (Baigneuse Séssuyant). c. 1908.",
-                "artist": "Pierre-Auguste Renoir."
+                "image_id": "5183",
+                "short_paragraph": {
+                    "html": "Renoir is best known for his impressionist paintings made during the 1870 s.Barnes vastly preferred Renoir’ s later canvases,however,because they seemed modern and classical at the same time.This 1910 nude is a good example."
+                },
+                "long_paragraph": {
+                    "html": "While other collectors favored Renoir’ s impressionist paintings(exemplified by the landscape just to the right),Barnes preferred the artist’ s later canvases made between 1890 and his death in 1919. In this period, Renoir concentrated on more traditional subjects like bathers set in dreamy landscapes, perfectly centered, with soft,curvy bodies.To many critics,it seemed that Renoir had passed his prime.Barnes disagreed.He saw the late works as the perfect blend of classical and modern vocabularies and called them the“ summation of Renoir’ s powers.”The late works make up 85 % of Barnes’ s Renoir collection."
+                },
+                "detail": {
+                    "id": 5183,
+                    "art_url": "https://barnes-images.imgix.net/5183_UGuBgiKQmnioAztv_b.jpg",
+                    "room": "Room 13",
+                    "invno": "BF142",
+                    "title": "After the Bath (La Sortie du bain)",
+                    "medium": "Oil on canvas",
+                    "people": "Pierre-Auguste Renoir",
+                    "locations": "Barnes Foundation (Philadelphia), Collection Gallery, Room 13, West Wall",
+                    "creditLine": "",
+                    "dimensions": "Overall: 37 3/16 x 29 5/8 in. (94.5 x 75.2 cm)",
+                    "displayDate": "1910",
+                    "imageSecret": "UGuBgiKQmnioAztv",
+                    "ensembleIndex": "52",
+                    "classification": "Paintings",
+                    "shortDescription": "",
+                    "curatorialApproval": "true"
+                }
             },
             {
-                "id": 7019,
-                "show": false,
-                "height": 823,
-                "art_url": "https://barnes-images.imgix.net/7019_nfDkcKrMa9lLxn1W_b.jpg?q=0&auto=compress&crop=faces,entropy&fit=crop&w=" + w + "&h=" + h,
-                "title": "Jeanne-Durrand-Ruel",
-                "short_para": "Barnes purchased over half of his Renoirs from Paul Durrand-Ruel, the famous impressionist dealer who had galleries in Paris and New York. This is a portrait of his daughter, Jeanne.",
-                "info": "Portrait of Jeanne Durrand-Ruel(Portrait de Mlle. J.). 1876.",
-                "artist": "Pierre-Auguste Renoir."
+                "image_id": "5187",
+                "long_paragraph": {
+                    "html": "Barnes purchased over half of his Renoirs from Paul Durand - Ruel,the famous impressionist dealer.Durand - Ruel had galleries in Paris and New York, and Barnes visited both locations regularly to see exhibitions and check out the new stock.“It is my intention to make my Renoir collection the best in the world,”he told the dealer.This painting of Paul Durand - Ruel’ s daughter,Jeanne,was part of the Durand - Ruel private collection.It stayed in the family for many years.Barnes purchased it from the dealer’ s youngest daughter, Marie - Therese, in 1935."
+                },
+                "detail": {
+                    "id": 5187,
+                    "art_url": "https://barnes-images.imgix.net/5187_cJ1n0YDmWauW39XF_b.jpg",
+                    "room": "Room 13",
+                    "invno": "BF950",
+                    "title": "Portrait of Jeanne Durand-Ruel (Portrait de Mlle. J.)",
+                    "medium": "Oil on canvas",
+                    "people": "Pierre-Auguste Renoir",
+                    "locations": "Barnes Foundation (Philadelphia), Collection Gallery, Room 13, West Wall",
+                    "creditLine": "",
+                    "dimensions": "Overall: 44 7/8 x 29 1/8 in. (114 x 74 cm)",
+                    "displayDate": "1876",
+                    "imageSecret": "cJ1n0YDmWauW39XF",
+                    "ensembleIndex": "52",
+                    "classification": "Paintings",
+                    "shortDescription": "During the early decades of his career, Pierre-Auguste Renoir supported himself doing portrait commissions. This little girl is the daughter of Paul Durand-Ruel, the great impressionist dealer from whom Albert Barnes bought almost half his Renoirs. Jeanne is presented here at age six, wearing a fashionable striped dress and a gold cross around her neck. The painting is a good example of the way Renoir seemed to embrace the traditions of painting while also pushing against them: the colors are experimental and modern--note the sweeps of purple in the girl's hair--while the overall format recalls the conventions of seventeenth-century court portraiture. ",
+                    "curatorialApproval": "true"
+                }
             },
             {
-                "id": 6981,
-                "show": false,
-                "height": 823,
-                "art_url": "https://barnes-images.imgix.net/6981_BlvD0VojmGU5ETzC_b.jpg?q=0&auto=compress&crop=faces,entropy&fit=crop&w=" + w + "&h=" + h,
-                "title": "Odalisque with Tea Set",
-                "short_para": "Renoir died in 1919, leaving behind more the 700 canvasses in his Cagnes-sur-Mer studio. Eager for a glimpse, Barnes travelled there in 1921 -a visit he later described as \" one of the most delightful experiences I ever had.\". He would eventually buy 41 studio painings from the Renoir sons.",
-                "info": "Odalisque with Tea Set (Odalisque á la théiére)",
-                "artist": "Pierre-Auguste Renoir."
-            },
-            null
+                "image_id": "5186",
+                "long_paragraph": {
+                    "html": " Renoir died in 1919, leaving behind more than 700 canvases in his Cagnes - sur - Mer studio.Eager for a glimpse, Barnes travelled there in 1921— a visit he later described as“ one of the most delightful experiences I ever had.”He would eventually buy 41 studio paintings from the Renoir sons."
+                },
+                "detail": {
+                    "id": 5186,
+                    "art_url": "https://barnes-images.imgix.net/5186_b6I3JBwYhzyyRqa7_b.jpg",
+                    "room": "Room 13",
+                    "invno": "BF1136",
+                    "title": "Odalisque with Tea Set (Odalisque à la théière)",
+                    "medium": "Oil on canvas",
+                    "people": "Pierre-Auguste Renoir",
+                    "locations": "Barnes Foundation (Philadelphia), Collection Gallery, Room 13, West Wall",
+                    "creditLine": "",
+                    "dimensions": "Overall: 16 5/16 x 12 11/16 in. (41.5 x 32.3 cm)",
+                    "displayDate": "c. 1917–1919",
+                    "imageSecret": "b6I3JBwYhzyyRqa7",
+                    "ensembleIndex": "52",
+                    "classification": "Paintings",
+                    "shortDescription": "",
+                    "curatorialApproval": "true"
+                }
+            }
         ];
     }
 
@@ -226,10 +327,11 @@ class FocusResult extends Component {
         }
     }
 
+
     render() {
-
-        const { index, prevIndex, scrollDir, isLanguageDropdownOpen, result } = this.state;
-
+        const { index, prevIndex, scrollDir, result, stories, showStory } = this.state;
+        const showEmailCard = !showStory;
+        console.log(stories);
         const zIndexCurrent = 100 * index;
         const zIndexPrev = zIndexCurrent - 100;
         const down = (scrollDir === 'DOWN') ? true : false;
@@ -243,49 +345,32 @@ class FocusResult extends Component {
         }
 
         return (
-            <Swipeable
-                onSwiping={this.swiping}
-                onSwiped={this.swiped}
-                {...swipeableConfig}>
+
+            <SectionWipesStyled>
+                {/* <div className="panel panel0"> */}
                 <Artwork result={result} langOptions={this.langOptions} selectedLanguage={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
-
-                <div className="story-container container-fluid" id="story-item-container">
-                    {/** this is to make sure that previous story item is back when we swipe down within story items. React spring doesn't keep track of previous item during transition */}
+                {/* </div> */}
+                <Controller globalSceneOptions={{ triggerHook: 'onLeave' }}>
                     {
-                        (index > 0) &&
-                        <div className="story-item-nav row">
-                            <div className="col-8 story-question">Why so many Renoirs?</div>
-                            <div className="col-4 language-dropdown">
-                                <LanguageDropdown isStoryItemDropDown={true} langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
-                            </div>
-                        </div>
-                    }
-                    {
-                        (down) &&
-                        (index > 0) &&
-                        <div className="story-item static" style={{ opacity: 1, zIndex: zIndexCurrent - 1, borderRadius: `0px`, transform: `translate3d(0, 0%, 0)` }} >
-                            {this.renderStoryItem(index - 1, {})}
-                        </div>
-                    }
-                    <Transition
-                        native
-                        unique
-                        keys={index}
-                        items={index}
-                        from={{ opacity: 1, transform: `translate3d(0,${yFrom}%,0)` }}
-                        enter={{ opacity: 1, zIndex: zIndexCurrent, borderRadius: `40px`, transform: `translate3d(0,${yEnter}%,0)` }}
-                        leave={{ opacity: 1, zIndex: zIndexPrev, borderRadius: `0px`, transform: `translate3d(0, ${yLeave}%, 0)` }}
-                    // config={{ mass: 1, tension: 50, friction: 5 }}
-                    >
-                        {index => style => (
-                            <animated.div className="story-item" style={{ ...style }} >
-                                {this.renderStoryItem(index, style)}
-                            </animated.div>
-                        )}
-                    </Transition>
+                        stories.map((story, index) =>
+                            <Scene indicators pin key={`storyitem${index + 1}`}>
 
+                                <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={{ zIndex: 100 * `${index + 2}` }}>
+                                    <StoryItem isFirstItem={(index === 0) ? true : false} story={story} langOptions={this.langOptions} selectedLanguage={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+                                </div>
+
+                            </Scene>
+                        )
+                    }
+                </Controller>
+                <div className="scan-wrapper">
+                    <div className="scan-button" onClick={this.handleScan}>
+                        <img src={scan_button} alt="scan" />
+                    </div>
                 </div>
-            </Swipeable >
+            </SectionWipesStyled>
+
+
         );
     }
 }

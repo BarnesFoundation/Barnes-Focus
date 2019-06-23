@@ -5,6 +5,7 @@ import posed, { PoseGroup } from "react-pose";
 import Home from '../components/Home';
 import Camera from '../components/Camera';
 import FocusResult from '../components/FocusResult';
+import Artwork from '../components/Artwork';
 import * as constants from '../components/Constants';
 
 const RouteContainer = posed.div({
@@ -20,7 +21,7 @@ const Routes = () => (
                     <Switch location={location}>
                         <Route path="/" component={Home} exact={true} key="home" />
                         <Route path="/scan" component={Camera} exact={true} key="scan" />
-                        <Route path="/artwork/:imageId?" component={FocusResult} key="artwork" />
+                        <Route path="/artwork/:imageId?" component={Artwork} key="artwork" />
                     </Switch>
                 </RouteContainer>
             </PoseGroup>
