@@ -26,6 +26,7 @@ import { flattenDeep, filter, debounce } from 'lodash';
 import StoryItem from '../components/StoryItem';
 import scan_button from 'images/scan-button.svg';
 import { Transition, animated } from 'react-spring/renderprops';
+import { Tween, Timeline } from 'react-gsap';
 
 
 /** 
@@ -433,13 +434,13 @@ class Artwork extends Component {
 
             const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-
             const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - h), 0);
             const artworkVScrollDuration = Math.ceil(((artworkVScrollOffset + 60) / h) * 100);
             this.setState({ artworkVScrollOffset, artworkVScrollDuration })
 
         }
     }
+
 
     renderArtwork = () => {
         const { artwork } = this.state;
@@ -562,38 +563,39 @@ class Artwork extends Component {
                     <Scene duration="100%" indicators pin pinSettings={{ pushFollowers: false }}>
                         {(progress) => (
                             <div className="panel">
-                                {/* <Timeline
-                                    totalProgress={progress}
-                                    paused>
-                                    <Tween
-                                        from={{ y: '-0%' }}
-                                        to={{ y: -artworkVScrollOffset }}
-                                    > */}
-                                {this.renderArtwork()}
-                                {/* </Tween>
-                                </Timeline> */}
+                                <Tween
+                                    from={{ y: '-0%' }}
+                                    to={{ y: -artworkVScrollOffset }}
+                                    progress={progress}
+                                    paused
+                                >
+                                    {this.renderArtwork()}
+                                </Tween>
+
                             </div>
                         )}
                     </Scene>
                     {
                         stories.map((story, index) =>
                             <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: false }}>
-                                <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={{ zIndex: 100 * `${index + 2}` }}>
-                                    <StoryItem isFirstItem={(index === 0) ? true : false} story={story} langOptions={this.langOptions} selectedLanguage={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
-                                </div>
+                                {(progress, event) => (
+
+                                    <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={{ zIndex: 100 * `${index + 2}` }}>
+                                        <StoryItem sceneStatus={event.type} isFirstItem={index === 0} story={story} langOptions={this.langOptions} selectedLanguage={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+                                    </div>
+                                )}
                             </Scene>
                         )
                     }
-                    <Scene indicators pin pinSettings={{ pushFollowers: false }}>
+                    <Scene indicators offset="-327" pin pinSettings={{ pushFollowers: false }}>
                         <div className="panel panel-email" style={{ zIndex: 600 }}>
-                            {/* <Timeline>
-                                <Tween
-                                    from={{ y: '-0%' }}
-                                    to={{ y: '-55%' }}
-                                > */}
+
+                            {/* <Tween
+                                from={{ y: '-0' }}
+                                to={{ y: '-60' }}
+                            > */}
                             {this.renderEmailScreen()}
-                            {/* </Tween>
-                            </Timeline> */}
+                            {/* </Tween> */}
                         </div>
 
                     </Scene>

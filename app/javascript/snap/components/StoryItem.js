@@ -2,7 +2,7 @@ import React from 'react';
 import { animated, config } from 'react-spring/renderprops';
 import LanguageDropdown from '../components/LanguageDropdown';
 import { throws } from 'assert';
-
+import { Tween, Timeline } from 'react-gsap';
 
 class StoryItem extends React.Component {
 
@@ -21,6 +21,13 @@ class StoryItem extends React.Component {
     componentWillUnmount() {
         // Un-register scroll listener
         this.cardRef.current.removeEventListener('scroll', this._onScroll);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps.sceneStatus)
+        if (nextProps.sceneStatus === 'start') {
+            console.log('Story : ' + this.props.story.detail.id + ' has started');
+        }
     }
 
     getArtUrl = () => {
@@ -55,13 +62,18 @@ class StoryItem extends React.Component {
         return (
             <div className="card story-item" ref={this.cardRef}>
                 <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
-                <div className="story-item-nav">
-                    <div className="col-8 story-nav-question">Why so many Renoirs?</div>
-                    <div className="col-4 language-dropdown">
-                        <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
+                {
+                    this.props.isFirstItem &&
+                    <div className="story-item-nav">
+                        <div className="col-8 story-nav-question">Why so many Renoirs?</div>
+                        <div className="col-4 language-dropdown">
+                            <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
+                        </div>
                     </div>
-                </div>
+                }
+
                 <div className="card-img-overlay">
+                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
                     <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
                     <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
                 </div>
