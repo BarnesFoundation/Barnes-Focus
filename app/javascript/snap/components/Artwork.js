@@ -20,7 +20,6 @@ import close_icon from 'images/cross.svg';
 import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
 import ProgressiveImage from 'react-progressive-image';
-import { Timeline, Tween } from 'react-gsap';
 import { Controller, Scene } from 'react-scrollmagic';
 import styled from 'styled-components';
 import { flattenDeep, filter, debounce } from 'lodash';
@@ -563,16 +562,16 @@ class Artwork extends Component {
                     <Scene duration="100%" indicators pin pinSettings={{ pushFollowers: false }}>
                         {(progress) => (
                             <div className="panel">
-                                <Timeline
+                                {/* <Timeline
                                     totalProgress={progress}
                                     paused>
                                     <Tween
                                         from={{ y: '-0%' }}
                                         to={{ y: -artworkVScrollOffset }}
-                                    >
-                                        {this.renderArtwork()}
-                                    </Tween>
-                                </Timeline>
+                                    > */}
+                                {this.renderArtwork()}
+                                {/* </Tween>
+                                </Timeline> */}
                             </div>
                         )}
                     </Scene>
@@ -587,14 +586,14 @@ class Artwork extends Component {
                     }
                     <Scene indicators pin pinSettings={{ pushFollowers: false }}>
                         <div className="panel panel-email" style={{ zIndex: 600 }}>
-                            <Timeline>
+                            {/* <Timeline>
                                 <Tween
                                     from={{ y: '-0%' }}
                                     to={{ y: '-55%' }}
-                                >
-                                    {this.renderEmailScreen()}
-                                </Tween>
-                            </Timeline>
+                                > */}
+                            {this.renderEmailScreen()}
+                            {/* </Tween>
+                            </Timeline> */}
                         </div>
 
                     </Scene>
