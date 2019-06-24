@@ -1,17 +1,23 @@
 import React, { Component } from 'react';
 import { SNAP_USER_EMAIL, SNAP_LANGUAGE_PREFERENCE } from './Constants';
 
+const withStoryStyles = {
+    backgroundColor: '#fff',
+    color: '#353535'
+}
+
 class EmailFooter extends Component {
 
     constructor(props) {
         super(props);
-
+        console.log('EmailFooter withStory = ' + props.withStory);
         this.state = {
             email: '',
             errors: {
                 email: false
             }
         }
+
     }
 
     handleEmailInput = (event) => {
@@ -48,7 +54,8 @@ class EmailFooter extends Component {
         let emailErrorFontStyle = (localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru') ? { fontSize: `12px` } : {};
         let emailHeadFontStyle = (localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru') ? { fontSize: `18px` } : {};
         return (
-            <div className="email-container">
+            <div className="email-container" style={(this.props.withStory) ? withStoryStyles : {}}>
+                <div className="email-overlay"></div>
                 <div className="email-head h2" style={emailHeadFontStyle}>
                     {this.props.getTranslation('Bookmark_capture', 'text_1')}
                 </div>

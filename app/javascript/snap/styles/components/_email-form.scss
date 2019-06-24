@@ -127,7 +127,7 @@
                 left: calc(50% - 160px);
                 position: relative;
                 text-align: center;
-                color: #fff;
+                color: inherit;
             }
 
             .email-input {       
@@ -175,7 +175,7 @@
             }
 
             .email-disclaimer {
-                color: #fff;
+                color: inherit;
                 padding-top: 20px;
                 text-align: center;
                 letter-spacing: 0.01em;
