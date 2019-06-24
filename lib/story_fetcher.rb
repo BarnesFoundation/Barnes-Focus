@@ -1,14 +1,33 @@
 require 'uri'
 require 'net/http'
-require 'net/https'
+require 'resolv-replace'
 
 class StoryFetcher
   def initialize
     @endpoint = "https://api-useast.graphcms.com/v1/cjw53solj3odo01eh6l7trigw/master"
   end
 
-  def has_related_stories? obj_id
-    return true
+  def has_story? obj_id
+    params = "
+      {
+        storiesForObjectIds(where: {objectID: #{obj_id}}) {
+          id
+          objectID
+          relatedStories {
+            id
+          }
+        }
+      }
+    "
+
+    response = query_grapql params
+    response_body = response.body.force_encoding 'utf-8'
+    response_body = JSON.parse(response_body)
+
+    return { story_id: nil, has_story: false } if response_body["data"]["storiesForObjectIds"].empty? || response_body["data"]["storiesForObjectIds"][0]["relatedStories"].empty?
+
+    story_id = response_body["data"]["storiesForObjectIds"][0]["relatedStories"][0]["id"]
+    return { story_id: story_id, has_story: true }
   end
 
   def find_by_object_id obj_id
@@ -89,12 +108,12 @@ class StoryFetcher
   def query_grapql params
     uri = URI.parse(@endpoint + "?query=" + params)
     req = Net::HTTP::Post.new(uri.to_s)
+    response = nil
 
-    https_request = Net::HTTP.new(uri.host, uri.port).tap do |http|
-      http.use_ssl = true
+    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+      response = http.request req
     end
 
-    response = https_request.request(req)
     return response
   end
 
