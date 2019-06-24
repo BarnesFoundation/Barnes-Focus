@@ -295,7 +295,7 @@ class Artwork extends Component {
 
         const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
         let resultsContainerBottom = Math.ceil(h - this.artworkRef.getBoundingClientRect().bottom);
-        console.log('resultsContainerBottom :: ' + resultsContainerBottom);
+        //console.log('resultsContainerBottom :: ' + resultsContainerBottom);
 
         if (resultsContainerBottom >= 0) {
             if (!this.state.triggerEmailScreen) {
@@ -543,28 +543,11 @@ class Artwork extends Component {
     }
 
     renderEmailScreen = () => {
-        const { showStory, triggerEmailScreen } = this.state;
-        console.log(triggerEmailScreen);
-
+        const { stories } = this.state;
         return (
             <div>
                 {
-                    (!showStory || stories.length === 0) &&
-                    <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
-                    // <Transition
-                    //     native
-                    //     items={triggerEmailScreen}
-                    //     from={{ transform: `translate3d(0,83%,0)` }}
-                    //     enter={{ transform: `translate3d(0,50%,0)` }}
-                    //     leave={{ transform: `translate3d(0, 83%, 0)` }}
-                    // // config={{ mass: 1, tension: 50, friction: 5 }}
-                    // >
-                    //     {triggerEmailScreen => triggerEmailScreen && (props =>
-                    //         <animated.div style={props}>
-                    //             <EmailForm isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
-                    //         </animated.div>
-                    //     )}
-                    // </Transition>
+                    <EmailForm withStory={stories.length > 0} isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
                 }
             </div>
         )
@@ -602,9 +585,8 @@ class Artwork extends Component {
                             </Scene>
                         )
                     }
-                    <div id="email-trigger" style={{ visibility: 'hidden', position: 'fixed' }}></div>
-                    <Scene offset="-500" duration="50%" indicators pin pinSettings={{ pushFollowers: false }}>
-                        <div className="panel panel-email">
+                    <Scene indicators pin pinSettings={{ pushFollowers: false }}>
+                        <div className="panel panel-email" style={{ zIndex: 600 }}>
                             <Timeline>
                                 <Tween
                                     from={{ y: '-0%' }}
