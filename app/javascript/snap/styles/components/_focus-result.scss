@@ -14,11 +14,9 @@
       font-size: 18px;
       vertical-align: middle;
       line-height: 50px;
-      padding-top: 10px;
       display: flex;
-
-      //top: 55px; /* shadow is at bottom of element, so at 48 + 16 = 64px */
-      box-shadow: 0px 2px 5px rgba(0,0,0,0.5);
+      justify-content: space-between;
+      padding-top: 10px;
 
       .story-nav-question {
         font-weight: bold;
@@ -26,20 +24,25 @@
         text-transform: uppercase;
       }
 
-      .dd-header {
-        background-color: transparent;
-        color: #FFF;
-        border: 2px solid rgba(255, 255, 255, .85);
+      .language-dropdown {
+
+        .dd-header {
+          background-color: transparent;
+          color: #FFF;
+          border: 2px solid rgba(255, 255, 255, .85);
+        }
+
+        .dd-list {
+          bottom: 0% !important;
+          position: relative;
+          top: 5px;
+          line-height: 16px;
+          right: 35px;
+          border: none;
+        }
       }
 
-      .dd-list {
-        bottom: 0% !important;
-        position: relative;
-        top: 5px;
-        line-height: 16px;
-        right: 22px;
-        border: none;
-      }
+      
   }
 
   .card-img-overlay {
