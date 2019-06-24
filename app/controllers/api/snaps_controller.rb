@@ -132,7 +132,7 @@ private
       # Get the image information for the image id
       response[:data][:records] << get_image_information(image_id)
       response[:data][:roomRecords] = get_similar_artworks(image_id)
-      response[:data][:show_story] = has_story?(image_id)
+      response[:data][:show_story] = find_and_save_story_by?(image_id)
     end
     return response
   end
@@ -163,6 +163,8 @@ private
 
   ## Translates the given text to the preferred language
   def translate_text(short_description)
+    return short_description if short_description.blank?
+
     # Strip unwanted content
     begin
       document = Nokogiri::HTML(short_description)
@@ -190,8 +192,33 @@ private
   end
 
   ## Fetch story from GraphQL
-  def has_story?(image_id)
-    StoryFetcher.new.has_related_stories?(image_id)
+  def find_and_save_story_by?(image_id)
+    session       = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
+    session_blob  = !session.blob.is_a?(Hash) && session.blob == '{}' ? JSON.parse(session.blob) : session.blob
+    story         = StoryFetcher.new.has_story?(image_id)
+
+    return false if !story[:has_story]
+
+    # if story is new
+    if session_blob.empty? || !session_blob.has_key?(story[:story_id])
+      session_blob[ story[:story_id] ] = { read_count: 1 }
+      session.update_column(:blob, session_blob)
+      return true
+    end
+
+    # if story has been read by user
+    return if session_blob[ story[:story_id] ].has_key?(:read) && session_blob[ story[:story_id] ][ :read ]
+
+    # if same story has been offered 3 times
+    if session_blob.keys.include?(story[:story_id])
+      if session_blob[ story[:story_id] ]["read_count"] < 3
+        session_blob[ story[:story_id] ]["read_count"] += 1
+        session.update_column(:blob, session_blob)
+        return true
+      end
+    end
+
+    return false
   end
 
   def fetch_session

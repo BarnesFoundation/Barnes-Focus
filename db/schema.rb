@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190130131110) do
+ActiveRecord::Schema.define(version: 20190624062814) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -90,6 +90,8 @@ ActiveRecord::Schema.define(version: 20190130131110) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "lang_pref"
+    t.jsonb "blob", default: "{}", null: false
+    t.index ["blob"], name: "index_sessions_on_blob", using: :gin
     t.index ["session_id"], name: "index_sessions_on_session_id", unique: true
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
