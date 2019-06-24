@@ -4,7 +4,6 @@ import posed, { PoseGroup } from "react-pose";
 
 import Home from '../components/Home';
 import Camera from '../components/Camera';
-import FocusResult from '../components/FocusResult';
 import Artwork from '../components/Artwork';
 import * as constants from '../components/Constants';
 
