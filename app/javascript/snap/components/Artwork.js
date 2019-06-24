@@ -577,7 +577,7 @@ class Artwork extends Component {
         return (
             <SectionWipesStyled>
                 <Controller globalSceneOptions={{ triggerHook: 'onLeave' }}>
-                    <Scene duration="100%" indicators pin>
+                    <Scene duration="100%" indicators pin pinSettings={{ pushFollowers: false }}>
                         {(progress) => (
                             <div className="panel">
                                 <Timeline
@@ -595,7 +595,7 @@ class Artwork extends Component {
                     </Scene>
                     {
                         stories.map((story, index) =>
-                            <Scene indicators pin key={`storyitem${index + 1}`}>
+                            <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: false }}>
                                 <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={{ zIndex: 100 * `${index + 2}` }}>
                                     <StoryItem isFirstItem={(index === 0) ? true : false} story={story} langOptions={this.langOptions} selectedLanguage={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
                                 </div>
@@ -603,7 +603,7 @@ class Artwork extends Component {
                         )
                     }
                     <div id="email-trigger" style={{ visibility: 'hidden', position: 'fixed' }}></div>
-                    <Scene triggerHook="onEnter" offset="-500" duration="50%" indicators pin>
+                    <Scene offset="-500" duration="50%" indicators pin pinSettings={{ pushFollowers: false }}>
                         <div className="panel panel-email">
                             <Timeline>
                                 <Tween
