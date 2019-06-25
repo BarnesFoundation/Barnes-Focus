@@ -1,3 +1,13 @@
+## Upgrade nodejs For version 3
+We'll have to upgrade nodejs to version 8. In order to do that ssh into both the application and run
+- `yum remove nodesource-release* nodejs`
+- `yum clean all`
+- `rm -rf /var/cache/yum/*`
+- `yum remove nodesource-release* nodejs`
+- `rm -rf /etc/yum.repos.d/nodesource-el.repo`
+
+And then proceed with the deployment
+
 # Installation Instructions
 * Git clone
 * Install Ruby (using RVM): `rvm install ruby-2.4.3`

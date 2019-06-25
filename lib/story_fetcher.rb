@@ -30,7 +30,7 @@ class StoryFetcher
     return { story_id: story_id, has_story: true }
   end
 
-  def find_by_object_id obj_id
+  def find_by_object_id obj_id, preferred_lang = 'en'
     params = "
       {
         storiesForObjectIds(where: {objectID: #{obj_id}}) {
@@ -45,10 +45,10 @@ class StoryFetcher
     response = response.body.force_encoding 'utf-8' # Another way of doing this: response.body.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
     original_response = JSON.parse(response)
 
-    return parse_response_and_fetch_metadata original_response, obj_id
+    return parse_response_and_fetch_metadata original_response, obj_id, preferred_lang
   end
 
-  def find_by_room_id room_id
+  def find_by_room_id room_id, preferred_lang
     params = "
       {
         storiesForRoomIds(where: {roomID: #{room_id}}) {
@@ -63,7 +63,7 @@ class StoryFetcher
     resp = response.body.force_encoding 'utf-8'
     original_response = JSON.parse(response)
 
-    return parse_response_and_fetch_metadata original_response, room_id
+    return parse_response_and_fetch_metadata original_response, room_id, preferred_lang
   end
 
   def related_stories
@@ -118,7 +118,7 @@ class StoryFetcher
     return response
   end
 
-  def parse_response_and_fetch_metadata original_response, searched_object_id
+  def parse_response_and_fetch_metadata original_response, searched_object_id, preferred_lang
     content, total, unique_identifier = Hash.new, 0, nil
 
     return {unique_identifier: unique_identifier, content: content, total: total} if original_response["data"]["storiesForObjectIds"].empty? || original_response["data"]["storiesForObjectIds"][0]["relatedStories"].empty?
