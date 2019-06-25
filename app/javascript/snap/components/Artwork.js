@@ -139,6 +139,9 @@ class Artwork extends Component {
                 result['title'] = art_obj.title;
                 result['shortDescription'] = art_obj.shortDescription;
                 result['artist'] = art_obj.people;
+                result['nationality'] = art_obj.nationality;
+                result['birthDate'] = art_obj.birthDate;
+                result['deathDate'] = art_obj.deathDate;
                 result['classification'] = art_obj.classification;
                 result['locations'] = art_obj.locations;
                 result['medium'] = art_obj.medium;
@@ -479,7 +482,7 @@ class Artwork extends Component {
                                         <tbody>
                                             <tr>
                                                 <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
-                                                <td className="text-left item-info">{artwork.artist}</td>
+                                                <td className="text-left item-info">{artwork.artist} ({artwork.nationality}, {artwork.birthDate} - {artwork.deathDate})</td>
                                             </tr>
                                             <tr>
                                                 <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_4')}:</td>
