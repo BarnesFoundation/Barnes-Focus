@@ -80,9 +80,18 @@ class SearchRequestService {
             let response = await axios.get(constants.STORIES_URL + imageId);
             return response.data;
         }
-
         catch (error) {
-            console.log('An error occurred while retrieving the artwork information from the server');
+            console.log('An error occurred while retrieving story from the server');
+        }
+    }
+
+    markStoryAsRead = async (imageId, storyId) => {
+        try {
+            let response = await axios.post(constants.STORIES_READ_URL + imageId + '&unique_identifier=' + storyId);
+            return response.data;
+        }
+        catch (error) {
+            console.log('An error occurred while marking story as read from the server');
         }
     }
 }

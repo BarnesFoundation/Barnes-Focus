@@ -80,7 +80,7 @@
                 font-size: 22px;
                 line-height: 26px;
                 letter-spacing: 0.11px;
-                font-family: 'Calibre-Regular';
+                font-family: 'Calibre-Regular', sans-serif;
 
             }
         }
@@ -93,6 +93,7 @@
             background: #fff;
             .card-text {
                 padding-bottom: 30px;
+                font-family: 'Calibre-Regular', sans-serif;
             }
 
             .card-info {
@@ -116,7 +117,7 @@
                 }
 
                 .item-info {
-                    font-family: 'Calibre-Regular';
+                    font-family: 'Calibre-Regular', sans-serif;
                     line-height: 18px;
                     padding-top: 6px;
                     font-size: 17px;

@@ -42,19 +42,19 @@ html, body {
 
 .paragraph {
     //font-family: 'Milo serif';
-    font-family: 'Calibre-Regular';
+    font-family: 'Calibre-Regular', sans-serif;
     font-size: 18px;
     line-height: 26px;
 }
 
 .small-paragraph {
-    font-family: 'Calibre-Regular';
+    font-family: 'Calibre-Regular', sans-serif;
     font-size: 17px;
     line-height: 20px;
 }
 
 .caption {
-     font-family: 'Calibre-Regular';
+    font-family: 'Calibre-Regular', sans-serif;
     font-size: 14px;
 }
 
@@ -82,7 +82,7 @@ html, body {
 h1 {
     font-size: 2.25rem;
     margin-bottom: 0.78125rem;
-    font-family: 'Calibre-Medium';
+    font-family: 'Calibre-Medium', sans-serif;
     font-weight: normal;
     margin-top: 0;
 
@@ -99,7 +99,7 @@ h2 {
 
 p {
     color: #8C8C8D;
-    font-family: 'Calibre-Regular';
+    font-family: 'Calibre-Regular', sans-serif;
 } 
 
 .landscape-wrapper {
@@ -173,7 +173,7 @@ p {
 .footer-text {
     padding: 24px 0 24px;
     a {
-        font-family: 'Calibre-Regular';
+        font-family: 'Calibre-Regular', sans-serif;
         font-size: 16px;
         text-align: center;
         color: #B4B4B4 !important;        

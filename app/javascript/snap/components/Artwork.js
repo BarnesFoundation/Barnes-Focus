@@ -142,6 +142,7 @@ class Artwork extends Component {
                 result['nationality'] = art_obj.nationality;
                 result['birthDate'] = art_obj.birthDate;
                 result['deathDate'] = art_obj.deathDate;
+                result['culture'] = art_obj.culture;
                 result['classification'] = art_obj.classification;
                 result['locations'] = art_obj.locations;
                 result['medium'] = art_obj.medium;
@@ -152,6 +153,7 @@ class Artwork extends Component {
                 result['displayDate'] = art_obj.displayDate;
                 result['dimensions'] = art_obj.dimensions;
                 result['curatorialApproval'] = (art_obj.curatorialApproval === "false") ? false : true;
+                result['unIdentified'] = art_obj.people.toLowerCase().includes('unidentified')
             }
 
             if (search_result["data"]["roomRecords"].length > 0) {
@@ -176,7 +178,7 @@ class Artwork extends Component {
 
         let imageId = (this.state.result) ? this.state.result.data.records[0].id : this.props.match.params.imageId;
         const selectedLang = await this.getSelectedLanguage();
-        const stories = await this.setupStory(imageId);
+        const { stories, storyId, storyTitle } = await this.setupStory(imageId);
         const emailCaptured = localStorage.getItem(constants.SNAP_USER_EMAIL) !== null;
 
         if (!this.state.result) {
@@ -185,8 +187,10 @@ class Artwork extends Component {
             this.setState({
                 selectedLanguage: selectedLang[0],
                 stories: stories,
+                storyId: storyId,
+                storyTitle: storyTitle,
                 result: artworkInfo,
-                showStory: artworkInfo.show_story,
+                showStory: artworkInfo.data.show_story,
                 artwork: artwork,
                 roomRecords: roomRecords,
                 emailCaptured: emailCaptured,
@@ -198,6 +202,8 @@ class Artwork extends Component {
             this.setState({
                 selectedLanguage: selectedLang[0],
                 stories: stories,
+                storyId: storyId,
+                storyTitle: storyTitle,
                 showStory: this.state.result.data.show_story,
                 artwork: artwork,
                 roomRecords: roomRecords,
@@ -240,28 +246,29 @@ class Artwork extends Component {
         /** Save the user selected language in the server session and call the getArtworksInfo API again to refresh the page with translated result. */
         const languageUpdated = await this.sr.saveLanguagePreference(lang.code);
         const artworkInfo = await this.sr.getArtworkInformation(imageId);
-        const stories = await this.setupStory(imageId);
+        const { stories, storyId, storyTitle } = await this.setupStory(imageId);
         const { artwork, roomRecords } = this.constructResultAndInRoomSlider(artworkInfo);
         this.setState({
             result: artworkInfo,
             selectedLanguage: lang,
             stories: stories,
+            storyId: storyId,
+            storyTitle: storyTitle,
             artwork: artwork,
             roomRecords: roomRecords
         });
     }
 
     getFocusedArtworkImageId = () => {
-        const imageId = (this.state.result) ? this.state.result.data.records[0].id : this.props.match.params.imageId;
-        return imageId;
+        return (this.state.artwork) ? this.state.artwork.id : this.props.match.params.imageId;
     }
 
     setupStory = async (imageId) => {
         let stories_data = await this.sr.getStoryItems(imageId);
         if (stories_data.data.total > 0) {
-            return stories_data.data.content.stories;
+            return { stories: stories_data.data.content.stories, storyId: stories_data.data.unique_identifier, storyTitle: stories_data.data.content.story_title };
         } else {
-            return [];
+            return { stories: undefined, storyId: undefined, storyTitle: undefined };
         }
     }
 
@@ -426,10 +433,6 @@ class Artwork extends Component {
         this.setState({ emailCaptured: false, showEmailScreen: false });
     }
 
-    getArtworkScrollOffset = () => {
-
-    }
-
     setArtworkRef = (elem) => {
         if (elem) {
             this.artworkRef = elem;
@@ -444,7 +447,15 @@ class Artwork extends Component {
         }
     }
 
+    onStoryReadComplete = () => {
+        const imageId = this.getFocusedArtworkImageId();
+        const storyId = this.state.storyId;
+        this.sr.markStoryAsRead(imageId, storyId);
+    }
 
+    /**
+     * Renders the focused artwork card.
+     */
     renderArtwork = () => {
         const { artwork } = this.state;
         return (
@@ -482,8 +493,15 @@ class Artwork extends Component {
                                         <tbody>
                                             <tr>
                                                 <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
-                                                <td className="text-left item-info">{artwork.artist} ({artwork.nationality}, {artwork.birthDate} - {artwork.deathDate})</td>
+                                                <td className="text-left item-info">{artwork.artist} {(artwork.unIdentified) ? '' : `(${artwork.nationality}, ${artwork.birthDate} - ${artwork.deathDate})`}</td>
                                             </tr>
+                                            {
+                                                artwork.unIdentified &&
+                                                <tr>
+                                                    <td className="text-left item-label">Culture:</td>
+                                                    <td className="text-left item-info">{artwork.culture}</td>
+                                                </tr>
+                                            }
                                             <tr>
                                                 <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_4')}:</td>
                                                 <td className="text-left item-info">{artwork.title}</td>
@@ -545,17 +563,53 @@ class Artwork extends Component {
         );
     }
 
+    /**
+     * Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts.
+     */
     renderEmailScreen = () => {
-        const { stories } = this.state;
+        const { showStory, stories } = this.state;
         return (
             <div>
                 {
-                    <EmailForm withStory={stories.length > 0} isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
+                    <EmailForm withStory={showStory} isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
                 }
             </div>
         )
     };
 
+    /**
+     * Renders the story cards if * showStory * flag is true.
+     */
+    renderStory = () => {
+        const { showStory, stories } = this.state;
+        if (!showStory) {
+            return <div></div>;
+        }
+        return (
+            stories.map((story, index) =>
+                <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: false }} pinSettings={{ pushFollowers: false }}>
+                    {(progress, event) => (
+
+                        <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={{ zIndex: 100 * `${index + 2}` }}>
+                            <StoryItem
+                                progress={progress}
+                                sceneStatus={event.type}
+                                storyIndex={index}
+                                story={story}
+                                langOptions={this.langOptions}
+                                selectedLanguage={this.state.selectedLanguage}
+                                onSelectLanguage={this.onSelectLanguage}
+                                onStoryReadComplete={this.onStoryReadComplete} />
+                        </div>
+                    )}
+                </Scene>
+            )
+        );
+    }
+
+    /**
+     * Main render screen setup
+     */
     renderResult = () => {
         const { stories, showStory, artworkVScrollOffset, artworkVScrollDuration } = this.state;
         console.log('artworkVScrollOffset ====== ' + artworkVScrollOffset);
@@ -578,29 +632,13 @@ class Artwork extends Component {
                             </div>
                         )}
                     </Scene>
-                    {
-                        stories.map((story, index) =>
-                            <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: false }}>
-                                {(progress, event) => (
 
-                                    <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={{ zIndex: 100 * `${index + 2}` }}>
-                                        <StoryItem sceneStatus={event.type} isFirstItem={index === 0} story={story} langOptions={this.langOptions} selectedLanguage={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
-                                    </div>
-                                )}
-                            </Scene>
-                        )
-                    }
+                    {this.renderStory()}
+
                     <Scene indicators offset="-327" pin pinSettings={{ pushFollowers: false }}>
                         <div className="panel panel-email" style={{ zIndex: 600 }}>
-
-                            {/* <Tween
-                                from={{ y: '-0' }}
-                                to={{ y: '-60' }}
-                            > */}
                             {this.renderEmailScreen()}
-                            {/* </Tween> */}
                         </div>
-
                     </Scene>
                 </Controller>
                 <div className="scan-wrapper">
