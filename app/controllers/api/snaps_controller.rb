@@ -4,7 +4,7 @@ require 'json'
 
 class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
-  skip_before_action :verify_authenticity_token, only: %w(storeSearchedResult)
+  skip_before_action :verify_authenticity_token, only: %w(storeSearchedResult mark_story_as_read)
   before_action only: [ :getArtworkInformation ] do
     capture_scanned_history( params[:imageId] )
   end
@@ -87,6 +87,7 @@ class Api::SnapsController < Api::BaseController
           data: {
             success: true,
             total: @story[:total],
+            unique_identifier: @story[:unique_identifier],
             content: @story[:content]
           },
           message: 'ok'
@@ -105,12 +106,56 @@ class Api::SnapsController < Api::BaseController
           data: {
             success: true,
             total: @story[:total],
+            unique_identifier: @story[:unique_identifier],
             content: @story[:content]
           },
           message: 'ok'
         },
         status: :ok
       end
+    end
+  end
+
+  def mark_story_as_read
+    session  = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
+
+    if session
+      session_blob = session.blob
+      bookmarks = Bookmark.where(image_id: params[:image_id], session_id: session.id)
+
+      respond_to do | wants |
+        if bookmarks.present? && session_blob != '{}' && session_blob.has_key?(params[:unique_identifier])
+          session_blob[params[:unique_identifier]]["read"] = true
+          bookmarks.update_all( story_read: true )
+          session.update_column(:blob, session_blob)
+          wants.json do
+            render json: {
+              data: {
+                success: true
+              },
+              message: "Story has been mark read successfully!"
+            },
+            status: :ok
+          end
+        else
+          wants.json do
+            render json: {
+              data: {
+                success: false
+              },
+              message: "Entry not found!"
+            },
+            status: 404
+          end
+        end
+      end
+    else
+      render json: {
+        data: {
+          success: false
+        },
+        message: "No active session found!"
+      }, status: 404
     end
   end
 
@@ -207,7 +252,7 @@ private
     end
 
     # if story has been read by user
-    return if session_blob[ story[:story_id] ].has_key?(:read) && session_blob[ story[:story_id] ][ :read ]
+    return false if session_blob[ story[:story_id] ].has_key?("read") && session_blob[ story[:story_id] ]["read"]
 
     # if same story has been offered 3 times
     if session_blob.keys.include?(story[:story_id])
