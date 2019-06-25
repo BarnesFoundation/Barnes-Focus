@@ -61,8 +61,9 @@ class StoryFetcher
 
     response = query_grapql params
     resp = response.body.force_encoding 'utf-8'
+    original_response = JSON.parse(response)
 
-    return JSON.parse(resp)
+    return parse_response_and_fetch_metadata original_response, room_id
   end
 
   def related_stories
@@ -118,9 +119,9 @@ class StoryFetcher
   end
 
   def parse_response_and_fetch_metadata original_response, searched_object_id
-    content, total = Hash.new, 0
+    content, total, unique_identifier = Hash.new, 0, nil
 
-    return {content: content, total: total} if original_response["data"]["storiesForObjectIds"].empty? || original_response["data"]["storiesForObjectIds"][0]["relatedStories"].empty?
+    return {unique_identifier: unique_identifier, content: content, total: total} if original_response["data"]["storiesForObjectIds"].empty? || original_response["data"]["storiesForObjectIds"][0]["relatedStories"].empty?
 
     related_stories = original_response["data"]["storiesForObjectIds"][0]["relatedStories"]
     story_attrs = related_stories.size > 1 ? related_stories.last : related_stories.first
@@ -144,8 +145,9 @@ class StoryFetcher
       content["stories"].push h
     end
 
+    unique_identifier = story_attrs["id"]
     total = content["stories"].count
 
-    return {content: content, total: total}
+    return {unique_identifier: unique_identifier, content: content, total: total}
   end
 end

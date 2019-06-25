@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190624062814) do
+ActiveRecord::Schema.define(version: 20190625053751) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,12 +51,16 @@ ActiveRecord::Schema.define(version: 20190624062814) do
     t.datetime "updated_at", null: false
     t.string "language"
     t.integer "session_id"
+    t.boolean "story_read", default: false
+    t.boolean "story_mail_sent", default: false
     t.index ["email"], name: "index_bookmarks_on_email"
     t.index ["image_id"], name: "index_bookmarks_on_image_id"
     t.index ["language"], name: "index_bookmarks_on_language"
     t.index ["mail_sent"], name: "index_bookmarks_on_mail_sent"
     t.index ["session_id", "email"], name: "index_bookmarks_on_session_id_and_email"
     t.index ["session_id"], name: "index_bookmarks_on_session_id"
+    t.index ["story_read", "story_mail_sent"], name: "index_bookmarks_on_story_read_and_story_mail_sent"
+    t.index ["story_read"], name: "index_bookmarks_on_story_read"
   end
 
   create_table "es_cached_records", force: :cascade do |t|
