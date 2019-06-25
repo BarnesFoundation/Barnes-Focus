@@ -4,7 +4,7 @@ require 'json'
 
 class Api::SnapsController < Api::BaseController
   include ActionView::Helpers::SanitizeHelper
-  skip_before_action :verify_authenticity_token, only: %w(storeSearchedResult mark_story_as_read)
+  skip_before_action :verify_authenticity_token, only: %w(storeSearchedResult mark_story_as_read find_stories_by_object_id)
   before_action only: [ :getArtworkInformation ] do
     capture_scanned_history( params[:imageId] )
   end
@@ -79,7 +79,8 @@ class Api::SnapsController < Api::BaseController
   end
 
   def find_stories_by_object_id
-    @story = StoryFetcher.new.find_by_object_id params[:object_id].to_i
+    session  = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
+    @story = StoryFetcher.new.find_by_object_id(params[:object_id].to_i, session.lang_pref)
 
     respond_to do | wants |
       wants.json do
