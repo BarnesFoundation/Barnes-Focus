@@ -4,11 +4,27 @@ import LanguageDropdown from '../components/LanguageDropdown';
 import { throws } from 'assert';
 import { Tween, Timeline } from 'react-gsap';
 
+const tweenProps = {
+    ease: 'Linear.easeNone',
+    from: {
+        opacity: 0,
+        yPercent: 100,
+    },
+    to: {
+        opacity: 1,
+        yPercent: 0,
+    }
+};
+
 class StoryItem extends React.Component {
 
     constructor(props) {
         super(props);
         this.cardRef = React.createRef();
+
+        this.state = {
+            storyRead: false
+        }
     }
 
     componentDidMount() {
@@ -25,8 +41,11 @@ class StoryItem extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         console.log(nextProps.sceneStatus)
-        if (nextProps.sceneStatus === 'start') {
-            console.log('Story : ' + this.props.story.detail.id + ' has started');
+        if (nextProps.sceneStatus === 'start' && nextProps.storyIndex === 2) {
+            if (!this.state.storyRead) {
+                this.setState({ storyRead: true });
+                this.props.onStoryReadComplete();
+            }
         }
     }
 
@@ -57,13 +76,13 @@ class StoryItem extends React.Component {
     }
 
     render() {
-        const { story } = this.props;
+        const { story, progress } = this.props;
         console.log('StoryItem >> render');
         return (
             <div className="card story-item" ref={this.cardRef}>
                 <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
                 {
-                    this.props.isFirstItem &&
+                    (this.props.storyIndex === 0) &&
                     <div className="story-item-nav">
                         <div className="col-8 story-nav-question">Why so many Renoirs?</div>
                         <div className="col-4 language-dropdown">
@@ -72,11 +91,19 @@ class StoryItem extends React.Component {
                     </div>
                 }
 
-                <div className="card-img-overlay">
-                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                    <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
-                </div>
+                <Timeline
+                    totalProgress={progress * 5}
+                    paused
+                >
+                    <Tween {...tweenProps}>
+                        <div className="card-img-overlay">
+                            <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                            <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                            <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
+                        </div>
+                    </Tween>
+                </Timeline>
+
             </div>
 
         );
