@@ -115,12 +115,25 @@
 }
 
 .email-container {
-            padding: 50px 30px 22px;
+            padding: 24px 32px 22px;
             position: relative;
             background-color: #353535;
             border-top-left-radius: 40px;
             border-top-right-radius: 40px;
             color: #fff;
+            transform: translate3d(0px, -172px, 0px);
+
+            .email-intent {
+                left: calc(50% - 69px);
+                position: relative;
+                text-align: center;
+                color: inherit;
+                text-transform: uppercase;
+                line-height: 19px;
+                width: 138px;
+                height: 16px;
+                margin-bottom: 16px;
+            }
             
             .email-head {
                 width: 320px;
@@ -128,13 +141,16 @@
                 position: relative;
                 text-align: center;
                 color: inherit;
+                font-size: 20px;
+                line-height: 24px;
+                font-weight: 600;
             }
 
             .email-input {       
                 width: 320px;
                 position: relative;
                 left: calc(50% -160px);
-                padding-top: 35px;
+                padding-top: 16px;
 
                 input {
                     -webkit-appearance: none;

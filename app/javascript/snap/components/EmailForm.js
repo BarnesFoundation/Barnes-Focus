@@ -55,8 +55,8 @@ class EmailFooter extends Component {
         let emailHeadFontStyle = (localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru') ? { fontSize: `18px` } : {};
         return (
             <div className="email-container" style={(this.props.withStory) ? withStoryStyles : {}}>
-                <div className="email-overlay"></div>
-                <div className="email-head h2" style={emailHeadFontStyle}>
+                <div className="email-intent">Send me my scans</div>
+                <div className="email-head" style={emailHeadFontStyle}>
                     {this.props.getTranslation('Bookmark_capture', 'text_1')}
                 </div>
                 <div className="email-input">
