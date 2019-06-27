@@ -590,7 +590,7 @@ class Artwork extends Component {
                 <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: false }} pinSettings={{ pushFollowers: false }}>
                     {(progress, event) => (
 
-                        <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={{ zIndex: 100 * `${index + 2}` }}>
+                        <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
                             <StoryItem
                                 progress={progress}
                                 sceneStatus={event.type}
@@ -636,7 +636,7 @@ class Artwork extends Component {
                     {this.renderStory()}
 
                     <Scene indicators offset="-327" pin pinSettings={{ pushFollowers: false }}>
-                        <div className="panel panel-email" style={{ zIndex: 600 }}>
+                        <div className="panel panel-email" >
                             {this.renderEmailScreen()}
                         </div>
                     </Scene>

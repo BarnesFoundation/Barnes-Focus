@@ -6,6 +6,7 @@ import Home from '../components/Home';
 import Camera from '../components/Camera';
 import Artwork from '../components/Artwork';
 import * as constants from '../components/Constants';
+import SectionWipes from '../components/Content';
 
 const RouteContainer = posed.div({
     enter: { opacity: 1, delay: 0, beforeChildren: true },
