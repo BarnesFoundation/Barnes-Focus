@@ -580,7 +580,7 @@ class Artwork extends Component {
     /**
      * Renders the story cards if * showStory * flag is true.
      */
-    renderStory = () => {
+    renderStory = (progress) => {
         const { showStory, stories } = this.state;
         if (!showStory) {
             return <div></div>;
@@ -626,7 +626,7 @@ class Artwork extends Component {
                                     progress={progress}
                                     paused
                                 >
-                                    {this.renderArtwork()}
+                                    {this.renderArtwork(progress)}
                                 </Tween>
 
                             </div>
