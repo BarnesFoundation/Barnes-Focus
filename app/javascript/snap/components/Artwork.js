@@ -587,7 +587,7 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: false }} duration="1200" offset="-100">
+                <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: true }} duration={300} offset="-100">
                     {(progress, event) => (
 
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>

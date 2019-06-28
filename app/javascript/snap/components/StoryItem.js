@@ -94,7 +94,7 @@ class StoryItem extends React.Component {
                     </div>
                 }
                 <Timeline
-                    totalProgress={progress * 5}
+                    totalProgress={progress}
                     paused
                     >
                     <Tween from={{ filter: "blur(8px)" }} to={{ filter: "blur(0px)" }} duration={0.8} >
@@ -109,7 +109,7 @@ class StoryItem extends React.Component {
                                 <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
                             </div>
                     }>
-                    <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={0.8} />
+                    <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={1.0} />
                     </Timeline>
 
                 </Timeline>
