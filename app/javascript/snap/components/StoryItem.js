@@ -75,12 +75,15 @@ class StoryItem extends React.Component {
         }
     }
 
+    handleUpdate = (event) => {
+
+    }
+
     render() {
         const { story, progress } = this.props;
-        console.log('StoryItem >> render');
+        console.log('StoryItem >> render', progress);
         return (
             <div className="card story-item" ref={this.cardRef}>
-                <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
                 {
                     (this.props.storyIndex === 0) &&
                     <div className="story-item-nav">
@@ -90,18 +93,25 @@ class StoryItem extends React.Component {
                         </div>
                     </div>
                 }
-
                 <Timeline
                     totalProgress={progress * 5}
                     paused
-                >
-                    <Tween {...tweenProps}>
-                        <div className="card-img-overlay">
-                            <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                            <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                            <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
-                        </div>
+                    >
+                    <Tween from={{ filter: "blur(8px)" }} to={{ filter: "blur(0px)" }} duration={0.8} >
+                        <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
                     </Tween>
+                
+                    <Timeline
+                        target={
+                            <div className="card-img-overlay">
+                                <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
+                            </div>
+                    }>
+                    <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={0.8} />
+                    </Timeline>
+
                 </Timeline>
 
             </div>

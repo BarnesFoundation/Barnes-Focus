@@ -121,7 +121,8 @@
             border-top-left-radius: 40px;
             border-top-right-radius: 40px;
             color: #fff;
-            transform: translate3d(0px, -172px, 0px);
+            height: 100vh;
+            // transform: translate3d(0px, -172px, 0px);
 
             .email-intent {
                 left: calc(50% - 69px);

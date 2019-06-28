@@ -587,7 +587,7 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: false }} pinSettings={{ pushFollowers: false }}>
+                <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: false }} duration="1200" offset="-100">
                     {(progress, event) => (
 
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
@@ -617,12 +617,12 @@ class Artwork extends Component {
         return (
             <SectionWipesStyled>
                 <Controller globalSceneOptions={{ triggerHook: 'onLeave' }}>
-                    <Scene duration="100%" indicators pin pinSettings={{ pushFollowers: false }}>
+                    <Scene duration="800" indicators pin pinSettings={{ pushFollowers: false }}>
                         {(progress) => (
                             <div className="panel">
                                 <Tween
                                     from={{ y: '-0%' }}
-                                    to={{ y: -artworkVScrollOffset }}
+                                    to={{ y: "-0%" }}
                                     progress={progress}
                                     paused
                                 >
@@ -635,7 +635,7 @@ class Artwork extends Component {
 
                     {this.renderStory()}
 
-                    <Scene indicators offset="-327" pin pinSettings={{ pushFollowers: false }}>
+                    <Scene indicators pin pinSettings={{ pushFollowers: true }} duration="800">
                         <div className="panel panel-email" >
                             {this.renderEmailScreen()}
                         </div>
