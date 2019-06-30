@@ -555,7 +555,7 @@ class Artwork extends Component {
      * Renders the story cards if * showStory * flag is true.
      */
     renderStory = () => {
-        const { showStory, stories } = this.state;
+        const { showStory, stories, storyTitle } = this.state;
         if (!showStory) {
             return <div></div>;
         }
@@ -570,6 +570,7 @@ class Artwork extends Component {
                                 sceneStatus={event.type}
                                 storyIndex={index}
                                 story={story}
+                                storyTitle={storyTitle}
                                 langOptions={this.langOptions}
                                 selectedLanguage={this.state.selectedLanguage}
                                 onSelectLanguage={this.onSelectLanguage}

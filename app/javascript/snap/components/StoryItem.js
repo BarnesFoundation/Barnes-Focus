@@ -80,14 +80,14 @@ class StoryItem extends React.Component {
     }
 
     render() {
-        const { story, progress } = this.props;
+        const { story, storyTitle, progress } = this.props;
         console.log('StoryItem >> render', progress);
         return (
             <div className="card story-item" ref={this.cardRef}>
                 {
                     (this.props.storyIndex === 0) &&
-                    <div className="story-item-nav">
-                        <div className="col-8 story-nav-question">Why so many Renoirs?</div>
+                    <div className="story-title-bar">
+                        <div className="col-8 story-nav-question">{storyTitle}</div>
                         <div className="col-4 language-dropdown">
                             <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
                         </div>
