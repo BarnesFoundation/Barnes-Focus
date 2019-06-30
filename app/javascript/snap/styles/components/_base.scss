@@ -122,12 +122,21 @@ p {
 .scan-button {
     width: 60px;
     height: 60px;
-    right: 24px;
+    right: 32px;
     bottom: 37px;
     z-index: 99999;
     position: fixed;
-    box-shadow: rgba(0, 0, 0, 0.42);
+    border-radius: 100%;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.42);
+
+    &.floating {
+        right: 0;
+        position: absolute;
+        bottom: -8px !important;
+    }
+
 }
+
 
 // .language-dropdown-wrapper {
 //     top:0;

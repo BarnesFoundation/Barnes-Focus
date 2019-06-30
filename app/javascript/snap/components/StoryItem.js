@@ -96,11 +96,11 @@ class StoryItem extends React.Component {
                 <Timeline
                     totalProgress={progress}
                     paused
-                    >
+                >
                     <Tween from={{ filter: "blur(8px)" }} to={{ filter: "blur(0px)" }} duration={0.8} >
                         <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
                     </Tween>
-                
+
                     <Timeline
                         target={
                             <div className="card-img-overlay">
@@ -108,8 +108,8 @@ class StoryItem extends React.Component {
                                 <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
                                 <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
                             </div>
-                    }>
-                    <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={1.0} />
+                        }>
+                        <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={1.0} />
                     </Timeline>
 
                 </Timeline>
