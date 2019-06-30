@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router';
 import { SNAP_USER_EMAIL, SNAP_LANGUAGE_PREFERENCE, TOP_OFFSET, VIEWPORT_HEIGHT } from './Constants';
 import scan_button from 'images/scan-button.svg';
 
@@ -57,6 +58,10 @@ class EmailForm extends Component {
             requestAnimationFrame(this.handleScroll)
             this.scrollInProgress = true;
         }
+    }
+
+    handleScan = () => {
+        this.props.history.push({ pathname: '/scan' });
     }
 
     handleEmailInput = (event) => {
@@ -163,4 +168,4 @@ class EmailForm extends Component {
     }
 }
 
-export default EmailForm;
+export default withRouter(EmailForm);
