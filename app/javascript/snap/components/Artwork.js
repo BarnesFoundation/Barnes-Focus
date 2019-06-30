@@ -398,11 +398,6 @@ class Artwork extends Component {
 
     }
 
-    handleScan = () => {
-        this.props.history.push({ pathname: '/scan' });
-    }
-
-
     setArtworkRef = (elem) => {
         if (elem) {
             this.artworkRef = elem;
@@ -538,7 +533,6 @@ class Artwork extends Component {
      */
     renderEmailScreen = () => {
         const { showStory, stories, emailCaptureAck } = this.state;
-        console.log('emailCaptureAck is == ', emailCaptureAck);
         if (emailCaptureAck) {
             return <div></div>;
         } else {
