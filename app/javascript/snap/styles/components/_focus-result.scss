@@ -1,20 +1,20 @@
 
 .story-item {
 
-  font-family: 'Calibre-Regular' !important;
+  font-family: 'Calibre-Regular', sans-serif;
   height: 100vh;
   width: 100vw;
   // background-color: transparent;
   transform: translate3d(0px, -100px, 0px);
 
-  .story-item-nav {
+  .story-title-bar {
       position: absolute;
       top: 0;
       height: 65px;
       z-index: 1000;
       color: #fff;
       width: 100%;
-      font-family: 'Calibre';
+      font-family: 'Calibre-Regular', sans-serif;
       font-size: 18px;
       vertical-align: middle;
       line-height: 50px;
@@ -24,7 +24,7 @@
 
       .story-nav-question {
         font-weight: bold;
-        font-family: 'Calibre-Regular';
+        font-family: inherit;
         text-transform: uppercase;
       }
 
