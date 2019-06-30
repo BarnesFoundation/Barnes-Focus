@@ -94,24 +94,12 @@ class Artwork extends Component {
             emailCaptured: false,
             emailCaptureAck: false,
             bgLoaded: false,
-            searchResults: [],
             alsoInRoomResults: [],
-            activeSlideIndex: 0,
-            blurValue: 5,
-            isShortDescVisible: false,
-            isLanguageDropdownOpen: false,
-            isLanguageDropdownVisible: false,
-            scanBtnStyle: {
-                position: 'fixed'
-            },
-            bgImageStyle: {},
-            showSliderOverlay: true,
             email: localStorage.getItem(constants.SNAP_USER_EMAIL) || '',
             snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 1,
             errors: {
                 email: false
             },
-            triggerEmailScreen: false,
             artworkVScrollOffset: 0,
             artworkVScrollDuration: 0
         }
@@ -307,16 +295,6 @@ class Artwork extends Component {
         let resultsContainerBottom = Math.ceil(h - this.artworkRef.getBoundingClientRect().bottom);
         //console.log('resultsContainerBottom :: ' + resultsContainerBottom);
 
-        if (resultsContainerBottom >= 0) {
-            if (!this.state.triggerEmailScreen) {
-                this.setState({ triggerEmailScreen: true });
-            }
-        } else {
-            if (this.state.triggerEmailScreen) {
-                this.setState({ triggerEmailScreen: false });
-            }
-        }
-
 
         let shortDescBoundingRect = this.shortDescContainer.getBoundingClientRect();
         let shortDescElemTop = shortDescBoundingRect.y;
@@ -411,32 +389,24 @@ class Artwork extends Component {
 
     onSubmitEmail = (email) => {
         console.log('Submitted email :: ' + email);
-        this.setState({ email: email, emailCaptured: true, showEmailScreen: false });
-
-        // close the email success ack screen after 4 secs.
+        this.setState({ email: email, emailCaptured: true });
+        this.sr.submitBookmarksEmail(email);
+        // close the email card after 4 secs
         setTimeout(() => {
             this.setState({ emailCaptureAck: true });
         }, 4000);
-        this.sr.submitBookmarksEmail(email);
+
     }
 
     handleScan = () => {
         this.props.history.push({ pathname: '/scan' });
     }
 
-    _emailSuccessAcknowledged = () => {
-        this.setState({ emailCaptureAck: true });
-    }
-
-    _closeEmailPopupScreen = () => {
-        console.log('Email popup screen closed');
-        this.setState({ emailCaptured: false, showEmailScreen: false });
-    }
 
     setArtworkRef = (elem) => {
         if (elem) {
             this.artworkRef = elem;
-            console.log('setArtworkRef == ' + this.artworkRef);
+            //console.log('setArtworkRef == ' + this.artworkRef);
 
             const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
@@ -567,14 +537,18 @@ class Artwork extends Component {
      * Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts.
      */
     renderEmailScreen = () => {
-        const { showStory, stories } = this.state;
-        return (
-            <div>
-                {
+        const { showStory, stories, emailCaptureAck } = this.state;
+        console.log('emailCaptureAck is == ', emailCaptureAck);
+        if (emailCaptureAck) {
+            return <div></div>;
+        } else {
+            return (
+                <div className="panel panel-email" >
                     <EmailForm withStory={showStory} isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
-                }
-            </div>
-        )
+                </div>
+            );
+        }
+
     };
 
     /**
@@ -612,8 +586,8 @@ class Artwork extends Component {
      */
     renderResult = () => {
         const { stories, showStory, artworkVScrollOffset, artworkVScrollDuration } = this.state;
-        console.log('artworkVScrollOffset ====== ' + artworkVScrollOffset);
-        console.log('artworkVScrollDuration ====== ' + artworkVScrollDuration);
+        //console.log('artworkVScrollOffset ====== ' + artworkVScrollOffset);
+        //console.log('artworkVScrollDuration ====== ' + artworkVScrollDuration);
         return (
             <SectionWipesStyled>
                 <Controller globalSceneOptions={{ triggerHook: 'onLeave' }}>
@@ -636,18 +610,13 @@ class Artwork extends Component {
                     {this.renderStory()}
 
                     <Scene indicators pin pinSettings={{ pushFollowers: true }} duration="800">
-                        <div className="panel panel-email" >
-                            {this.renderEmailScreen()}
-                        </div>
+                        {this.renderEmailScreen()}
                     </Scene>
-                </Controller>
-                <div className="scan-wrapper">
-                    <div className="scan-button" onClick={this.handleScan}>
-                        <img src={scan_button} alt="scan" />
-                    </div>
-                </div>
 
-            </SectionWipesStyled>
+
+                </Controller>
+
+            </SectionWipesStyled >
 
         );
     }

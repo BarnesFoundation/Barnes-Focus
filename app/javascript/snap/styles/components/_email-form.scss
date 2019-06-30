@@ -145,6 +145,7 @@
                 font-size: 20px;
                 line-height: 24px;
                 font-weight: 600;
+                font-family: 'Calibre-Regular', sans-serif;
             }
 
             .email-input {       
@@ -158,7 +159,7 @@
                     -moz-appearance: none;
                     appearance: none;
 
-                    font-family: 'Calibre-Regular';
+                    font-family: 'Calibre-Regular', sans-serif;
                     background: #FFFFFF;
                     border: 2px solid #DCDCDC;
                     box-sizing: border-box;
@@ -199,5 +200,6 @@
                 position: relative;
                 width: 320px;
                 left: calc(50% -160px);
+                font-family: 'Calibre-Regular', sans-serif;
             }
         }
