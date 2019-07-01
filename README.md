@@ -1,4 +1,5 @@
-## Upgrade nodejs For version 3
+## Pre Production Dependencies
+### Upgrade nodejs For version/release 3
 We'll have to upgrade nodejs to version 8. In order to do that ssh into both the application and run
 - `yum remove nodesource-release* nodejs`
 - `yum clean all`
@@ -13,12 +14,13 @@ And then proceed with the deployment
 * Install Ruby (using RVM): `rvm install ruby-2.4.3`
 * Install Rails: `gem install rails` OR run `bundle`
 * Install Yarn (for Mac): `brew install yarn`
-* Install Foreman: `gem install foreman`
+* Install Foreman (Deprecated): `gem install foreman`
 * `$ bundle`
 * `$ yarn install`
 * Create Schema: `rake db:create`
 * Migration: `rake db:migrate`
 * Note: You must have a PSQL server running for the above rake commands to run successfully
+* Start server in development mode: `rails server`
 
 ## About rake db:seed
 In V1, for in-app translations, we used to run `rake db:seed` command followed by `rake db:migrate` (on new env). This did few things for us:
@@ -29,14 +31,14 @@ With V2, since most of the screens are new and so are texts on screen, `rake db:
 ### What if I have translations table already populated with V1 data?
 In case, if your `translations` table contains data from `rake db:seed` command. Here's what you can do:
  - From rails console: `Translation.delete_all`
- - Run these rake tasks (IMP: Follow the sequence & To-Do: Had to create these rake tasks as translations were not stablize. This can be clubbed into 1 big task):
-	- `rake data:regenrate_translations`
-	- `rake data:add_more_to_translations`
-	- `rake data:translations:for_browser_screen`
-	- `rake data:translations:for_error_screen`
-    - `rake data:translations:for_artworkinfo_screen`
-    - `rake data:translations:content_changes`
-    - `rake data:translations:welcome_and_disclaimer_changes`
+ - Run this rake task :
+  - `bundle exec rake data:add_translations` OR `rake data:add_translations`
+
+### How I can handle an update in translations table?
+Updates are very easy and can be done from Admin panel directly. For e.g., if a text of translation changes from 'A' to 'B', then you can directly go to edit that record inside Admin panel -> do the changes and save it.
+
+### How I can add more to translations?
+Adding to translations can be done via one time job (OTJ). Preferably `rake` task. You can refer to file: `/lib/tasks/data.rake` on how translations are added.
 
 ### What if I am setting up Barnes App in new ENV?
 In this case, we just have to run above 7 rake tasks
