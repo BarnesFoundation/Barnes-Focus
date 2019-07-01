@@ -22,13 +22,17 @@
       justify-content: space-between;
       padding-top: 10px;
 
-      .story-nav-question {
+      .story-title{
         font-weight: bold;
         font-family: inherit;
         text-transform: uppercase;
       }
 
       .language-dropdown {
+
+        .dd-wrapper {
+          max-width: 80px;
+        }
 
         .dd-header {
           background-color: transparent;

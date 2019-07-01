@@ -89,7 +89,7 @@ class StoryItem extends React.Component {
                 {
                     (this.props.storyIndex === 0) &&
                     <div className="story-title-bar">
-                        <div className="col-8 story-nav-question">{storyTitle}</div>
+                        <div className="col-8 story-title">{storyTitle}</div>
                         <div className="col-4 language-dropdown">
                             <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
                         </div>
