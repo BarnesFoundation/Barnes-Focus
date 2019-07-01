@@ -422,7 +422,7 @@ class Artwork extends Component {
      * Renders the focused artwork card.
      */
     renderArtwork = () => {
-        const { artwork } = this.state;
+        const { artwork, selectedLanguage } = this.state;
         return (
             <Container className="container-fluid artwork-container" id="search-result" initialPose="exit" pose="enter">
                 <div className="row">
@@ -450,7 +450,7 @@ class Artwork extends Component {
                                 </div>
                                 {
                                     artwork.shortDescription &&
-                                    this.state.selectedLanguage.code !== 'En' &&
+                                    selectedLanguage.code !== constants.LANGUAGE_EN &&
                                     <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
                                 }
                                 <div className="card-info">
@@ -591,7 +591,7 @@ class Artwork extends Component {
                             <div className="panel">
                                 <Tween
                                     from={{ y: '-0%' }}
-                                    to={{ y: "-0%" }}
+                                    to={{ y: "-100%" }}
                                     progress={progress}
                                     paused
                                 >
