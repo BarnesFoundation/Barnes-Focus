@@ -133,16 +133,25 @@ class StoryFetcher
       next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
       object_id = "objectID#{i.to_s}"
 
-      art_info = ("objectID1" == object_id && searched_object_id == story_attrs[object_id]) ? EsCachedRecord.search(story_attrs["alternativeHeroImageObjectID"]) : EsCachedRecord.search(story_attrs["objectID"+i.to_s])
+      short_para = preferred_lang == "en" ? story_attrs["shortParagraph"+i.to_s] : SnapTranslator.translate_story_content(story_attrs["shortParagraph"+i.to_s]["html"], preferred_lang)
+      long_para = preferred_lang == "en" ? story_attrs["longParagraph"+i.to_s] : SnapTranslator.translate_story_content(story_attrs["longParagraph"+i.to_s]["html"], preferred_lang)
 
       h = {
-        "image_id"        => story_attrs[object_id],
-        "short_paragraph" => story_attrs["shortParagraph"+i.to_s],
-        "long_paragraph"  => story_attrs["longParagraph"+i.to_s],
-        "detail"          => art_info
+        "image_id"        => ("objectID1" == object_id && searched_object_id == story_attrs[object_id]) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s],
+        "short_paragraph" => short_para,
+        "long_paragraph"  => long_para,
+        "detail"          => nil
       }
 
       content["stories"].push h
+    end
+
+    arts = EsCachedRecord.fetch_all(content["stories"].map{|s| s["image_id"]})
+
+    content["stories"].each do |story|
+      arts.map {|art|
+        story["detail"] = art if story["image_id"].to_s == art["id"].to_s
+      }
     end
 
     unique_identifier = story_attrs["id"]

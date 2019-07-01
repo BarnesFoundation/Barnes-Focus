@@ -66,6 +66,16 @@ class EsCachedRecord < ApplicationRecord
     return searched_data
   end
 
+  def self.fetch_all image_ids
+    arts = where(image_id: image_ids).collect(&:es_data)
+
+    arts.each do |art|
+      art['art_url'] = Image.imgix_url(art['id'], art['imageSecret'])
+    end
+
+    return arts
+  end
+
   ## Retrieves the object data from elastic search for a provided image id
   def self.connect_with_es_endpoint image_id
     # Query elastic search and extract the desired fields
