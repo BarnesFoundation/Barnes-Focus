@@ -1,4 +1,3 @@
-require 'nokogiri'
 require 'rest-client'
 require 'json'
 
@@ -80,7 +79,7 @@ class Api::SnapsController < Api::BaseController
 
   def find_stories_by_object_id
     session  = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
-    @story = StoryFetcher.new.find_by_object_id(params[:object_id].to_i, session.lang_pref)
+    @story = StoryFetcher.new.find_by_object_id(params[:object_id].to_i, session.lang_pref || 'en')
 
     respond_to do | wants |
       wants.json do
@@ -209,24 +208,7 @@ private
 
   ## Translates the given text to the preferred language
   def translate_text(short_description)
-    return short_description if short_description.blank?
-
-    # Strip unwanted content
-    begin
-      document = Nokogiri::HTML(short_description)
-      document.remove_namespaces!
-      short_description = document.xpath("//p")[0].content
-
-      return short_description if preferred_language && preferred_language.downcase == 'en'
-
-      # Configure language translator
-      translator = GoogleTranslate.new preferred_language
-      short_description = translator.translate(short_description) if !short_description.nil?
-    rescue Exception => error
-      p error
-      short_description = short_description if short_description
-    end
-    return short_description
+    return SnapTranslator.translate_short_desc(short_description, preferred_language)
   end
 
   ## Get artworks from the same room
