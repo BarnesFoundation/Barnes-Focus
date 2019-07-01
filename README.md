@@ -41,7 +41,7 @@ Updates are very easy and can be done from Admin panel directly. For e.g., if a 
 Adding to translations can be done via one time job (OTJ). Preferably `rake` task. You can refer to file: `/lib/tasks/data.rake` on how translations are added.
 
 ### What if I am setting up Barnes App in new ENV?
-In this case, we just have to run above 7 rake tasks
+In this case, we just have to run above rake task `bundle exec rake data:add_translations`
 
 # To Start Server in background
 `foreman start -f Procfile.dev -p 3000`
