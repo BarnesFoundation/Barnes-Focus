@@ -14,7 +14,7 @@ And then proceed with the deployment
 * Install Ruby (using RVM): `rvm install ruby-2.4.3`
 * Install Rails: `gem install rails` OR run `bundle`
 * Install Yarn (for Mac): `brew install yarn`
-* Install Foreman (Deprecated): `gem install foreman`
+* Install Foreman: `gem install foreman`
 * `$ bundle`
 * `$ yarn install`
 * Create Schema: `rake db:create`
