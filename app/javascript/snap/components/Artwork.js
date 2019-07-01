@@ -27,6 +27,7 @@ import StoryItem from '../components/StoryItem';
 import scan_button from 'images/scan-button.svg';
 import { Transition, animated } from 'react-spring/renderprops';
 import { Tween, Timeline } from 'react-gsap';
+import { isTablet } from 'react-device-detect';
 
 
 /** 
@@ -116,11 +117,12 @@ class Artwork extends Component {
             let roomRecords = [];
             if (search_result["data"]["records"].length > 0) {
 
-                let w = screen.width;
-                let artUrlParams = '?w=' + (w - 120);
-                let cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
-                let topCropParams = '?q=0&auto=compress&crop=top&fit=crop&h=75&w=' + w;
-                let lowQualityParams = '?q=0&auto=compress';
+                const w = screen.width;
+                const h = (isTablet) ? screen.height : 95;
+                const artUrlParams = '?w=' + (w - 120);
+                const cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
+                const topCropParams = '?q=0&auto=compress&crop=top&fit=crop&h=' + h + '&w=' + w;
+                const lowQualityParams = '?q=0&auto=compress';
 
                 const art_obj = search_result["data"]["records"][0];
                 result['id'] = art_obj.id;

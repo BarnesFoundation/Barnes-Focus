@@ -240,14 +240,109 @@ p {
 /* iPads (portrait) ----------- */
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {
 /* Styles */
+    .artwork-container {
+        .card {
+            position:  !important;
+            width: calc(100vw - 170px) !important;
+            left: 85px !important;
+            .card-body {
+                padding: 25px 65px !important;
+
+                .share-wrapper {
+                    position:  relative !important;
+                    width: 280px !important;
+                    left: calc(50% - 140px) !important;
+                }
+            }
+        }
+    }
+
+    .story-item {
+        .story-title-bar {
+            padding: 32px 174px 0 !important;
+
+            .story-title {
+                font-size: 16px !important;
+                line-height: 19px !important;
+                letter-spacing: 0.2px !important;
+                font-weight: 600 !important;
+            }
+
+        }
+
+        .card-img-overlay {
+            padding: 160px 174px 0;
+
+            .story-text {
+                p {
+                    font-size: 28px !important;
+                    line-height: 36px !important;
+                }
+
+                .story-footer {
+                    font-size: 12px !important;
+                    line-height: 14px !important;
+                    letter-spacing: 0.07px !important;
+                }
+            }
+        }
+    }
 }
 /**********
 iPad 3
 **********/
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) and (-webkit-min-device-pixel-ratio : 2) {
 /* Styles */
+    
 }
 
 @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) and (-webkit-min-device-pixel-ratio : 2) {
 /* Styles */
+    .artwork-container {
+        .card {
+            position:  !important;
+            width: calc(100vw - 170px) !important;
+            left: 85px !important;
+            .card-body {
+                padding: 25px 65px !important;
+
+                .share-wrapper {
+                    position:  relative !important;
+                    width: 280px !important;
+                    left: calc(50% - 140px) !important;
+                }
+            }
+        }
+    }
+
+    .story-item {
+        .story-title-bar {
+            padding: 32px 174px 0 !important;
+
+            .story-title {
+                font-size: 16px !important;
+                line-height: 19px !important;
+                letter-spacing: 0.2px !important;
+                font-weight: 600 !important;
+            }
+
+        }
+
+        .card-img-overlay {
+            padding: 160px 174px 0;
+
+            .story-text {
+                p {
+                    font-size: 28px !important;
+                    line-height: 36px !important;
+                }
+
+                .story-footer {
+                    font-size: 12px !important;
+                    line-height: 14px !important;
+                    letter-spacing: 0.07px !important;
+                }
+            }
+        }
+    }
 }

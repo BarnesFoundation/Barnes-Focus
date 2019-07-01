@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { SNAP_USER_EMAIL, SNAP_LANGUAGE_PREFERENCE, TOP_OFFSET, VIEWPORT_HEIGHT } from './Constants';
 import scan_button from 'images/scan-button.svg';
+import { debounce, throttle } from 'lodash';
 
 const withStoryStyles = {
     backgroundColor: '#fff',
@@ -44,18 +45,20 @@ class EmailForm extends Component {
             this.scrollInProgress = false;
             return;
         }
-        let emailFormTop = this.emailRef.getBoundingClientRect().top;
-        if (emailFormTop <= TOP_OFFSET * VIEWPORT_HEIGHT) {
-            this.setState({ floatScanBtn: true });
-        } else {
-            this.setState({ floatScanBtn: false });
+        const emailFormTop = this.emailRef.getBoundingClientRect().top;
+
+        const floating = (emailFormTop <= TOP_OFFSET * VIEWPORT_HEIGHT) ? true : false;
+
+        if (this.state.floatScanBtn !== floating) {
+            this.setState({ floatScanBtn: floating });
         }
+
         this.scrollInProgress = false;
     }
 
     _onScroll = (event) => {
         if (!this.scrollInProgress) {
-            requestAnimationFrame(this.handleScroll)
+            requestAnimationFrame(throttle(this.handleScroll, 1000))
             this.scrollInProgress = true;
         }
     }
