@@ -36,6 +36,7 @@ export const SNAP_APP_RESET_INTERVAL = 86400000;
 
 export const TOP_OFFSET = 504 / 563;
 export const VIEWPORT_HEIGHT = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+export const LANGUAGE_EN = 'En';
 
 export const SCROLL_DIR = {
     DOWN: 'DOWN',

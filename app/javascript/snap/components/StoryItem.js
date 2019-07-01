@@ -3,6 +3,8 @@ import { animated, config } from 'react-spring/renderprops';
 import LanguageDropdown from '../components/LanguageDropdown';
 import { throws } from 'assert';
 import { Tween, Timeline } from 'react-gsap';
+import google_logo from 'images/google_translate.svg';
+import { LANGUAGE_EN } from './Constants';
 
 const tweenProps = {
     ease: 'Linear.easeNone',
@@ -97,7 +99,7 @@ class StoryItem extends React.Component {
                     totalProgress={progress}
                     paused
                 >
-                    <Tween from={{ filter: "blur(8px)" }} to={{ filter: "blur(0px)" }} duration={0.8} >
+                    <Tween from={{ filter: "blur(0px)" }} to={{ filter: "blur(8px)" }} duration={0.8} >
                         <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
                     </Tween>
 
@@ -107,6 +109,10 @@ class StoryItem extends React.Component {
                                 <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
                                 <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
                                 <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
+                                {
+                                    this.props.selectedLanguage.code !== LANGUAGE_EN &&
+                                    <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                }
                             </div>
                         }>
                         <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={1.0} />
