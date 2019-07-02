@@ -7,6 +7,10 @@ We'll have to upgrade nodejs to version 8. In order to do that ssh into both the
 - `yum remove nodesource-release* nodejs`
 - `rm -rf /etc/yum.repos.d/nodesource-el.repo`
 
+### Translations Updates
+* Email(Header) - "Bookmarked art" -> "Artworks You Discovered"
+* Email(Sub Header) - "Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit" -> "Thank you for visiting the Barnes today! Here are all the works of art you explored using the Barnes Focus guide. Each link will take you to our collection online for more information about each piece."
+
 And then proceed with the deployment
 
 # Installation Instructions
