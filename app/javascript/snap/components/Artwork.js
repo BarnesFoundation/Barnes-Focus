@@ -557,7 +557,7 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: true }} duration={300} offset="-100">
+                <Scene indicators pin key={`storyitem${index + 1}`} triggerHook="onLeave" pinSettings={{ pushFollowers: true }} duration={300} offset="300">
                     {(progress, event) => (
 
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
@@ -579,6 +579,26 @@ class Artwork extends Component {
     }
 
     /**
+     * Renders the story cards if * showStory * flag is true.
+     */
+    renderTriggers = () => {
+        const { showStory, stories, storyTitle } = this.state;
+        if (!showStory) {
+            return <div></div>;
+        }
+        return (
+            stories.map((story, index) =>
+                
+                <Scene key={`storytrigger${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={true} duration="300" offset="100" pinSettings={{ pushFollowers: false }}>
+                    <div>test</div>
+                </Scene> 
+            )
+        );
+    }
+
+
+
+    /**
      * Main render screen setup
      */
     renderResult = () => {
@@ -587,13 +607,13 @@ class Artwork extends Component {
         //console.log('artworkVScrollDuration ====== ' + artworkVScrollDuration);
         return (
             <SectionWipesStyled>
-                <Controller globalSceneOptions={{ triggerHook: 'onLeave' }}>
-                    <Scene duration="800" indicators pin pinSettings={{ pushFollowers: false }}>
+                <Controller >
+                    <Scene duration="100%" indicators pin triggerHook="onLeave" pinSettings={{ pushFollowers: true }}>
                         {(progress) => (
                             <div className="panel">
                                 <Tween
                                     from={{ y: '-0%' }}
-                                    to={{ y: "-100%" }}
+                                    to={{ y: "-0%" }}
                                     progress={progress}
                                     paused
                                 >
@@ -605,6 +625,8 @@ class Artwork extends Component {
                     </Scene>
 
                     {this.renderStory()}
+
+                    {this.renderTriggers()}
 
                     <Scene indicators pin pinSettings={{ pushFollowers: true }} duration="800">
                         {this.renderEmailScreen()}

@@ -99,7 +99,7 @@ class StoryItem extends React.Component {
                     totalProgress={progress}
                     paused
                 >
-                    <Tween from={{ filter: "blur(0px)" }} to={{ filter: "blur(8px)" }} duration={0.8} >
+                    <Tween from={{ filter: "blur(0px)", css:{borderRadius: "50px 50px 0px 0px"} }} to={{ filter: "blur(8px)", css:{borderRadius: "0px 0px 0px 0px"} }} duration={0.8} >
                         <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
                     </Tween>
 
