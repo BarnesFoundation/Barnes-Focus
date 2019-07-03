@@ -15,6 +15,10 @@
         text-align: center;
         background-color: transparent;
 
+        &.story-item {
+            background-color: transparent;
+        }
+
         .card-top-container {
             position: relative;
             height: auto !important;
