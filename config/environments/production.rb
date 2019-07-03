@@ -33,7 +33,7 @@ Rails.application.configure do
   # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  # config.action_controller.asset_host = 'http://assets.example.com'
+  # config.action_controller.asset_host = ENV['ASSET_HOST']
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
@@ -62,6 +62,7 @@ Rails.application.configure do
   #config.active_elastic_job.periodic_tasks_route = '/background_jobs'.freeze
   # config.active_job.queue_name_prefix = "barnes-snap_#{Rails.env}"
   config.action_mailer.perform_caching = false
+  config.action_mailer.asset_host = ENV['ASSET_HOST']
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

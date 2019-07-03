@@ -45,15 +45,15 @@
                 <tr>
                   <td width="50%" dir="ltr" class="w100 text-center logos__barnes-logo" style="text-align: left; padding: 20px 0;">
                     <a href="https://collection.barnesfoundation.org" target="_blank">
-                      <img alt="Barnes" src="https://s3.amazonaws.com/barnes-assets/Barnes_lockup_Promotional_web_orange.png" width="200px" />
+                      <%= image_tag "mailer/barnes_email_logo_red.png", alt: "Barnes", width: "200px" %>
                     </a>
                   </td>
                   <td width="50%" dir="ltr" class="w100 text-center logos__social-icons" style="text-align: right;">
                     <a href="https://twitter.com/the_barnes" target="_blank">
-                      <img alt="twitter" src="https://www.gstatic.com/youtube/img/email/twitter_email_icon_grey.png" width="20px" height="20px" style="padding: 20px 10px; opacity: 0.8;" />
+                      <%= image_tag "mailer/social_twitter.png", alt: "twitter", width: "20px", height: "20px", style: "padding: 20px 10px; opacity: 0.8;" %>
                     </a>
                     <a href="https://www.youtube.com/user/BarnesFoundation" target="_blank">
-                      <img alt="youtube" src="https://www.gstatic.com/youtube/img/email/youtube_email_icon_grey.png" width="20px" height="15px" style="padding: 20px 10px; opacity: 0.8;" />
+                      <%= image_tag "mailer/social_youtube.png", alt: "Youtube", width: "20px", height: "20px", style: "padding: 20px 10px; opacity: 0.8;" %>
                     </a>
                   </td>
                 </tr>
@@ -110,7 +110,7 @@
                     
                     <td width="65%" dir="ltr" class="w100" style="color: #282828; vertical-align: top; padding: 18px 0 40px 0;">
                       <p>
-                        <%= link_to 'https://collection.barnesfoundation.org/objects/'+ els_elem['id'].to_s, :title => "barnes collection", :style => "color: #D64242 !important;" do %>
+                        <%= link_to 'https://collection.barnesfoundation.org/objects/'+ els_elem['id'].to_s, :title => "barnes collection", :style => "color: #D6421F !important;" do %>
                           <h3><%= els_elem['title'] %></h3>
                         <% end %>
                       </p>
