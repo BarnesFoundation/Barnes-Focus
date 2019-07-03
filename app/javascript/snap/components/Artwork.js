@@ -102,7 +102,8 @@ class Artwork extends Component {
                 email: false
             },
             artworkVScrollOffset: 0,
-            artworkVScrollDuration: 0
+            artworkVScrollDuration: 0,
+            storyDuration: 1000
         }
 
 
@@ -276,12 +277,12 @@ class Artwork extends Component {
         console.log('Artwork >> componentDidMount');
         this.scrollInProgress = false;
         // Register scroll listener
-        window.addEventListener('scroll', this._onScroll, true);
+        // window.addEventListener('scroll', this._onScroll, true);
     }
 
     componentWillUnmount() {
         // Un-register scroll listener
-        window.removeEventListener('scroll', this._onScroll);
+        // window.removeEventListener('scroll', this._onScroll);
     }
 
     /**
@@ -418,6 +419,19 @@ class Artwork extends Component {
         const imageId = this.getFocusedArtworkImageId();
         const storyId = this.state.storyId;
         this.sr.markStoryAsRead(imageId, storyId);
+    }
+
+    onStoryHeightReady = (height) => {
+        console.log("Story height ready", height);
+        if(height > 0 ) {
+            console.log("Setting State Height");
+            this.setState({"storyDuration":height});
+        }
+        //this.updateStoryHeight(1000);
+    }
+
+    updateStoryHeight = (height) => {
+        return 1000;
     }
 
     /**
@@ -557,11 +571,18 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene indicators pin key={`storyitem${index + 1}`} pinSettings={{ pushFollowers: true }} duration={300} offset="-100">
+                <Scene indicators key={`storyitem${index + 1}`} triggerHook="onLeave" pinSettings={{ pushFollowers: false }} duration={this.state.storyDuration} offset="300">
                     {(progress, event) => (
-
+                        
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
+                            <Tween
+                                from={{ y: '-0%' }}
+                                to={{ y: "-0%" }}
+                                progress={progress}
+                                paused
+                            >
                             <StoryItem
+                                key={`storyitem${index + 1}`}
                                 progress={progress}
                                 sceneStatus={event.type}
                                 storyIndex={index}
@@ -570,10 +591,49 @@ class Artwork extends Component {
                                 langOptions={this.langOptions}
                                 selectedLanguage={this.state.selectedLanguage}
                                 onSelectLanguage={this.onSelectLanguage}
-                                onStoryReadComplete={this.onStoryReadComplete} />
+                                onStoryReadComplete={this.onStoryReadComplete}
+                                getSize={this.onStoryHeightReady} />
+                            </Tween>
                         </div>
+                        
                     )}
                 </Scene>
+            )
+        );
+    }
+
+    /**
+     * Renders the story cards if * showStory * flag is true.
+     */
+    renderPinsEnter = () => {
+        const { showStory, stories, storyTitle } = this.state;
+        if (!showStory) {
+            return <div></div>;
+        }
+        return (
+            stories.map((story, index) =>
+                
+                <Scene key={`storytrigger${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={true} duration="300" offset="100" pinSettings={{ pushFollowers: true }}>
+                    <div></div>
+                </Scene> 
+            )
+        );
+    }
+
+    /**
+     * Renders the story cards if * showStory * flag is true.
+     */
+    renderPinsLeave = () => {
+        const { showStory, stories, storyTitle } = this.state;
+        if (!showStory) {
+            return <div></div>;
+        }
+        return (
+            stories.map((story, index) =>
+                
+                <Scene key={`storytrigger${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onLeave" indicators={true} duration="800" offset="100" pinSettings={{ pushFollowers: true }}>
+                    <div>test</div>
+                </Scene> 
             )
         );
     }
@@ -587,13 +647,13 @@ class Artwork extends Component {
         //console.log('artworkVScrollDuration ====== ' + artworkVScrollDuration);
         return (
             <SectionWipesStyled>
-                <Controller globalSceneOptions={{ triggerHook: 'onLeave' }}>
-                    <Scene duration="800" indicators pin pinSettings={{ pushFollowers: false }}>
+                <Controller >
+                    <Scene duration="800" indicators triggerHook="onLeave" pin offset="800" pinSettings={{ pushFollowers: false }}>
                         {(progress) => (
                             <div className="panel">
                                 <Tween
                                     from={{ y: '-0%' }}
-                                    to={{ y: "-100%" }}
+                                    to={{ y: "-0%" }}
                                     progress={progress}
                                     paused
                                 >
@@ -606,7 +666,11 @@ class Artwork extends Component {
 
                     {this.renderStory()}
 
-                    <Scene indicators pin pinSettings={{ pushFollowers: true }} duration="800">
+                    {this.renderPinsEnter()}
+
+                    {/*this.renderPinsLeave()*/}
+
+                    <Scene indicators pin pinSettings={{ pushFollowers: false }} triggerHook="onLeave" duration="800">
                         {this.renderEmailScreen()}
                     </Scene>
 
