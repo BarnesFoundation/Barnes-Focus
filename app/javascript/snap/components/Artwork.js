@@ -103,7 +103,7 @@ class Artwork extends Component {
             },
             artworkVScrollOffset: 0,
             artworkVScrollDuration: 0,
-            storyDuration: 1000
+            storyDuration: 250
         }
 
 
@@ -203,6 +203,17 @@ class Artwork extends Component {
             });
 
         }
+
+        console.log("STORIES NUM:", stories.length);
+        var durationArr = [];
+        var offsetArr = [];
+        stories.forEach(story => {
+            durationArr.push(300);
+            offsetArr.push(300);
+        })
+        this.setState({"storyDurations": durationArr})
+        this.setState({"storyOffsets": offsetArr})
+        console.log("STATE", this.state);
 
     }
 
@@ -421,11 +432,13 @@ class Artwork extends Component {
         this.sr.markStoryAsRead(imageId, storyId);
     }
 
-    onStoryHeightReady = (height) => {
-        console.log("Story height ready", height);
-        if(height > 0 ) {
-            console.log("Setting State Height");
-            this.setState({"storyDuration":height});
+    onStoryHeightReady = (height, index) => {
+        console.log("Story height ready", height, index);
+        if(height > 200 && index > -1) {
+            var durationArr = this.state.storyDurations;
+            durationArr[index] = height;
+            //this.setState({ "durations": durationArr });
+            console.log("Setting State Height", this.state.storyDurations);
         }
         //this.updateStoryHeight(1000);
     }
@@ -553,7 +566,7 @@ class Artwork extends Component {
             return <div></div>;
         } else {
             return (
-                <div className="panel panel-email" >
+                <div id="email-panel" className="panel panel-email" >
                     <EmailForm withStory={showStory} isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
                 </div>
             );
@@ -571,7 +584,7 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene indicators key={`storyitem${index + 1}`} triggerHook="onLeave" pinSettings={{ pushFollowers: false }} duration={this.state.storyDuration} offset="300">
+                <Scene indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={100} offset={`${this.state.storyOffsets[index]}`}>
                     {(progress, event) => (
                         
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
@@ -613,7 +626,7 @@ class Artwork extends Component {
         return (
             stories.map((story, index) =>
                 
-                <Scene key={`storytrigger${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={true} duration="300" offset="100" pinSettings={{ pushFollowers: true }}>
+                <Scene key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration="300" offset="100" pinSettings={{ pushFollowers: true }}>
                     <div></div>
                 </Scene> 
             )
@@ -631,8 +644,8 @@ class Artwork extends Component {
         return (
             stories.map((story, index) =>
                 
-                <Scene key={`storytrigger${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onLeave" indicators={true} duration="800" offset="100" pinSettings={{ pushFollowers: true }}>
-                    <div>test</div>
+                <Scene key={`storytriggerleave${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onLeave" indicators={true} duration={`${this.state.storyDurations[index]+500}`} offset="600" pinSettings={{ pushFollowers: false }}>
+                    <div></div>
                 </Scene> 
             )
         );
@@ -668,10 +681,13 @@ class Artwork extends Component {
 
                     {this.renderPinsEnter()}
 
-                    {/*this.renderPinsLeave()*/}
+                    {this.renderPinsLeave()}
 
-                    <Scene indicators pin pinSettings={{ pushFollowers: false }} triggerHook="onLeave" duration="800">
+                    <Scene indicators pin pinSettings={{ pushFollowers: false }} triggerHook="onLeave" duration="800" offset="300">
                         {this.renderEmailScreen()}
+                    </Scene>
+                    <Scene pin="#email-panel" triggerElement="#email-panel" triggerHook="onEnter" indicators={false} duration="300" offset="100" pinSettings={{ pushFollowers: true }}>
+                        <div></div>
                     </Scene>
 
 
