@@ -25,7 +25,8 @@ class StoryItem extends React.Component {
         this.cardRef = React.createRef();
 
         this.state = {
-            storyRead: false
+            storyRead: false,
+            heightUpated: false
         }
     }
 
@@ -33,12 +34,12 @@ class StoryItem extends React.Component {
         console.log('StoryItem >> componentDidMount');
         this.scrollInProgress = false;
         // Register scroll listener
-        this.cardRef.current.addEventListener('scroll', this._onScroll, true);
+        // this.cardRef.current.addEventListener('scroll', this._onScroll, true);
     }
 
     componentWillUnmount() {
         // Un-register scroll listener
-        this.cardRef.current.removeEventListener('scroll', this._onScroll);
+        // this.cardRef.current.removeEventListener('scroll', this._onScroll);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -48,6 +49,14 @@ class StoryItem extends React.Component {
                 this.setState({ storyRead: true });
                 this.props.onStoryReadComplete();
             }
+        }
+        // console.log("STORY HEIGHT:", this.cardRef.current.getBoundingClientRect().height);
+    }
+
+    componentDidUpdate() {
+        if(!this.state.heightUpated) {
+            this.props.getSize(this.cardRef.getBoundingClientRect());
+            this.setState({heightUpated: true})
         }
     }
 
@@ -81,11 +90,29 @@ class StoryItem extends React.Component {
 
     }
 
+    refCallback = (element) => {
+        if(element) {
+            this.cardRef = element;
+            this.props.getSize(element.getBoundingClientRect());
+        }
+    }
+
     render() {
         const { story, storyTitle, progress } = this.props;
         console.log('StoryItem >> render', progress);
         return (
-            <div className="card story-item" ref={this.cardRef}>
+            <Tween
+                from={{ y: '0px' }}
+                to={{ y: "-30%" }} // view height - content height
+                progress={progress}
+                paused
+            >
+            <div>
+            <Timeline
+                totalProgress={progress}
+                paused
+            >
+            <div className="card story-item" ref={this.refCallback}>
                 {
                     (this.props.storyIndex === 0) &&
                     <div className="story-title-bar">
@@ -95,15 +122,18 @@ class StoryItem extends React.Component {
                         </div>
                     </div>
                 }
-                <Timeline
-                    totalProgress={progress}
-                    paused
-                >
-                    <Tween from={{ filter: "blur(0px)" }} to={{ filter: "blur(8px)" }} duration={0.8} >
-                        <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
-                    </Tween>
+                    <Timeline
+                        totalProgress={progress*2}
+                        paused
+                        target={
+                            <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
+                        }>
+                        <Tween from={{ css:{borderRadius: "50px 50px 0px 0px", filter: "blur(0px)"} }} to={{ css:{borderRadius: "0px 0px 0px 0px", filter: "blur(8px)"} }} duration={0.8} />
+                    </Timeline>
 
                     <Timeline
+                        totalProgress={progress*3}
+                        paused
                         target={
                             <div className="card-img-overlay">
                                 <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
@@ -115,13 +145,15 @@ class StoryItem extends React.Component {
                                 }
                             </div>
                         }>
-                        <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={1.0} />
+                        <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={0.3} />
                     </Timeline>
 
-                </Timeline>
+                
 
             </div>
-
+            </Timeline>
+            </div>
+            </Tween>
         );
     }
 }

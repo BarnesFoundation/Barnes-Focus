@@ -2,10 +2,11 @@
 .story-item {
 
   font-family: 'Calibre-Regular', sans-serif;
-  height: 100vh;
+  height: 100%;
   width: 100vw;
-  // background-color: transparent;
-  transform: translate3d(0px, -100px, 0px);
+  background-color: transparent;
+  border: none;
+  // transform: translate3d(0px, -100px, 0px);
 
   .story-title-bar {
       position: absolute;
