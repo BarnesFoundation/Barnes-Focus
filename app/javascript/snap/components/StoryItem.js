@@ -26,7 +26,7 @@ class StoryItem extends React.Component {
 
         this.state = {
             storyRead: false,
-            heightUpated: false
+            heightUpdated: false
         }
     }
 
@@ -54,9 +54,10 @@ class StoryItem extends React.Component {
     }
 
     componentDidUpdate() {
-        if(!this.state.heightUpated) {
-            this.props.getSize(this.cardRef.getBoundingClientRect());
-            this.setState({heightUpated: true})
+        // console.log("Story ComponentDidUpdate", this.props.storyIndex, this.state.heightUpdated, this.cardRef.getBoundingClientRect());
+        if(!this.state.heightUpdated) {
+            this.props.getSize(this.cardRef.getBoundingClientRect().height, this.props.storyIndex);
+            this.setState({heightUpdated: true})
         }
     }
 
@@ -93,17 +94,21 @@ class StoryItem extends React.Component {
     refCallback = (element) => {
         if(element) {
             this.cardRef = element;
-            this.props.getSize(element.getBoundingClientRect());
+            this.props.getSize(element.getBoundingClientRect().height, this.props.key);
         }
+    }
+
+    getHeight = () => {
+        return this.cardRef.current.getBoundingClientRect().height;
     }
 
     render() {
         const { story, storyTitle, progress } = this.props;
-        console.log('StoryItem >> render', progress);
+        console.log('StoryItem >> render', this.props.storyIndex, progress);
         return (
             <Tween
                 from={{ y: '0px' }}
-                to={{ y: "-30%" }} // view height - content height
+                to={{ y: "-0%" }} // view height - content height
                 progress={progress}
                 paused
             >
