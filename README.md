@@ -7,6 +7,11 @@ We'll have to upgrade nodejs to version 8. In order to do that ssh into both the
 - `yum remove nodesource-release* nodejs`
 - `rm -rf /etc/yum.repos.d/nodesource-el.repo`
 
+### Define asset host
+With changes in existing artowrks email template and introduction of story email templates, we are now rendering barnes logo, twitter and youtube icons from Rails assets folder.
+
+In order to work this properly on Production, we now have to define a new ENV variable `ASSET_HOST` and sets it value to `https://barnes.foc.us`
+
 ### Translations Updates
 * Email(Header) - "Bookmarked art" -> "Artworks You Discovered"
 * Email(Sub Header) - "Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit" -> "Thank you for visiting the Barnes today! Here are all the works of art you explored using the Barnes Focus guide. Each link will take you to our collection online for more information about each piece."
@@ -74,6 +79,7 @@ Some of those ENV variable changes its value based on Web/Worker Apps. Let's tak
  - **RAILS_SKIP_MIGRATIONS**: System generated. Default value: `false`. Locally not required
  - **RDS_DB_NAME**, **RDS_HOSTNAME**, **RDS_PASSWORD**, **RDS_PORT**, **RDS_USERNAME**: Database settings needed to Connect Barnes App with PostgreSQL Database.
  - **SECRET_KEY_BASE**: System generated. Not required locally.
+ - **ASSET_HOST**: Required to render images for emails
 
 # Deployment on Elastic Beanstalk
 ## Prerequisite

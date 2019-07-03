@@ -86,6 +86,16 @@ class JobsController < ApplicationController
     head :ok, content_type: "text/html"
   end
 
+  def send_stories_email
+    stories_in_bookmarks = Bookmark.where("email IS NOT NULL").stories_to_deliver.order('created_at DESC')
+
+    if stories_in_bookmarks.any?
+
+    end
+
+    head :ok, content_type: "text/html"
+  end
+
   def cleanup_bookmarks
     p 'Fetching bookmarks for blank/null emails'
     bookmarks_with_blank_emails = Bookmark.where("email IS NULL OR email = ''").where("DATE(bookmarks.created_at) < ?", (Time.now.utc - 30.days).to_date)
