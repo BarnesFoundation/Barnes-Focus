@@ -15,6 +15,7 @@ In order to work this properly on Production, we now have to define a new ENV va
 ### Translations Updates
 * Email(Header) - "Bookmarked art" -> "Artworks You Discovered"
 * Email(Sub Header) - "Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit" -> "Thank you for visiting the Barnes today! Here are all the works of art you explored using the Barnes Focus guide. Each link will take you to our collection online for more information about each piece."
+* Execute `bundle exec rake data:extend_email_translations`. Once this runs successfully on Production, move content inside this method to `add_translations` method.
 
 And then proceed with the deployment
 
