@@ -90,7 +90,44 @@ class JobsController < ApplicationController
     stories_in_bookmarks = Bookmark.where("email IS NOT NULL").stories_to_deliver.order('created_at DESC')
 
     if stories_in_bookmarks.any?
+      stories_in_bookmarks.group_by(&:email).each do | mail, story_in_bookmark |
+        next if mail.blank?
 
+        data                  = Hash.new
+        data[mail]            = Array.new
+        latest_bookmark_entry = story_in_bookmark.first
+
+        language  = latest_bookmark_entry.language
+        language  = language || 'en'
+        language  = language.downcase
+        stories   = Array.new
+
+        story_in_bookmark.each { | obj |
+          next if data[mail].include?(obj.image_id)
+
+          response = StoryFetcher.new.find_by_object_id(obj.image_id, language)
+          h = {
+            total: response[:total],
+            unique_identifier: response[:unique_identifier],
+            artwork_info: EsCachedRecord.search(obj.image_id),
+            content: response[:content]
+          }
+
+          next if response.nil?
+          stories.push h
+          data[mail].push obj.image_id
+        }
+
+        begin
+          unless mail.blank?
+            BookmarkNotifierMailer.send_stories_email(mail, stories, language).deliver_now
+            story_in_bookmark.each {|b| b.update_attributes(story_mail_sent: true)}
+          end
+        rescue Exception => ex
+          p "Unable to send email due to #{ex.to_s}"
+          p ex.backtrace.join("\n\t")
+        end
+      end
     end
 
     head :ok, content_type: "text/html"

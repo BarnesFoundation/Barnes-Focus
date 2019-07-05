@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       end
     end
     resources :translations, only: [:index]
+    resources :stories, only: [:show], param: :slug
   end
 
   post 'jobs/update_es_cache'             => 'jobs/update_es_cache'

@@ -325,6 +325,38 @@ namespace :data do
     )
   end
 
+  desc "extending translations for story emails"
+  task extend_email_translations: :environment do
+    email_header = Translation.find_by(screen_text: "Email", display_order: 101)
+
+    if email_header
+      Translation.create(
+        screen_text: 'Stories You Have Unlocked',
+        parent_id: email_header.id,
+        english_translation: 'Stories You Have Unlocked',
+        unique_identifier: 'text_3'
+      )
+      Translation.create(
+        screen_text: 'Unlock more stories on your next visit. Get 20% off your next visit.',
+        parent_id: email_header.id,
+        english_translation: 'Unlock more stories on your next visit. Get 20% off your next visit.',
+        unique_identifier: 'text_4'
+      )
+      Translation.create(
+        screen_text: 'Promo Code',
+        parent_id: email_header.id,
+        english_translation: 'Promo Code',
+        unique_identifier: 'text_5'
+      )
+      Translation.create(
+        screen_text: 'Buy Tickets',
+        parent_id: email_header.id,
+        english_translation: 'Buy Tickets',
+        unique_identifier: 'text_6'
+      )
+    end
+  end
+
   def stream_query_rows(sql_query, options="WITH CSV HEADER")
     conn = ActiveRecord::Base.connection.raw_connection
     conn.copy_data "COPY (#{sql_query}) TO STDOUT #{options};" do
