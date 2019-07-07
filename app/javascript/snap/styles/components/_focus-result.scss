@@ -2,7 +2,7 @@
 .story-item {
 
   font-family: 'Calibre-Regular', sans-serif;
-  height: 100%;
+  // height: 100%;
   width: 100vw;
   background-color: transparent;
   border: none;
@@ -59,8 +59,11 @@
   }
 
   .card-img-overlay {
-     margin-top: 100px;
-     text-align: left;
+      margin-top: 100px;
+      text-align: left;
+      bottom: unset;
+      // position: relative;
+      // height: 100%;
 
      .story-question {
         text-transform: uppercase;
