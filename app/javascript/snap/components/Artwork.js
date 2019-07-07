@@ -39,7 +39,6 @@ const SectionWipesStyled = styled.div`
     height: auto;
     min-height: 800px;
     width: 100vw;
-    border: 1px solid;
   }  
 `;
 
@@ -215,16 +214,18 @@ class Artwork extends Component {
         var durationCurArr = [];
         var durationNextArr = [];
         var offsetArr = [];
+        var durDefault = 300;
         stories.forEach(story => {
-            durationCurArr.push(300);
-            durationNextArr.push(300);
-            offsetArr.push(300);
+            durationCurArr.push(durDefault);
+            durationNextArr.push(durDefault);
+            offsetArr.push(durDefault);
         })
+        durationNextArr.push(durDefault);
         this.setState({"storyDurationsCurrent": durationCurArr})
         this.setState({"storyDurationsNext": durationNextArr})
         this.setState({"storyOffsets": offsetArr})
+        
         console.log("STATE", this.state);
-
     }
 
     getSelectedLanguage = async () => {
@@ -461,6 +462,7 @@ class Artwork extends Component {
             var durationCurArr = this.state.storyDurationsCurrent;
             var durationNextArr = this.state.storyDurationsNext;
             durationCurArr[index] = (index == 0) ? 0 : height;
+            durationNextArr[index+1] = (index == 0) ? 0 : height;
             this.setState({ "durationsCur": durationCurArr });
             this.setState({ "durationsNext": durationNextArr });
             console.log("Setting State Height", this.state.storyDurationsCurrent);
