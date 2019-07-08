@@ -357,6 +357,20 @@ namespace :data do
     end
   end
 
+  desc "adding culture to result page"
+  task add_culture_to_result_page: :environment do
+    screen_3 = Translation.find_by(screen_text: "Result_page", display_order: 3)
+
+    if screen_3
+      Translation.create(
+        screen_text: "Culture",
+        parent_id: screen_3.id,
+        english_translation: "Culture",
+        unique_identifier: 'text_10'
+      )
+    end
+  end
+
   def stream_query_rows(sql_query, options="WITH CSV HEADER")
     conn = ActiveRecord::Base.connection.raw_connection
     conn.copy_data "COPY (#{sql_query}) TO STDOUT #{options};" do
