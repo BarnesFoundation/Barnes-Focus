@@ -109,7 +109,7 @@
                     
                     <td width="65%" dir="ltr" class="w100" style="color: #282828; vertical-align: top; padding: 18px 0 40px 0;">
                       <p>
-                        <%= link_to 'https://collection.barnesfoundation.org/objects/'+ els_elem['id'].to_s, :title => "barnes collection", :style => "color: #D6421F !important;" do %>
+                        <%= link_to "https://collection.barnesfoundation.org/objects/#{els_elem['id'].to_s}/#{els_elem['title']}?utm_source=focus&utm_medium=email&utm_campaign=focus_scanned_object", :title => "barnes collection", :style => "color: #D6421F !important;" do %>
                           <h3><%= els_elem['title'] %></h3>
                         <% end %>
                       </p>

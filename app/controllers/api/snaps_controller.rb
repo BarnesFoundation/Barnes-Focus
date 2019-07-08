@@ -78,8 +78,9 @@ class Api::SnapsController < Api::BaseController
   end
 
   def find_stories_by_object_id
-    session  = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
-    @story = StoryFetcher.new.find_by_object_id(params[:object_id].to_i, session.lang_pref || 'en')
+    session   = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
+    lang_pref = session && !session.lang_pref.nil? ? session.lang_pref : 'en'
+    @story = StoryFetcher.new.find_by_object_id(params[:object_id].to_i, lang_pref)
 
     respond_to do | wants |
       wants.json do

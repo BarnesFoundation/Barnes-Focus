@@ -15,6 +15,7 @@ module SnapTranslator
       # Configure language translator
       translator = GoogleTranslate.new preferred_language
       text = translator.translate(text) if !text.blank? || !text.nil?
+      text = CGI::unescapeHTML(text)
     rescue Exception => error
       p error
       text = text if text
