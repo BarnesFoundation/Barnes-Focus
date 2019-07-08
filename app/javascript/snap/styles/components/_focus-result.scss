@@ -107,8 +107,41 @@
         letter-spacing: 0.07px;
       }
   }
+}
 
+#search-result {
+  height: 90vh;
+  // margin-bottom: -170px;
+}
 
-  
+#story-card-0 {
+  // margin-top: -300px;
+}
 
+#story-title-bar {
+  position: fixed;
+  // opacity: 0;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 69px;
+  z-index: 100;
+  // background-color: rgba(100,100,100,0.2);
+  color: white;
+  text-transform: uppercase;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.content-mask {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 10%, black, black, black, black, black);
+  mask-image: linear-gradient(to bottom, transparent 10%, black, black, black, black, black);
+  // background: linear-gradient(to bottom, transparent, black, black, black, black, black);
+  position: absolute;
+  top: 0px;
+  width: 100vw;
+  height: 100vh;
+  // border: 2px solid red;
 }
