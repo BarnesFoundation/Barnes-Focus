@@ -1,8 +1,5 @@
 version: 1
 cron:
- - name: "Update ES Cache Every morning at 5 AM"
-   url: "/jobs/update_es_cache"
-   schedule: "0 9 * * *"
  - name: "Every hour run and validate bookmark entries and send email"
    url: "/jobs/send_bookmarks_email"
    schedule: "0 */1 * * *"
@@ -12,3 +9,9 @@ cron:
  - name: "Daily job to delete from bookmarks where entries are more than 30 days old"
    url: "/jobs/cleanup_bookmarks"
    schedule: "0 6 * * *"
+ - name: "Daily at morning send story newsletter email"
+   url: "/jobs/send_stories_email"
+   schedule: "0 7 * * *"
+ - name: "Update ES Cache Every morning at 5 AM"
+   url: "/jobs/update_es_cache"
+   schedule: "0 9 * * *"
