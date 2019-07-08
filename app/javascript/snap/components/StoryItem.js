@@ -152,6 +152,7 @@ class StoryItem extends React.Component {
             <div className="card story-item" ref={this.refCallback}>
                 {
                     (this.props.storyIndex === 0) &&
+                    this.props.langOptions &&
                     <div className="story-title-bar">
                         <div className="col-8 story-title">{storyTitle}</div>
                         <div className="col-4 language-dropdown">
