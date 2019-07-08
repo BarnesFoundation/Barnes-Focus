@@ -48,6 +48,24 @@ class StoryFetcher
     return parse_response_and_fetch_metadata original_response, obj_id, preferred_lang
   end
 
+  def find_by_title title, preferred_lang = 'en'
+    params = "
+      {
+        storiesForObjectIds(where: {relatedStories_some: {storyTitle: \"#{title}\"}}) {
+          id
+          objectID
+          #{related_stories}
+        }
+      }
+    "
+
+    response = query_grapql params
+    response = response.body.force_encoding 'utf-8' # Another way of doing this: response.body.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+    original_response = JSON.parse(response)
+
+    return parse_response_and_fetch_metadata original_response, nil, preferred_lang
+  end
+
   def find_by_room_id room_id, preferred_lang
     params = "
       {

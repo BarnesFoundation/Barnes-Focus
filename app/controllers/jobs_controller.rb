@@ -106,14 +106,20 @@ class JobsController < ApplicationController
           next if data[mail].include?(obj.image_id)
 
           response = StoryFetcher.new.find_by_object_id(obj.image_id, language)
+          next if response.nil?
+
+          story = Story.find_by(title: response[:content]["story_title"])
+          story = Story.create(title: response[:content]["story_title"]) if story.nil?
+
+          host = Rails.env.development? ? 'http://localhost:3000' : ENV['ASSET_HOST']
+
           h = {
             total: response[:total],
             unique_identifier: response[:unique_identifier],
-            artwork_info: EsCachedRecord.search(obj.image_id),
-            content: response[:content]
+            #artwork_info: EsCachedRecord.search(obj.image_id),
+            content: response[:content],
+            link: "#{host}/story/#{story.slug}"
           }
-
-          next if response.nil?
           stories.push h
           data[mail].push obj.image_id
         }

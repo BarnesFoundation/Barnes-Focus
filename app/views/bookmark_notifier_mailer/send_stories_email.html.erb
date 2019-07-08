@@ -84,14 +84,14 @@
                   <td width="50%" dir="ltr" class="w100 text-center logos__barnes-logo" style="text-align: left; padding: 20px 0;">
                     <p style="color: #B6B6B6; font-size: 22px">
                       <span><%= @translations["Email"]["text_5"][:translated_content] %></span>
-                      <span><strong>20OFF</strong></span>
+                      <span><strong>FOCUS</strong></span>
                     </p>
                   </td>
                   <td width="50%" dir="ltr" class="w100 text-center logos__social-icons" style="text-align: right;">
                     <button
                       style="border: none; height: 50px; width: 325px; background-color: #D6431F; color: #FFFFFF; font-size: 18px;"
                       type="button"
-                      onclick="location.href='https://tickets.barnesfoundation.org/orders/316/calendar?eventId=59288c7aca6afe2b653a4757&cart&pc=20OFF&utm_source=focus-stories-mailer&utm_medium=email'"
+                      onclick="window.open('https://tickets.barnesfoundation.org/orders/316/calendar?eventId=59288c7aca6afe2b653a4757&cart&pc=20OFF&utm_source=focus-stories-mailer&utm_medium=email&coupon=focus', '_blank')"
                     >
                       <%= @translations["Email"]["text_6"][:translated_content] %>
                     </button>
@@ -121,7 +121,7 @@
 
                     <td width="65%" dir="ltr" class="w100" style="color: #282828; vertical-align: top; padding: 18px 0 40px 0;">
                       <p>
-                        <%= link_to "#{ENV['ASSET_HOST']}/story/#{story[:content]['story_title']}", :title => "barnes collection", :style => "color: #FFFFFF !important;" do %>
+                        <%= link_to "#{story[:link]}?utm_source=focus&utm_medium=email&utm_campaign=focus_story&coupon=focus", :title => "barnes collection", :style => "color: #FFFFFF !important;" do %>
                           <h3><%= story[:content]['story_title'] %></h3>
                         <% end %>
                       </p>

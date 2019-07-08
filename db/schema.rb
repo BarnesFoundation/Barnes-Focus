@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190625053751) do
+ActiveRecord::Schema.define(version: 20190708114049) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -98,6 +98,15 @@ ActiveRecord::Schema.define(version: 20190625053751) do
     t.index ["blob"], name: "index_sessions_on_blob", using: :gin
     t.index ["session_id"], name: "index_sessions_on_session_id", unique: true
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
+  end
+
+  create_table "stories", force: :cascade do |t|
+    t.string "title"
+    t.string "slug"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_stories_on_slug"
+    t.index ["title"], name: "index_stories_on_title"
   end
 
   create_table "subscriptions", force: :cascade do |t|
