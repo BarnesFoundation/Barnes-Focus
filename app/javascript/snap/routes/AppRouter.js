@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import { BrowserRouter, Route, NavLink, Switch } from 'react-router-dom';
 import posed, { PoseGroup } from "react-pose";
 
+
 import Home from '../components/Home';
 import Camera from '../components/Camera';
 import Artwork from '../components/Artwork';
+import StoryPage from '../components/StoryPage';
 import * as constants from '../components/Constants';
-import SectionWipes from '../components/Content';
 
 const RouteContainer = posed.div({
     enter: { opacity: 1, delay: 0, beforeChildren: true },
@@ -22,6 +23,7 @@ const Routes = () => (
                         <Route path="/" component={Home} exact={true} key="home" />
                         <Route path="/scan" component={Camera} exact={true} key="scan" />
                         <Route path="/artwork/:imageId?" component={Artwork} key="artwork" />
+                        <Route path="/story/:slug" component={StoryPage} exact={true} key="story" />
                     </Switch>
                 </RouteContainer>
             </PoseGroup>
