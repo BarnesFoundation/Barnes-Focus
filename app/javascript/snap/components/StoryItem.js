@@ -27,28 +27,29 @@ class StoryItem extends React.Component {
         this.cardRef = React.createRef();
         this.contentRef = React.createRef();
 
-        
+
 
         this.state = {
             storyRead: false,
             heightUpdated: false,
-            scrollHeight: 0
+            scrollHeight: 0,
+            showTitle: true
         }
     }
 
     componentDidMount() {
-        console.log('StoryItem >> componentDidMount');
+        console.log('StoryItem >> componentDidMount', this.contentRef.clientHeight);
         this.scrollInProgress = false;
-        this.setState({scrollHeight: this.contentRef.clientHeight})
+        this.setState({ scrollHeight: this.contentRef.clientHeight })
         // Register scroll listener
         // this.cardRef.current.addEventListener('scroll', this._onScroll, true);
-        
+
         // this.tween;
-        
+
         // const tween = this.tween.getGSAP();
         // tween.timeScale(0.1);
-        
-        this.t2 = new TimelineLite({paused: true});
+
+        this.t2 = new TimelineLite({ paused: true });
 
     }
 
@@ -58,34 +59,48 @@ class StoryItem extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps.sceneStatus)
-        if (nextProps.sceneStatus === 'start' && nextProps.storyIndex === 2) {
+        // console.log(nextProps.sceneStatus)
+        if (nextProps.sceneStatus.type === 'start' && nextProps.storyIndex === 2) {
             if (!this.state.storyRead) {
                 this.setState({ storyRead: true });
                 this.props.onStoryReadComplete();
+            }
+        }
+        if (nextProps.sceneStatus.type === 'start' && nextProps.storyIndex === 0) {
+            // console.log("First Card Started", nextProps.sceneStatus.type, this.props.sceneStatus.type)
+            let showTitle = (nextProps.sceneStatus.type === 'start' && nextProps.sceneStatus.state === 'DURING');
+            if ((this.props.sceneStatus.state != nextProps.sceneStatus.state) || this.props.sceneStatus.type === 'enter') {
+                this.props.statusCallback(showTitle);
+                this.setState({ showTitle: !showTitle });
             }
         }
         // console.log("STORY HEIGHT:", this.cardRef.current.getBoundingClientRect().height);
     }
 
     componentDidUpdate() {
-        // console.log("Story ComponentDidUpdate", this.props.storyIndex, this.state.heightUpdated, this.props.progress);
-        if(!this.state.heightUpdated) {
+        // console.log("Story ComponentDidUpdate", this.contentRef.getBoundingClientRect().top, this.state.scrollOffset*this.props.progress);
+        if (!this.state.heightUpdated) {
             var contentHeight = this.contentRef.getBoundingClientRect().height;
             let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-            var offset = contentHeight - h + 100;
-            if(offset < 0) offset = 0;
+            var offset;
+            offset = (contentHeight > h) ? contentHeight - h + 100 : 100;
+            if (offset < 0) offset = 0;
             // console.log("SCROLL OFFSET", offset);
+
+            // if(this.state.scrollOffset < offset) {
             this.props.getSize(offset, this.props.storyIndex);
-            this.setState({heightUpdated: true, scrollOffset: offset})
-            // console.log("TweenMax", this.state.scrollHeight);
+            this.setState({ scrollOffset: offset })
+            // }
+            this.setState({ heightUpdated: true })
+
+            console.log("Setting TWEEN OFFSET", offset, contentHeight, h);
 
             this.t2
-                .fromTo(this.contentRef, 0.2, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
-                .fromTo(this.contentRef, 0.8, { y: '0px' }, { y: -offset, ease: Linear.easeNone })
+                .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
+                .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
         }
-        
-        if(this.t2) this.t2.totalProgress(this.props.progress);
+
+        if (this.t2) this.t2.progress(this.props.progress);
     }
 
     getArtUrl = () => {
@@ -120,7 +135,7 @@ class StoryItem extends React.Component {
 
     refCallback = (element) => {
         // console.log("Ref card callback", element);
-        if(element) {
+        if (element) {
             this.cardRef = element;
             //this.props.getSize(element.getBoundingClientRect().height, this.props.key);
         }
@@ -128,9 +143,9 @@ class StoryItem extends React.Component {
 
     refContentCallback = (element) => {
         // console.log("Ref content callback", element);
-        if(element) {
+        if (element) {
             this.contentRef = element;
-            this.props.getSize(element.getBoundingClientRect().height, this.props.key);
+            // this.props.getSize(element.getBoundingClientRect().height, this.props.key);
         }
     }
 
@@ -144,42 +159,47 @@ class StoryItem extends React.Component {
                 progress={progress}
                 paused
             >
-            <div>
-            <Timeline
-                totalProgress={progress}
-                paused
-            >
-            <div className="card story-item" ref={this.refCallback}>
-                {
-                    (this.props.storyIndex === 0) &&
-                    this.props.langOptions &&
-                    <div className="story-title-bar">
-                        <div className="col-8 story-title">{storyTitle}</div>
-                        <div className="col-4 language-dropdown">
-                            <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
-                        </div>
-                    </div>
-                }
+                <div>
                     <Timeline
                         totalProgress={progress}
                         paused
-                        target={
-                            <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
-                        }>
-                        <Tween from={{ css:{borderRadius: "50px 50px 0px 0px", filter: "blur(0px)", transform: "scale(1)"} }} to={{ css:{borderRadius: "0px 0px 0px 0px", filter: "blur(8px)", transform: "scale(1.1)"} }} ease="easeOut" duration={0.8} />
-                    </Timeline>
+                    >
+                        <div className="card story-item" ref={this.refCallback}>
+                            {
+                                (this.props.storyIndex === 0
+                                    && this.state.showTitle
+                                    && this.props.langOptions) &&
+                                <div className="story-title-bar">
+                                    <div className="col-8 story-title">{storyTitle}</div>
+                                    <div className="col-4 language-dropdown">
+                                        <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
+                                    </div>
+                                </div>
+                            }
+                            <Timeline
+                                totalProgress={progress * 3}
+                                paused
+                                target={
+                                    <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
+                                }>
+                                <Tween from={{ css: { borderRadius: "50px 50px 0px 0px", filter: "blur(0px)", transform: "scale(1)" } }} to={{ css: { borderRadius: "0px 0px 0px 0px", filter: "blur(10px)", transform: "scale(1.1)" } }} ease="easeOut" duration={0.2} />
+                            </Timeline>
 
-                    <div className="card-img-overlay" ref={this.refContentCallback}>
-                        <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                        <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                        <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
-                        {
-                            this.props.selectedLanguage.code !== LANGUAGE_EN &&
-                            <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
-                        }
-                    </div>
+                            <div className="content-mask">
 
-                    {/*<div className="card-img-overlay" ref={this.refContentCallback}>
+                                <div className="card-img-overlay" ref={this.refContentCallback}>
+                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                    <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
+                                    {
+                                        this.props.selectedLanguage.code !== LANGUAGE_EN &&
+                                        <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                    }
+                                </div>
+
+                            </div>
+
+                            {/*<div className="card-img-overlay" ref={this.refContentCallback}>
                         <Timeline
                             totalProgress={progress*1.5}
                             paused
@@ -198,9 +218,9 @@ class StoryItem extends React.Component {
                             <Tween from={{ y: '0px' }} to={{ y: `-${this.state.scrollHeight}` }} duration={0.8}  /> 
                         </Timeline>
                     </div>*/}
-            </div>
-            </Timeline>
-            </div>
+                        </div>
+                    </Timeline>
+                </div>
             </Tween>
         );
     }

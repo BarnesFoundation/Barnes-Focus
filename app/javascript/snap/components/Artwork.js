@@ -107,6 +107,7 @@ class Artwork extends Component {
             },
             artworkVScrollOffset: 0,
             artworkVScrollDuration: 0,
+            showTitleBar: false,
             storyDuration: 250,
             infoHeightUpdated: false,
             infoCardDuration: 700
@@ -308,9 +309,10 @@ class Artwork extends Component {
     }
 
     componentDidUpdate() {
-        if(!this.state.infoHeightUpdated && this.infoCardRef.current) {
+        console.log("Artwork::componentDidUpdate", this.state.infoHeightUpdated, this.infoCardRef);
+        if(!this.state.infoHeightUpdated && this.infoCardRef && this.infoCardRef.current) {
             console.log("componentDidUpdate", this.infoCardRef);
-            var contentHeight = this.infoCardRef.getBoundingClientRect().height;
+            var contentHeight = this.infoCardRef.current.getBoundingClientRect().height;
             let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             var offset = contentHeight - h + 100;
             if(offset < 0) offset = 0;
@@ -439,13 +441,17 @@ class Artwork extends Component {
     setArtworkRef = (elem) => {
         if (elem) {
             this.artworkRef = elem;
-            //console.log('setArtworkRef == ' + this.artworkRef);
+            
 
             const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
             const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - h), 0);
             const artworkVScrollDuration = Math.ceil(((artworkVScrollOffset + 60) / h) * 100);
+            
+            console.log('setArtworkRef == ', this.artworkRef.getBoundingClientRect().bottom, artworkVScrollOffset);
+
             this.setState({ artworkVScrollOffset, artworkVScrollDuration })
+            this.setState({infoCardDuration: artworkVScrollOffset});
 
         }
     }
@@ -472,6 +478,15 @@ class Artwork extends Component {
 
     updateStoryHeight = (height) => {
         return 1000;
+    }
+
+    storySceneCallback = (showTitle) => {
+        console.log("Story 0 Scene Callback", showTitle);
+        if(showTitle) {
+            this.setState({showTitleBar: true});
+        } else {
+            this.setState({showTitleBar: false});
+        }
     }
 
     refCallbackInfo = (element) => {
@@ -610,7 +625,25 @@ class Artwork extends Component {
             );
         }
 
-    };
+    }
+
+    renderTitleBar = () => {
+        const { showTitleBar, storyTitle } = this.state;
+        if(showTitleBar) {
+            return (
+                <div id="story-title-bar">
+                    {storyTitle}
+                    <div className="language-dropdown-wrapper">
+                        <div className="language-dropdown">
+                            <LanguageDropdown langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+                        </div>
+                    </div>
+                </div>
+            );
+        } else {
+            return <div></div>;
+        }
+    }
 
     /**
      * Renders the story cards if * showStory * flag is true.
@@ -622,7 +655,7 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`${this.state.storyDurationsCurrent[index]}`} offset={(index > 0) ? `${this.state.storyOffsets[index]}` : 0}>
+                <Scene indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`${this.state.storyDurationsCurrent[index]+200}`} offset={(index > 0) ? `${this.state.storyOffsets[index]}` : 0}>
                     {(progress, event) => (
                         
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
@@ -635,7 +668,7 @@ class Artwork extends Component {
                             <StoryItem
                                 key={`storyitem${index + 1}`}
                                 progress={progress}
-                                sceneStatus={event.type}
+                                sceneStatus={event}
                                 storyIndex={index}
                                 story={story}
                                 storyTitle={storyTitle}
@@ -643,7 +676,8 @@ class Artwork extends Component {
                                 selectedLanguage={this.state.selectedLanguage}
                                 onSelectLanguage={this.onSelectLanguage}
                                 onStoryReadComplete={this.onStoryReadComplete}
-                                getSize={this.onStoryHeightReady} />
+                                getSize={this.onStoryHeightReady}
+                                statusCallback={this.storySceneCallback} />
                             </Tween>
                         </div>
                         
@@ -664,7 +698,7 @@ class Artwork extends Component {
         return (
             stories.map((story, index) =>
                 
-                <Scene key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? 300 : 1} offset="100" pinSettings={{ pushFollowers: true }}>
+                <Scene key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? 300 : 1} offset="70" pinSettings={{ pushFollowers: true }}>
                     <div></div>
                 </Scene> 
             )
@@ -682,7 +716,7 @@ class Artwork extends Component {
         return (
             stories.map((story, index) =>
                 
-                <Scene key={`storytriggerleave${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onLeave" indicators={true} duration={(index > -1) ? `${this.state.storyDurationsCurrent[index]+500}` : `${this.state.storyDurationsCurrent[index]+500}`} offset={(index > 0) ? 600 : 300} pinSettings={{ pushFollowers: false }}>
+                <Scene key={`storytriggerleave${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onLeave" indicators={false} duration={0} offset={(index > 0) ? 600 : 300} pinSettings={{ pushFollowers: false }}>
                     <div></div>
                 </Scene> 
             )
@@ -699,22 +733,11 @@ class Artwork extends Component {
         return (
             <SectionWipesStyled>
                 <Controller >
-                    <Scene duration="0" indicators triggerHook="onLeave" offset="0" >
-                        {(progress) => (
-                            <div className="panel">
-                                <Tween
-                                    from={{ y: '-0%' }}
-                                    to={{ y: "-0%" }}
-                                    progress={progress}
-                                    paused
-                                >
-                                    {this.renderArtwork()}
-                                </Tween>
-
-                            </div>
-                        )}
-                    </Scene>
-                    <Scene pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={false} duration="1300" offset={`${this.state.infoCardDuration}`} pinSettings={{ pushFollowers: false }}>
+                    {this.renderTitleBar()}
+                    
+                    {this.renderArtwork()}
+                    
+                    <Scene pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={false} duration="0" offset={`${this.state.infoCardDuration}`} pinSettings={{ pushFollowers: false }}>
                         <div></div>
                     </Scene>
 
@@ -724,10 +747,10 @@ class Artwork extends Component {
 
                     {this.renderPinsLeave()}
 
-                    <Scene indicators pin pinSettings={{ pushFollowers: false }} triggerHook="onLeave" duration="800" offset="300">
+                    <Scene indicators={false} pin pinSettings={{ pushFollowers: false }} triggerHook="onCenter" duration="0" offset={(showStory) ? 300 : 0}>
                         {this.renderEmailScreen()}
                     </Scene>
-                    <Scene pin="#email-panel" triggerElement="#email-panel" triggerHook="onEnter" indicators={false} duration="300" offset="100" pinSettings={{ pushFollowers: true }}>
+                    <Scene pin={(showStory) ? "#email-panel" : false} triggerElement="#email-panel" triggerHook="onEnter" indicators={false} duration="300" offset="100" pinSettings={{ pushFollowers: true }}>
                         <div></div>
                     </Scene>
 
