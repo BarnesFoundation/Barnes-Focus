@@ -10,6 +10,7 @@ import { Tween, Timeline } from 'react-gsap';
 import * as constants from './Constants';
 import { filter, debounce } from 'lodash';
 import styled from 'styled-components';
+import barnes_logo from 'images/barnes_email_logo_1x.png';
 
 const SectionWipesStyled = styled.div`
   overflow: hidden;
@@ -27,6 +28,18 @@ class StoryPage extends Component {
 
         this.sr = new SearchRequestService();
 
+        this.langOptions = [
+            { name: 'English', code: 'En', selected: true },
+            { name: 'Español', code: 'Es', selected: false },
+            { name: 'Français', code: 'Fr', selected: false },
+            { name: 'Deutsch', code: 'De', selected: false },
+            { name: 'Italiano', code: 'It', selected: false },
+            { name: 'русский', code: 'Ru', selected: false },
+            { name: '中文', code: 'Zh', selected: false },
+            { name: '日本語', code: 'Ja', selected: false },
+            { name: '한국어', code: 'Ko', selected: false }
+        ];
+
         this.state = {
             stories: []
         }
@@ -34,10 +47,9 @@ class StoryPage extends Component {
     }
 
     async componentWillMount() {
-        const slug = 'why-so-many-reniors';
+        const slug = this.props.match.params.slug;
         const { stories, storyId, storyTitle } = await this.setupStory(slug);
         const selectedLang = await this.getSelectedLanguage();
-
         this.setState({
             stories: stories,
             storyId: storyId,
@@ -94,13 +106,17 @@ class StoryPage extends Component {
     render() {
 
         const { stories, storyTitle } = this.state;
-        console.log(stories);
         return (
             <SectionWipesStyled>
                 <Controller >
-                    <div className="story-item">
+                    <div className="story-page-intro">
                         <div className="card-img-overlay">
-                            <h1>{storyTitle}</h1>
+                            <div className="barnes-logo">
+                                <img src={barnes_logo} alt="barnes_logo" />
+                            </div>
+                            <div className="story-title">
+                                {storyTitle}
+                            </div>
                         </div>
                     </div>
                     {stories.map((story, index) =>
