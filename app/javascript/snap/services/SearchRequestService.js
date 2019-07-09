@@ -85,6 +85,16 @@ class SearchRequestService {
         }
     }
 
+    getStoriesFromEmail = async (slug) => {
+        try {
+            let response = await axios.get(constants.STORIES_EMAIL_PAGE_URL + slug);
+            return response.data;
+        }
+        catch (error) {
+            console.log('An error occurred while retrieving story from the server');
+        }
+    }
+
     markStoryAsRead = async (imageId, storyId) => {
         try {
             let response = await axios.post(constants.STORIES_READ_URL + imageId + '&unique_identifier=' + storyId);

@@ -30,24 +30,12 @@ class StoryPage extends Component {
         this.state = {
             stories: []
         }
-        this.langOptions = [
-            { name: 'English', code: 'En', selected: true },
-            { name: 'Español', code: 'Es', selected: false },
-            { name: 'Français', code: 'Fr', selected: false },
-            { name: 'Deutsch', code: 'De', selected: false },
-            { name: 'Italiano', code: 'It', selected: false },
-            { name: 'русский', code: 'Ru', selected: false },
-            { name: '中文', code: 'Zh', selected: false },
-            { name: '日本語', code: 'Ja', selected: false },
-            { name: '한국어', code: 'Ko', selected: false }
-        ];
-        this.cropParamsHQ = '?crop=faces,entropy&fit=crop&h=230&w=230';
 
     }
 
     async componentWillMount() {
-        const imageId = '5204';
-        const { stories, storyId, storyTitle } = await this.setupStory(imageId);
+        const slug = 'why-so-many-reniors';
+        const { stories, storyId, storyTitle } = await this.setupStory(slug);
         const selectedLang = await this.getSelectedLanguage();
 
         this.setState({
@@ -72,9 +60,9 @@ class StoryPage extends Component {
         return filter(this.langOptions, lang => lang.selected === true);
     }
 
-    setupStory = async (imageId) => {
-        console.log('fetching stories for imageId == ' + imageId);
-        const stories_data = await this.sr.getStoryItems(imageId);
+    setupStory = async (slug) => {
+        console.log('fetching stories for slug == ' + slug);
+        const stories_data = await this.sr.getStoriesFromEmail(slug);
         if (stories_data.data.total > 0) {
             return { stories: stories_data.data.content.stories, storyId: stories_data.data.unique_identifier, storyTitle: stories_data.data.content.story_title };
         } else {
@@ -116,7 +104,7 @@ class StoryPage extends Component {
                         </div>
                     </div>
                     {stories.map((story, index) =>
-                        <Scene indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`100`} offset={0}>
+                        <Scene indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`1000`} offset={0}>
                             {(progress, event) => (
 
                                 <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
@@ -145,7 +133,7 @@ class StoryPage extends Component {
                     )}
                 </Controller>
             </SectionWipesStyled>
-            
+
         );
     }
 }

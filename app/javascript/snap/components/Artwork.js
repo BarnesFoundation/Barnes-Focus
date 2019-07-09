@@ -222,10 +222,10 @@ class Artwork extends Component {
             offsetArr.push(durDefault);
         })
         durationNextArr.push(durDefault);
-        this.setState({"storyDurationsCurrent": durationCurArr})
-        this.setState({"storyDurationsNext": durationNextArr})
-        this.setState({"storyOffsets": offsetArr})
-        
+        this.setState({ "storyDurationsCurrent": durationCurArr })
+        this.setState({ "storyDurationsNext": durationNextArr })
+        this.setState({ "storyOffsets": offsetArr })
+
         console.log("STATE", this.state);
     }
 
@@ -243,12 +243,7 @@ class Artwork extends Component {
         return filter(this.langOptions, lang => lang.selected === true);
     }
 
-    onSelectLanguage = async (lang) => {
-        console.log('Selected lang changed in Artwork >> : ' + JSON.stringify(lang));
-        localStorage.setItem(constants.SNAP_LANGUAGE_PREFERENCE, lang.code);
-
-        const imageId = this.getFocusedArtworkImageId();
-
+    updateSelectedLanguage = (lang) => {
         this.langOptions.map(option => {
             if (option.code === lang.code) {
                 option.selected = true;
@@ -256,9 +251,18 @@ class Artwork extends Component {
                 option.selected = false;
             }
         })
+    }
 
+    onSelectLanguage = async (lang) => {
+        console.log('Selected lang changed in Artwork >> : ' + JSON.stringify(lang));
+        localStorage.setItem(constants.SNAP_LANGUAGE_PREFERENCE, lang.code);
         /** Save the user selected language in the server session and call the getArtworksInfo API again to refresh the page with translated result. */
         const languageUpdated = await this.sr.saveLanguagePreference(lang.code);
+
+        await this.props.updateTranslations();
+        this.updateSelectedLanguage(lang);
+
+        const imageId = this.getFocusedArtworkImageId();
         const artworkInfo = await this.sr.getArtworkInformation(imageId);
         const { stories, storyId, storyTitle } = await this.setupStory(imageId);
         const { artwork, roomRecords } = this.constructResultAndInRoomSlider(artworkInfo);
@@ -310,15 +314,15 @@ class Artwork extends Component {
 
     componentDidUpdate() {
         console.log("Artwork::componentDidUpdate", this.state.infoHeightUpdated, this.infoCardRef);
-        if(!this.state.infoHeightUpdated && this.infoCardRef && this.infoCardRef.current) {
+        if (!this.state.infoHeightUpdated && this.infoCardRef && this.infoCardRef.current) {
             console.log("componentDidUpdate", this.infoCardRef);
             var contentHeight = this.infoCardRef.current.getBoundingClientRect().height;
             let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             var offset = contentHeight - h + 100;
-            if(offset < 0) offset = 0;
+            if (offset < 0) offset = 0;
             console.log("Info HEIGHT", offset);
-            
-            this.setState({infoHeightUpdated: true, infoCardDuration: offset})
+
+            this.setState({ infoHeightUpdated: true, infoCardDuration: offset })
         }
     }
 
@@ -441,17 +445,17 @@ class Artwork extends Component {
     setArtworkRef = (elem) => {
         if (elem) {
             this.artworkRef = elem;
-            
+
 
             const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
             const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - h), 0);
             const artworkVScrollDuration = Math.ceil(((artworkVScrollOffset + 60) / h) * 100);
-            
+
             console.log('setArtworkRef == ', this.artworkRef.getBoundingClientRect().bottom, artworkVScrollOffset);
 
             this.setState({ artworkVScrollOffset, artworkVScrollDuration })
-            this.setState({infoCardDuration: artworkVScrollOffset});
+            this.setState({ infoCardDuration: artworkVScrollOffset });
 
         }
     }
@@ -464,11 +468,11 @@ class Artwork extends Component {
 
     onStoryHeightReady = (height, index) => {
         console.log("Story height ready", height, index);
-        if(index > -1) {
+        if (index > -1) {
             var durationCurArr = this.state.storyDurationsCurrent;
             var durationNextArr = this.state.storyDurationsNext;
             durationCurArr[index] = (index == 0) ? 0 : height;
-            durationNextArr[index+1] = (index == 0) ? 0 : height;
+            durationNextArr[index + 1] = (index == 0) ? 0 : height;
             this.setState({ "durationsCur": durationCurArr });
             this.setState({ "durationsNext": durationNextArr });
             console.log("Setting State Height", this.state.storyDurationsCurrent);
@@ -482,20 +486,20 @@ class Artwork extends Component {
 
     storySceneCallback = (showTitle) => {
         console.log("Story 0 Scene Callback", showTitle);
-        if(showTitle) {
-            this.setState({showTitleBar: true});
+        if (showTitle) {
+            this.setState({ showTitleBar: true });
         } else {
-            this.setState({showTitleBar: false});
+            this.setState({ showTitleBar: false });
         }
     }
 
     refCallbackInfo = (element) => {
-        if(element) {
+        if (element) {
             this.infoCardRef = element;
             let contentHeight = this.infoCardRef.getBoundingClientRect().height;
             let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             let offset = contentHeight - h + 100;
-            this.setState({infoCardDuration: offset})
+            this.setState({ infoCardDuration: offset })
             console.log("refCallbackInfo", this.state.infoCardDuration);
         }
     }
@@ -545,7 +549,7 @@ class Artwork extends Component {
                                             {
                                                 artwork.unIdentified &&
                                                 <tr>
-                                                    <td className="text-left item-label">Culture:</td>
+                                                    <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_10')}:</td>
                                                     <td className="text-left item-info">{artwork.culture}</td>
                                                 </tr>
                                             }
@@ -629,7 +633,7 @@ class Artwork extends Component {
 
     renderTitleBar = () => {
         const { showTitleBar, storyTitle } = this.state;
-        if(showTitleBar) {
+        if (showTitleBar) {
             return (
                 <div id="story-title-bar">
                     {storyTitle}
@@ -655,9 +659,9 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`${this.state.storyDurationsCurrent[index]+200}`} offset={(index > 0) ? `${this.state.storyOffsets[index]}` : 0}>
+                <Scene indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`${this.state.storyDurationsCurrent[index] + 200}`} offset={(index > 0) ? `${this.state.storyOffsets[index]}` : 0}>
                     {(progress, event) => (
-                        
+
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
                             <Tween
                                 from={{ y: '-0%' }}
@@ -665,22 +669,22 @@ class Artwork extends Component {
                                 progress={progress}
                                 paused
                             >
-                            <StoryItem
-                                key={`storyitem${index + 1}`}
-                                progress={progress}
-                                sceneStatus={event}
-                                storyIndex={index}
-                                story={story}
-                                storyTitle={storyTitle}
-                                langOptions={this.langOptions}
-                                selectedLanguage={this.state.selectedLanguage}
-                                onSelectLanguage={this.onSelectLanguage}
-                                onStoryReadComplete={this.onStoryReadComplete}
-                                getSize={this.onStoryHeightReady}
-                                statusCallback={this.storySceneCallback} />
+                                <StoryItem
+                                    key={`storyitem${index + 1}`}
+                                    progress={progress}
+                                    sceneStatus={event}
+                                    storyIndex={index}
+                                    story={story}
+                                    storyTitle={storyTitle}
+                                    langOptions={this.langOptions}
+                                    selectedLanguage={this.state.selectedLanguage}
+                                    onSelectLanguage={this.onSelectLanguage}
+                                    onStoryReadComplete={this.onStoryReadComplete}
+                                    getSize={this.onStoryHeightReady}
+                                    statusCallback={this.storySceneCallback} />
                             </Tween>
                         </div>
-                        
+
                     )}
                 </Scene>
             )
@@ -697,10 +701,10 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                
+
                 <Scene key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? 300 : 1} offset="70" pinSettings={{ pushFollowers: true }}>
                     <div></div>
-                </Scene> 
+                </Scene>
             )
         );
     }
@@ -715,10 +719,10 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                
+
                 <Scene key={`storytriggerleave${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onLeave" indicators={false} duration={0} offset={(index > 0) ? 600 : 300} pinSettings={{ pushFollowers: false }}>
                     <div></div>
-                </Scene> 
+                </Scene>
             )
         );
     }
@@ -734,9 +738,9 @@ class Artwork extends Component {
             <SectionWipesStyled>
                 <Controller >
                     {this.renderTitleBar()}
-                    
+
                     {this.renderArtwork()}
-                    
+
                     <Scene pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={false} duration="0" offset={`${this.state.infoCardDuration}`} pinSettings={{ pushFollowers: false }}>
                         <div></div>
                     </Scene>
