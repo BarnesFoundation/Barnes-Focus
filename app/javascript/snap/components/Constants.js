@@ -8,6 +8,7 @@ export const APP_VERSION = process.env.APP_VERSION;
 export const UNSUPPORTED_ORIENTATION_ALERT_MESSAGE = 'This app is best viewed in Portrait mode.';
 export const ART_WORK_INFO_URL = '/api/snaps/getArtworkInformation?imageId=';
 export const STORIES_URL = '/api/snaps/find_stories_by_object_id?object_id=';
+export const STORIES_EMAIL_PAGE_URL = 'api/stories/'
 export const STORIES_READ_URL = '/api/snaps/mark_story_as_read?image_id=';
 export const STORE_SEARCHED_RESULT_URL = '/api/snaps/storeSearchedResult';
 export const SUBMIT_BOOKMARKS_EMAIL_URL = '/api/bookmarks';

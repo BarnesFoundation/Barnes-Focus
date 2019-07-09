@@ -18,10 +18,17 @@ const withTranslation = WrappedComponent => {
 
         async componentWillMount() {
             console.log('WithTranslation >> componentWillMount. Load the translations here');
-            let translations = await this.sr.getAppTranslations();
+            const translations = await this.sr.getAppTranslations();
             this.setState({ translations: translations, loaded: true });
             localStorage.setItem(SNAP_LANGUAGE_TRANSLATION, JSON.stringify(translations));
 
+        }
+
+        updateTranslations = async () => {
+            console.log('WithTranslation >> updateTranslations. Update translations.');
+            const translations = await this.sr.getAppTranslations();
+            this.setState({ translations: translations, loaded: true });
+            localStorage.setItem(SNAP_LANGUAGE_TRANSLATION, JSON.stringify(translations));
         }
 
         getTranslation = (screen, textId) => {
@@ -31,7 +38,7 @@ const withTranslation = WrappedComponent => {
         render() {
             return (
                 <div>
-                    {this.state.loaded && <WrappedComponent {...this.props} getTranslation={this.getTranslation} />}
+                    {this.state.loaded && <WrappedComponent {...this.props} getTranslation={this.getTranslation} updateTranslations={this.updateTranslations} />}
                 </div>
             );
         }
