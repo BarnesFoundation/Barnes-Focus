@@ -80,12 +80,12 @@ class StoryItem extends React.Component {
     componentDidUpdate() {
         // console.log("Story ComponentDidUpdate", this.contentRef.getBoundingClientRect().top, this.state.scrollOffset*this.props.progress);
 
-        if(!this.state.heightUpdated) {
+        if (!this.state.heightUpdated) {
             var contentHeight = this.contentRef.getBoundingClientRect().height;
             let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             var offset;
             offset = (contentHeight > h) ? contentHeight - h + 100 : 50;
-            if(offset < 0) offset = 0;
+            if (offset < 0) offset = 0;
             // console.log("SCROLL OFFSET", offset);
 
             // if(this.state.scrollOffset < offset) {
@@ -227,10 +227,10 @@ class StoryItem extends React.Component {
                             }>
                             <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={0.3} />
                             <Tween from={{ y: '0px' }} to={{ y: `-${this.state.scrollHeight}` }} duration={0.8}  /> 
-                        </Timeline>
-                    </div>*/}
+                        </Timeline>*/}
                         </div>
-                    </Timeline>
+                    </div>
+
                 </div>
             </Tween>
         );
