@@ -79,11 +79,12 @@ class StoryItem extends React.Component {
 
     componentDidUpdate() {
         // console.log("Story ComponentDidUpdate", this.contentRef.getBoundingClientRect().top, this.state.scrollOffset*this.props.progress);
+        console.log("Did Update Scene Status", this.props.sceneStatus)
         if(!this.state.heightUpdated) {
             var contentHeight = this.contentRef.getBoundingClientRect().height;
             let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             var offset;
-            offset = (contentHeight > h) ? contentHeight - h + 100 : 100;
+            offset = (contentHeight > h) ? contentHeight - h + 100 : 50;
             if(offset < 0) offset = 0;
             // console.log("SCROLL OFFSET", offset);
             
@@ -180,7 +181,7 @@ class StoryItem extends React.Component {
                         target={
                             <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
                         }>
-                        <Tween from={{ css:{borderRadius: "50px 50px 0px 0px", filter: "blur(0px)", transform: "scale(1)"} }} to={{ css:{borderRadius: "0px 0px 0px 0px", filter: "blur(10px)", transform: "scale(1.1)"} }} ease="easeOut" duration={0.2} />
+                        {/*<Tween from={{ css:{borderRadius: "50px 50px 0px 0px", filter: "blur(0px)", transform: "scale(1.0)"} }} to={{ css:{borderRadius: "0px 0px 0px 0px", filter: "blur(10px)", transform: "scale(1.0)"} }} ease="easeOut" duration={0.2} />*/}
                     </Timeline>
 
                     <div className="content-mask">
