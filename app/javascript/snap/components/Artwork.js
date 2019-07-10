@@ -86,7 +86,7 @@ class Artwork extends Component {
         this.infoCardRef = React.createRef();
         this.emailCardRef = React.createRef();
 
-        this.contentOffset = 300;
+        this.contentOffset = 400;
 
         this.langOptions = [
             { name: 'English', code: 'En', selected: true },
@@ -672,7 +672,7 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index < stories.length - 1) ? { pushFollowers: false } : { pushFollowers: true }} duration={this.state.storyDurationsCurrent[index]} offset={(index > 0) ? this.state.storyOffsets[index]-100 : this.state.infoCardDuration + this.contentOffset - 100}>
+                <Scene loglevel={0} indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index < stories.length - 1) ? { pushFollowers: false } : { pushFollowers: true }} duration={this.state.storyDurationsCurrent[index]} offset={(index > 0) ? this.state.storyOffsets[index]-100 : this.state.infoCardDuration + this.contentOffset - 100}>
                     {(progress, event) => (
                         
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={(false) ? {position: 'fixed'} : {}}>
@@ -715,7 +715,7 @@ class Artwork extends Component {
         return (
             stories.map((story, index) =>
                 
-                <Scene key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? this.state.storyDurationsCurrent[index-1] : this.state.infoCardDuration + this.contentOffset} offset="0" pinSettings={{ pushFollowers: true }}>
+                <Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? this.state.storyDurationsCurrent[index-1] : this.state.infoCardDuration + this.contentOffset} offset="0" pinSettings={{ pushFollowers: true }}>
                     <div></div>
                 </Scene>
             )
@@ -733,7 +733,7 @@ class Artwork extends Component {
         return (
             stories.map((story, index) =>
                 
-                <Scene key={`storytriggerleave${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onLeave" indicators={true} duration={0} offset={(index > 0) ? this.state.storyOffsets[index]-100 : this.state.infoCardDuration + this.contentOffset - 100} pinSettings={{ pushFollowers: false }}>
+                <Scene loglevel={0} key={`storytriggerleave${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onLeave" indicators={true} duration={0} offset={(index > 0) ? this.state.storyOffsets[index]-100 : this.state.infoCardDuration + this.contentOffset - 100} pinSettings={{ pushFollowers: false }}>
                     <div></div>
                 </Scene>
             )
@@ -749,10 +749,10 @@ class Artwork extends Component {
         //console.log('artworkVScrollDuration ====== ' + artworkVScrollDuration);
         return (
             <SectionWipesStyled>
-                <Controller >
+                <Controller refreshInterval>
                     {this.renderTitleBar()}
                     
-                    <Scene pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={true} duration="0" offset={this.state.infoCardDuration+this.contentOffset} pinSettings={{ pushFollowers: false }}>
+                    <Scene loglevel={0} pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={true} duration="0" offset={this.state.infoCardDuration+this.contentOffset} pinSettings={{ pushFollowers: false }}>
                         {(progress, event) => (
                             this.renderArtwork(progress)
                         )}    
@@ -768,7 +768,7 @@ class Artwork extends Component {
 
                     {this.renderPinsLeave()}
 
-                    <Scene indicators={false} pin pinSettings={{ pushFollowers: false }} triggerHook="onCenter" duration="0" offset={(showStory) ? 0 : 0}>
+                    <Scene loglevel={0} indicators={false} pin pinSettings={{ pushFollowers: false }} triggerHook="onCenter" duration="0" offset={(showStory) ? 0 : 0}>
                         {this.renderEmailScreen()}
                     </Scene>
                     {/*<Scene pin={(showStory) ? "#email-panel" : false} triggerElement="#email-panel" triggerHook="onEnter" indicators={false} duration="300" offset="100" pinSettings={{ pushFollowers: true }}>
