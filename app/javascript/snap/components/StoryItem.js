@@ -160,9 +160,23 @@ class StoryItem extends React.Component {
                 progress={progress}
                 paused
             >
-                <div>
+            <div>
+            <Timeline
+                totalProgress={progress}
+                paused
+            >
+            <div className="card story-item" ref={this.refCallback}>
+                {
+                    (this.props.storyIndex === 0 && this.state.showTitle) &&
+                    <div className="story-title-bar">
+                        <div className="col-8 story-title">{storyTitle}</div>
+                        <div className="col-4 language-dropdown">
+                            <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
+                        </div>
+                    </div>
+                }
                     <Timeline
-                        totalProgress={progress}
+                        totalProgress={progress*3}
                         paused
                         target={
                             <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
@@ -177,64 +191,34 @@ class StoryItem extends React.Component {
                             <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
                             <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
                             {
-                                (this.props.storyIndex === 0
-                                    && this.state.showTitle
-                                    && this.props.langOptions) &&
-                                <div className="story-title-bar">
-                                    <div className="col-8 story-title">{storyTitle}</div>
-                                    <div className="col-4 language-dropdown">
-                                        <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
-                                    </div>
-                                </div>
+                                this.props.selectedLanguage.code !== LANGUAGE_EN &&
+                                <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
                             }
-                            <Timeline
-                                totalProgress={progress * 3}
-                                paused
-                                target={
-                                    <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
-                                }>
-                                <Tween from={{ css: { borderRadius: "50px 50px 0px 0px", filter: "blur(0px)", transform: "scale(1)" } }} to={{ css: { borderRadius: "0px 0px 0px 0px", filter: "blur(10px)", transform: "scale(1.1)" } }} ease="easeOut" duration={0.2} />
-                            </Timeline>
-
-                            <div className="content-mask">
-
-                                <div className="card-img-overlay" ref={this.refContentCallback}>
-                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                    <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
-                                    {
-                                        this.props.selectedLanguage.code !== LANGUAGE_EN &&
-                                        <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
-                                    }
-                                </div>
-
-                            </div>
-
-                            {/*<div className="card-img-overlay" ref={this.refContentCallback}>
-                        <Timeline
-                            totalProgress={progress*1.5}
-                            paused
-                            target={
-                                <div>
-                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                    <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
-                                    {
-                                        this.props.selectedLanguage.code !== LANGUAGE_EN &&
-                                        <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
-                                    }
-                                </div>
-                            }>
-                            <Tween from={{ autoAlpha: 0, y: '50px' }} to={{ autoAlpha: 1, y: '0px' }} duration={0.3} />
-                            <Tween from={{ y: '0px' }} to={{ y: `-${this.state.scrollHeight}` }} duration={0.8}  /> 
-                        </Timeline>*/}
                         </div>
+
                     </div>
 
-                </div>
+                    
+            </div>
+            </Timeline>
+            </div>
             </Tween>
         );
     }
 }
 
 export default StoryItem;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
