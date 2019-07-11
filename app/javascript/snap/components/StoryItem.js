@@ -80,7 +80,7 @@ class StoryItem extends React.Component {
     componentDidUpdate() {
         // console.log("Story ComponentDidUpdate", this.contentRef.getBoundingClientRect().top, this.state.scrollOffset*this.props.progress);
         // console.log("Did Update Scene Status", this.props.sceneStatus)
-        if(!this.state.heightUpdated) {
+        if (!this.state.heightUpdated) {
             var contentHeight = this.contentRef.getBoundingClientRect().height;
             let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             var offset;
@@ -92,16 +92,16 @@ class StoryItem extends React.Component {
             this.props.getSize(offset, this.props.storyIndex);
             this.setState({ scrollOffset: offset })
             // }
-            this.setState({heightUpdated: true})
-            
+            this.setState({ heightUpdated: true })
+
             // console.log("Setting TWEEN OFFSET", offset, contentHeight, h);
 
             this.t2
                 .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
                 .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
         }
-        
-        if(this.t2) this.t2.progress(this.props.progress*4);
+
+        if (this.t2) this.t2.progress(this.props.progress * 4);
 
     }
 
@@ -161,58 +161,61 @@ class StoryItem extends React.Component {
                 progress={progress}
                 paused
             >
-            <div>
-            <Timeline
-                totalProgress={progress}
-                paused
-            >
-            <div className="card story-item" ref={this.refCallback}>
-                {
-                    (this.props.storyIndex === 0 && this.state.showTitle) &&
-                    <div className="story-title-bar">
-                        <div className="col-8 story-title">{storyTitle}</div>
-                        <div className="col-4 language-dropdown">
-                            <LanguageDropdown isStoryItemDropDown={true} langOptions={this.props.langOptions} selected={this.props.selectedLanguage} onSelectLanguage={this.props.onSelectLanguage} />
-                        </div>
-                    </div>
-                }
+                <div>
                     <Timeline
-                        totalProgress={progress*5}
+                        totalProgress={progress}
                         paused
-                        target={
-                            <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
-                        }>
-                        {<Tween from={{ css:{borderRadius: "50px 50px 0px 0px"} }} to={{ css:{borderRadius: "0px 0px 0px 0px"} }} ease="easeOut" duration={0.2} />}
-                    </Timeline>
-
-                    <Timeline
-                        totalProgress={progress*5}
-                        paused
-                        target={
-                            <div className="overlay"></div>
-                        }>
-                        <Tween from={{ autoAlpha: 0, borderRadius: "50px 50px 0px 0px"}} to={{ autoAlpha: 0.5, borderRadius: "0px 0px 0px 0px"}} ease="easeOut" duration={0.2} />
-                    </Timeline>
-                    
-
-                    <div className="content-mask">
-
-                        <div className="card-img-overlay" ref={this.refContentCallback}>
-                            <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                            <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                            <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
+                    >
+                        <div className="card story-item" ref={this.refCallback}>
                             {
-                                this.props.selectedLanguage.code !== LANGUAGE_EN &&
-                                <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                (this.props.storyIndex === 0 && this.state.showTitle) &&
+                                <div className="story-title-bar">
+                                    <div className="story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
+                                </div>
                             }
+                            <Timeline
+                                totalProgress={progress * 5}
+                                paused
+                                target={
+                                    <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
+                                }>
+                                {<Tween from={{ css: { borderRadius: "50px 50px 0px 0px" } }} to={{ css: { borderRadius: "0px 0px 0px 0px" } }} ease="easeOut" duration={0.2} />}
+                            </Timeline>
+
+                            <Timeline
+                                totalProgress={progress * 5}
+                                paused
+                                target={
+                                    <div className="overlay"></div>
+                                }>
+                                <Tween from={{ autoAlpha: 0, borderRadius: "50px 50px 0px 0px" }} to={{ autoAlpha: 0.5, borderRadius: "0px 0px 0px 0px" }} ease="easeOut" duration={0.2} />
+                            </Timeline>
+
+
+                            <div className="content-mask">
+
+                                <div className="card-img-overlay" ref={this.refContentCallback}>
+                                    {
+                                        this.props.storyIndex === 0 &&
+                                        <div className="story-name">
+                                            {storyTitle}
+                                        </div>
+                                    }
+                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                    <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
+                                    {
+                                        this.props.selectedLanguage.code !== LANGUAGE_EN &&
+                                        <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                    }
+                                </div>
+
+                            </div>
+
+
                         </div>
-
-                    </div>
-
-                    
-            </div>
-            </Timeline>
-            </div>
+                    </Timeline>
+                </div>
             </Tween>
         );
     }
