@@ -9,11 +9,8 @@ import withTranslation from './withTranslation';
 import share from 'images/share.svg';
 import posed from "react-pose";
 
-import check_email_icon from 'images/check_email.svg';
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
-import Footer from './Footer';
-import About from './About';
 import { Popover, PopoverBody } from 'reactstrap';
 
 import close_icon from 'images/cross.svg';
@@ -22,7 +19,7 @@ import { SearchRequestService } from '../services/SearchRequestService';
 import ProgressiveImage from 'react-progressive-image';
 import { Controller, Scene } from 'react-scrollmagic';
 import styled from 'styled-components';
-import { flattenDeep, filter, debounce } from 'lodash';
+import { filter, debounce } from 'lodash';
 import StoryItem from '../components/StoryItem';
 // import ObjectCard from '../components/ObjectCard';
 import scan_button from 'images/scan-button.svg';
@@ -639,7 +636,13 @@ class Artwork extends Component {
     renderEmailScreen = () => {
         const { showStory, stories, emailCaptureAck } = this.state;
         if (emailCaptureAck) {
-            return <div></div>;
+            return (
+                <div className="scan-wrapper">
+                    <div className="scan-button" onClick={this.handleScan}>
+                        <img src={scan_button} alt="scan" />
+                    </div>
+                </div>
+            );
         } else {
             return (
                 <div id="email-panel" ref={this.emailCardRef} className="panel panel-email" >
