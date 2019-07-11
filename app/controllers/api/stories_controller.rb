@@ -3,10 +3,11 @@ class Api::StoriesController < Api::BaseController
 
   def show
     @story      = Story.find_by slug: params[:slug]
+    lang        = params[:lang] || 'en'
 
     respond_to do |wants|
       if @story
-        @story_data = StoryFetcher.new.find_by_title(@story.title, 'en')
+        @story_data = StoryFetcher.new.find_by_title(@story.title, lang)
 
         wants.json do
           render json: {
