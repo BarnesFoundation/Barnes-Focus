@@ -371,6 +371,26 @@ namespace :data do
     end
   end
 
+  desc "add text to bookmark capture"
+  task additions_to_bookmark_and_resultpage: :environment do
+    screen_6 = Translation.find_by(screen_text: "Bookmark_capture", display_order: 6)
+
+    Translation.create(
+      screen_text: "Send Me My Scans",
+      parent_id: screen_6.id,
+      english_translation: "Send Me My Scans",
+      unique_identifier: 'text_8'
+    )
+
+    screen_3 = Translation.find_by(screen_text: "Result_page", display_order: 3)
+    Translation.create(
+      screen_text: "In This Room",
+      parent_id: screen_3.id,
+      english_translation: "IN THIS ROOM",
+      unique_identifier: 'text_11'
+    )
+  end
+
   def stream_query_rows(sql_query, options="WITH CSV HEADER")
     conn = ActiveRecord::Base.connection.raw_connection
     conn.copy_data "COPY (#{sql_query}) TO STDOUT #{options};" do
