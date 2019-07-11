@@ -144,7 +144,7 @@ class StoryFetcher
     related_stories = original_response["data"]["storiesForObjectIds"][0]["relatedStories"]
     story_attrs = related_stories.size > 1 ? related_stories.last : related_stories.first
 
-    content["story_title"] = story_attrs["storyTitle"]
+    content["story_title"] = preferred_lang == "en" ? story_attrs["storyTitle"] : SnapTranslator.translate_story_title(story_attrs["storyTitle"], preferred_lang)
     content["stories"] = Array.new
 
     [1, 2, 3, 4, 5, 6].each do |i|

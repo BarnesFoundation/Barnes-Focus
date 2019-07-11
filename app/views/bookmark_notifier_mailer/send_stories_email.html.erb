@@ -88,13 +88,13 @@
                     </p>
                   </td>
                   <td width="50%" dir="ltr" class="w100 text-center logos__social-icons" style="text-align: right;">
-                    <button
-                      style="border: none; height: 50px; width: 325px; background-color: #D6431F; color: #FFFFFF; font-size: 18px;"
-                      type="button"
-                      onclick="window.open('https://tickets.barnesfoundation.org/orders/316/calendar?eventId=59288c7aca6afe2b653a4757&cart&pc=20OFF&utm_source=focus-stories-mailer&utm_medium=email&coupon=focus', '_blank')"
+                    <a
+                      href="https://tickets.barnesfoundation.org/orders/316/calendar?eventId=59288c7aca6afe2b653a4757&cart&pc=20OFF&utm_source=focus-stories-mailer&utm_medium=email&coupon=focus"
+                      style="border: none; height: 25px; width: 275px; background-color: #D6431F; color: #FFFFFF; font-size: 18px; padding: 20px 34px; text-align: center; text-decoration: none; display: inline-block; margin: 4px 2px; cursor: pointer;"
+                      target="_blank"
                     >
                       <%= @translations["Email"]["text_6"][:translated_content] %>
-                    </button>
+                    </a>
                   </td>
                 </tr>
                 <tr><td colspan="2" style="border-top: 1px solid #454545;"></td></tr>
@@ -121,8 +121,8 @@
 
                     <td width="65%" dir="ltr" class="w100" style="color: #282828; vertical-align: top; padding: 18px 0 40px 0;">
                       <p>
-                        <%= link_to "#{story[:link]}?utm_source=focus&utm_medium=email&utm_campaign=focus_story&coupon=focus", :title => "barnes collection", :style => "color: #FFFFFF !important;" do %>
-                          <h3><%= story[:content]['story_title'] %></h3>
+                        <%= link_to "#{story[:link]}?utm_source=focus&utm_medium=email&utm_campaign=focus_story&coupon=focus&lang=#{@lang}", :title => "barnes collection", :style => "color: #FFFFFF !important;" do %>
+                          <h3><%= story[:translated_title] %></h3>
                         <% end %>
                       </p>
 
