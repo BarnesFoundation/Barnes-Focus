@@ -38,7 +38,7 @@ class StoryItem extends React.Component {
     }
 
     componentDidMount() {
-        console.log('StoryItem >> componentDidMount', this.contentRef.clientHeight);
+        // console.log('StoryItem >> componentDidMount', this.contentRef.clientHeight);
         this.scrollInProgress = false;
         this.setState({ scrollHeight: this.contentRef.clientHeight })
         // Register scroll listener
@@ -92,16 +92,17 @@ class StoryItem extends React.Component {
             this.props.getSize(offset, this.props.storyIndex);
             this.setState({ scrollOffset: offset })
             // }
-            this.setState({ heightUpdated: true })
-
-            console.log("Setting TWEEN OFFSET", offset, contentHeight, h);
+            this.setState({heightUpdated: true})
+            
+            // console.log("Setting TWEEN OFFSET", offset, contentHeight, h);
 
             this.t2
                 .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
                 .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
         }
+        
+        if(this.t2) this.t2.progress(this.props.progress*4);
 
-        if (this.t2) this.t2.progress(this.props.progress);
     }
 
     getArtUrl = () => {
@@ -176,21 +177,21 @@ class StoryItem extends React.Component {
                     </div>
                 }
                     <Timeline
-                        totalProgress={progress*3}
+                        totalProgress={progress*5}
                         paused
                         target={
                             <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
                         }>
-                        {/*<Tween from={{ css:{borderRadius: "50px 50px 0px 0px", filter: "blur(0px)", transform: "scale(1.0)"} }} to={{ css:{borderRadius: "0px 0px 0px 0px", filter: "blur(10px)", transform: "scale(1.0)"} }} ease="easeOut" duration={0.2} />*/}
+                        {<Tween from={{ css:{borderRadius: "50px 50px 0px 0px"} }} to={{ css:{borderRadius: "0px 0px 0px 0px"} }} ease="easeOut" duration={0.2} />}
                     </Timeline>
 
                     <Timeline
-                        totalProgress={progress*3}
+                        totalProgress={progress*5}
                         paused
                         target={
                             <div className="overlay"></div>
                         }>
-                        <Tween from={{ autoAlpha: 0 }} to={{ autoAlpha: 0.5 }} ease="easeOut" duration={0.2} />
+                        <Tween from={{ autoAlpha: 0, borderRadius: "50px 50px 0px 0px"}} to={{ autoAlpha: 0.5, borderRadius: "0px 0px 0px 0px"}} ease="easeOut" duration={0.2} />
                     </Timeline>
                     
 
