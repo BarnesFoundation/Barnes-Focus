@@ -118,6 +118,7 @@ class JobsController < ApplicationController
             unique_identifier: response[:unique_identifier],
             #artwork_info: EsCachedRecord.search(obj.image_id),
             content: response[:content],
+            translated_title: language == 'en' ? response[:content]["story_title"] : SnapTranslator.translate_story_title(response[:content]["story_title"], language),
             link: "#{host}/story/#{story.slug}"
           }
           stories.push h
