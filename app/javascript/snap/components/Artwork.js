@@ -86,7 +86,7 @@ class Artwork extends Component {
         this.infoCardRef = React.createRef();
         this.emailCardRef = React.createRef();
 
-        this.contentOffset = 400;
+        this.contentOffset = 100;
 
         this.langOptions = [
             { name: 'English', code: 'En', selected: true },
@@ -319,8 +319,9 @@ class Artwork extends Component {
     }
 
     componentDidUpdate() {
-        if(this.infoCardRef.current) console.log("Artwork::componentDidUpdate", this.state.infoHeightUpdated, this.infoCardRef.current.getBoundingClientRect().height);
-        if(!this.state.infoHeightUpdated && this.infoCardRef && this.infoCardRef.current) {
+        console.log("Artwork::componentDidUpdate")
+        if(this.infoCardRef.current) console.log("Artwork::componentDidUpdate::INFOREF", this.state.infoHeightUpdated, this.infoCardRef.current);
+        if(!this.state.infoHeightUpdated && this.infoCardRef.current) {
             console.log("componentDidUpdate", this.infoCardRef);
             var contentHeight = this.infoCardRef.current.getBoundingClientRect().height;
             let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -474,7 +475,7 @@ class Artwork extends Component {
     }
 
     onStoryHeightReady = (height, index) => {
-        console.log("Story height ready", height, index);
+        // console.log("Story height ready", height, index);
         if(index > -1) {
             var durationCurArr = this.state.storyDurationsCurrent;
             
@@ -482,7 +483,7 @@ class Artwork extends Component {
             
             this.setState({ "storyDurationsCurrent": durationCurArr });
             
-            console.log("Setting State Height", this.state.storyDurationsCurrent);
+            // console.log("Setting State Height", this.state.storyDurationsCurrent);
         }
         //this.updateStoryHeight(1000);
     }
@@ -492,7 +493,7 @@ class Artwork extends Component {
     }
 
     storySceneCallback = (showTitle) => {
-        console.log("Story 0 Scene Callback", showTitle);
+        // console.log("Story 0 Scene Callback", showTitle);
         if(showTitle) {
             this.setState({showTitleBar: true});
         } else {
@@ -668,7 +669,7 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene loglevel={0} indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index < stories.length - 1) ? { pushFollowers: false } : { pushFollowers: true }} duration={this.state.storyDurationsCurrent[index]} offset={(index > 0) ? this.state.storyOffsets[index]-100 : this.state.infoCardDuration + this.contentOffset - 100}>
+                <Scene loglevel={0} indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index < stories.length - 1) ? { pushFollowers: false } : { pushFollowers: false }} duration={this.state.storyDurationsCurrent[index]*4} offset={(index > 0) ? this.state.storyOffsets[index]-375 : this.state.infoCardDuration + this.contentOffset - 100}>
                     {(progress, event) => (
                         
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={(false) ? {position: 'fixed'} : {}}>
@@ -711,7 +712,7 @@ class Artwork extends Component {
         return (
             stories.map((story, index) =>
                 
-                <Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? this.state.storyDurationsCurrent[index-1] : this.state.infoCardDuration + this.contentOffset} offset="0" pinSettings={{ pushFollowers: true }}>
+                <Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? this.state.storyDurationsCurrent[index-1]/4 - 50 : this.state.infoCardDuration + this.contentOffset} offset="0" pinSettings={{ pushFollowers: true }}>
                     <div></div>
                 </Scene> 
             )
@@ -745,7 +746,7 @@ class Artwork extends Component {
         //console.log('artworkVScrollDuration ====== ' + artworkVScrollDuration);
         return (
             <SectionWipesStyled>
-                <Controller refreshInterval>
+                <Controller refreshInterval={50}>
                     {this.renderTitleBar()}
                     
                     <Scene loglevel={0} pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={true} duration="0" offset={this.state.infoCardDuration+this.contentOffset} pinSettings={{ pushFollowers: false }}>
@@ -769,7 +770,7 @@ class Artwork extends Component {
 
                     {this.renderPinsEnter()}
 
-                    {this.renderPinsLeave()}
+                    {/*this.renderPinsLeave()*/}
 
                     <Scene loglevel={0} indicators={false} pin pinSettings={{ pushFollowers: false }} triggerHook="onCenter" duration="0" offset={(showStory) ? 0 : 0}>
                         {this.renderEmailScreen()}
