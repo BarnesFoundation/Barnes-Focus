@@ -18,7 +18,7 @@ import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
 import ProgressiveImage from 'react-progressive-image';
 import { Controller, Scene } from 'react-scrollmagic';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { filter, debounce } from 'lodash';
 import StoryItem from '../components/StoryItem';
 // import ObjectCard from '../components/ObjectCard';
@@ -28,12 +28,14 @@ import { Tween, Timeline } from 'react-gsap';
 import { TweenMax, TimelineLite, Power2, Linear, Elastic, CSSPlugin } from "gsap/TweenMax";
 import { isTablet } from 'react-device-detect';
 
-
 /** 
  * withRouter HOC provides props with location, history and match objects
 */
 const SectionWipesStyled = styled.div`
-  overflow: hidden;
+  ${ props => props.hasChildCards && css`
+    overflow: hidden;
+  `}
+  
   .panel {
     height: auto;
     min-height: 800px;
@@ -80,9 +82,6 @@ class Artwork extends Component {
         console.log('Artwork >> constructor');
         this.sr = new SearchRequestService();
 
-        this.infoCardRef = React.createRef();
-        this.emailCardRef = React.createRef();
-
         this.contentOffset = 100;
 
         this.langOptions = [
@@ -120,6 +119,8 @@ class Artwork extends Component {
 
 
         this.artworkRef = null;
+        this.infoCardRef = null
+        this.emailCardRef = null;
 
     }
 
@@ -135,7 +136,7 @@ class Artwork extends Component {
                 const artUrlParams = '?w=' + (w - 120);
                 const cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
                 const topCropParams = '?q=0&auto=compress&crop=top&fit=crop&h=' + h + '&w=' + w;
-                const lowQualityParams = '?q=0&auto=compress';
+                const lowQualityParams = '?q=0&auto=compress&w=' + (w - 120);
 
                 const art_obj = search_result["data"]["records"][0];
                 result['id'] = art_obj.id;
@@ -216,12 +217,11 @@ class Artwork extends Component {
 
         }
 
-        console.log("STORIES NUM:", stories.length);
-        var durationCurArr = [];
-        var durationNextArr = [];
-        var storyPositionArr = [];
-        var offsetArr = [];
-        var durDefault = 300;
+        const durationCurArr = [];
+        const durationNextArr = [];
+        const storyPositionArr = [];
+        const offsetArr = [];
+        const durDefault = 300;
         stories.forEach(story => {
             durationCurArr.push(durDefault);
             offsetArr.push(durDefault);
@@ -231,7 +231,6 @@ class Artwork extends Component {
         this.setState({ "storyDurationsCurrent": durationCurArr })
         this.setState({ "storyOffsets": offsetArr })
 
-        console.log("STATE", this.state);
     }
 
     getSelectedLanguage = async () => {
@@ -268,9 +267,9 @@ class Artwork extends Component {
         this.updateSelectedLanguage(lang);
 
         const imageId = this.getFocusedArtworkImageId();
-        const artworkInfo = await this.sr.getArtworkInformation(imageId);
+        const artworkInfo = this.sr.getArtworkInformation(imageId);
         const { stories, storyId, storyTitle } = await this.setupStory(imageId);
-        const { artwork, roomRecords } = this.constructResultAndInRoomSlider(artworkInfo);
+        const { artwork, roomRecords } = this.constructResultAndInRoomSlider(await artworkInfo);
         this.setState({
             result: artworkInfo,
             selectedLanguage: lang,
@@ -310,31 +309,29 @@ class Artwork extends Component {
         this.scrollInProgress = false;
         this.t1 = new TimelineLite({ paused: true });
         // Register scroll listener
-        // window.addEventListener('scroll', this._onScroll, true);
+        window.addEventListener('scroll', this._onScroll, true);
+
         // this.t2 = new TimelineLite({paused: true});
     }
 
     componentWillUnmount() {
         // Un-register scroll listener
-        // window.removeEventListener('scroll', this._onScroll);
+        window.removeEventListener('scroll', this._onScroll);
     }
 
     componentDidUpdate() {
-        console.log("Artwork::componentDidUpdate")
-        if (!this.infoCardRef) {
-            return;
-        }
-        if (this.infoCardRef) console.log("Artwork::componentDidUpdate::INFOREF", this.state.infoHeightUpdated, this.infoCardRef);
-        if (!this.state.infoHeightUpdated && this.infoCardRef.current) {
-            console.log("componentDidUpdate", this.infoCardRef);
-            var contentHeight = this.infoCardRef.getBoundingClientRect().height;
-            let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-            var offset = contentHeight - h + 100;
-            if (offset < 0) offset = 0;
-            console.log("Info HEIGHT", offset);
+        console.log("Artwork::componentDidUpdate");
+        // if (this.infoCardRef) console.log("Artwork::componentDidUpdate::INFOREF", this.state.infoHeightUpdated, this.infoCardRef);
+        // if (!this.state.infoHeightUpdated && this.infoCardRef.current) {
+        //     console.log("componentDidUpdate", this.infoCardRef);
+        //     var contentHeight = this.infoCardRef.getBoundingClientRect().height;
+        //     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+        //     var offset = contentHeight - h + 100;
+        //     if (offset < 0) offset = 0;
+        //     console.log("Info HEIGHT", offset);
 
-            this.setState({ infoHeightUpdated: true, infoCardDuration: offset })
-        }
+        //     this.setState({ infoHeightUpdated: true, infoCardDuration: offset })
+        // }
     }
 
     /**
@@ -348,7 +345,7 @@ class Artwork extends Component {
 
         const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
         let resultsContainerBottom = Math.ceil(h - this.artworkRef.getBoundingClientRect().bottom);
-        //console.log('resultsContainerBottom :: ' + resultsContainerBottom);
+        //console.log('resultsContainerBottom :: ' + this.artworkRef.getBoundingClientRect().bottom);
 
 
         let shortDescBoundingRect = this.shortDescContainer.getBoundingClientRect();
@@ -457,11 +454,9 @@ class Artwork extends Component {
         if (elem) {
             this.artworkRef = elem;
 
-
-            const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
-            const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - h), 0);
-            const artworkVScrollDuration = Math.ceil(((artworkVScrollOffset + 60) / h) * 100);
+            const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
+            const artworkVScrollDuration = Math.ceil(((artworkVScrollOffset + 60) / constants.VIEWPORT_HEIGHT) * 100);
+            this.artworkScrollOffset = artworkVScrollOffset;
 
             console.log('setArtworkRef == ', this.artworkRef.getBoundingClientRect().bottom, artworkVScrollOffset);
 
@@ -479,27 +474,14 @@ class Artwork extends Component {
     }
 
     onStoryHeightReady = (height, index) => {
-
-        // console.log("Story height ready", height, index);
         if (index > -1) {
             var durationCurArr = this.state.storyDurationsCurrent;
-
             durationCurArr[index] = (index == 0) ? 0 : height;
-
             this.setState({ "storyDurationsCurrent": durationCurArr });
-
-            // console.log("Setting State Height", this.state.storyDurationsCurrent);
         }
-        //this.updateStoryHeight(1000);
-    }
-
-    updateStoryHeight = (height) => {
-        return 1000;
     }
 
     storySceneCallback = (showTitle) => {
-
-        // console.log("Story 0 Scene Callback", showTitle);
         if (showTitle) {
             this.setState({ showTitleBar: true });
         } else {
@@ -510,12 +492,11 @@ class Artwork extends Component {
     refCallbackInfo = (element) => {
         if (element) {
             this.infoCardRef = element;
-            // let contentHeight = this.infoCardRef.getBoundingClientRect().height;
-            // let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-            // let offset = contentHeight - h + 100;
-            // this.setState({infoCardDuration: offset})
-            // console.log("refCallbackInfo:Ref", this.state.infoCardDuration);
         }
+    }
+
+    onArtworkImgLoad = ({ target: img }) => {
+        this.artworkImgHeight = img.offsetHeight;
     }
 
     /**
@@ -523,8 +504,6 @@ class Artwork extends Component {
      */
     renderArtwork = (progress) => {
         const { artwork, selectedLanguage } = this.state;
-        // if(this.t1) this.t1.progress(progress);
-        // console.log("Artwork PROGRESS", this.t1.progress);
         return (
             <div className="container-fluid artwork-container" id="search-result" >
                 <div className="row" ref={this.refCallbackInfo}>
@@ -538,7 +517,7 @@ class Artwork extends Component {
                                     <div className="card-header h1">Focused Artwork</div>
                                     <div className="card-img-result">
                                         <ProgressiveImage src={artwork.url} placeholder={artwork.url_low_quality}>
-                                            {src => <img src={src} alt="match_image" />}
+                                            {src => <img src={src} alt="match_image" onLoad={this.onArtworkImgLoad} />}
                                         </ProgressiveImage>
                                         {/* <img src={artwork.url} alt="match_image" /> */}
                                     </div>
@@ -621,12 +600,11 @@ class Artwork extends Component {
                                         </PopoverBody>
                                     </Popover>
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 
@@ -683,31 +661,23 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene loglevel={0} indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index < stories.length - 1) ? { pushFollowers: false } : { pushFollowers: false }} duration={this.state.storyDurationsCurrent[index] * 4} offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset - 100}>
+                <Scene loglevel={0} indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index < stories.length - 1) ? { pushFollowers: false } : { pushFollowers: false }} duration={this.state.storyDurationsCurrent[index] * 4} offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset - 100}>
                     {(progress, event) => (
-
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={(false) ? { position: 'fixed' } : {}}>
-                            <Tween
-                                from={{ y: '-0%' }}
-                                to={{ y: "-0%" }}
+                            <StoryItem
+                                key={`storyitem${index + 1}`}
                                 progress={progress}
-                                paused
-                            >
-                                <StoryItem
-                                    key={`storyitem${index + 1}`}
-                                    progress={progress}
-                                    sceneStatus={event}
-                                    storyIndex={index}
-                                    story={story}
-                                    storyTitle={storyTitle}
-                                    langOptions={this.langOptions}
-                                    selectedLanguage={this.state.selectedLanguage}
-                                    onSelectLanguage={this.onSelectLanguage}
-                                    onStoryReadComplete={this.onStoryReadComplete}
-                                    getSize={this.onStoryHeightReady}
-                                    statusCallback={this.storySceneCallback}
-                                    getTranslation={this.props.getTranslation} />
-                            </Tween>
+                                sceneStatus={event}
+                                storyIndex={index}
+                                story={story}
+                                storyTitle={storyTitle}
+                                langOptions={this.langOptions}
+                                selectedLanguage={this.state.selectedLanguage}
+                                onSelectLanguage={this.onSelectLanguage}
+                                onStoryReadComplete={this.onStoryReadComplete}
+                                getSize={this.onStoryHeightReady}
+                                statusCallback={this.storySceneCallback}
+                                getTranslation={this.props.getTranslation} />
                         </div>
 
                     )}
@@ -756,15 +726,14 @@ class Artwork extends Component {
      * Main render screen setup
      */
     renderResult = () => {
-        const { stories, showStory, artworkVScrollOffset, artworkVScrollDuration, artwork, selectedLanguage } = this.state;
-        //console.log('artworkVScrollOffset ====== ' + artworkVScrollOffset);
-        //console.log('artworkVScrollDuration ====== ' + artworkVScrollDuration);
+        const { stories, showStory, emailCaptureAck } = this.state;
+        const hasChildCards = showStory || !emailCaptureAck;
         return (
-            <SectionWipesStyled>
+            <SectionWipesStyled hasChildCards={hasChildCards}>
                 <Controller refreshInterval={50}>
                     {this.renderTitleBar()}
 
-                    <Scene loglevel={0} pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={true} duration="0" offset={this.state.infoCardDuration + this.contentOffset} pinSettings={{ pushFollowers: false }}>
+                    <Scene loglevel={0} pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={true} duration="0" offset={this.state.infoCardDuration + this.contentOffset} pinSettings={{ pushFollowers: true }}>
                         {(progress, event) => (
                             this.renderArtwork(progress)
                         )}
