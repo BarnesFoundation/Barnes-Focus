@@ -197,6 +197,7 @@ class StoryItem extends React.Component {
                                 <div className="card-img-overlay" ref={this.refContentCallback}>
                                     {
                                         this.props.storyIndex === 0 &&
+                                        !this.props.storyEmailPage &&
                                         <div className="story-name">
                                             {storyTitle}
                                         </div>
