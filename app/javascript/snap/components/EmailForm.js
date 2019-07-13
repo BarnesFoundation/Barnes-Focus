@@ -123,7 +123,7 @@ class EmailForm extends Component {
 
         return (
             <div>
-                <div className="email-intent" style={intentStyle}>Send me my scans</div>
+                <div className="email-intent" style={intentStyle}>{this.props.getTranslation('Bookmark_capture', 'text_8')}</div>
                 <div className="email-head" style={emailHeadFontStyle}>
                     {this.props.getTranslation('Bookmark_capture', 'text_1')}
                 </div>
