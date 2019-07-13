@@ -85,9 +85,9 @@ class SearchRequestService {
         }
     }
 
-    getStoriesFromEmail = async (slug) => {
+    getStoriesFromEmail = async (slug, lang) => {
         try {
-            let response = await axios.get(constants.STORIES_EMAIL_PAGE_URL + slug);
+            let response = await axios.get(constants.STORIES_EMAIL_PAGE_URL + slug + '?lang=' + lang);
             return response.data;
         }
         catch (error) {

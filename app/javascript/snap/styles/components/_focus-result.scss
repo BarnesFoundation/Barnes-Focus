@@ -66,11 +66,15 @@
   }
 
   .card-img-overlay {
-      margin-top: 100px;
+      padding-top: 100px;
       text-align: left;
       bottom: unset;
       // position: relative;
       // height: 100%;
+
+      .intro {
+        position: absolute;
+      }
 
      .story-question {
         text-transform: uppercase;
@@ -99,7 +103,7 @@
         font-size: 40px;
         font-weight: bold;
         line-height: 44px;
-        margin: 50px 0;
+        margin: 50px 0 0;
       }
 
       .story-text {
@@ -135,12 +139,6 @@
   overflow: visible;
 }
 
-#story-card-0 {
-  // margin-top: -300px;
-  // position: relative;
-  // bottom: 20px;
-}
-
 .overlay {
   position: absolute;
   top: 0px;
@@ -169,8 +167,8 @@
 }
 
 .content-mask {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 55px, black 80px, black 100%);
-  mask-image: linear-gradient(to bottom, transparent 55px, black 80px, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 69px, black 80px, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 69px, black 80px, black 100%);
   // background: linear-gradient(to bottom, transparent, black, black, black, black, black);
   position: absolute;
   top: 0px;

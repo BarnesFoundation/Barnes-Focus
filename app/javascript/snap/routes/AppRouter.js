@@ -23,7 +23,7 @@ const Routes = () => (
                         <Route path="/" component={Home} exact={true} key="home" />
                         <Route path="/scan" component={Camera} exact={true} key="scan" />
                         <Route path="/artwork/:imageId?" component={Artwork} key="artwork" />
-                        <Route path="/story/:slug" component={StoryPage} exact={true} key="story" />
+                        <Route path="/story/:slug" component={StoryPage} exact={false} key="story" />
                     </Switch>
                 </RouteContainer>
             </PoseGroup>

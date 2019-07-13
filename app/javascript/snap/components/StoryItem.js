@@ -6,16 +6,18 @@ import { Tween, Timeline } from 'react-gsap';
 import { TweenMax, TimelineLite, Power2, Linear, Elastic, CSSPlugin } from "gsap/TweenMax";
 import google_logo from 'images/google_translate.svg';
 import { LANGUAGE_EN } from './Constants';
+import barnes_logo from 'images/barnes_email_logo_1x.png';
+import scroll_up from 'images/up_wht_1x.png';
 
 class StoryItem extends React.Component {
 
 
     constructor(props) {
         super(props);
-        this.cardRef = React.createRef();
         this.contentRef = React.createRef();
-
-
+        this.titleRef = React.createRef();
+        this.overlayRef = React.createRef();
+        this.scrollCtaRef = React.createRef();
 
         this.state = {
             storyRead: false,
@@ -29,21 +31,7 @@ class StoryItem extends React.Component {
         console.log('StoryItem >> componentDidMount');
         this.scrollInProgress = false;
         this.setState({ scrollHeight: this.contentRef.clientHeight })
-        // Register scroll listener
-        // this.cardRef.current.addEventListener('scroll', this._onScroll, true);
-
-        // this.tween;
-
-        // const tween = this.tween.getGSAP();
-        // tween.timeScale(0.1);
-
         this.t2 = new TimelineLite({ paused: true });
-
-    }
-
-    componentWillUnmount() {
-        // Un-register scroll listener
-        // this.cardRef.current.removeEventListener('scroll', this._onScroll);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -62,7 +50,7 @@ class StoryItem extends React.Component {
                 this.setState({ showTitle: !showTitle });
             }
         }
-        // console.log("STORY HEIGHT:", this.cardRef.current.getBoundingClientRect().height);
+
     }
 
     componentDidUpdate() {
@@ -83,13 +71,32 @@ class StoryItem extends React.Component {
             this.setState({ heightUpdated: true })
 
             // console.log("Setting TWEEN OFFSET", offset, contentHeight, h);
+            if (this.props.storyIndex === 0) {
+                if(this.props.storyEmailPage) {
+                    this.t2
+                    .fromTo(this.overlayRef, 1, { autoAlpha: 0.5, borderRadius: "50px 50px 0px 0px" }, { autoAlpha: 0, borderRadius: "0px 0px 0px 0px" })
+                    .fromTo(this.titleRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
+                    .fromTo(this.scrollCtaRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
+                    .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, "-=0.1")
+                    .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
+                } else {
+                    this.t2
+                    .fromTo(this.overlayRef, 1, { autoAlpha: 0.5, borderRadius: "50px 50px 0px 0px" }, { autoAlpha: 0, borderRadius: "0px 0px 0px 0px" })
+                    .fromTo(this.titleRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
+                    .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, "-=0.1")
+                    .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
+                }
+                
+            } else {
+                this.t2
+                    .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, "-=0.1")
+                    .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
+            }
 
-            this.t2
-                .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
-                .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
+
         }
 
-        if (this.t2) this.t2.progress(this.props.progress * 4);
+        if (this.t2) this.t2.progress(this.props.progress * 5);
 
     }
 
@@ -97,45 +104,28 @@ class StoryItem extends React.Component {
         return this.props.story.detail.art_url + `?crop=faces,entropy&fit=crop&w=` + screen.width + `&h=` + screen.height;
     }
 
-    /**
-     * All the fancy scroll animation goes here.
-     */
-    handleScroll = () => {
-        if (!this.cardRef) {
-            this.scrollInProgress = false;
-            return;
-        }
-        console.log('Scrolling on storyItem');
-        let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-        let cardBottom = Math.ceil(h - this.cardRef.current.getBoundingClientRect().bottom);
-
-        this.scrollInProgress = false;
-    }
-
-    _onScroll = (event) => {
-        if (!this.scrollInProgress) {
-            requestAnimationFrame(this.handleScroll)
-            this.scrollInProgress = true;
-        }
-    }
-
-    handleUpdate = (event) => {
-
-    }
-
-    refCallback = (element) => {
-        // console.log("Ref card callback", element);
-        if (element) {
-            this.cardRef = element;
-            //this.props.getSize(element.getBoundingClientRect().height, this.props.key);
-        }
-    }
-
     refContentCallback = (element) => {
-        // console.log("Ref content callback", element);
         if (element) {
             this.contentRef = element;
             // this.props.getSize(element.getBoundingClientRect().height, this.props.key);
+        }
+    }
+
+    refTitleCallback = (element) => {
+        if (element) {
+            this.titleRef = element;
+        }
+    }
+
+    refOverlayCallback = (element) => {
+        if (element) {
+            this.overlayRef = element;
+        }
+    }
+
+    refScrollTextCallback = (element) => {
+        if (element) {
+            this.scrollCtaRef = element;
         }
     }
 
@@ -143,20 +133,16 @@ class StoryItem extends React.Component {
         const { story, storyTitle, progress } = this.props;
         // console.log('StoryItem >> render', this.props.storyIndex, progress);
         return (
-            // <Tween
-            //     from={{ y: '0px' }}
-            //     to={{ y: "-0%" }} // view height - content height
-            //     progress={progress}
-            //     paused
-            // >
             <div>
                 <Timeline
                     totalProgress={progress}
                     paused
                 >
-                    <div className="card story-item" ref={this.cardRef}>
+                    <div className="card story-item" >
                         {
-                            (this.props.storyIndex === 0 && this.state.showTitle) &&
+                            (this.props.storyIndex === 0
+                                && this.state.showTitle
+                                && !this.props.storyEmailPage) &&
                             <div className="story-title-bar">
                                 <div className="story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
                             </div>
@@ -176,27 +162,52 @@ class StoryItem extends React.Component {
                             target={
                                 <div className="overlay"></div>
                             }>
-                            <Tween from={{ autoAlpha: 0, borderRadius: "50px 50px 0px 0px" }} to={{ autoAlpha: 0.5, borderRadius: "0px 0px 0px 0px" }} ease="easeOut" duration={0.2} />
+                            <Tween from={{ autoAlpha: 0, borderRadius: "50px 50px 0px 0px" }} to={{ autoAlpha: 0.6, borderRadius: "0px 0px 0px 0px" }} ease="easeOut" duration={0.1} />
                         </Timeline>
 
-
+                        {
+                            this.props.storyIndex === 0 &&
+                            <div className="overlay" ref={this.refOverlayCallback}></div>
+                        }
                         <div className="content-mask">
 
-                            <div className="card-img-overlay" ref={this.refContentCallback}>
+                            <div className="card-img-overlay" >
+
+                                <div className="intro" ref={this.refTitleCallback}>
+                                    {
+                                        this.props.storyIndex === 0 &&
+                                        this.props.storyEmailPage &&
+                                        <div className="barnes-logo">
+                                            <img src={barnes_logo} alt="barnes_logo" />
+                                        </div>
+                                    }
+                                    {
+                                        this.props.storyIndex === 0 &&
+                                        <div className="story-name">
+                                            {storyTitle}
+                                        </div>
+                                    }
+                                    
+                                </div>
                                 {
-                                    this.props.storyIndex === 0 &&
-                                    !this.props.storyEmailPage &&
-                                    <div className="story-name">
-                                        {storyTitle}
-                                    </div>
+                                        this.props.storyIndex === 0 &&
+                                        this.props.storyEmailPage &&
+                                        <div className="scroll-cta" ref={this.refScrollTextCallback}>
+                                            <div className="scroll-icon">
+                                                <img src={scroll_up} alt="scroll"/>
+                                            </div>
+                                            <div className="text">{`Scroll to Begin`}</div>
+                                        </div>
                                 }
-                                <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
-                                {
-                                    this.props.selectedLanguage.code !== LANGUAGE_EN &&
-                                    <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
-                                }
+                                <div className="scroll-text" ref={this.refContentCallback}>
+                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                    <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
+                                    {
+                                        this.props.selectedLanguage.code !== LANGUAGE_EN &&
+                                        <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                    }
+                                </div>
                             </div>
 
                         </div>
