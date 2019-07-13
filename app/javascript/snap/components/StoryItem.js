@@ -7,18 +7,6 @@ import { TweenMax, TimelineLite, Power2, Linear, Elastic, CSSPlugin } from "gsap
 import google_logo from 'images/google_translate.svg';
 import { LANGUAGE_EN } from './Constants';
 
-const tweenProps = {
-    ease: 'Linear.easeNone',
-    from: {
-        opacity: 0,
-        yPercent: 100,
-    },
-    to: {
-        opacity: 1,
-        yPercent: 0,
-    }
-};
-
 class StoryItem extends React.Component {
 
 
@@ -38,7 +26,7 @@ class StoryItem extends React.Component {
     }
 
     componentDidMount() {
-        // console.log('StoryItem >> componentDidMount', this.contentRef.clientHeight);
+        console.log('StoryItem >> componentDidMount');
         this.scrollInProgress = false;
         this.setState({ scrollHeight: this.contentRef.clientHeight })
         // Register scroll listener
@@ -78,7 +66,7 @@ class StoryItem extends React.Component {
     }
 
     componentDidUpdate() {
-        // console.log("Story ComponentDidUpdate", this.contentRef.getBoundingClientRect().top, this.state.scrollOffset*this.props.progress);
+        console.log("StoryItem >> ComponentDidUpdate");
         // console.log("Did Update Scene Status", this.props.sceneStatus)
         if (!this.state.heightUpdated) {
             var contentHeight = this.contentRef.getBoundingClientRect().height;
@@ -155,69 +143,69 @@ class StoryItem extends React.Component {
         const { story, storyTitle, progress } = this.props;
         // console.log('StoryItem >> render', this.props.storyIndex, progress);
         return (
-            <Tween
-                from={{ y: '0px' }}
-                to={{ y: "-0%" }} // view height - content height
-                progress={progress}
-                paused
-            >
-                <div>
-                    <Timeline
-                        totalProgress={progress}
-                        paused
-                    >
-                        <div className="card story-item" ref={this.refCallback}>
-                            {
-                                (this.props.storyIndex === 0 && this.state.showTitle) &&
-                                <div className="story-title-bar">
-                                    <div className="story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
-                                </div>
-                            }
-                            <Timeline
-                                totalProgress={progress * 5}
-                                paused
-                                target={
-                                    <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
-                                }>
-                                {<Tween from={{ css: { borderRadius: "50px 50px 0px 0px" } }} to={{ css: { borderRadius: "0px 0px 0px 0px" } }} ease="easeOut" duration={0.2} />}
-                            </Timeline>
+            // <Tween
+            //     from={{ y: '0px' }}
+            //     to={{ y: "-0%" }} // view height - content height
+            //     progress={progress}
+            //     paused
+            // >
+            <div>
+                <Timeline
+                    totalProgress={progress}
+                    paused
+                >
+                    <div className="card story-item" ref={this.cardRef}>
+                        {
+                            (this.props.storyIndex === 0 && this.state.showTitle) &&
+                            <div className="story-title-bar">
+                                <div className="story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
+                            </div>
+                        }
+                        <Timeline
+                            totalProgress={progress * 5}
+                            paused
+                            target={
+                                <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
+                            }>
+                            {<Tween from={{ css: { borderRadius: "50px 50px 0px 0px" } }} to={{ css: { borderRadius: "0px 0px 0px 0px" } }} ease="easeOut" duration={0.2} />}
+                        </Timeline>
 
-                            <Timeline
-                                totalProgress={progress * 5}
-                                paused
-                                target={
-                                    <div className="overlay"></div>
-                                }>
-                                <Tween from={{ autoAlpha: 0, borderRadius: "50px 50px 0px 0px" }} to={{ autoAlpha: 0.5, borderRadius: "0px 0px 0px 0px" }} ease="easeOut" duration={0.2} />
-                            </Timeline>
+                        <Timeline
+                            totalProgress={progress * 5}
+                            paused
+                            target={
+                                <div className="overlay"></div>
+                            }>
+                            <Tween from={{ autoAlpha: 0, borderRadius: "50px 50px 0px 0px" }} to={{ autoAlpha: 0.5, borderRadius: "0px 0px 0px 0px" }} ease="easeOut" duration={0.2} />
+                        </Timeline>
 
 
-                            <div className="content-mask">
+                        <div className="content-mask">
 
-                                <div className="card-img-overlay" ref={this.refContentCallback}>
-                                    {
-                                        this.props.storyIndex === 0 &&
-                                        !this.props.storyEmailPage &&
-                                        <div className="story-name">
-                                            {storyTitle}
-                                        </div>
-                                    }
-                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                    <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                    <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
-                                    {
-                                        this.props.selectedLanguage.code !== LANGUAGE_EN &&
-                                        <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
-                                    }
-                                </div>
-
+                            <div className="card-img-overlay" ref={this.refContentCallback}>
+                                {
+                                    this.props.storyIndex === 0 &&
+                                    !this.props.storyEmailPage &&
+                                    <div className="story-name">
+                                        {storyTitle}
+                                    </div>
+                                }
+                                <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
+                                <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
+                                {
+                                    this.props.selectedLanguage.code !== LANGUAGE_EN &&
+                                    <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                }
                             </div>
 
-
                         </div>
-                    </Timeline>
-                </div>
-            </Tween>
+
+
+                    </div>
+                </Timeline>
+            </div>
+
         );
     }
 }

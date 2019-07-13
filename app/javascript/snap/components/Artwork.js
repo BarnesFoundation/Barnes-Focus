@@ -21,7 +21,6 @@ import { Controller, Scene } from 'react-scrollmagic';
 import styled, { css } from 'styled-components';
 import { filter, debounce } from 'lodash';
 import StoryItem from '../components/StoryItem';
-// import ObjectCard from '../components/ObjectCard';
 import scan_button from 'images/scan-button.svg';
 import { Transition, animated } from 'react-spring/renderprops';
 import { Tween, Timeline } from 'react-gsap';
@@ -46,33 +45,6 @@ const SectionWipesStyled = styled.div`
       position: fixed;
   }
 `;
-
-
-/** React pose animation config */
-const Child = posed.div({
-    enter: {
-        y: 0,
-        opacity: 1,
-        transition: {
-            duration: 400,
-            ease: "linear"
-        }
-    },
-    exit: {
-        y: 50,
-        opacity: 0
-    }
-});
-
-const Container = posed.div({
-    enter: {
-        opacity: 1,
-        staggerChildren: 300
-    },
-    exit: {
-        opacity: 0
-    }
-});
 
 class Artwork extends Component {
 
@@ -661,9 +633,9 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene loglevel={0} indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index < stories.length - 1) ? { pushFollowers: false } : { pushFollowers: false }} duration={this.state.storyDurationsCurrent[index] * 4} offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset - 100}>
+                <Scene loglevel={0} indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index === 0) ? { spacerClass: 'scrollmagic-pin-spacer-pt' } : { spacerClass: 'scrollmagic-pin-spacer' }} duration={this.state.storyDurationsCurrent[index] * 4} offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset - 100}>
                     {(progress, event) => (
-                        <div id={`story-card-${index}`} className={`panel panel${index + 1}`} style={(false) ? { position: 'fixed' } : {}}>
+                        <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
                             <StoryItem
                                 key={`storyitem${index + 1}`}
                                 progress={progress}
