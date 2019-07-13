@@ -158,7 +158,7 @@ class EmailForm extends Component {
             scanBtnClass.push('floating');
         }
         return (
-            <div className="email-container" style={(this.props.withStory) ? withStoryStyles : {}} ref={this.setEmailRef}>
+            <div className="email-container" style={(this.props.withStory) ? withStoryStyles : {}} ref={this.setEmailRef} >
                 <div className="scan-wrapper">
                     <div className={scanBtnClass.join(' ')} onClick={this.handleScan}>
                         <img src={scan_button} alt="scan" />

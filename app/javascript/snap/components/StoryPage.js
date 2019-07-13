@@ -109,44 +109,44 @@ class StoryPage extends Component {
         return (
             <SectionWipesStyled>
                 <Controller >
-                        <Timeline
-                            paused
-                            target={
-                                <div className="story-page-intro">
-                                    <div className="card-img-overlay">
-                                        <div className="barnes-logo">
-                                            <img src={barnes_logo} alt="barnes_logo" />
-                                        </div>
-                                        <div className="story-title">
-                                            {storyTitle}
-                                        </div>
+                    <Timeline
+                        paused
+                        target={
+                            <div className="story-page-intro">
+                                <div className="card-img-overlay">
+                                    <div className="barnes-logo">
+                                        <img src={barnes_logo} alt="barnes_logo" />
+                                    </div>
+                                    <div className="story-title">
+                                        {storyTitle}
                                     </div>
                                 </div>
-                            }>
-                            {<Tween from={{ css: { opacity: 1 }, y: '-0px' }} to={{ css: { opacity: 0}, y: '-0px'  }} ease="easeOut" duration={1} />}
-                        </Timeline>
-  
-                    
+                            </div>
+                        }>
+                        {<Tween from={{ css: { opacity: 1 }, y: '-0px' }} to={{ css: { opacity: 0 }, y: '-0px' }} ease="easeOut" duration={1} />}
+                    </Timeline>
+
+
                     {stories.map((story, index) =>
                         <Scene indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`1000`} offset={0}>
                             {(progress, event) => (
 
                                 <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
-                                    
-                                        <StoryItem
-                                            key={`storyitem${index + 1}`}
-                                            progress={progress}
-                                            sceneStatus={event.type}
-                                            storyIndex={index}
-                                            story={story}
-                                            storyTitle={storyTitle}
-                                            langOptions={undefined}
-                                            selectedLanguage={this.state.selectedLanguage}
-                                            onStoryReadComplete={this.onStoryReadComplete}
-                                            getSize={this.onStoryHeightReady}
-                                            getTranslation={this.props.getTranslation}
-                                            storyEmailPage={true} />
-                                    
+
+                                    <StoryItem
+                                        key={`storyitem${index + 1}`}
+                                        progress={progress}
+                                        sceneStatus={event.type}
+                                        storyIndex={index}
+                                        story={story}
+                                        storyTitle={storyTitle}
+                                        langOptions={undefined}
+                                        selectedLanguage={this.state.selectedLanguage}
+                                        onStoryReadComplete={this.onStoryReadComplete}
+                                        getSize={this.onStoryHeightReady}
+                                        getTranslation={this.props.getTranslation}
+                                        storyEmailPage={true} />
+
                                 </div>
 
                             )}
