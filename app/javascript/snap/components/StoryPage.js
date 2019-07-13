@@ -11,6 +11,7 @@ import * as constants from './Constants';
 import { filter, debounce } from 'lodash';
 import styled from 'styled-components';
 import barnes_logo from 'images/barnes_email_logo_1x.png';
+import queryString from 'query-string';
 
 const SectionWipesStyled = styled.div`
   overflow: hidden;
@@ -19,6 +20,14 @@ const SectionWipesStyled = styled.div`
     min-height: 800px;
     width: 100vw;
   }  
+
+  .story-item {
+      transform: translate3d(0px, 0px, 0px)
+  }
+
+  .content-mask {
+     mask-image: none;
+  }
 `;
 
 class StoryPage extends Component {
@@ -48,7 +57,9 @@ class StoryPage extends Component {
 
     async componentWillMount() {
         const slug = this.props.match.params.slug;
-        const { stories, storyId, storyTitle } = await this.setupStory(slug);
+        const queryParams = queryString.parse(this.props.location.search)
+
+        const { stories, storyId, storyTitle } = await this.setupStory(slug, queryParams.lang);
         const selectedLang = await this.getSelectedLanguage();
         this.setState({
             stories: stories,
@@ -72,9 +83,9 @@ class StoryPage extends Component {
         return filter(this.langOptions, lang => lang.selected === true);
     }
 
-    setupStory = async (slug) => {
-        console.log('fetching stories for slug == ' + slug);
-        const stories_data = await this.sr.getStoriesFromEmail(slug);
+    setupStory = async (slug, lang) => {
+        console.log('fetching stories for slug: ', slug, lang);
+        const stories_data = await this.sr.getStoriesFromEmail(slug, lang);
         if (stories_data.data.total > 0) {
             return { stories: stories_data.data.content.stories, storyId: stories_data.data.unique_identifier, storyTitle: stories_data.data.content.story_title };
         } else {
@@ -109,29 +120,11 @@ class StoryPage extends Component {
         return (
             <SectionWipesStyled>
                 <Controller >
-                    <Timeline
-                        paused
-                        target={
-                            <div className="story-page-intro">
-                                <div className="card-img-overlay">
-                                    <div className="barnes-logo">
-                                        <img src={barnes_logo} alt="barnes_logo" />
-                                    </div>
-                                    <div className="story-title">
-                                        {storyTitle}
-                                    </div>
-                                </div>
-                            </div>
-                        }>
-                        {<Tween from={{ css: { opacity: 1 }, y: '-0px' }} to={{ css: { opacity: 0 }, y: '-0px' }} ease="easeOut" duration={1} />}
-                    </Timeline>
-
-
                     {stories.map((story, index) =>
                         <Scene indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`1000`} offset={0}>
                             {(progress, event) => (
 
-                                <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
+                                <div id={`story-card-${index}`} className={`story-page panel panel${index + 1}`}>
 
                                     <StoryItem
                                         key={`storyitem${index + 1}`}
