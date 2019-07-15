@@ -12,6 +12,11 @@ With changes in existing artowrks email template and introduction of story email
 
 In order to work this properly on Production, we now have to define a new ENV variable `ASSET_HOST` and sets it value to `https://barnes.foc.us`
 
+### Define paragrpah to use
+We'd observed slowness while translating stories content to other languages. That's beacause the number of calls we are making to Google API based on short paragrpah and long paragraph.
+
+In order to reduce this and work this faster, we now have to define a new ENV variable `STORY_PARAGRAPH_TO_USE`. For now, set it's value to `long`. Other value would be `short`.
+
 ### Translations Updates
 * Email(Header) - "Bookmarked art" -> "Artworks You Discovered"
 * Email(Sub Header) - "Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit" -> "Thank you for visiting the Barnes today! Here are all the works of art you explored using the Barnes Focus guide. Each link will take you to our collection online for more information about each piece."
@@ -65,8 +70,9 @@ a. `rails server` and
 b. `webpack-dev-server` - this will analyse changes in our `app/javascript` folder and rebuild the front end on the fly.
 
 # Environment Variables
-Though  `.env` file is committed into the source code but in order to setup everything locally, you'll have to change the path of: `GOOGLE_APPLICATION_CREDENTIALS`.
-To do so, the file `SNAP-865144db2e55` lies under: `private` folder
+You can find `localhost.env.development` file is committed into the `private` folder but in order to setup everything locally, you'll have to:
+ - Move this file into root and rename to `.env`
+ - Change the path of: `GOOGLE_APPLICATION_CREDENTIALS`. - To do so, the file `SNAP-865144db2e55` lies under: `private` folder
 
 ## What's not in ENV file?
 There are certain variables that are created for us by Beanstalk while we are setting up the Rails application. And some of ENV variables are created by us.
@@ -83,6 +89,7 @@ Some of those ENV variable changes its value based on Web/Worker Apps. Let's tak
  - **RDS_DB_NAME**, **RDS_HOSTNAME**, **RDS_PASSWORD**, **RDS_PORT**, **RDS_USERNAME**: Database settings needed to Connect Barnes App with PostgreSQL Database.
  - **SECRET_KEY_BASE**: System generated. Not required locally.
  - **ASSET_HOST**: Required to render images for emails
+ - **STORY_PARAGRAPH_TO_USE**: Required to define which paragrpah to use for story. Possible values: `long` or `short`
 
 # Deployment on Elastic Beanstalk
 ## Prerequisite
