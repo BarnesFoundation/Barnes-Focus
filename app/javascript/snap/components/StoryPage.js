@@ -121,7 +121,7 @@ class StoryPage extends Component {
             <SectionWipesStyled>
                 <Controller >
                     {stories.map((story, index) =>
-                        <Scene indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`1000`} offset={0}>
+                        <Scene indicators={true} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={{ pushFollowers: false }} duration={`800`} offset={0}>
                             {(progress, event) => (
 
                                 <div id={`story-card-${index}`} className={`story-page panel panel${index + 1}`}>

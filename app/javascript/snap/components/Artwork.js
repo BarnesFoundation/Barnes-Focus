@@ -19,7 +19,7 @@ import { SearchRequestService } from '../services/SearchRequestService';
 import ProgressiveImage from 'react-progressive-image';
 import { Controller, Scene } from 'react-scrollmagic';
 import styled, { css } from 'styled-components';
-import { filter, debounce } from 'lodash';
+import { filter, throttle, debounce } from 'lodash';
 import StoryItem from '../components/StoryItem';
 import scan_button from 'images/scan-button.svg';
 import { Transition, animated } from 'react-spring/renderprops';
@@ -51,7 +51,7 @@ class Artwork extends Component {
 
     constructor(props) {
         super(props);
-        console.log('Artwork >> constructor');
+        //console.log('Artwork >> constructor');
         this.sr = new SearchRequestService();
 
         this.contentOffset = 100;
@@ -81,8 +81,6 @@ class Artwork extends Component {
             errors: {
                 email: false
             },
-            artworkVScrollOffset: 0,
-            artworkVScrollDuration: 0,
             showTitleBar: false,
             storyDuration: 250,
             infoHeightUpdated: false,
@@ -150,7 +148,7 @@ class Artwork extends Component {
     }
 
     async componentWillMount() {
-        console.log('Artwork >> componentWillMount');
+        //console.log('Artwork >> componentWillMount');
 
         let imageId = (this.state.result) ? this.state.result.data.records[0].id : this.props.match.params.imageId;
         const selectedLang = await this.getSelectedLanguage();
@@ -277,7 +275,7 @@ class Artwork extends Component {
     }
 
     componentDidMount() {
-        console.log('Artwork >> componentDidMount');
+        //console.log('Artwork >> componentDidMount');
         this.scrollInProgress = false;
         this.t1 = new TimelineLite({ paused: true });
         // Register scroll listener
@@ -292,18 +290,7 @@ class Artwork extends Component {
     }
 
     componentDidUpdate() {
-        console.log("Artwork::componentDidUpdate");
-        // if (this.infoCardRef) console.log("Artwork::componentDidUpdate::INFOREF", this.state.infoHeightUpdated, this.infoCardRef);
-        // if (!this.state.infoHeightUpdated && this.infoCardRef.current) {
-        //     console.log("componentDidUpdate", this.infoCardRef);
-        //     var contentHeight = this.infoCardRef.getBoundingClientRect().height;
-        //     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-        //     var offset = contentHeight - h + 100;
-        //     if (offset < 0) offset = 0;
-        //     console.log("Info HEIGHT", offset);
 
-        //     this.setState({ infoHeightUpdated: true, infoCardDuration: offset })
-        // }
     }
 
     /**
@@ -314,24 +301,19 @@ class Artwork extends Component {
             this.scrollInProgress = false;
             return;
         }
+        const resultsContainerBottom = Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT);
 
-        const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-        let resultsContainerBottom = Math.ceil(h - this.artworkRef.getBoundingClientRect().bottom);
-        //console.log('resultsContainerBottom :: ' + this.artworkRef.getBoundingClientRect().bottom);
-
-
-        let shortDescBoundingRect = this.shortDescContainer.getBoundingClientRect();
-        let shortDescElemTop = shortDescBoundingRect.y;
-        let shortDescElemHeight = shortDescBoundingRect.bottom - shortDescBoundingRect.top;
-        let currentShortDescScrollOffset = h - shortDescElemTop;
-        let visibleShortDescHeight = Math.floor(currentShortDescScrollOffset);
-
+        if (resultsContainerBottom > this.artworkScrollOffset) {
+            //console.log('this.artworkScrollOffset :: ' + resultsContainerBottom);
+            //this.setState({ infoCardDuration: this.artworkScrollOffset });
+        }
+        //console.log('resultsContainerBottom :: ' + resultsContainerBottom);
         this.scrollInProgress = false;
     }
 
     _onScroll = (event) => {
         if (!this.scrollInProgress) {
-            requestAnimationFrame(debounce(this.handleScroll, 20))
+            requestAnimationFrame(throttle(this.handleScroll, 1000))
             this.scrollInProgress = true;
         }
     }
@@ -425,17 +407,14 @@ class Artwork extends Component {
     setArtworkRef = (elem) => {
         if (elem) {
             this.artworkRef = elem;
-
             const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
-            const artworkVScrollDuration = Math.ceil(((artworkVScrollOffset + 60) / constants.VIEWPORT_HEIGHT) * 100);
-            this.artworkScrollOffset = artworkVScrollOffset;
+            const artworkVScrollDuration = Math.ceil((artworkVScrollOffset / constants.VIEWPORT_HEIGHT) * 100) + 100;
 
-            console.log('setArtworkRef == ', this.artworkRef.getBoundingClientRect().bottom, artworkVScrollOffset);
+            console.log('setArtworkRef >> artworkVScrollOffset == ', artworkVScrollOffset);
 
             this.setState({ artworkVScrollOffset, artworkVScrollDuration })
             this.setState({ infoCardDuration: artworkVScrollOffset });
-            console.log("refCallbackInfo:ArtworkRef", this.state.infoCardDuration);
-
+            console.log("setArtworkRef >> infoCardDuration = ", this.state.infoCardDuration);
         }
     }
 
@@ -447,6 +426,7 @@ class Artwork extends Component {
 
     onStoryHeightReady = (height, index) => {
         if (index > -1) {
+            console.log('Story durations based on height :: ', index, height);
             var durationCurArr = this.state.storyDurationsCurrent;
             durationCurArr[index] = (index == 0) ? 0 : height;
             this.setState({ "storyDurationsCurrent": durationCurArr });
@@ -469,6 +449,15 @@ class Artwork extends Component {
 
     onArtworkImgLoad = ({ target: img }) => {
         this.artworkImgHeight = img.offsetHeight;
+        const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
+
+        console.log('onArtworkImgLoad >> artworkVScrollOffset == ', artworkVScrollOffset);
+
+        setTimeout(() => {
+            const offset = (artworkVScrollOffset > 0) ? artworkVScrollOffset - 55 : 0;
+            this.setState({ infoCardDuration: offset });
+            console.log("onArtworkImgLoad >> infoCardDuration = ", offset);
+        }, 0);
     }
 
     /**
@@ -633,7 +622,7 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene loglevel={0} indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index === 0) ? { spacerClass: 'scrollmagic-pin-spacer-pt', pushFollowers: false  } : { spacerClass: 'scrollmagic-pin-spacer', pushFollowers: false  }} duration={this.state.storyDurationsCurrent[index] * 4} offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset - 100}>
+                <Scene loglevel={0} indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index === 0) ? { spacerClass: 'scrollmagic-pin-spacer-pt', pushFollowers: false } : { spacerClass: 'scrollmagic-pin-spacer', pushFollowers: false }} duration={this.state.storyDurationsCurrent[index] * 4} offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset -100}>
                     {(progress, event) => (
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
                             <StoryItem
@@ -698,6 +687,7 @@ class Artwork extends Component {
      * Main render screen setup
      */
     renderResult = () => {
+        console.log('Artwork render >> Artwork Scene duration : ', this.state.infoCardDuration);
         const { stories, showStory, emailCaptureAck } = this.state;
         const hasChildCards = showStory || !emailCaptureAck;
         return (
@@ -711,10 +701,6 @@ class Artwork extends Component {
                         )}
                     </Scene>
 
-                    {/*<Scene pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={false} duration="0" offset={`${this.state.infoCardDuration}`} pinSettings={{ pushFollowers: false }}>
-                        <div></div>
-                    </Scene>*/}
-
                     {this.renderStory()}
 
                     {this.renderPinsEnter()}
@@ -724,10 +710,6 @@ class Artwork extends Component {
                     <Scene loglevel={0} indicators={false} pin pinSettings={{ pushFollowers: false }} triggerHook="onCenter" duration="0" offset={(showStory) ? 0 : 0}>
                         {this.renderEmailScreen()}
                     </Scene>
-                    {/*<Scene pin={(showStory) ? "#email-panel" : false} triggerElement="#email-panel" triggerHook="onEnter" indicators={false} duration="300" offset="100" pinSettings={{ pushFollowers: true }}>
-                        <div></div>
-                    </Scene>*/}
-
 
                 </Controller>
 
