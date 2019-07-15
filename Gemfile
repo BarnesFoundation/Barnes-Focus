@@ -25,7 +25,7 @@ gem "daemons"
 gem 'activeadmin'
 gem 'devise'
 gem 'ffi', '1.9.18'
-gem 'google-cloud-translate'
+gem 'google-cloud-translate', '~> 1.3'
 #gem 'whenever', require: false
 gem 'silverpop'
 gem 'mandrill-api'
