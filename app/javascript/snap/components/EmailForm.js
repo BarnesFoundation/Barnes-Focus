@@ -13,7 +13,6 @@ class EmailForm extends Component {
 
     constructor(props) {
         super(props);
-        console.log('EmailForm withStory = ' + props.withStory);
         this.state = {
             email: '',
             floatScanBtn: false,
@@ -26,7 +25,7 @@ class EmailForm extends Component {
     }
 
     componentDidMount() {
-        console.log('EmailForm >> componentDidMount');
+        //console.log('EmailForm >> componentDidMount');
         this.scrollInProgress = false;
         // Register scroll listener
         window.addEventListener('scroll', this._onScroll, true);
