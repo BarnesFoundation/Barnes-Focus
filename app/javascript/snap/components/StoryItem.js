@@ -31,7 +31,7 @@ class StoryItem extends React.Component {
         //console.log('StoryItem >> componentDidMount');
         this.scrollInProgress = false;
         this.setState({ scrollHeight: this.contentRef.clientHeight })
-        this.t2 = new TimelineLite({ paused: true, lazy: true });
+        this.t2 = new TimelineLite({ paused: true });
     }
 
     componentWillReceiveProps(nextProps) {
@@ -82,7 +82,7 @@ class StoryItem extends React.Component {
                 } else {
                     this.t2
                         .fromTo(this.overlayRef, 1, { autoAlpha: 0.5, borderRadius: "50px 50px 0px 0px" }, { autoAlpha: 0, borderRadius: "0px 0px 0px 0px" })
-                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, "-=0.1")
+                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, "-=0.33") //-0.33 (1/3) means it would start along with above animation
                         .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
                 }
 
@@ -95,7 +95,7 @@ class StoryItem extends React.Component {
 
         }
 
-        if (this.t2) this.t2.progress(this.props.progress * 4);
+        if (this.t2) this.t2.progress(this.props.progress * 6);
 
     }
 
@@ -202,13 +202,13 @@ class StoryItem extends React.Component {
                                         </div>
                                     }
                                     <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                    <div className="story-footer" style={{ paddingBottom: this.props.selectedLanguage.code === LANGUAGE_EN ? `150px` : 0 }}>
+                                    <div className="story-footer" style={{ paddingBottom: this.props.selectedLanguage.code === LANGUAGE_EN ? `200px` : 0 }}>
                                         {story.detail.title}, {story.detail.displayDate}<br />
                                         {story.detail.people}
                                     </div>
                                     {
                                         this.props.selectedLanguage.code !== LANGUAGE_EN &&
-                                        <div className="google-translate-disclaimer" style={{ paddingBottom: `150px` }}><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                        <div className="google-translate-disclaimer" style={{ paddingBottom: `200px` }}><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
                                     }
                                 </div>
                             </div>
