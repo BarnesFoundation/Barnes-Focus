@@ -60,7 +60,7 @@ class StoryItem extends React.Component {
             var contentHeight = this.contentRef.getBoundingClientRect().height;
             console.log('Story Item content height : ', this.props.storyIndex, contentHeight);
             var offset;
-            offset = (contentHeight > VIEWPORT_HEIGHT) ? (contentHeight - VIEWPORT_HEIGHT + 100) : 50;
+            offset = (contentHeight > VIEWPORT_HEIGHT) ? (contentHeight - VIEWPORT_HEIGHT + 100) : 30;
             if (offset < 0) offset = 0;
             // console.log("SCROLL OFFSET", offset);
 
@@ -202,13 +202,13 @@ class StoryItem extends React.Component {
                                         </div>
                                     }
                                     <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                    <div className="story-footer" style={{ paddingBottom: this.props.selectedLanguage.code === LANGUAGE_EN ? `250px` : 0 }}>
+                                    <div className="story-footer" style={{ paddingBottom: this.props.selectedLanguage.code === LANGUAGE_EN ? `150px` : 0 }}>
                                         {story.detail.title}, {story.detail.displayDate}<br />
                                         {story.detail.people}
                                     </div>
                                     {
                                         this.props.selectedLanguage.code !== LANGUAGE_EN &&
-                                        <div className="google-translate-disclaimer" style={{ paddingBottom: `250px` }}><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                        <div className="google-translate-disclaimer" style={{ paddingBottom: `150px` }}><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
                                     }
                                 </div>
                             </div>
