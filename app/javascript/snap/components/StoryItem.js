@@ -77,12 +77,12 @@ class StoryItem extends React.Component {
                         .fromTo(this.overlayRef, 1, { autoAlpha: 0.5, borderRadius: "50px 50px 0px 0px" }, { autoAlpha: 0, borderRadius: "0px 0px 0px 0px" })
                         .fromTo(this.titleRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
                         .fromTo(this.scrollCtaRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
-                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
+                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, "-=0.1")
                         .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
                 } else {
                     this.t2
                         .fromTo(this.overlayRef, 1, { autoAlpha: 0.5, borderRadius: "50px 50px 0px 0px" }, { autoAlpha: 0, borderRadius: "0px 0px 0px 0px" })
-                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
+                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, "-=0.1")
                         .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
                 }
 
@@ -95,7 +95,7 @@ class StoryItem extends React.Component {
 
         }
 
-        if (this.t2) this.t2.progress(this.props.progress * 6);
+        if (this.t2) this.t2.progress(this.props.progress * 4);
 
     }
 
