@@ -286,7 +286,6 @@ class Artwork extends Component {
 
     componentDidUpdate() {
         console.log('Artwork >> componentDidUpdate');
-        console.log('CSS height of parent container : ', $('#search-result-container').outerHeight(true));
         if (this.infoCardRef) {
             console.log('this.infoCardRef.getBoundingClientRect().height : ', this.infoCardRef.getBoundingClientRect().height);
         }
@@ -301,18 +300,12 @@ class Artwork extends Component {
             return;
         }
         const resultsContainerBottom = Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT);
-
-        if (resultsContainerBottom > this.artworkScrollOffset) {
-            //console.log('this.artworkScrollOffset :: ' + resultsContainerBottom);
-            //this.setState({ infoCardDuration: this.artworkScrollOffset });
-        }
-        //console.log('resultsContainerBottom :: ' + resultsContainerBottom);
         this.scrollInProgress = false;
     }
 
     _onScroll = (event) => {
         if (!this.scrollInProgress) {
-            requestAnimationFrame(throttle(this.handleScroll, 1000))
+            requestAnimationFrame(this.handleScroll)
             this.scrollInProgress = true;
         }
     }
@@ -407,11 +400,8 @@ class Artwork extends Component {
         if (elem) {
             this.artworkRef = elem;
             const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
-            const artworkVScrollDuration = Math.ceil((artworkVScrollOffset / constants.VIEWPORT_HEIGHT) * 100) + 100;
 
             console.log('setArtworkRef >> artworkVScrollOffset == ', artworkVScrollOffset);
-
-            this.setState({ artworkVScrollOffset, artworkVScrollDuration })
             this.setState({ infoCardDuration: artworkVScrollOffset });
             console.log("setArtworkRef >> infoCardDuration = ", this.state.infoCardDuration);
         }
@@ -457,7 +447,7 @@ class Artwork extends Component {
         const { artwork, selectedLanguage } = this.state;
         return (
             <div className="container-fluid artwork-container" id="search-result" >
-                <div className="row" ref={this.refCallbackInfo} id="search-result-container">
+                <div className="row" ref={this.refCallbackInfo}>
                     <div className="artwork-top-bg">
                         <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" />
                     </div>
@@ -677,15 +667,18 @@ class Artwork extends Component {
      * Main render screen setup
      */
     renderResult = () => {
-        console.log('Artwork render >> Artwork Scene duration : ', this.state.infoCardDuration);
+        const extraOffset = (this.state.infoCardDuration > 0) ? 50 : 0;
+        const artworkOffset = this.state.infoCardDuration + this.contentOffset + extraOffset;
+        console.log('Artwork render >> Artwork Scene duration : ', this.state.infoCardDuration, this.contentOffset, extraOffset, artworkOffset);
         const { stories, showStory, emailCaptureAck } = this.state;
         const hasChildCards = showStory || !emailCaptureAck;
+
         return (
             <SectionWipesStyled hasChildCards={hasChildCards}>
                 <Controller refreshInterval={50}>
                     {this.renderTitleBar()}
 
-                    <Scene loglevel={0} pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={true} duration="0" offset={this.state.infoCardDuration + this.contentOffset} pinSettings={{ pushFollowers: true }}>
+                    <Scene loglevel={0} pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={true} duration="0" offset={artworkOffset} pinSettings={{ pushFollowers: true }}>
                         {(progress, event) => (
                             this.renderArtwork(progress)
                         )}
