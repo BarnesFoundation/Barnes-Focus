@@ -74,7 +74,7 @@ class Artwork extends Component {
             showEmailScreen: false,
             emailCaptured: false,
             emailCaptureAck: false,
-            bgLoaded: false,
+            imgLoaded: false,
             alsoInRoomResults: [],
             email: localStorage.getItem(constants.SNAP_USER_EMAIL) || '',
             snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 1,
@@ -264,18 +264,13 @@ class Artwork extends Component {
         }
     }
 
-    onBackgroundImageLoad = () => {
-        this.setState({ bgLoaded: true });
-    }
-
-
     onSelectInRoomArt = (aitrId) => {
         localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
         this.props.history.push({ pathname: `/artwork/${aitrId}` });
     }
 
     componentDidMount() {
-        //console.log('Artwork >> componentDidMount');
+        console.log('Artwork >> componentDidMount');
         this.scrollInProgress = false;
         this.t1 = new TimelineLite({ paused: true });
         // Register scroll listener
@@ -290,7 +285,11 @@ class Artwork extends Component {
     }
 
     componentDidUpdate() {
-
+        console.log('Artwork >> componentDidUpdate');
+        console.log('CSS height of parent container : ', $('#search-result-container').outerHeight(true));
+        if (this.infoCardRef) {
+            console.log('this.infoCardRef.getBoundingClientRect().height : ', this.infoCardRef.getBoundingClientRect().height);
+        }
     }
 
     /**
@@ -448,16 +447,7 @@ class Artwork extends Component {
     }
 
     onArtworkImgLoad = ({ target: img }) => {
-        this.artworkImgHeight = img.offsetHeight;
-        const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
-
-        console.log('onArtworkImgLoad >> artworkVScrollOffset == ', artworkVScrollOffset);
-
-        setTimeout(() => {
-            const offset = (artworkVScrollOffset > 0) ? artworkVScrollOffset - 55 : 0;
-            this.setState({ infoCardDuration: offset });
-            console.log("onArtworkImgLoad >> infoCardDuration = ", offset);
-        }, 0);
+        this.setState({ imgLoaded: true });
     }
 
     /**
@@ -467,7 +457,7 @@ class Artwork extends Component {
         const { artwork, selectedLanguage } = this.state;
         return (
             <div className="container-fluid artwork-container" id="search-result" >
-                <div className="row" ref={this.refCallbackInfo}>
+                <div className="row" ref={this.refCallbackInfo} id="search-result-container">
                     <div className="artwork-top-bg">
                         <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" />
                     </div>
@@ -478,7 +468,7 @@ class Artwork extends Component {
                                     <div className="card-header h1">Focused Artwork</div>
                                     <div className="card-img-result">
                                         <ProgressiveImage src={artwork.url} placeholder={artwork.url_low_quality}>
-                                            {src => <img src={src} alt="match_image" onLoad={this.onArtworkImgLoad} />}
+                                            {src => <img src={src} alt="match_image" />}
                                         </ProgressiveImage>
                                         {/* <img src={artwork.url} alt="match_image" /> */}
                                     </div>
@@ -622,7 +612,7 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene loglevel={0} indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index === 0) ? { spacerClass: 'scrollmagic-pin-spacer-pt', pushFollowers: false } : { spacerClass: 'scrollmagic-pin-spacer', pushFollowers: false }} duration={this.state.storyDurationsCurrent[index] * 4} offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset -100}>
+                <Scene loglevel={0} indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index === 0) ? { spacerClass: 'scrollmagic-pin-spacer-pt', pushFollowers: false } : { spacerClass: 'scrollmagic-pin-spacer', pushFollowers: false }} duration={this.state.storyDurationsCurrent[index] * 4} offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset - 100}>
                     {(progress, event) => (
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
                             <StoryItem
@@ -725,12 +715,12 @@ class Artwork extends Component {
         }
         return (
             <div>
-                {!this.state.bgLoaded &&
+                {!this.state.imgLoaded &&
                     <div style={{ visibility: `hidden` }}>
-                        <img className="card-img-top" src={this.state.artwork.bg_url} alt="match_image_background" onLoad={this.onBackgroundImageLoad} />
+                        <img className="card-img-result" src={this.state.artwork.url} alt="match_image" onLoad={this.onArtworkImgLoad} />
                     </div>
                 }
-                {this.state.bgLoaded && this.renderResult()}
+                {this.state.imgLoaded && this.renderResult()}
             </div>
         );
     }
