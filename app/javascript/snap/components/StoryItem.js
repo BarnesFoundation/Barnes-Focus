@@ -77,19 +77,19 @@ class StoryItem extends React.Component {
                         .fromTo(this.overlayRef, 1, { autoAlpha: 0.5, borderRadius: "50px 50px 0px 0px" }, { autoAlpha: 0, borderRadius: "0px 0px 0px 0px" })
                         .fromTo(this.titleRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
                         .fromTo(this.scrollCtaRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
-                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, timeScale: 0.01, y: '0px' })
-                        .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, timeScale: 0.01, ease: Linear.easeNone }, "-=0.1")
+                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
+                        .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
                 } else {
                     this.t2
                         .fromTo(this.overlayRef, 1, { autoAlpha: 0.5, borderRadius: "50px 50px 0px 0px" }, { autoAlpha: 0, borderRadius: "0px 0px 0px 0px" })
-                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, timeScale: 0.01, y: '0px' })
-                        .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, timeScale: 0.01, ease: Linear.easeNone }, "-=0.1")
+                        .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
+                        .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
                 }
 
             } else {
                 this.t2
-                    .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, timeScale: 0.01, y: '0px' })
-                    .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, timeScale: 0.01, ease: Linear.easeNone }, "-=0.1")
+                    .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
+                    .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, "-=0.1")
             }
 
 
@@ -202,10 +202,13 @@ class StoryItem extends React.Component {
                                         </div>
                                     }
                                     <div className="story-text" dangerouslySetInnerHTML={{ __html: story.long_paragraph.html }} />
-                                    <p className="story-footer">{story.detail.title}, {story.detail.displayDate}<br /> {story.detail.people}</p>
+                                    <div className="story-footer" style={{ paddingBottom: this.props.selectedLanguage.code === LANGUAGE_EN ? `250px` : 0 }}>
+                                        {story.detail.title}, {story.detail.displayDate}<br />
+                                        {story.detail.people}
+                                    </div>
                                     {
                                         this.props.selectedLanguage.code !== LANGUAGE_EN &&
-                                        <div className="google-translate-disclaimer"><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
+                                        <div className="google-translate-disclaimer" style={{ paddingBottom: `250px` }}><span>Translated with </span><img src={google_logo} alt="google_logo" /></div>
                                     }
                                 </div>
                             </div>
