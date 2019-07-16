@@ -80,7 +80,9 @@ class Api::SnapsController < Api::BaseController
   def find_stories_by_object_id
     session   = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
     lang_pref = session && !session.lang_pref.nil? ? session.lang_pref : 'en'
-    @story = StoryFetcher.new.find_by_object_id(params[:object_id].to_i, lang_pref)
+    @story = Rails.cache.fetch("stories-#{params[:object_id]}-#{lang_pref}-data", expires_in: 4.hours) do
+      StoryFetcher.new.find_by_object_id(params[:object_id].to_i, lang_pref)
+    end
 
     respond_to do | wants |
       wants.json do
@@ -177,7 +179,7 @@ private
 
       # Get the image information for the image id
       response[:data][:records] << get_image_information(image_id)
-      response[:data][:roomRecords] = get_similar_artworks(image_id)
+      response[:data][:roomRecords] = [] # method: `get_similar_artworks(image_id)` is replaced with stories in V3. Uncomment it, if Barnes need also in this room feature back
       response[:data][:show_story] = find_and_save_story_by?(image_id)
     end
     return response
@@ -195,7 +197,9 @@ private
 
       # Translate if needed
       if preferred_language.present?
-        image_info["shortDescription"] = translate_text(image_info["shortDescription"])
+        image_info["shortDescription"] = Rails.cache.fetch("artworks-#{image_id.to_s}-#{preferred_language}-data", expires_in: 4.hours) do
+          translate_text(image_info["shortDescription"])
+        end
       end
     end
     return image_info
