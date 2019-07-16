@@ -3,6 +3,8 @@ require 'net/http'
 require 'resolv-replace'
 
 class StoryFetcher
+  UNIQUE_SEPARATOR = "***"
+
   def initialize
     @endpoint = "https://api-useast.graphcms.com/v1/cjw53solj3odo01eh6l7trigw/master"
   end
@@ -146,18 +148,26 @@ class StoryFetcher
 
     content["story_title"] = preferred_lang == "en" ? story_attrs["storyTitle"] : SnapTranslator.translate_story_title(story_attrs["storyTitle"], preferred_lang)
     content["stories"] = Array.new
+    translatable_content = {}
 
     [1, 2, 3, 4, 5, 6].each do |i|
       next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
       object_id = "objectID#{i.to_s}"
 
-      short_para = preferred_lang == "en" ? story_attrs["shortParagraph"+i.to_s] : SnapTranslator.translate_story_content(story_attrs["shortParagraph"+i.to_s]["html"], preferred_lang)
-      long_para = preferred_lang == "en" ? story_attrs["longParagraph"+i.to_s] : SnapTranslator.translate_story_content(story_attrs["longParagraph"+i.to_s]["html"], preferred_lang)
+      img_id = ("objectID1" == object_id && searched_object_id == story_attrs[object_id]) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s]
+
+      if ENV['STORY_PARAGRAPH_TO_USE'].present? && ENV['STORY_PARAGRAPH_TO_USE'] == 'short' && preferred_lang != "en"
+        translatable_content[img_id] = "#{UNIQUE_SEPARATOR} #{story_attrs['shortParagraph'+i.to_s]['html']}"
+      end
+
+      if ENV['STORY_PARAGRAPH_TO_USE'].present? && ENV['STORY_PARAGRAPH_TO_USE'] == 'long' && preferred_lang != "en"
+        translatable_content[img_id] =  "#{UNIQUE_SEPARATOR} #{story_attrs['longParagraph'+i.to_s]['html']}"
+      end
 
       h = {
-        "image_id"        => ("objectID1" == object_id && searched_object_id == story_attrs[object_id]) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s],
-        "short_paragraph" => short_para,
-        "long_paragraph"  => long_para,
+        "image_id"        => img_id,
+        "short_paragraph" => story_attrs["shortParagraph"+i.to_s],
+        "long_paragraph"  => story_attrs["longParagraph"+i.to_s],
         "detail"          => nil
       }
 
@@ -166,9 +176,24 @@ class StoryFetcher
 
     arts = EsCachedRecord.fetch_all(content["stories"].map{|s| s["image_id"]})
 
+    if !translatable_content.empty?
+      translatable_text = translatable_content.values.join(" ")
+      translatable_text = SnapTranslator.translate_story_content(translatable_text, preferred_lang)["html"]
+      translatable_text = translatable_text.split("#{UNIQUE_SEPARATOR}").drop(1).map(&:lstrip)
+
+      keys = translatable_content.keys
+
+      translatable_content = Hash[keys.zip(translatable_text)]
+    end
+
     content["stories"].each do |story|
       arts.map {|art|
         story["detail"] = art if story["image_id"].to_s == art["id"].to_s
+      }
+
+      translatable_content.each { |img_id, content|
+        story["short_paragraph"] = {"html" => content} if story["image_id"].to_s == img_id.to_s && ENV['STORY_PARAGRAPH_TO_USE'].present? && ENV['STORY_PARAGRAPH_TO_USE'] == 'short'
+        story["long_paragraph"] = {"html" => content} if story["image_id"].to_s == img_id.to_s && ENV['STORY_PARAGRAPH_TO_USE'].present? && ENV['STORY_PARAGRAPH_TO_USE'] == 'long'
       }
     end
 
