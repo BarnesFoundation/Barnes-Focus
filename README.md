@@ -39,6 +39,11 @@ And then proceed with the deployment
 * Note: You must have a PSQL server running for the above rake commands to run successfully
 * Start server in development mode: `rails server`
 
+## About updating ES table
+If you're working locally/on localhost, from postman or any other ARC client, you'll have to make a POST request to this url: `POST: http://localhost:3000/jobs/update_es_cache` (make sure server is running)
+
+This will populate `es_cached_records` table with the artworks.
+
 ## About rake db:seed
 In V1, for in-app translations, we used to run `rake db:seed` command followed by `rake db:migrate` (on new env). This did few things for us:
  - Populate `translations` database table
@@ -50,6 +55,7 @@ In case, if your `translations` table contains data from `rake db:seed` command.
  - From rails console: `Translation.delete_all`
  - Run this rake task :
   - `bundle exec rake data:add_translations` OR `rake data:add_translations`
+ - Until we merge other newly added translations from V3 to this method, you can run/execute above commands (from Translations update) in the same sequence after `add_translations` command.
 
 ### How I can handle an update in translations table?
 Updates are very easy and can be done from Admin panel directly. For e.g., if a text of translation changes from 'A' to 'B', then you can directly go to edit that record inside Admin panel -> do the changes and save it.
