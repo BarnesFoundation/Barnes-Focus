@@ -57,7 +57,7 @@ class EmailForm extends Component {
 
     _onScroll = (event) => {
         if (!this.scrollInProgress) {
-            requestAnimationFrame(throttle(this.handleScroll, 1000))
+            requestAnimationFrame(throttle(this.handleScroll, 100))
             this.scrollInProgress = true;
         }
     }
