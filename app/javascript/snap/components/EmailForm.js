@@ -101,6 +101,9 @@ class EmailForm extends Component {
   setEmailRef = elem => {
     if (elem) {
       this.emailRef = elem;
+      console.log('Email Form height = ' + this.emailRef.getBoundingClientRect().height);
+      const emailFormHeight = this.emailRef.getBoundingClientRect().height;
+      this.props.getSize(emailFormHeight);
     }
   };
 
@@ -196,6 +199,7 @@ class EmailForm extends Component {
     }
     return (
       <div
+        id="email-form"
         className="email-container"
         style={this.props.withStory ? withStoryStyles : {}}
         ref={this.setEmailRef}
