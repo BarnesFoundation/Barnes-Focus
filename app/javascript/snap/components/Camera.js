@@ -1,22 +1,16 @@
+import axios from "axios";
+import scan_button from "images/scan-button.svg";
 import React, { Component } from "react";
+import ReactCSSTransitionGroup from "react-addons-css-transition-group";
+import { isIOS } from "react-device-detect";
+import posed from "react-pose";
 import { withRouter } from "react-router-dom";
 import { compose } from "redux";
-import posed from "react-pose";
+import { SearchRequestService } from "../services/SearchRequestService";
+import { cropPhoto } from "./CameraHelper";
+import * as constants from "./Constants";
 import withOrientation from "./withOrientation";
 import withTranslation from "./withTranslation";
-import scan_button from "images/scan-button.svg";
-import axios from "axios";
-import * as constants from "./Constants";
-import {
-  isIOS,
-  isAndroid,
-  isSafari,
-  isFirefox,
-  isChrome
-} from "react-device-detect";
-import { cropPhoto } from "./CameraHelper";
-import { SearchRequestService } from "../services/SearchRequestService";
-import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
 const Container = posed.div({
   enter: { opacity: 1 },

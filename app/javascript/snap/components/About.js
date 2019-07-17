@@ -1,13 +1,9 @@
+import close_icon from "images/cross.svg";
+import kf_logo from "images/knight-foundation-logo.svg";
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-
 import { compose } from "redux";
 import withOrientation from "./withOrientation";
-
-import home_background from "images/barnes-v2-landing.png";
-import kf_logo from "images/knight-foundation-logo.svg";
-import close_icon from "images/cross.svg";
-import * as constants from "./Constants";
 
 class AboutComponent extends Component {
   constructor(props) {

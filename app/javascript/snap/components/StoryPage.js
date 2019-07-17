@@ -1,17 +1,15 @@
+import { filter } from "lodash";
+import queryString from "query-string";
 import React, { Component } from "react";
-import StoryItem from "../components/StoryItem";
 import { withRouter } from "react-router";
+import { Controller, Scene } from "react-scrollmagic";
 import { compose } from "redux";
+import styled from "styled-components";
+import StoryItem from "../components/StoryItem";
+import { SearchRequestService } from "../services/SearchRequestService";
+import * as constants from "./Constants";
 import withOrientation from "./withOrientation";
 import withTranslation from "./withTranslation";
-import { SearchRequestService } from "../services/SearchRequestService";
-import { Controller, Scene } from "react-scrollmagic";
-import { Tween, Timeline } from "react-gsap";
-import * as constants from "./Constants";
-import { filter, debounce } from "lodash";
-import styled from "styled-components";
-import barnes_logo from "images/barnes_email_logo_1x.png";
-import queryString from "query-string";
 
 const SectionWipesStyled = styled.div`
   overflow: hidden;

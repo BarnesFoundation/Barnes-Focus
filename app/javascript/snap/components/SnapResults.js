@@ -1,32 +1,23 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router";
-import { compose } from "redux";
-import posed from "react-pose";
-import {
-  isIOS,
-  isAndroid,
-  isSafari,
-  isFirefox,
-  isChrome
-} from "react-device-detect";
-
-import * as constants from "./Constants";
-import withOrientation from "./withOrientation";
-import withTranslation from "./withTranslation";
-import share from "images/share.svg";
-import scan_button from "images/scan-button.svg";
 import check_email_icon from "images/check_email.svg";
-import InRoomSlider from "./Slider";
-import LanguageDropdown from "./LanguageDropdown";
-import EmailForm from "./EmailForm";
-import Footer from "./Footer";
-import About from "./About";
-import { Popover, PopoverBody } from "reactstrap";
-
 import close_icon from "images/cross.svg";
 import google_logo from "images/google_translate.svg";
-import { SearchRequestService } from "../services/SearchRequestService";
+import scan_button from "images/scan-button.svg";
+import share from "images/share.svg";
+import React, { Component } from "react";
+import posed from "react-pose";
 import ProgressiveImage from "react-progressive-image";
+import { withRouter } from "react-router";
+import { Popover, PopoverBody } from "reactstrap";
+import { compose } from "redux";
+import { SearchRequestService } from "../services/SearchRequestService";
+import About from "./About";
+import * as constants from "./Constants";
+import EmailForm from "./EmailForm";
+import Footer from "./Footer";
+import LanguageDropdown from "./LanguageDropdown";
+import InRoomSlider from "./Slider";
+import withOrientation from "./withOrientation";
+import withTranslation from "./withTranslation";
 
 /** React pose animation config */
 const Child = posed.div({
@@ -766,59 +757,57 @@ class SnapResults extends Component {
           </div>
         </Container>
 
-        {this.state.showEmailScreen &&
-          !this.state.emailCaptured && (
-            <div>
-              <PopupAnimation
-                className="email-popup-screen"
-                initialPose="exit"
-                pose="enter"
+        {this.state.showEmailScreen && !this.state.emailCaptured && (
+          <div>
+            <PopupAnimation
+              className="email-popup-screen"
+              initialPose="exit"
+              pose="enter"
+            >
+              <EmailForm
+                isEmailScreen={true}
+                onSubmitEmail={this.onSubmitEmail}
+                getTranslation={this.props.getTranslation}
+              />
+              <div
+                className="btn-close"
+                onClick={this.closeWindow}
+                style={{
+                  position: `absolute`,
+                  top: `${emailScreenCloseBtnTop}`
+                }}
               >
-                <EmailForm
-                  isEmailScreen={true}
-                  onSubmitEmail={this.onSubmitEmail}
-                  getTranslation={this.props.getTranslation}
-                />
-                <div
-                  className="btn-close"
-                  onClick={this.closeWindow}
-                  style={{
-                    position: `absolute`,
-                    top: `${emailScreenCloseBtnTop}`
+                <img
+                  src={close_icon}
+                  alt="close"
+                  onClick={() => {
+                    this._closeEmailPopupScreen();
                   }}
-                >
-                  <img
-                    src={close_icon}
-                    alt="close"
-                    onClick={() => {
-                      this._closeEmailPopupScreen();
-                    }}
-                  />
-                </div>
-              </PopupAnimation>
-            </div>
-          )}
+                />
+              </div>
+            </PopupAnimation>
+          </div>
+        )}
 
-        {this.state.emailCaptured &&
-          !this.state.emailCaptureAck && (
-            <div>
-              <PopupAnimation
-                className="email-success-screen"
-                initialPose="exit"
-                pose="enter"
+        {this.state.emailCaptured && !this.state.emailCaptureAck && (
+          <div>
+            <PopupAnimation
+              className="email-success-screen"
+              initialPose="exit"
+              pose="enter"
+            >
+              <div
+                className="success-icon"
+                onClick={() => this._emailSuccessAcknowledged()}
               >
-                <div
-                  className="success-icon"
-                  onClick={() => this._emailSuccessAcknowledged()}
-                >
-                  <img src={check_email_icon} alt="email_success" />
-                </div>
-                <div className="success-message">
-                  {this.props.getTranslation("Bookmark_capture", "text_4")}
-                </div>
-              </PopupAnimation>
-            </div>
-          )}
+                <img src={check_email_icon} alt="email_success" />
+              </div>
+              <div className="success-message">
+                {this.props.getTranslation("Bookmark_capture", "text_4")}
+              </div>
+            </PopupAnimation>
+          </div>
+        )}
 
         {this.state.showAboutScreen && (
           <div>

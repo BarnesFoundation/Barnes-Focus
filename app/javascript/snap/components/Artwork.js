@@ -1,44 +1,23 @@
+import { TimelineLite } from "gsap/TweenMax";
+import google_logo from "images/google_translate.svg";
+import scan_button from "images/scan-button.svg";
+import share from "images/share.svg";
+import { filter } from "lodash";
 import React, { Component } from "react";
+import { isTablet } from "react-device-detect";
+import ProgressiveImage from "react-progressive-image";
 import { withRouter } from "react-router";
+import { Controller, Scene } from "react-scrollmagic";
+import { Popover, PopoverBody } from "reactstrap";
 import { compose } from "redux";
-import {
-  isIOS,
-  isAndroid,
-  isSafari,
-  isFirefox,
-  isChrome
-} from "react-device-detect";
-
+import styled, { css } from "styled-components";
+import StoryItem from "../components/StoryItem";
+import { SearchRequestService } from "../services/SearchRequestService";
 import * as constants from "./Constants";
+import EmailForm from "./EmailForm";
+import LanguageDropdown from "./LanguageDropdown";
 import withOrientation from "./withOrientation";
 import withTranslation from "./withTranslation";
-import share from "images/share.svg";
-import posed from "react-pose";
-
-import LanguageDropdown from "./LanguageDropdown";
-import EmailForm from "./EmailForm";
-import { Popover, PopoverBody } from "reactstrap";
-
-import close_icon from "images/cross.svg";
-import google_logo from "images/google_translate.svg";
-import { SearchRequestService } from "../services/SearchRequestService";
-import ProgressiveImage from "react-progressive-image";
-import { Controller, Scene } from "react-scrollmagic";
-import styled, { css } from "styled-components";
-import { filter, throttle, debounce } from "lodash";
-import StoryItem from "../components/StoryItem";
-import scan_button from "images/scan-button.svg";
-import { Transition, animated } from "react-spring/renderprops";
-import { Tween, Timeline } from "react-gsap";
-import {
-  TweenMax,
-  TimelineLite,
-  Power2,
-  Linear,
-  Elastic,
-  CSSPlugin
-} from "gsap/TweenMax";
-import { isTablet } from "react-device-detect";
 
 /**
  * withRouter HOC provides props with location, history and match objects
