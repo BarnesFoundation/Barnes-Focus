@@ -61,15 +61,12 @@ class StoryItem extends React.Component {
       offset =
         contentHeight > VIEWPORT_HEIGHT
           ? contentHeight - VIEWPORT_HEIGHT + 100
-          : 30;
+          : 0;
       if (offset < 0) offset = 0;
       // console.log("SCROLL OFFSET", offset);
 
-      // if(this.state.scrollOffset < offset) {
       this.props.getSize(offset, this.props.storyIndex);
-      this.setState({ scrollOffset: offset });
-      // }
-      this.setState({ heightUpdated: true });
+      this.setState({ heightUpdated: true, scrollOffset: offset });
 
       // console.log("Setting TWEEN OFFSET", offset, contentHeight, h);
       if (this.props.storyIndex === 0) {
@@ -138,7 +135,7 @@ class StoryItem extends React.Component {
       }
     }
 
-    if (this.t2) this.t2.progress(this.props.progress * 6);
+    if (this.t2) this.t2.progress(this.props.progress * 4);
   }
 
   getArtUrl = () => {

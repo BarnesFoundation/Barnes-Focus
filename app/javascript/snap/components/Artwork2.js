@@ -56,7 +56,7 @@ class Artwork extends Component {
         this.sr = new SearchRequestService();
         this.controller = new ScrollMagic.Controller();
         this.artworkScene = null;
-        this.storyScene = null;
+        this.emailScene = null;
 
         this.contentOffset = 100;
 
@@ -404,7 +404,7 @@ class Artwork extends Component {
             duration: 0, // scroll distance
             offset: (artworkVScrollOffset + 100) // start this scene after scrolling for 50px
         })
-            .setPin("#search-result") // pins the element for the the scene's duration
+            .setPin("#search-result", { pushFollowers: false }) // pins the element for the the scene's duration
             .addTo(this.controller);
     }
 
@@ -430,6 +430,17 @@ class Artwork extends Component {
             durationCurArr[index] = (index == 0) ? 0 : height;
             this.setState({ "storyDurationsCurrent": durationCurArr });
         }
+    }
+
+    onEmailHeightReady = (height) => {
+        this.emailScene = new ScrollMagic.Scene({
+            triggerElement: "#email-form",
+            triggerHook: "onEnter",
+            duration: 0, // scroll distance
+            offset: height // start this scene after scrolling for 50px
+        })
+            .setPin("#email-form") // pins the element for the the scene's duration
+            .addTo(this.controller);
     }
 
     storySceneCallback = (showTitle) => {
@@ -578,8 +589,8 @@ class Artwork extends Component {
             );
         } else {
             return (
-                <div id="email-panel" ref={this.emailCardRef} className="panel panel-email" >
-                    <EmailForm withStory={showStory} isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} />
+                <div id="email-panel" ref={this.emailCardRef} className="panel-email" >
+                    <EmailForm withStory={showStory} isEmailScreen={false} onSubmitEmail={this.onSubmitEmail} getTranslation={this.props.getTranslation} getSize={this.onEmailHeightReady} />
                 </div>
             );
         }
@@ -652,7 +663,7 @@ class Artwork extends Component {
         return (
             stories.map((story, index) =>
 
-                <Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? this.state.storyDurationsCurrent[index - 1] / 4 - 50 : this.state.infoCardDuration + this.contentOffset} offset="0" pinSettings={{ pushFollowers: true }}>
+                <Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={true} duration={(index > 0) ? this.state.storyDurationsCurrent[index - 1] / 4 - 50 : this.state.infoCardDuration + this.contentOffset} offset="0" pinSettings={{ pushFollowers: true }}>
                     <div></div>
                 </Scene>
             )
@@ -693,23 +704,13 @@ class Artwork extends Component {
 
                     {this.renderTitleBar()}
 
-                    {/* <Scene loglevel={0} pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={true} duration="0" offset={artworkOffset} pinSettings={{ pushFollowers: true }}>
-                        {(progress, event) => (
-                            this.renderArtwork()
-                        )}
-                    </Scene> */}
-
                     {this.renderStory()}
 
                     {this.renderPinsEnter()}
 
-                    {/*this.renderPinsLeave()*/}
-
-                    <Scene loglevel={0} indicators={false} pin pinSettings={{ pushFollowers: false }} triggerHook="onCenter" duration="0" offset={(showStory) ? 0 : 0}>
-                        {this.renderEmailScreen()}
-                    </Scene>
-
                 </Controller>
+
+                {this.renderEmailScreen()}
 
             </SectionWipesStyled >
 
