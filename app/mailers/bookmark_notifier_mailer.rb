@@ -9,6 +9,6 @@ class BookmarkNotifierMailer < ApplicationMailer
     @stories = stories
     @lang = lang
     @translations = Translation.find_by_header_text_and_language 'Email', @lang
-    mail(to: email, subject: "Stories you've unlocked at the Barnes yesterday")
+    mail(to: email, subject: "Stories you've unlocked at the Barnes today!")
   end
 end

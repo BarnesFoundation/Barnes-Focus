@@ -28,10 +28,11 @@ results = ActiveRecord::Base.connection.execute(sql)
 # Export query results to CSV
 require 'csv'
 
-
-CSV.open("public/scannedSessions.csv", "wb") do |csv|
-	csv << results.first.keys
-    results.each do |row|
-        csv << row.values
-    end
+if (results.first.present?)
+	CSV.open("public/scannedSessions.csv", "wb") do |csv|
+		csv << results.first.keys
+		results.each do |row|
+			csv << row.values
+		end
+	end
 end

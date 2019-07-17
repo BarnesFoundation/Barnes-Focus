@@ -1,8 +1,8 @@
 // @flow
-import React, { Component } from 'react';
-import styled from 'styled-components';
-import { Controller, Scene } from 'react-scrollmagic';
-import { Tween, Timeline } from 'react-gsap';
+import React from "react";
+import { Timeline, Tween } from "react-gsap";
+import { Controller, Scene } from "react-scrollmagic";
+import styled from "styled-components";
 
 const SectionWipesStyled = styled.div`
   overflow: hidden;
@@ -11,7 +11,7 @@ const SectionWipesStyled = styled.div`
     width: 100vw;
     text-align: center;
   }
-  
+
   .panel span {
     position: relative;
     display: block;
@@ -24,43 +24,40 @@ const SectionWipesStyled = styled.div`
     margin: 0;
     padding: 50px;
   }
-  
+
   .panel.blue {
     background-color: #3883d8;
   }
-  
+
   .panel.turqoise {
     background-color: #38ced7;
   }
-  
+
   .panel.green {
     background-color: #22d659;
     margin-bottom: 1000px;
   }
-  
+
   .panel.bordeaux {
     background-color: #953543;
   }
 `;
 
 const tweenProps = {
-  ease: 'Back.easeInOut',
+  ease: "Back.easeInOut",
   from: {
     opacity: 0,
-    xPercent: -100,
+    xPercent: -100
   },
   to: {
     opacity: 1,
-    xPercent: 0,
+    xPercent: 0
   }
 };
 
 const FadeInTimeline = ({ progress }) => {
   return (
-    <Timeline
-      totalProgress={progress * 2}
-      paused
-    >
+    <Timeline totalProgress={progress * 2} paused>
       <Tween {...tweenProps}>
         <h1>Fade 1</h1>
       </Tween>
@@ -79,22 +76,28 @@ const FadeInTimeline = ({ progress }) => {
 
 const SectionWipes = () => (
   <SectionWipesStyled>
-    <Controller globalSceneOptions={{ triggerHook: 'onLeave' }}>
+    <Controller globalSceneOptions={{ triggerHook: "onLeave" }}>
       <Scene pin>
-        <div className="panel blue"><span>Panel</span></div>
+        <div className="panel blue">
+          <span>Panel</span>
+        </div>
       </Scene>
       <Scene pin>
-        <div className="panel turqoise"><span>Panel</span></div>
+        <div className="panel turqoise">
+          <span>Panel</span>
+        </div>
       </Scene>
       <Scene pin pinSettings={{ pushFollowers: false }} duration="2000">
-        {(progress) => (
+        {progress => (
           <div className="panel green">
             <FadeInTimeline progress={progress} />
           </div>
         )}
       </Scene>
       <Scene pin>
-        <div className="panel bordeaux"><span>Panel</span></div>
+        <div className="panel bordeaux">
+          <span>Panel</span>
+        </div>
       </Scene>
     </Controller>
   </SectionWipesStyled>

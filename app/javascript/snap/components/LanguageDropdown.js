@@ -1,80 +1,85 @@
-import React, { Component } from 'react';
-import dropdown_icon from 'images/dropdown.svg';
-import dropup_icon from 'images/dropup.svg';
-import check from 'images/check.svg';
-import up_gray from 'images/up_gray_1x.png';
-import up_white from 'images/up_wht_1x.png';
-import down_gray from 'images/down_gray_1x.png';
-import down_white from 'images/down_wht_1x.png';
+import check from "images/check.svg";
+import down_gray from "images/down_gray_1x.png";
+import down_white from "images/down_wht_1x.png";
+import up_gray from "images/up_gray_1x.png";
+import up_white from "images/up_wht_1x.png";
+import React, { Component } from "react";
 
 /**
  *
-*/
-const DROP_UP = 'UP';
-const DROP_DOWN = 'DOWN';
+ */
+const DROP_UP = "UP";
+const DROP_DOWN = "DOWN";
 
 class LanguageDropdown extends Component {
+  constructor(props) {
+    super(props);
 
-    constructor(props) {
-        super(props);
+    this.state = {
+      listVisible: false
+    };
+  }
 
-        this.state = {
-            listVisible: false
-        }
+  selectItem = item => {
+    this.props.onSelectLanguage(item);
+  };
 
+  show = () => {
+    this.setState({ listVisible: true });
+    document.addEventListener("click", this.hide);
+  };
+
+  hide = () => {
+    this.setState({ listVisible: false });
+    document.removeEventListener("click", this.hide);
+  };
+
+  getDropdownIcon = dir => {
+    if (this.props.isStoryItemDropDown) {
+      return dir === DROP_UP ? up_white : down_white;
+    } else {
+      return dir === DROP_UP ? up_gray : down_gray;
     }
+  };
 
-    selectItem = (item) => {
-        this.props.onSelectLanguage(item);
-    }
+  getDropdownText = selected => {
+    return this.props.isStoryItemDropDown ? selected.code : selected.name;
+  };
 
-    show = () => {
-        this.setState({ listVisible: true });
-        document.addEventListener("click", this.hide);
-    }
-
-    hide = () => {
-        this.setState({ listVisible: false });
-        document.removeEventListener("click", this.hide);
-    }
-
-    getDropdownIcon = (dir) => {
-        if (this.props.isStoryItemDropDown) {
-            return (dir === DROP_UP) ? up_white : down_white;
-        } else {
-            return (dir === DROP_UP) ? up_gray : down_gray;
-        }
-    }
-
-    getDropdownText = (selected) => {
-        return (this.props.isStoryItemDropDown) ? selected.code : selected.name;
-    }
-
-    render = () => {
-        return (
-            <div className="dd-wrapper">
-                <div className="dd-header" onClick={this.show}>
-                    <div className="dd-header-title">
-                        {this.getDropdownText(this.props.selected)}
-                    </div>
-                    {this.state.listVisible
-                        ? <span><img src={this.getDropdownIcon(DROP_UP)} /></span>
-                        : <span><img src={this.getDropdownIcon(DROP_DOWN)} /></span>
-                    }
-                </div>
-                {this.state.listVisible && <ul className="dd-list">
-                    {this.props.langOptions.map((item) => (
-                        <li className="dd-list-item" key={item.code} onClick={() => this.selectItem(item)}>
-                            <span className="language-select-s">{item.name}</span>{item.selected && <img src={check} />}
-                        </li>
-                    ))}
-                </ul>}
-            </div>
-
-        );
-    }
-
-
+  render = () => {
+    return (
+      <div className="dd-wrapper">
+        <div className="dd-header" onClick={this.show}>
+          <div className="dd-header-title">
+            {this.getDropdownText(this.props.selected)}
+          </div>
+          {this.state.listVisible ? (
+            <span>
+              <img src={this.getDropdownIcon(DROP_UP)} />
+            </span>
+          ) : (
+            <span>
+              <img src={this.getDropdownIcon(DROP_DOWN)} />
+            </span>
+          )}
+        </div>
+        {this.state.listVisible && (
+          <ul className="dd-list">
+            {this.props.langOptions.map(item => (
+              <li
+                className="dd-list-item"
+                key={item.code}
+                onClick={() => this.selectItem(item)}
+              >
+                <span className="language-select-s">{item.name}</span>
+                {item.selected && <img src={check} />}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
 }
 
 export default LanguageDropdown;
