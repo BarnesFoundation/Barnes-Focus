@@ -450,6 +450,10 @@ class Artwork extends Component {
         this.setState({ imgLoaded: true });
     }
 
+    handleScan = () => {
+        this.props.history.push({ pathname: "/scan" });
+    };
+
     /**
      * Renders the focused artwork card.
      */
@@ -713,13 +717,13 @@ class Artwork extends Component {
     }
 
     render() {
-
-        if (!this.state.artwork) {
+        const { artwork, imgLoaded } = this.state;
+        if (!artwork) {
             return null;
         }
         return (
             <div>
-                {!this.state.imgLoaded &&
+                {!imgLoaded &&
                     <div style={{ visibility: `hidden` }}>
                         <img className="card-img-result" src={this.state.artwork.url} alt="match_image" onLoad={this.onArtworkImgLoad} />
                     </div>
