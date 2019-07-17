@@ -96,45 +96,49 @@ class JobsController < ApplicationController
         data                  = Hash.new
         data[mail]            = Array.new
         latest_bookmark_entry = story_in_bookmark.first
+        time_in_seconds       = ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].present? ? (ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].to_i * 2) : 21600
 
-        language  = latest_bookmark_entry.language
-        language  = language || 'en'
-        language  = language.downcase
-        stories   = Array.new
+        if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
+          language  = latest_bookmark_entry.language
+          language  = language || 'en'
+          language  = language.downcase
+          stories   = Array.new
 
-        story_in_bookmark.each { | obj |
-          next if data[mail].include?(obj.image_id)
+          story_in_bookmark.each { | obj |
+            next if data[mail].include?(obj.image_id)
 
-          response = StoryFetcher.new.find_by_object_id(obj.image_id, language)
-          next if response.nil?
+            response = StoryFetcher.new.find_by_object_id(obj.image_id, language)
+            next if response.nil?
 
-          story = Story.find_by(title: response[:content]["story_title"])
-          story = Story.create(title: response[:content]["story_title"]) if story.nil?
+            story = Story.find_by(title: response[:content]["story_title"])
+            story = Story.create(title: response[:content]["story_title"]) if story.nil?
 
-          host = Rails.env.development? ? 'http://localhost:3000' : ENV['ASSET_HOST']
+            host = Rails.env.development? ? 'http://localhost:3000' : ENV['ASSET_HOST']
 
-          h = {
-            total: response[:total],
-            unique_identifier: response[:unique_identifier],
-            #artwork_info: EsCachedRecord.search(obj.image_id),
-            content: response[:content],
-            translated_title: language == 'en' ? response[:content]["story_title"] : SnapTranslator.translate_story_title(response[:content]["story_title"], language),
-            link: "#{host}/story/#{story.slug}"
+            h = {
+              total: response[:total],
+              unique_identifier: response[:unique_identifier],
+              #artwork_info: EsCachedRecord.search(obj.image_id),
+              content: response[:content],
+              translated_title: language == 'en' ? response[:content]["story_title"] : SnapTranslator.translate_story_title(response[:content]["story_title"], language),
+              link: "#{host}/story/#{story.slug}"
+            }
+            stories.push h
+            data[mail].push obj.image_id
           }
-          stories.push h
-          data[mail].push obj.image_id
-        }
 
-        begin
-          unless mail.blank?
-            BookmarkNotifierMailer.send_stories_email(mail, stories, language).deliver_now
-            story_in_bookmark.each {|b| b.update_attributes(story_mail_sent: true)}
+          begin
+            unless mail.blank?
+              BookmarkNotifierMailer.send_stories_email(mail, stories, language).deliver_now
+              story_in_bookmark.each {|b| b.update_attributes(story_mail_sent: true)}
+            end
+          rescue Exception => ex
+            p "Unable to send email due to #{ex.to_s}"
+            p ex.backtrace.join("\n\t")
           end
-        rescue Exception => ex
-          p "Unable to send email due to #{ex.to_s}"
-          p ex.backtrace.join("\n\t")
         end
       end
+      p 'done sending stories emails'
     end
 
     head :ok, content_type: "text/html"
