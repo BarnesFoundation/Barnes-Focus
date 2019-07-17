@@ -156,12 +156,26 @@ class Artwork extends Component {
 
         let imageId = (this.state.result) ? this.state.result.data.records[0].id : this.props.match.params.imageId;
         const selectedLang = await this.getSelectedLanguage();
-        const { stories, storyId, storyTitle } = await this.setupStory(imageId);
         const emailCaptured = localStorage.getItem(constants.SNAP_USER_EMAIL) !== null;
+
+        const durationCurArr = [];
+        const durationNextArr = [];
+        const storyPositionArr = [];
+        const offsetArr = [];
+        const durDefault = 300;
 
         if (!this.state.result) {
             const artworkInfo = await this.sr.getArtworkInformation(imageId);
+            const { stories, storyId, storyTitle } = await this.setupStory(imageId);
             const { artwork, roomRecords } = this.constructResultAndInRoomSlider(artworkInfo);
+
+            stories.forEach(story => {
+                durationCurArr.push(durDefault);
+                offsetArr.push(durDefault);
+                storyPositionArr.push(false);
+            })
+            durationNextArr.push(durDefault);
+
             this.setState({
                 selectedLanguage: selectedLang[0],
                 stories: stories,
@@ -172,11 +186,22 @@ class Artwork extends Component {
                 artwork: artwork,
                 roomRecords: roomRecords,
                 emailCaptured: emailCaptured,
-                emailCaptureAck: emailCaptured
+                emailCaptureAck: emailCaptured,
+                storyDurationsCurrent: durationCurArr,
+                storyOffsets: offsetArr
             });
 
         } else {
             const { artwork, roomRecords } = this.constructResultAndInRoomSlider(this.state.result);
+            const { stories, storyId, storyTitle } = await this.setupStory(imageId);
+
+            stories.forEach(story => {
+                durationCurArr.push(durDefault);
+                offsetArr.push(durDefault);
+                storyPositionArr.push(false);
+            })
+            durationNextArr.push(durDefault);
+
             this.setState({
                 selectedLanguage: selectedLang[0],
                 stories: stories,
@@ -186,25 +211,30 @@ class Artwork extends Component {
                 artwork: artwork,
                 roomRecords: roomRecords,
                 emailCaptured: emailCaptured,
-                emailCaptureAck: emailCaptured
+                emailCaptureAck: emailCaptured,
+                storyDurationsCurrent: durationCurArr,
+                storyOffsets: offsetArr
             });
 
         }
 
-        const durationCurArr = [];
-        const durationNextArr = [];
-        const storyPositionArr = [];
-        const offsetArr = [];
-        const durDefault = 300;
-        stories.forEach(story => {
-            durationCurArr.push(durDefault);
-            offsetArr.push(durDefault);
-            storyPositionArr.push(false);
-        })
-        durationNextArr.push(durDefault);
-        this.setState({ "storyDurationsCurrent": durationCurArr })
-        this.setState({ "storyOffsets": offsetArr })
+    }
 
+    componentDidUpdate(prevProps, prevState) {
+        console.log('Artwork >> componentDidUpdate');
+        if (!this.artworkRef) {
+            return;
+        }
+        if (prevState.selectedLanguage.code !== this.state.selectedLanguage.code) {
+            this.artworkScene.removePin(true);
+            const newOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
+            const offset = newOffset + 100;
+            console.log('Setting new offset to Artwork scene on componentDidUpdate: ', Math.ceil(this.artworkRef.getBoundingClientRect().height), offset);
+
+            this.artworkScene.offset(offset);
+            this.artworkScene.setPin('#search-result');
+            this.artworkScene.refresh();
+        }
     }
 
     getSelectedLanguage = async () => {
@@ -233,6 +263,12 @@ class Artwork extends Component {
 
     onSelectLanguage = async (lang) => {
         console.log('Selected lang changed in Artwork >> : ' + JSON.stringify(lang));
+        //scroll to top when language changes. This should help re-calculate correct offsets on language change.
+        window.scroll({
+            top: 0,
+            behavior: 'smooth'
+        });
+
         localStorage.setItem(constants.SNAP_LANGUAGE_PREFERENCE, lang.code);
         /** Save the user selected language in the server session and call the getArtworksInfo API again to refresh the page with translated result. */
         const languageUpdated = await this.sr.saveLanguagePreference(lang.code);
@@ -271,59 +307,6 @@ class Artwork extends Component {
     onSelectInRoomArt = (aitrId) => {
         localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
         this.props.history.push({ pathname: `/artwork/${aitrId}` });
-    }
-
-    componentDidMount() {
-        console.log('Artwork >> componentDidMount');
-        this.scrollInProgress = false;
-        this.t1 = new TimelineLite({ paused: true });
-        // Register scroll listener
-        window.addEventListener('scroll', this._onScroll, true);
-
-        // this.t2 = new TimelineLite({paused: true});
-    }
-
-    componentWillUnmount() {
-        // Un-register scroll listener
-        window.removeEventListener('scroll', this._onScroll);
-    }
-
-    componentDidUpdate() {
-        console.log('Artwork >> componentDidUpdate');
-        if (this.infoCardRef) {
-            console.log('this.infoCardRef.getBoundingClientRect().height : ', this.infoCardRef.getBoundingClientRect().height);
-        }
-    }
-
-    /**
-     * All the fancy scroll animation goes here.
-     */
-    handleScroll = () => {
-        if (!this.artworkRef || !this.shortDescContainer) {
-            this.scrollInProgress = false;
-            return;
-        }
-        const newOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);;
-        if (!this.artworkSceneRefreshed) {
-            const offset = newOffset + 100;
-            console.log('Setting new offset to Artwork scene : ', offset);
-            this.artworkScene.removePin();
-            this.artworkScene.offset(offset);
-            this.artworkScene.setPin('#search-result');
-            this.artworkScene.refresh();
-            this.artworkSceneRefreshed = true;
-        }
-
-
-
-        this.scrollInProgress = false;
-    }
-
-    _onScroll = (event) => {
-        if (!this.scrollInProgress) {
-            requestAnimationFrame(this.handleScroll)
-            this.scrollInProgress = true;
-        }
     }
 
     getFacebookShareUrl = () => {
@@ -412,23 +395,25 @@ class Artwork extends Component {
 
     }
 
+    setupArtworkScene = () => {
+        const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
+        console.log('setArtworkRef >> offset after setTimeout  == ', (artworkVScrollOffset + 100));
+        this.artworkScene = new ScrollMagic.Scene({
+            triggerElement: "#search-result",
+            triggerHook: "onLeave",
+            duration: 0, // scroll distance
+            offset: (artworkVScrollOffset + 100) // start this scene after scrolling for 50px
+        })
+            .setPin("#search-result") // pins the element for the the scene's duration
+            .addTo(this.controller);
+    }
+
     setArtworkRef = (elem) => {
         if (elem) {
             this.artworkRef = elem;
-            const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
-
-            console.log('setArtworkRef >> artworkVScrollOffset == ', artworkVScrollOffset);
-            //this.setState({ infoCardDuration: artworkVScrollOffset });
-            console.log("setArtworkRef >> infoCardDuration = ", this.state.infoCardDuration);
-
-            this.artworkScene = new ScrollMagic.Scene({
-                triggerElement: "#search-result",
-                triggerHook: "onLeave",
-                duration: 0, // scroll distance
-                offset: (artworkVScrollOffset + 100) // start this scene after scrolling for 50px
-            })
-                .setPin("#search-result") // pins the element for the the scene's duration
-                .addTo(this.controller);
+            setTimeout(() => {
+                this.setupArtworkScene();
+            }, 0);
         }
     }
 
@@ -692,9 +677,6 @@ class Artwork extends Component {
      * Main render screen setup
      */
     renderResult = () => {
-        const extraOffset = (this.state.infoCardDuration > 0) ? 50 : 0;
-        const artworkOffset = this.state.infoCardDuration + this.contentOffset + extraOffset;
-        console.log('Artwork render >> Artwork Scene duration : ', this.state.infoCardDuration, this.contentOffset, extraOffset, artworkOffset);
         const { stories, showStory, emailCaptureAck } = this.state;
         const hasChildCards = showStory || !emailCaptureAck;
 
@@ -704,6 +686,7 @@ class Artwork extends Component {
                 {this.renderArtwork()}
 
                 <Controller refreshInterval={50}>
+
                     {this.renderTitleBar()}
 
                     {/* <Scene loglevel={0} pin="#search-result" triggerElement="#search-result" triggerHook="onLeave" indicators={true} duration="0" offset={artworkOffset} pinSettings={{ pushFollowers: true }}>

@@ -57,11 +57,6 @@ class StoryItem extends React.Component {
     // console.log("Did Update Scene Status", this.props.sceneStatus)
     if (!this.state.heightUpdated) {
       var contentHeight = this.contentRef.getBoundingClientRect().height;
-      console.log(
-        "Story Item content height : ",
-        this.props.storyIndex,
-        contentHeight
-      );
       var offset;
       offset =
         contentHeight > VIEWPORT_HEIGHT
