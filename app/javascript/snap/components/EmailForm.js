@@ -1,13 +1,13 @@
+import scan_button from "images/scan-button.svg";
+import { throttle } from "lodash";
 import React, { Component } from "react";
 import { withRouter } from "react-router";
 import {
-  SNAP_USER_EMAIL,
   SNAP_LANGUAGE_PREFERENCE,
+  SNAP_USER_EMAIL,
   TOP_OFFSET,
   VIEWPORT_HEIGHT
 } from "./Constants";
-import scan_button from "images/scan-button.svg";
-import { debounce, throttle } from "lodash";
 
 const withStoryStyles = {
   backgroundColor: "#fff",

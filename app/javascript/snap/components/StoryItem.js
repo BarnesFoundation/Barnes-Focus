@@ -1,20 +1,10 @@
-import React from "react";
-import { animated, config } from "react-spring/renderprops";
-import LanguageDropdown from "../components/LanguageDropdown";
-import { throws } from "assert";
-import { Tween, Timeline } from "react-gsap";
-import {
-  TweenMax,
-  TimelineLite,
-  Power2,
-  Linear,
-  Elastic,
-  CSSPlugin
-} from "gsap/TweenMax";
-import google_logo from "images/google_translate.svg";
-import { LANGUAGE_EN, VIEWPORT_HEIGHT } from "./Constants";
+import { Linear, TimelineLite } from "gsap/TweenMax";
 import barnes_logo from "images/barnes_email_logo_1x.png";
+import google_logo from "images/google_translate.svg";
 import scroll_up from "images/up_wht_1x.png";
+import React from "react";
+import { Timeline, Tween } from "react-gsap";
+import { LANGUAGE_EN, VIEWPORT_HEIGHT } from "./Constants";
 
 class StoryItem extends React.Component {
   constructor(props) {
@@ -247,26 +237,25 @@ class StoryItem extends React.Component {
             )}
             <div className="content-mask">
               <div className="card-img-overlay">
-                {this.props.storyEmailPage &&
-                  this.props.storyIndex === 0 && (
-                    <div>
-                      <div className="intro" ref={this.refTitleCallback}>
-                        <div className="barnes-logo">
-                          <img src={barnes_logo} alt="barnes_logo" />
-                          <div className="story-name">{storyTitle}</div>
-                        </div>
-                      </div>
-                      <div
-                        className="scroll-cta"
-                        ref={this.refScrollTextCallback}
-                      >
-                        <div className="scroll-icon">
-                          <img src={scroll_up} alt="scroll" />
-                        </div>
-                        <div className="text">{`Scroll to Begin`}</div>
+                {this.props.storyEmailPage && this.props.storyIndex === 0 && (
+                  <div>
+                    <div className="intro" ref={this.refTitleCallback}>
+                      <div className="barnes-logo">
+                        <img src={barnes_logo} alt="barnes_logo" />
+                        <div className="story-name">{storyTitle}</div>
                       </div>
                     </div>
-                  )}
+                    <div
+                      className="scroll-cta"
+                      ref={this.refScrollTextCallback}
+                    >
+                      <div className="scroll-icon">
+                        <img src={scroll_up} alt="scroll" />
+                      </div>
+                      <div className="text">{`Scroll to Begin`}</div>
+                    </div>
+                  </div>
+                )}
                 <div className="scroll-text" ref={this.refContentCallback}>
                   {this.props.storyIndex === 0 &&
                     !this.props.storyEmailPage && (

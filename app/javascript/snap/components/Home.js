@@ -1,27 +1,16 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
-import { compose } from "redux";
-import { Textfit } from "react-textfit";
-
-import withOrientation from "./withOrientation";
-import withTranslation from "./withTranslation";
-
 import home_background from "images/barnes-v2-landing.png";
 import barnes_logo from "images/Barnes_logo.svg";
-import kf_logo from "images/knight-foundation-logo.svg";
 import close_icon from "images/cross.svg";
-
+import kf_logo from "images/knight-foundation-logo.svg";
+import React, { Component } from "react";
+import { isAndroid, isIOS, isSafari, osVersion } from "react-device-detect";
+import { withRouter } from "react-router-dom";
+import { Textfit } from "react-textfit";
+import { compose } from "redux";
 import * as constants from "./Constants";
-import {
-  isIOS,
-  isAndroid,
-  isSafari,
-  isFirefox,
-  isChrome,
-  osVersion
-} from "react-device-detect";
-
 import UnsupportedDialog from "./UnsupportedDialog";
+import withOrientation from "./withOrientation";
+import withTranslation from "./withTranslation";
 
 class HomeComponent extends Component {
   constructor(props) {
@@ -155,91 +144,82 @@ class HomeComponent extends Component {
           alt="home_background"
           style={{ width: screen.width, height: screen.height }}
         />
-        {this.state.userAtBarnes &&
-          !this.state.getUserMediaError && (
-            <div className="landing-screen">
+        {this.state.userAtBarnes && !this.state.getUserMediaError && (
+          <div className="landing-screen">
+            <img src={barnes_logo} alt="barnes_logo" className="logo-center" />
+            {/* <div className="user-loc-prompt">Are you at <br />the Barnes?</div> */}
+            <div className="user-loc-prompt">
+              {this.props.getTranslation("Welcome_screen", "text_1")} <br />
+              {this.props.getTranslation("Welcome_screen", "text_2")}
+            </div>
+            <div className="home-action">
+              <button className="action-btn" onClick={this.onSelectYes}>
+                <span className="action-text h2">
+                  <Textfit mode="single" max={25}>
+                    {this.props.getTranslation("Welcome_screen", "text_3")}
+                  </Textfit>
+                </span>
+              </button>
+              <button className="action-btn" onClick={this.onSelectNo}>
+                <span className="action-text h2">
+                  <Textfit mode="single" max={25}>
+                    {this.props.getTranslation("Welcome_screen", "text_4")}
+                  </Textfit>
+                </span>
+              </button>
+            </div>
+            <div className="kf-banner">
               <img
-                src={barnes_logo}
-                alt="barnes_logo"
-                className="logo-center"
+                src={kf_logo}
+                alt="knight_foundation_logo"
+                className="kf-logo"
               />
-              {/* <div className="user-loc-prompt">Are you at <br />the Barnes?</div> */}
-              <div className="user-loc-prompt">
-                {this.props.getTranslation("Welcome_screen", "text_1")} <br />
-                {this.props.getTranslation("Welcome_screen", "text_2")}
-              </div>
-              <div className="home-action">
-                <button className="action-btn" onClick={this.onSelectYes}>
-                  <span className="action-text h2">
-                    <Textfit mode="single" max={25}>
-                      {this.props.getTranslation("Welcome_screen", "text_3")}
-                    </Textfit>
-                  </span>
-                </button>
-                <button className="action-btn" onClick={this.onSelectNo}>
-                  <span className="action-text h2">
-                    <Textfit mode="single" max={25}>
-                      {this.props.getTranslation("Welcome_screen", "text_4")}
-                    </Textfit>
-                  </span>
-                </button>
-              </div>
-              <div className="kf-banner">
-                <img
-                  src={kf_logo}
-                  alt="knight_foundation_logo"
-                  className="kf-logo"
-                />
-                <div className="kf-text caption">
-                  {this.props.getTranslation("About", "text_2")}
-                </div>
+              <div className="kf-text caption">
+                {this.props.getTranslation("About", "text_2")}
               </div>
             </div>
-          )}
-        {!this.state.userAtBarnes &&
-          !this.state.getUserMediaError && (
-            <div>
-              <div className="app-usage-alert h2">
-                <div className="app-usage-msg">
-                  <span>
-                    {this.props.getTranslation("Visit_soon", "text_1")}
-                  </span>
-                  <span>
-                    {" "}
-                    {this.props.getTranslation("Visit_soon", "text_2")}
-                  </span>
-                </div>
-                <div className="visit-online-link" style={visitOnlineLinkStyle}>
-                  <a href="https://www.barnesfoundation.org/" target="_blank">
-                    {this.props.getTranslation("Visit_soon", "text_3")}
-                  </a>
-                </div>
+          </div>
+        )}
+        {!this.state.userAtBarnes && !this.state.getUserMediaError && (
+          <div>
+            <div className="app-usage-alert h2">
+              <div className="app-usage-msg">
+                <span>{this.props.getTranslation("Visit_soon", "text_1")}</span>
+                <span>
+                  {" "}
+                  {this.props.getTranslation("Visit_soon", "text_2")}
+                </span>
               </div>
-              <div className="btn-close" onClick={this.navigateBackToHome}>
-                <img src={close_icon} alt="close" />
+              <div className="visit-online-link" style={visitOnlineLinkStyle}>
+                <a href="https://www.barnesfoundation.org/" target="_blank">
+                  {this.props.getTranslation("Visit_soon", "text_3")}
+                </a>
               </div>
             </div>
-          )}
+            <div className="btn-close" onClick={this.navigateBackToHome}>
+              <img src={close_icon} alt="close" />
+            </div>
+          </div>
+        )}
 
-        {this.state.getUserMediaError &&
-          !this.state.userAtBarnes && (
-            <div>
-              <div className="app-usage-alert h2">
-                <div className="app-usage-msg">
-                  {isIOS && <span>{constants.GET_USER_MEDIA_ERROR_IOS}</span>}
-                  {isAndroid && (
-                    <span>{constants.GET_USER_MEDIA_ERROR_ANDROID}</span>
-                  )}
-                </div>
-              </div>
-              <div
-                className="btn-close"
-                onClick={this._onClickCloseUserMediaErrorScreen}
-              >
-                <img src={close_icon} alt="close" />
+        {this.state.getUserMediaError && !this.state.userAtBarnes && (
+          <div>
+            <div className="app-usage-alert h2">
+              <div className="app-usage-msg">
+                {isIOS && <span>{constants.GET_USER_MEDIA_ERROR_IOS}</span>}
+                {isAndroid && (
+                  <span>{constants.GET_USER_MEDIA_ERROR_ANDROID}</span>
+                )}
               </div>
             </div>
-          )}
+            <div
+              className="btn-close"
+              onClick={this._onClickCloseUserMediaErrorScreen}
+            >
+              <img src={close_icon} alt="close" />
+            </div>
+          </div>
+        )}
       </div>
     );
   }

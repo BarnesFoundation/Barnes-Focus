@@ -1,8 +1,8 @@
 // @flow
-import React, { Component } from "react";
-import styled from "styled-components";
+import React from "react";
+import { Timeline, Tween } from "react-gsap";
 import { Controller, Scene } from "react-scrollmagic";
-import { Tween, Timeline } from "react-gsap";
+import styled from "styled-components";
 
 const SectionWipesStyled = styled.div`
   overflow: hidden;
