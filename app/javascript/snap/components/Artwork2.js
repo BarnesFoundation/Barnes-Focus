@@ -57,6 +57,7 @@ class Artwork extends Component {
         this.controller = new ScrollMagic.Controller();
         this.artworkScene = null;
         this.emailScene = null;
+        this.emailSceneTrigger = null;
 
         this.contentOffset = 100;
 
@@ -95,6 +96,8 @@ class Artwork extends Component {
         this.artworkRef = null;
         this.infoCardRef = null
         this.emailCardRef = null;
+
+        this.artworkScrollOffset = 0;
 
     }
 
@@ -225,16 +228,32 @@ class Artwork extends Component {
         if (!this.artworkRef) {
             return;
         }
-        if (prevState.selectedLanguage.code !== this.state.selectedLanguage.code) {
-            this.artworkScene.removePin(true);
-            const newOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
-            const offset = newOffset + 100;
-            console.log('Setting new offset to Artwork scene on componentDidUpdate: ', Math.ceil(this.artworkRef.getBoundingClientRect().height), offset);
 
-            this.artworkScene.offset(offset);
-            this.artworkScene.setPin('#search-result');
-            this.artworkScene.refresh();
+        if (prevState.selectedLanguage.code !== this.state.selectedLanguage.code) {
+            const newOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
+            this.artworkScrollOffset = newOffset + 100;
+            console.log('Setting new offset to Artwork scene on componentDidUpdate: ', Math.ceil(this.artworkRef.getBoundingClientRect().height), this.artworkScrollOffset);
+            this.resetArtworkSceneSettings();
+
+            if (!this.state.showStory) {
+                this.resetEmailSceneTriggerSettings();
+            }
         }
+
+    }
+
+    resetArtworkSceneSettings = () => {
+        this.artworkScene.removePin(true);
+        this.artworkScene.offset(this.artworkScrollOffset);
+        this.artworkScene.setPin('#search-result');
+        this.artworkScene.refresh();
+    }
+
+    resetEmailSceneTriggerSettings = () => {
+        this.emailSceneTrigger.removePin();
+        this.emailSceneTrigger.duration(this.artworkScrollOffset - 100);
+        this.emailSceneTrigger.setPin('#email-trigger-enter');
+        this.emailSceneTrigger.refresh();
     }
 
     getSelectedLanguage = async () => {
@@ -397,14 +416,42 @@ class Artwork extends Component {
 
     setupArtworkScene = () => {
         const artworkVScrollOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
-        console.log('setArtworkRef >> offset after setTimeout  == ', (artworkVScrollOffset + 100));
+        this.artworkScrollOffset = artworkVScrollOffset + 100;
+        console.log('setArtworkRef >> offset after setTimeout  == ', this.artworkScrollOffset);
         this.artworkScene = new ScrollMagic.Scene({
             triggerElement: "#search-result",
             triggerHook: "onLeave",
             duration: 0, // scroll distance
-            offset: (artworkVScrollOffset + 100) // start this scene after scrolling for 50px
+            offset: this.artworkScrollOffset // start this scene after scrolling for 50px
         })
             .setPin("#search-result", { pushFollowers: false }) // pins the element for the the scene's duration
+            .addTo(this.controller);
+    }
+
+
+    setupEmailSceneOnEnter = () => {
+        this.emailSceneTrigger = new ScrollMagic.Scene({
+            triggerElement: "#email-trigger-enter",
+            triggerHook: "onEnter",
+            duration: (this.artworkScrollOffset - 100)
+        })
+            .setPin("#email-trigger-enter", { pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }) // pins the element for the the scene's duration
+            .on('leave', (event) => {
+                console.log(event.type);
+                this.emailSceneTrigger.removePin();
+                this.emailSceneTrigger.refresh();
+            })
+            .addTo(this.controller);
+    }
+
+    setupEmailScene = () => {
+        this.emailScene = new ScrollMagic.Scene({
+            triggerElement: "#email-form",
+            triggerHook: "onEnter",
+            duration: 0, // scroll distance
+            offset: this.emailHeight // start this scene after scrolling for 50px
+        })
+            .setPin("#email-form") // pins the element for the the scene's duration
             .addTo(this.controller);
     }
 
@@ -413,6 +460,12 @@ class Artwork extends Component {
             this.artworkRef = elem;
             setTimeout(() => {
                 this.setupArtworkScene();
+                if (!this.state.showStory) {
+                    this.setupEmailSceneOnEnter();
+                }
+                if (!this.state.emailCaptured) {
+                    this.setupEmailScene();
+                }
             }, 0);
         }
     }
@@ -433,14 +486,7 @@ class Artwork extends Component {
     }
 
     onEmailHeightReady = (height) => {
-        this.emailScene = new ScrollMagic.Scene({
-            triggerElement: "#email-form",
-            triggerHook: "onEnter",
-            duration: 0, // scroll distance
-            offset: height // start this scene after scrolling for 50px
-        })
-            .setPin("#email-form") // pins the element for the the scene's duration
-            .addTo(this.controller);
+        this.emailHeight = height;
     }
 
     storySceneCallback = (showTitle) => {
@@ -669,7 +715,6 @@ class Artwork extends Component {
             )
         );
     }
-
     /**
      * Renders the story cards if * showStory * flag is true.
      */
@@ -709,6 +754,9 @@ class Artwork extends Component {
                     {this.renderPinsEnter()}
 
                 </Controller>
+
+                {/** this is a placeholder element at the bottom of viewport to control email card enter animation when no stories are present */}
+                {<div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }}></div>}
 
                 {this.renderEmailScreen()}
 
