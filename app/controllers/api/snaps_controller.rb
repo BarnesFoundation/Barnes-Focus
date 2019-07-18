@@ -228,7 +228,7 @@ private
   def find_and_save_story_by?(image_id)
     session       = ActiveRecord::SessionStore::Session.find_by_session_id( request.session_options[:id] )
     session_blob  = !session.blob.is_a?(Hash) && session.blob == '{}' ? JSON.parse(session.blob) : session.blob
-    story         = StoryFetcher.new.has_story?(image_id)
+    story         = StoryFetcher.new.has_story?(image_id.to_i)
 
     return false if !story[:has_story]
 
