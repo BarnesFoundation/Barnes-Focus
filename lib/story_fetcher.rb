@@ -154,7 +154,7 @@ class StoryFetcher
       next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
       object_id = "objectID#{i.to_s}"
 
-      img_id = ("objectID1" == object_id && searched_object_id == story_attrs[object_id]) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s]
+      img_id = ("objectID1" == object_id && searched_object_id.to_s == story_attrs[object_id].to_s) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s]
 
       if ENV['STORY_PARAGRAPH_TO_USE'].present? && ENV['STORY_PARAGRAPH_TO_USE'] == 'short' && preferred_lang != "en"
         translatable_content[img_id] = "#{UNIQUE_SEPARATOR} #{story_attrs['shortParagraph'+i.to_s]['html']}"
