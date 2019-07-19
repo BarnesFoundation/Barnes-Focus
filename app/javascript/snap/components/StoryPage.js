@@ -123,12 +123,12 @@ class StoryPage extends Component {
         <Controller>
           {stories.map((story, index) => (
             <Scene
-              indicators={true}
+              indicators={false}
               key={`storyitem${index + 1}`}
               triggerHook="onLeave"
               pin
               pinSettings={{ pushFollowers: false }}
-              duration={`800`}
+              duration={`1000`}
               offset={0}
             >
               {(progress, event) => (
@@ -154,6 +154,16 @@ class StoryPage extends Component {
               )}
             </Scene>
           ))}
+          <Scene
+            loglevel={0}
+            key={`story-page-end`}
+            triggerHook="onEnter"
+            indicators={false}
+            duration={1000}
+            offset="0"
+          >
+            <div id={`story-card-end`} className={`story-page panel`} />
+          </Scene>
         </Controller>
       </SectionWipesStyled>
     );
