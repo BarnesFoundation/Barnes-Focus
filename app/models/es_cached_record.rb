@@ -73,7 +73,18 @@ class EsCachedRecord < ApplicationRecord
       art['art_url'] = Image.imgix_url(art['id'], art['imageSecret'])
     end
 
-    return arts
+    return arts if image_ids.size == arts.size
+
+    original_ids = arts.map { |art| art["id"].to_s }
+    ids_not_found = image_ids - original_ids
+
+    if ids_not_found.any?
+      ids_not_found.each do | art_id |
+        arts.push search(art_id)
+      end
+    end
+
+    return arts.compact
   end
 
   ## Retrieves the object data from elastic search for a provided image id

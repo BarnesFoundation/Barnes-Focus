@@ -8,7 +8,9 @@ class Api::TranslationsController < Api::BaseController
       if session
         language = session.lang_pref ? session.lang_pref.downcase : 'en'
 
-        @translations = Translation.search(language)
+        @translations = Rails.cache.fetch("translations/#{language}", expires_in: 8.hours) do
+          Translation.search(language)
+        end
 
         wants.json do
           render json: { data: { translations: @translations }, message: '' }, status: :ok
