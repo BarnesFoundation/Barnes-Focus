@@ -106,9 +106,8 @@ class StoryItem extends React.Component {
               this.contentRef,
               0.1,
               { autoAlpha: 0, y: "50px" },
-              { autoAlpha: 1, y: "0px" },
-              "-=0.33"
-            ) //-0.33 (1/3) means it would start along with above animation
+              { autoAlpha: 1, y: "0px" }
+            )
             .fromTo(
               this.contentRef,
               1.0,
@@ -174,8 +173,10 @@ class StoryItem extends React.Component {
   };
 
   isUnidentifiedArtist = () => {
-    return this.props.story.detail.people.toLowerCase().includes('unidentified')
-  }
+    return this.props.story.detail.people
+      .toLowerCase()
+      .includes("unidentified");
+  };
 
   render() {
     const { story, storyTitle, progress } = this.props;
@@ -252,10 +253,9 @@ class StoryItem extends React.Component {
                   </div>
                 )}
                 <div className="scroll-text" ref={this.refContentCallback}>
-                  {this.props.storyIndex === 0 &&
-                    !this.props.storyEmailPage && (
-                      <div className="story-name">{storyTitle}</div>
-                    )}
+                  {!this.props.storyEmailPage && (
+                    <div className="story-name">{storyTitle}</div>
+                  )}
                   <div
                     className="story-text"
                     dangerouslySetInnerHTML={{
@@ -274,8 +274,14 @@ class StoryItem extends React.Component {
                     {story.detail.title}, {story.detail.displayDate}
                     <br />
                     {story.detail.people}
-                    {(this.isUnidentifiedArtist()) ? '' : ` (${story.detail.nationality}, ${story.detail.birthDate} - ${story.detail.deathDate})`}
-                    {(this.isUnidentifiedArtist()) ? `, ${story.detail.culture}` : ''}
+                    {this.isUnidentifiedArtist()
+                      ? ""
+                      : ` (${story.detail.nationality}, ${
+                          story.detail.birthDate
+                        } - ${story.detail.deathDate})`}
+                    {this.isUnidentifiedArtist()
+                      ? `, ${story.detail.culture}`
+                      : ""}
                   </div>
                   {this.props.selectedLanguage.code !== LANGUAGE_EN && (
                     <div
