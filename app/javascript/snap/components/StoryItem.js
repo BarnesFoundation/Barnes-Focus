@@ -173,9 +173,12 @@ class StoryItem extends React.Component {
     }
   };
 
+  isUnidentifiedArtist = () => {
+    return this.props.story.detail.people.toLowerCase().includes('unidentified')
+  }
+
   render() {
     const { story, storyTitle, progress } = this.props;
-    // console.log('StoryItem >> render', this.props.storyIndex, progress);
     return (
       <div>
         <Timeline totalProgress={progress} paused>
@@ -271,6 +274,8 @@ class StoryItem extends React.Component {
                     {story.detail.title}, {story.detail.displayDate}
                     <br />
                     {story.detail.people}
+                    {(this.isUnidentifiedArtist()) ? '' : ` (${story.detail.nationality}, ${story.detail.birthDate} - ${story.detail.deathDate})`}
+                    {(this.isUnidentifiedArtist()) ? `, ${story.detail.culture}` : ''}
                   </div>
                   {this.props.selectedLanguage.code !== LANGUAGE_EN && (
                     <div
