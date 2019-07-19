@@ -1,50 +1,47 @@
 .story-page {
-    
-    .card-img-overlay {
-        z-index: 1000;
-        margin-top: 100px;
-        text-align: left;
+  .card-img-overlay {
+    z-index: 1000;
+    margin-top: 100px;
+    text-align: left;
 
-        .scroll-cta {
+    .scroll-cta {
+      position: fixed;
+      bottom: 154px;
+      left: calc(50% - 92px);
+      height: 46px;
+      width: 184px;
 
-            position: fixed;
-            bottom: 42px;
-            left: calc(50% - 62px);
-            height: 46px;	
-            width: 124px;
+      .scroll-icon {
+        height: 10px;
+        width: 10px;
+        margin: 0 auto;
+        padding-bottom: 30px;
+      }
 
-            .scroll-icon {
-                height: 10px;
-                width: 10px;
-                margin: 0 auto;
-                padding-bottom: 30px;
-            }
-
-            .text {
-                height: 16px;	
-                width: 124px;	
-                color: #FFFFFF;	
-                font-family: 'Calibre-Medium', sans-serif;	
-                font-size: 16px;	
-                font-weight: 600;	
-                letter-spacing: 0.2px;	
-                line-height: 19px;	
-                text-align: center;
-                text-transform: uppercase;
-            }
-        }
-        
+      .text {
+        height: 16px;
+        width: auto;
+        color: #ffffff;
+        font-family: "Calibre-Medium", sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        line-height: 19px;
+        text-align: center;
+        text-transform: uppercase;
+      }
     }
+  }
 
-    .story-title {
-        height: 96px;	
-        width: 327px;	
-        color: #FFFFFF;	
-        font-family: 'Calibre-Medium', sans-serif;	
-        font-size: 48px;	
-        font-weight: 600;	
-        letter-spacing: 0.6px;	
-        line-height: 58px;
-        padding-top: 56px;
-    }
+  .story-title {
+    height: 96px;
+    width: 327px;
+    color: #ffffff;
+    font-family: "Calibre-Medium", sans-serif;
+    font-size: 48px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    line-height: 58px;
+    padding-top: 56px;
+  }
 }
