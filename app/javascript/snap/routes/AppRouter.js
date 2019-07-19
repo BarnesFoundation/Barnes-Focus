@@ -5,7 +5,7 @@ import posed, { PoseGroup } from "react-pose";
 
 import Home from '../components/Home';
 import Camera from '../components/Camera';
-import Artwork from '../components/Artwork2';
+import Artwork from '../components/Artwork';
 import StoryPage from '../components/StoryPage';
 import * as constants from '../components/Constants';
 
