@@ -110,8 +110,8 @@ class JobsController < ApplicationController
             response = StoryFetcher.new.find_by_object_id(obj.image_id, language)
             next if response.nil?
 
-            story = Story.find_by(title: response[:content]["story_title"])
-            story = Story.create(title: response[:content]["story_title"]) if story.nil?
+            story = Story.find_by(title: response[:content]["original_story_title"])
+            story = Story.create(title: response[:content]["original_story_title"]) if story.nil?
 
             host = Rails.env.development? ? 'http://localhost:3000' : ENV['ASSET_HOST']
 
@@ -120,7 +120,7 @@ class JobsController < ApplicationController
               unique_identifier: response[:unique_identifier],
               #artwork_info: EsCachedRecord.search(obj.image_id),
               content: response[:content],
-              translated_title: language == 'en' ? response[:content]["story_title"] : SnapTranslator.translate_story_title(response[:content]["story_title"], language),
+              translated_title: response[:content]["story_title"],
               link: "#{host}/story/#{story.slug}"
             }
             stories.push h

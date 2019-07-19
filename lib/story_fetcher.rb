@@ -147,6 +147,7 @@ class StoryFetcher
     story_attrs = related_stories.size > 1 ? related_stories.last : related_stories.first
 
     content["story_title"] = preferred_lang == "en" ? story_attrs["storyTitle"] : SnapTranslator.translate_story_title(story_attrs["storyTitle"], preferred_lang)
+    content["original_story_title"] = story_attrs["storyTitle"]
     content["stories"] = Array.new
     translatable_content = {}
 
