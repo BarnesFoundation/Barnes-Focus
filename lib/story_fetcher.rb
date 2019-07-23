@@ -127,7 +127,12 @@ class StoryFetcher
   end
 
   def query_grapql params
-    uri = URI.parse(@endpoint + "?query=" + params)
+    begin
+      uri = URI.parse(@endpoint + "?query=" + params)
+    rescue URI::InvalidURIError
+      uri = URI.parse(URI.escape(@endpoint + "?query=" + params))
+    end
+
     req = Net::HTTP::Post.new(uri.to_s)
     response = nil
 
