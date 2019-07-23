@@ -670,7 +670,11 @@ class Artwork extends Component {
         }
         return (
             stories.map((story, index) =>
-                <Scene loglevel={0} indicators={false} key={`storyitem${index + 1}`} triggerHook="onLeave" pin pinSettings={(index === 0) ? { spacerClass: 'scrollmagic-pin-spacer-pt', pushFollowers: false } : { spacerClass: 'scrollmagic-pin-spacer', pushFollowers: false }} duration={this.state.storyDurationsCurrent[index] * 4} offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset - 100}>
+                <Scene loglevel={0} indicators={false} key={`storyitem${index + 1}`} 
+                    triggerHook="onLeave" pin 
+                    pinSettings={(index === 0) ? { spacerClass: 'scrollmagic-pin-spacer-pt', pushFollowers: false } : { spacerClass: 'scrollmagic-pin-spacer', pushFollowers: false }} 
+                    duration={this.state.storyDurationsCurrent[index] * 5} 
+                    offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset - 100}>
                     {(progress, event) => (
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
                             <StoryItem
@@ -742,7 +746,7 @@ class Artwork extends Component {
 
                 {this.renderArtwork()}
 
-                <Controller refreshInterval={50}>
+                <Controller refreshInterval={250}>
 
                     {this.renderTitleBar()}
 

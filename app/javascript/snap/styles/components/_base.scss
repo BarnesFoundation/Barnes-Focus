@@ -1,5 +1,5 @@
 * {
-  font-family: "Calibre-Medium", "Calibre-Regular", sans-serif;
+  font-family: 'Calibre-Medium', 'Calibre-Regular', sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -10,11 +10,11 @@ body {
   height: 100%;
   width: 100%;
   font-size: 1rem !important;
-  font-family: "Calibre-Medium", "Calibre-Regular", sans-serif;
+  font-family: 'Calibre-Medium', 'Calibre-Regular', sans-serif;
   font-weight: 400;
   color: #282828;
   font-kerning: normal;
-  font-feature-settings: "kern";
+  font-feature-settings: 'kern';
   text-rendering: optimizeLegibility;
   font-variant-ligatures: common-ligatures;
   //position: absolute;
@@ -42,19 +42,19 @@ body {
 
 .paragraph {
   //font-family: 'Milo serif';
-  font-family: "Calibre-Regular", sans-serif;
+  font-family: 'Calibre-Regular', sans-serif;
   font-size: 18px;
   line-height: 26px;
 }
 
 .small-paragraph {
-  font-family: "Calibre-Regular", sans-serif;
+  font-family: 'Calibre-Regular', sans-serif;
   font-size: 17px;
   line-height: 20px;
 }
 
 .caption {
-  font-family: "Calibre-Regular", sans-serif;
+  font-family: 'Calibre-Regular', sans-serif;
   font-size: 14px;
 }
 
@@ -82,7 +82,7 @@ body {
 h1 {
   font-size: 2.25rem;
   margin-bottom: 0.78125rem;
-  font-family: "Calibre-Medium", sans-serif;
+  font-family: 'Calibre-Medium', sans-serif;
   font-weight: normal;
   margin-top: 0;
 
@@ -99,7 +99,7 @@ h2 {
 
 p {
   color: #8c8c8d;
-  font-family: "Calibre-Regular", sans-serif;
+  font-family: 'Calibre-Regular', sans-serif;
 }
 
 .landscape-wrapper {
@@ -180,7 +180,7 @@ p {
 .footer-text {
   padding: 24px 0 24px;
   a {
-    font-family: "Calibre-Regular", sans-serif;
+    font-family: 'Calibre-Regular', sans-serif;
     font-size: 16px;
     text-align: center;
     color: #b4b4b4 !important;
