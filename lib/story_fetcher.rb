@@ -53,7 +53,7 @@ class StoryFetcher
   def find_by_title title, preferred_lang = 'en'
     params = "
       {
-        storiesForObjectIds(where: {relatedStories_some: {storyTitle: \"#{title}\"}}) {
+        storiesForObjectIds(where: {relatedStories_some: {storyTitle: \"#{CGI::escape(title).gsub('%22', '%5C%22')}\"}}) {
           id
           objectID
           #{related_stories}
