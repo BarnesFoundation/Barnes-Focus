@@ -53,7 +53,7 @@ class StoryFetcher
   def find_by_title title, preferred_lang = 'en'
     params = "
       {
-        storiesForObjectIds(where: {relatedStories_some: {storyTitle: \"#{title}\"}}) {
+        storiesForObjectIds(where: {relatedStories_some: {storyTitle: \"#{CGI::escape(title).gsub('%22', '%5C%22')}\"}}) {
           id
           objectID
           #{related_stories}
@@ -127,7 +127,12 @@ class StoryFetcher
   end
 
   def query_grapql params
-    uri = URI.parse(@endpoint + "?query=" + params)
+    begin
+      uri = URI.parse(@endpoint + "?query=" + params)
+    rescue URI::InvalidURIError
+      uri = URI.parse(URI.escape(@endpoint + "?query=" + params))
+    end
+
     req = Net::HTTP::Post.new(uri.to_s)
     response = nil
 
