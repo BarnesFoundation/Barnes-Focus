@@ -96,7 +96,7 @@ class JobsController < ApplicationController
         data                  = Hash.new
         data[mail]            = Array.new
         latest_bookmark_entry = story_in_bookmark.first
-        time_in_seconds       = ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].present? ? (ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].to_i * 2) : 21600
+        time_in_seconds       = 22 * 60 * 60
 
         if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
           language  = latest_bookmark_entry.language
