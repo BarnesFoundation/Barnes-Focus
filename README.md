@@ -1,31 +1,3 @@
-## Pre Production Dependencies
-### Upgrade nodejs For version/release 3
-We'll have to upgrade nodejs to version 8. In order to do that ssh into both the application and run
-- `yum remove nodesource-release* nodejs`
-- `yum clean all`
-- `rm -rf /var/cache/yum/*`
-- `yum remove nodesource-release* nodejs`
-- `rm -rf /etc/yum.repos.d/nodesource-el.repo`
-
-### Define asset host
-With changes in existing artowrks email template and introduction of story email templates, we are now rendering barnes logo, twitter and youtube icons from Rails assets folder.
-
-In order to work this properly on Production, we now have to define a new ENV variable `ASSET_HOST` and sets it value to `https://barnes.foc.us`
-
-### Define paragrpah to use
-We'd observed slowness while translating stories content to other languages. That's beacause the number of calls we are making to Google API based on short paragrpah and long paragraph.
-
-In order to reduce this and work this faster, we now have to define a new ENV variable `STORY_PARAGRAPH_TO_USE`. For now, set it's value to `long`. Other value would be `short`.
-
-### Translations Updates
-* Email(Header) - "Bookmarked art" -> "Artworks You Discovered"
-* Email(Sub Header) - "Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit" -> "Thank you for visiting the Barnes today! Here are all the works of art you explored using the Barnes Focus guide. Each link will take you to our collection online for more information about each piece."
-* Execute `bundle exec rake data:extend_email_translations`. Once this runs successfully on Production, move content inside this method to `add_translations` method.
-* Execute `bundle exec rake data:add_culture_to_result_page`. Once this runs successfully on Production, move content inside this method to `add_translations` method.
-* Execute `bundle exec rake data:additions_to_bookmark_and_resultpage`. Once this runs successfully on Production, move content inside this method to `add_translations` method.
-
-And then proceed with the deployment
-
 # Installation Instructions
 * Git clone
 * Install Ruby (using RVM): `rvm install ruby-2.4.3`
@@ -39,23 +11,19 @@ And then proceed with the deployment
 * Note: You must have a PSQL server running for the above rake commands to run successfully
 * Start server in development mode: `rails server`
 
-## About updating ES table
-If you're working locally/on localhost, from postman or any other ARC client, you'll have to make a POST request to this url: `POST: http://localhost:3000/jobs/update_es_cache` (make sure server is running)
+## About updating ES Cache table
+If you're working locally/on localhost or setting up a new app, then from postman or any other ARC client, you'll have to make a POST request to this url: `POST: http://localhost:3000/jobs/update_es_cache` (make sure server is running)
 
 This will populate `es_cached_records` table with the artworks.
 
-## About rake db:seed
-In V1, for in-app translations, we used to run `rake db:seed` command followed by `rake db:migrate` (on new env). This did few things for us:
- - Populate `translations` database table
+### Way to populate in-app translations
+If you are setting up this app newly, then execute this command: `bundle exec rake data:add_translations`
 
-With V2, since most of the screens are new and so are texts on screen, `rake db:seed` is no longer required. Here's what we can do:
-
-### What if I have translations table already populated with V1 data?
-In case, if your `translations` table contains data from `rake db:seed` command. Here's what you can do:
+### What if I have translations table already populated?
+In case, if your local `translations` table contains data from `rake db:seed` command. Here's what you can do:
  - From rails console: `Translation.delete_all`
  - Run this rake task :
   - `bundle exec rake data:add_translations` OR `rake data:add_translations`
- - Until we merge other newly added translations from V3 to this method, you can run/execute above commands (from Translations update) in the same sequence after `add_translations` command.
 
 ### How I can handle an update in translations table?
 Updates are very easy and can be done from Admin panel directly. For e.g., if a text of translation changes from 'A' to 'B', then you can directly go to edit that record inside Admin panel -> do the changes and save it.
@@ -63,8 +31,16 @@ Updates are very easy and can be done from Admin panel directly. For e.g., if a 
 ### How I can add more to translations?
 Adding to translations can be done via one time job (OTJ). Preferably `rake` task. You can refer to file: `/lib/tasks/data.rake` on how translations are added.
 
-### What if I am setting up Barnes App in new ENV?
+### What if I am setting up Barnes App in new ENV? (Repeated)
 In this case, we just have to run above rake task `bundle exec rake data:add_translations`
+
+### What if nodejs version in an environment is less than 8? Upgrade nodejs:
+We'll have to upgrade nodejs to version 8. In order to do that ssh into both the application (web and worker) and run
+- `yum remove nodesource-release* nodejs`
+- `yum clean all`
+- `rm -rf /var/cache/yum/*`
+- `yum remove nodesource-release* nodejs`
+- `rm -rf /etc/yum.repos.d/nodesource-el.repo`
 
 # To Start Server in background
 `foreman start -f Procfile.dev -p 3000`
@@ -94,7 +70,7 @@ Some of those ENV variable changes its value based on Web/Worker Apps. Let's tak
  - **RAILS_SKIP_MIGRATIONS**: System generated. Default value: `false`. Locally not required
  - **RDS_DB_NAME**, **RDS_HOSTNAME**, **RDS_PASSWORD**, **RDS_PORT**, **RDS_USERNAME**: Database settings needed to Connect Barnes App with PostgreSQL Database.
  - **SECRET_KEY_BASE**: System generated. Not required locally.
- - **ASSET_HOST**: Required to render images for emails
+ - **ASSET_HOST**: Required to render images for emails. E.g. values: http://localhost:3000
  - **STORY_PARAGRAPH_TO_USE**: Required to define which paragrpah to use for story. Possible values: `long` or `short`
 
 # Deployment on Elastic Beanstalk

@@ -119,6 +119,18 @@ namespace :data do
       english_translation: "Please note that not all records are complete as research on the collection is ongoing.",
       unique_identifier: 'text_9'
     )
+    Translation.create(
+      screen_text: "Culture",
+      parent_id: screen_3.id,
+      english_translation: "Culture",
+      unique_identifier: 'text_10'
+    )
+    Translation.create(
+      screen_text: "In This Room",
+      parent_id: screen_3.id,
+      english_translation: "IN THIS ROOM",
+      unique_identifier: 'text_11'
+    )
 
     #====================== screen 4 ======================#
     screen_4 = Translation.find_or_create_by(screen_text: "Result_page_Language_Selector", display_order: 4)
@@ -257,6 +269,12 @@ namespace :data do
       english_translation: "Save",
       unique_identifier: 'text_7'
     )
+    Translation.create(
+      screen_text: "Send Me My Scans",
+      parent_id: screen_6.id,
+      english_translation: "Send Me My Scans",
+      unique_identifier: 'text_8'
+    )
 
     #====================== screen 7 ======================#
     screen_7 = Translation.find_or_create_by(screen_text: "About", display_order: 7)
@@ -312,82 +330,40 @@ namespace :data do
     #====================== others ======================#
     email_header = Translation.find_or_create_by(screen_text: "Email", display_order: 101)
     Translation.create(
-      screen_text: 'Bookmarked art',
+      screen_text: 'Artworks You Discovered',
       parent_id: email_header.id,
-      english_translation: 'Bookmarked art',
+      english_translation: 'Artworks You Discovered',
       unique_identifier: 'text_1'
     )
     Translation.create(
-      screen_text: 'Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit',
+      screen_text: 'Thank you for visiting the Barnes today! Here are all the works of art you explored using the Barnes Focus guide. Each link will take you to our collection online for more information about each piece.',
       parent_id: email_header.id,
-      english_translation: 'Thank you for visiting the Barnes today! Here are all the works you bookmarked during your visit',
+      english_translation: 'Thank you for visiting the Barnes today! Here are all the works of art you explored using the Barnes Focus guide. Each link will take you to our collection online for more information about each piece.',
       unique_identifier: 'text_2'
     )
-  end
-
-  desc "extending translations for story emails"
-  task extend_email_translations: :environment do
-    email_header = Translation.find_by(screen_text: "Email", display_order: 101)
-
-    if email_header
-      Translation.create(
-        screen_text: 'Stories You Have Unlocked',
-        parent_id: email_header.id,
-        english_translation: 'Stories You Have Unlocked',
-        unique_identifier: 'text_3'
-      )
-      Translation.create(
-        screen_text: 'Unlock more stories on your next visit. Get 20% off your next visit.',
-        parent_id: email_header.id,
-        english_translation: 'Unlock more stories on your next visit. Get 20% off your next visit.',
-        unique_identifier: 'text_4'
-      )
-      Translation.create(
-        screen_text: 'Promo Code',
-        parent_id: email_header.id,
-        english_translation: 'Promo Code',
-        unique_identifier: 'text_5'
-      )
-      Translation.create(
-        screen_text: 'Buy Tickets',
-        parent_id: email_header.id,
-        english_translation: 'Buy Tickets',
-        unique_identifier: 'text_6'
-      )
-    end
-  end
-
-  desc "adding culture to result page"
-  task add_culture_to_result_page: :environment do
-    screen_3 = Translation.find_by(screen_text: "Result_page", display_order: 3)
-
-    if screen_3
-      Translation.create(
-        screen_text: "Culture",
-        parent_id: screen_3.id,
-        english_translation: "Culture",
-        unique_identifier: 'text_10'
-      )
-    end
-  end
-
-  desc "add text to bookmark capture"
-  task additions_to_bookmark_and_resultpage: :environment do
-    screen_6 = Translation.find_by(screen_text: "Bookmark_capture", display_order: 6)
-
     Translation.create(
-      screen_text: "Send Me My Scans",
-      parent_id: screen_6.id,
-      english_translation: "Send Me My Scans",
-      unique_identifier: 'text_8'
+      screen_text: 'Stories You Have Unlocked',
+      parent_id: email_header.id,
+      english_translation: 'Stories You Have Unlocked',
+      unique_identifier: 'text_3'
     )
-
-    screen_3 = Translation.find_by(screen_text: "Result_page", display_order: 3)
     Translation.create(
-      screen_text: "In This Room",
-      parent_id: screen_3.id,
-      english_translation: "IN THIS ROOM",
-      unique_identifier: 'text_11'
+      screen_text: 'Unlock more stories on your next visit. Get 20% off your next visit.',
+      parent_id: email_header.id,
+      english_translation: 'Unlock more stories on your next visit. Get 20% off your next visit.',
+      unique_identifier: 'text_4'
+    )
+    Translation.create(
+      screen_text: 'Promo Code',
+      parent_id: email_header.id,
+      english_translation: 'Promo Code',
+      unique_identifier: 'text_5'
+    )
+    Translation.create(
+      screen_text: 'Buy Tickets',
+      parent_id: email_header.id,
+      english_translation: 'Buy Tickets',
+      unique_identifier: 'text_6'
     )
   end
 
