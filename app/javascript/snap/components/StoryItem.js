@@ -123,66 +123,69 @@ class StoryItem extends React.Component {
     return (
       <div>
         <Timeline totalProgress={progress} paused>
-          <div className='card story-item'>
+          <div className="card story-item">
             {this.props.storyIndex === 0 && this.state.showTitle && !this.props.storyEmailPage && (
-              <div className='story-title-bar'>
-                <div className='story-title'>{this.props.getTranslation('Result_page', 'text_11')}</div>
+              <div className="story-title-bar">
+                <div className="story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
               </div>
             )}
             <Timeline
               totalProgress={progress * 5}
               paused
               target={
-                <img className='card-img-top' src={this.getArtUrl()} alt='story_item' style={{ width: `100%` }} />
+                <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
               }>
               {
                 <Tween
                   from={{ css: { borderRadius: '50px 50px 0px 0px' } }}
                   to={{ css: { borderRadius: '0px 0px 0px 0px' } }}
-                  ease='easeOut'
+                  ease="easeOut"
                   duration={0.2}
                 />
               }
             </Timeline>
 
-            <Timeline totalProgress={progress * 5} paused target={<div className='overlay' />}>
+            <Timeline totalProgress={progress * 5} paused target={<div className="overlay" />}>
               <Tween
                 from={{ autoAlpha: 0, borderRadius: '50px 50px 0px 0px' }}
                 to={{ autoAlpha: 0.6, borderRadius: '0px 0px 0px 0px' }}
-                ease='easeOut'
+                ease="easeOut"
                 duration={0.1}
               />
             </Timeline>
 
-            {this.props.storyIndex === 0 && <div className='overlay' ref={this.refOverlayCallback} />}
-            <div className='content-mask'>
-              <div className='card-img-overlay'>
+            {this.props.storyIndex === 0 && <div className="overlay" ref={this.refOverlayCallback} />}
+            <div className="content-mask">
+              <div className="card-img-overlay">
                 {this.props.storyEmailPage && this.props.storyIndex === 0 && (
                   <div>
-                    <div className='intro' ref={this.refTitleCallback}>
-                      <div className='barnes-logo'>
-                        <img src={barnes_logo} alt='barnes_logo' />
-                        <div className='story-name'>{storyTitle}</div>
+                    <div className="intro" ref={this.refTitleCallback}>
+                      <div className="barnes-logo">
+                        <img src={barnes_logo} alt="barnes_logo" />
+                        <div className="story-name">{storyTitle}</div>
                       </div>
                     </div>
-                    <div className='scroll-cta' ref={this.refScrollTextCallback}>
-                      <div className='scroll-icon'>
-                        <img src={scroll_up} alt='scroll' />
+                    <div className="scroll-cta" ref={this.refScrollTextCallback}>
+                      <div className="scroll-icon">
+                        <img src={scroll_up} alt="scroll" />
                       </div>
-                      <div className='text'>{`Scroll to Begin`}</div>
+                      <div className="text">{`Scroll to Begin`}</div>
                     </div>
                   </div>
                 )}
-                <div className='scroll-text' ref={this.refContentCallback}>
-                  {!this.props.storyEmailPage && <div className='story-name'>{storyTitle}</div>}
+                <div className="scroll-text" ref={this.refContentCallback}>
+                  {!this.props.storyEmailPage && <div className="story-name">{storyTitle}</div>}
                   <div
-                    className='story-text'
+                    className="story-text"
                     dangerouslySetInnerHTML={{
-                      __html: story.long_paragraph.html
+                      __html:
+                        process.env.STORY_PARAGRAPH_TO_USE === 'long'
+                          ? story.long_paragraph.html
+                          : story.short_paragraph.html
                     }}
                   />
                   <div
-                    className='story-footer'
+                    className="story-footer"
                     style={{
                       paddingBottom: this.props.selectedLanguage.code === LANGUAGE_EN ? `200px` : 0
                     }}>
@@ -195,9 +198,9 @@ class StoryItem extends React.Component {
                     {this.isUnidentifiedArtist() ? `, ${story.detail.culture}` : ''}
                   </div>
                   {this.props.selectedLanguage.code !== LANGUAGE_EN && (
-                    <div className='google-translate-disclaimer' style={{ paddingBottom: `200px` }}>
+                    <div className="google-translate-disclaimer" style={{ paddingBottom: `200px` }}>
                       <span>Translated with </span>
-                      <img src={google_logo} alt='google_logo' />
+                      <img src={google_logo} alt="google_logo" />
                     </div>
                   )}
                 </div>
