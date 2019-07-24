@@ -316,7 +316,7 @@ class Artwork extends Component {
         if (stories_data.data.total > 0) {
             return { stories: stories_data.data.content.stories, storyId: stories_data.data.unique_identifier, storyTitle: stories_data.data.content.story_title };
         } else {
-            return { stories: undefined, storyId: undefined, storyTitle: undefined };
+            return { stories: [], storyId: undefined, storyTitle: undefined };
         }
     }
 
