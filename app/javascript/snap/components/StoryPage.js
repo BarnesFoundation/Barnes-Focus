@@ -1,15 +1,15 @@
-import { filter } from "lodash";
-import queryString from "query-string";
-import React, { Component } from "react";
-import { withRouter } from "react-router";
-import { Controller, Scene } from "react-scrollmagic";
-import { compose } from "redux";
-import styled from "styled-components";
-import StoryItem from "../components/StoryItem";
-import { SearchRequestService } from "../services/SearchRequestService";
-import * as constants from "./Constants";
-import withOrientation from "./withOrientation";
-import withTranslation from "./withTranslation";
+import { filter } from 'lodash';
+import queryString from 'query-string';
+import React, { Component } from 'react';
+import { withRouter } from 'react-router';
+import { Controller, Scene } from 'react-scrollmagic';
+import { compose } from 'redux';
+import styled from 'styled-components';
+import StoryItem from '../components/StoryItem';
+import { SearchRequestService } from '../services/SearchRequestService';
+import * as constants from './Constants';
+import withOrientation from './withOrientation';
+import withTranslation from './withTranslation';
 
 const SectionWipesStyled = styled.div`
   overflow: hidden;
@@ -35,15 +35,15 @@ class StoryPage extends Component {
     this.sr = new SearchRequestService();
 
     this.langOptions = [
-      { name: "English", code: "En", selected: true },
-      { name: "Español", code: "Es", selected: false },
-      { name: "Français", code: "Fr", selected: false },
-      { name: "Deutsch", code: "De", selected: false },
-      { name: "Italiano", code: "It", selected: false },
-      { name: "русский", code: "Ru", selected: false },
-      { name: "中文", code: "Zh", selected: false },
-      { name: "日本語", code: "Ja", selected: false },
-      { name: "한국어", code: "Ko", selected: false }
+      { name: 'English', code: 'En', selected: true },
+      { name: 'Español', code: 'Es', selected: false },
+      { name: 'Français', code: 'Fr', selected: false },
+      { name: 'Deutsch', code: 'De', selected: false },
+      { name: 'Italiano', code: 'It', selected: false },
+      { name: 'русский', code: 'Ru', selected: false },
+      { name: '中文', code: 'Zh', selected: false },
+      { name: '日本語', code: 'Ja', selected: false },
+      { name: '한국어', code: 'Ko', selected: false }
     ];
 
     this.state = {
@@ -55,10 +55,7 @@ class StoryPage extends Component {
     const slug = this.props.match.params.slug;
     const queryParams = queryString.parse(this.props.location.search);
 
-    const { stories, storyId, storyTitle } = await this.setupStory(
-      slug,
-      queryParams.lang
-    );
+    const { stories, storyId, storyTitle } = await this.setupStory(slug, queryParams.lang);
     const selectedLang = await this.getSelectedLanguage();
     this.setState({
       stories: stories,
@@ -69,9 +66,7 @@ class StoryPage extends Component {
   }
 
   getSelectedLanguage = async () => {
-    const selectedLangCode = localStorage.getItem(
-      constants.SNAP_LANGUAGE_PREFERENCE
-    );
+    const selectedLangCode = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE);
     if (selectedLangCode !== null) {
       this.langOptions.map(option => {
         if (option.code === selectedLangCode) {
@@ -85,7 +80,7 @@ class StoryPage extends Component {
   };
 
   setupStory = async (slug, lang) => {
-    console.log("fetching stories for slug: ", slug, lang);
+    console.log('fetching stories for slug: ', slug, lang);
     const stories_data = await this.sr.getStoriesFromEmail(slug, lang);
     if (stories_data.data.total > 0) {
       return {
@@ -99,17 +94,15 @@ class StoryPage extends Component {
   };
 
   onStoryHeightReady = (height, index) => {
-    console.log("Story height ready", height, index);
+    console.log('Story height ready', height, index);
   };
 
   onStoryReadComplete = () => {
-    console.log("Story read complete!");
+    console.log('Story read complete!');
   };
 
   onSelectLanguage = async lang => {
-    console.log(
-      "Selected lang changed in StoryPage >> : " + JSON.stringify(lang)
-    );
+    console.log('Selected lang changed in StoryPage >> : ' + JSON.stringify(lang));
   };
 
   componentDidMount() {}
@@ -129,18 +122,15 @@ class StoryPage extends Component {
               pin
               pinSettings={{ pushFollowers: false }}
               duration={`1000`}
-              offset={0}
-            >
+              offset={0}>
               {(progress, event) => (
-                <div
-                  id={`story-card-${index}`}
-                  className={`story-page panel panel${index + 1}`}
-                >
+                <div id={`story-card-${index}`} className={`story-page panel panel${index + 1}`}>
                   <StoryItem
                     key={`storyitem${index + 1}`}
                     progress={progress}
                     sceneStatus={event.type}
                     storyIndex={index}
+                    isLastStoryItem={index === stories.length - 1 ? true : false}
                     story={story}
                     storyTitle={storyTitle}
                     langOptions={undefined}
@@ -160,8 +150,7 @@ class StoryPage extends Component {
             triggerHook="onEnter"
             indicators={false}
             duration={1000}
-            offset="0"
-          >
+            offset="0">
             <div id={`story-card-end`} className={`story-page panel`} />
           </Scene>
         </Controller>

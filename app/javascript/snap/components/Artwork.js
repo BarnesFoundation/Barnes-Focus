@@ -682,6 +682,7 @@ class Artwork extends Component {
                                 progress={progress}
                                 sceneStatus={event}
                                 storyIndex={index}
+                                isLastStoryItem={(index===(stories.length - 1))? true: false}
                                 story={story}
                                 storyTitle={storyTitle}
                                 langOptions={this.langOptions}
