@@ -59,7 +59,7 @@ class Artwork extends Component {
         this.emailScene = null;
         this.emailSceneTrigger = null;
 
-        this.contentOffset = 100;
+        this.contentOffset = 67;
 
         this.langOptions = [
             { name: 'English', code: 'En', selected: true },
@@ -185,7 +185,7 @@ class Artwork extends Component {
                 storyId: storyId,
                 storyTitle: storyTitle,
                 result: artworkInfo,
-                showStory: artworkInfo.data.show_story,
+                showStory: true,//artworkInfo.data.show_story,
                 artwork: artwork,
                 roomRecords: roomRecords,
                 emailCaptured: emailCaptured,
@@ -674,7 +674,7 @@ class Artwork extends Component {
                     triggerHook="onLeave" pin 
                     pinSettings={(index === 0) ? { spacerClass: 'scrollmagic-pin-spacer-pt', pushFollowers: false } : { spacerClass: 'scrollmagic-pin-spacer', pushFollowers: false }} 
                     duration={this.state.storyDurationsCurrent[index] * 5} 
-                    offset={(index > 0) ? this.state.storyOffsets[index] - 375 : this.state.infoCardDuration + this.contentOffset - 100}>
+                    offset={(index > 0) ? this.state.storyOffsets[index] - 342 : (this.state.infoCardDuration + 37)}>
                     {(progress, event) => (
                         <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
                             <StoryItem
@@ -711,24 +711,7 @@ class Artwork extends Component {
         return (
             stories.map((story, index) =>
 
-                <Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? this.state.storyDurationsCurrent[index - 1] / 4 - 50 : this.state.infoCardDuration + this.contentOffset} offset="0" pinSettings={{ pushFollowers: true }}>
-                    <div></div>
-                </Scene>
-            )
-        );
-    }
-    /**
-     * Renders the story cards if * showStory * flag is true.
-     */
-    renderPinsLeave = () => {
-        const { showStory, stories, storyTitle } = this.state;
-        if (!showStory) {
-            return <div></div>;
-        }
-        return (
-            stories.map((story, index) =>
-
-                <Scene loglevel={0} key={`storytriggerleave${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onLeave" indicators={false} duration={0} offset={(index > 0) ? this.state.storyOffsets[index] - 100 : this.state.infoCardDuration + this.contentOffset - 100} pinSettings={{ pushFollowers: false }}>
+                <Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`} triggerHook="onEnter" indicators={false} duration={(index > 0) ? this.state.storyDurationsCurrent[index - 1] / 4 - 50 : this.state.infoCardDuration + this.contentOffset + 33} offset="0" pinSettings={{ pushFollowers: true }}>
                     <div></div>
                 </Scene>
             )

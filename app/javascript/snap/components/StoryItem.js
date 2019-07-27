@@ -86,7 +86,7 @@ class StoryItem extends React.Component {
       }
     }
 
-    if (this.t2) this.t2.progress(this.props.progress * 5).timeScale(0.2);
+    if (this.t2) this.t2.progress(this.props.progress * 5).timeScale(0.1);
   }
 
   getArtUrl = () => {
