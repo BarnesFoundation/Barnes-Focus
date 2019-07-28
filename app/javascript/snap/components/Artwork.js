@@ -480,7 +480,7 @@ class Artwork extends Component {
 
   onStoryHeightReady = (height, index) => {
     if (index > -1) {
-      console.log('Story durations based on height :: ', index, height);
+      //console.log('Story durations based on height :: ', index, height);
       var durationCurArr = this.state.storyDurationsCurrent;
       durationCurArr[index] = index == 0 ? 0 : height;
       this.setState({ storyDurationsCurrent: durationCurArr });
@@ -684,9 +684,9 @@ class Artwork extends Component {
     if (showTitleBar) {
       return (
         <div id="story-title-bar" className="story-title-bar">
-          <div className="col-8 story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
+          <div className="story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
 
-          <div className="col-4 language-dropdown">
+          <div className="language-dropdown">
             <LanguageDropdown
               isStoryItemDropDown={true}
               langOptions={this.langOptions}
@@ -709,70 +709,77 @@ class Artwork extends Component {
     if (!showStory) {
       return <div />;
     }
-    return stories.map((story, index) => (
-      <Scene
-        loglevel={0}
-        indicators={false}
-        key={`storyitem${index + 1}`}
-        triggerHook="onLeave"
-        pin
-        pinSettings={
-          index === 0
-            ? { spacerClass: 'scrollmagic-pin-spacer-pt', pushFollowers: false }
-            : { spacerClass: 'scrollmagic-pin-spacer', pushFollowers: false }
-        }
-        duration={this.state.storyDurationsCurrent[index] * 5}
-        offset={index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33}>
-        {(progress, event) => (
-          <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
-            <StoryItem
-              key={`storyitem${index + 1}`}
-              progress={progress}
-              sceneStatus={event}
-              storyIndex={index}
-              isLastStoryItem={index === stories.length - 1 ? true : false}
-              story={story}
-              storyTitle={storyTitle}
-              langOptions={this.langOptions}
-              selectedLanguage={this.state.selectedLanguage}
-              onSelectLanguage={this.onSelectLanguage}
-              onStoryReadComplete={this.onStoryReadComplete}
-              getSize={this.onStoryHeightReady}
-              statusCallback={this.storySceneCallback}
-              getTranslation={this.props.getTranslation}
-            />
-          </div>
-        )}
-      </Scene>
-    ));
+    return stories.map((story, index) => {
+      const storyDuration = this.state.storyDurationsCurrent[index] * 5;
+      const storySceneOffset = index > 0 ? this.state.storyOffsets[index] + 350 : this.state.infoCardDuration + 33;
+      //console.log('renderStory > storyDuration, storySceneOffset :: ', index, storyDuration, storySceneOffset);
+      return (
+        <Scene
+          loglevel={0}
+          indicators={false}
+          key={`storyitem${index + 1}`}
+          triggerHook="onLeave"
+          pin
+          pinSettings={{ pushFollowers: false }}
+          duration={storyDuration}
+          offset={storySceneOffset}>
+          {(progress, event) => (
+            <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
+              <StoryItem
+                key={`storyitem${index + 1}`}
+                progress={progress}
+                sceneStatus={event}
+                storyIndex={index}
+                isLastStoryItem={index === stories.length - 1 ? true : false}
+                story={story}
+                storyTitle={storyTitle}
+                langOptions={this.langOptions}
+                selectedLanguage={this.state.selectedLanguage}
+                onSelectLanguage={this.onSelectLanguage}
+                onStoryReadComplete={this.onStoryReadComplete}
+                getSize={this.onStoryHeightReady}
+                statusCallback={this.storySceneCallback}
+                getTranslation={this.props.getTranslation}
+              />
+            </div>
+          )}
+        </Scene>
+      );
+    });
   };
 
   /**
    * Renders the story cards if * showStory * flag is true.
+   * IMP:: For index > 0, storySceneOffset = storyEnterPinDuration + 8;
    */
   renderPinsEnter = () => {
     const { showStory, stories, storyTitle } = this.state;
     if (!showStory) {
       return <div />;
     }
-    return stories.map((story, index) => (
-      <Scene
-        loglevel={0}
-        key={`storytriggerenter${index + 1}`}
-        pin={`#story-card-${index}`}
-        triggerElement={`#story-card-${index}`}
-        triggerHook="onEnter"
-        indicators={false}
-        duration={
-          index > 0
-            ? this.state.storyDurationsCurrent[index - 1] / 4 - 50
-            : this.state.infoCardDuration + this.contentOffset + 33
-        }
-        offset="0"
-        pinSettings={{ pushFollowers: true }}>
-        <div />
-      </Scene>
-    ));
+    return stories.map((story, index) => {
+      const storyEnterPinDuration =
+        index > 0
+          ? this.state.storyDurationsCurrent[index - 1] / 4 + 642
+          : this.state.infoCardDuration + this.contentOffset + 33;
+
+      //console.log('renderPinsEnter :: storyEnterPinDuration', index, storyEnterPinDuration);
+
+      return (
+        <Scene
+          loglevel={0}
+          key={`storytriggerenter${index + 1}`}
+          pin={`#story-card-${index}`}
+          triggerElement={`#story-card-${index}`}
+          triggerHook="onEnter"
+          indicators={false}
+          duration={storyEnterPinDuration}
+          offset="0"
+          pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
+          <div />
+        </Scene>
+      );
+    });
   };
 
   /**
@@ -789,9 +796,9 @@ class Artwork extends Component {
         <Controller refreshInterval={250}>
           {this.renderTitleBar()}
 
-          {this.renderStory()}
-
           {this.renderPinsEnter()}
+
+          {this.renderStory()}
         </Controller>
 
         {/** this is a placeholder element at the bottom of viewport to control email card enter animation when no stories are present */}
