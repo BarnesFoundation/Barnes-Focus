@@ -4,7 +4,7 @@ import google_logo from 'images/google_translate.svg';
 import scroll_up from 'images/up_wht_1x.png';
 import React from 'react';
 import { Timeline, Tween } from 'react-gsap';
-import { LANGUAGE_EN, VIEWPORT_HEIGHT } from './Constants';
+import { LANGUAGE_EN, VIEWPORT_HEIGHT, SNAP_LANGUAGE_PREFERENCE } from './Constants';
 
 class StoryItem extends React.Component {
   constructor(props) {
@@ -72,7 +72,7 @@ class StoryItem extends React.Component {
         } else {
           this.t2
             .fromTo(this.overlayRef, 0.1, { autoAlpha: 0.5 }, { autoAlpha: 0 })
-            .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
+            .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, '-=0.1')
             .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, '-=0.1');
         }
       } else if (this.props.isLastStoryItem) {
@@ -124,6 +124,7 @@ class StoryItem extends React.Component {
 
   render() {
     const { story, storyTitle, progress } = this.props;
+    const paragraphFontStyle = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `16px` } : {};
     return (
       <div>
         <Timeline totalProgress={progress} paused>
@@ -181,6 +182,7 @@ class StoryItem extends React.Component {
                   {!this.props.storyEmailPage && <div className="story-name">{storyTitle}</div>}
                   <div
                     className="story-text"
+                    style={paragraphFontStyle}
                     dangerouslySetInnerHTML={{
                       __html:
                         process.env.STORY_PARAGRAPH_TO_USE === 'long'
