@@ -53,7 +53,7 @@ class StoryItem extends React.Component {
     if (!this.state.heightUpdated) {
       var contentHeight = this.contentRef.getBoundingClientRect().height;
       var offset;
-      offset = contentHeight > VIEWPORT_HEIGHT ? contentHeight - VIEWPORT_HEIGHT + 100 : 0;
+      offset = contentHeight > VIEWPORT_HEIGHT ? contentHeight - VIEWPORT_HEIGHT + 67 : 0;
       if (offset < 0) offset = 0;
       // console.log("SCROLL OFFSET", offset);
 
@@ -78,7 +78,7 @@ class StoryItem extends React.Component {
       } else if (this.props.isLastStoryItem) {
         this.t2
           .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
-          .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, '-=0.5');
+          .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, '-=0.15');
       } else {
         this.t2
           .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' })
