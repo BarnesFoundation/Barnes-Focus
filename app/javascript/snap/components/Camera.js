@@ -1,16 +1,16 @@
-import axios from "axios";
-import scan_button from "images/scan-button.svg";
-import React, { Component } from "react";
-import ReactCSSTransitionGroup from "react-addons-css-transition-group";
-import { isIOS } from "react-device-detect";
-import posed from "react-pose";
-import { withRouter } from "react-router-dom";
-import { compose } from "redux";
-import { SearchRequestService } from "../services/SearchRequestService";
-import { cropPhoto } from "./CameraHelper";
-import * as constants from "./Constants";
-import withOrientation from "./withOrientation";
-import withTranslation from "./withTranslation";
+import axios from 'axios';
+import scan_button from 'images/scan-button.svg';
+import React, { Component } from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { isIOS } from 'react-device-detect';
+import posed from 'react-pose';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
+import { SearchRequestService } from '../services/SearchRequestService';
+import { cropPhoto } from './CameraHelper';
+import * as constants from './Constants';
+import withOrientation from './withOrientation';
+import withTranslation from './withTranslation';
 
 const Container = posed.div({
   enter: { opacity: 1 },
@@ -55,14 +55,9 @@ class Camera extends Component {
   }
 
   resetSnapCounter = () => {
-    let last_snap_timestamp = parseInt(
-      localStorage.getItem(constants.SNAP_LAST_TIMESTAMP)
-    );
+    let last_snap_timestamp = parseInt(localStorage.getItem(constants.SNAP_LAST_TIMESTAMP));
     if (last_snap_timestamp) {
-      let ttl =
-        last_snap_timestamp +
-        parseInt(constants.SNAP_COUNT_RESET_INTERVAL) -
-        Date.now();
+      let ttl = last_snap_timestamp + parseInt(constants.SNAP_COUNT_RESET_INTERVAL) - Date.now();
       if (ttl <= 0 && this.state.snapAttempts > 0) {
         localStorage.removeItem(constants.SNAP_ATTEMPTS);
         this.setState({ snapAttempts: 0 });
@@ -79,14 +74,10 @@ class Camera extends Component {
   /** Captures photo over a 3-second duration */
   capturePhotoShots = () => {
     // Update the snap attempts with this scan as a single attempt
-    localStorage.setItem(
-      constants.SNAP_ATTEMPTS,
-      parseInt(this.state.snapAttempts) + 1
-    );
+    localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
     localStorage.setItem(constants.SNAP_LAST_TIMESTAMP, Date.now());
 
-    let prefLang =
-      localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) || "en";
+    let prefLang = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) || 'en';
     this.intervalExecutions = 0;
 
     this.stopScan();
@@ -116,7 +107,8 @@ class Camera extends Component {
     let start = Date.now();
     const imageBlob = await new Promise(resolve => {
       canvas.toBlob(async blob => {
-        if (process.env.CROP_IMAGE === "TRUE") {
+        console.log('process.env.CROP_IMAGE :: ', process.env.CROP_IMAGE);
+        if (process.env.CROP_IMAGE === 'TRUE') {
           window.URL = window.URL || window.webkitURL;
           let imageUri = window.URL.createObjectURL(blob);
           let imageBlob = await cropPhoto(imageUri);
@@ -126,15 +118,12 @@ class Camera extends Component {
         } else {
           resolve(blob);
         }
-      }, "image/jpeg");
+      }, 'image/jpeg');
     });
     let end = Date.now();
 
     //console.log('Blob creation time: ' + (end - start) + ' ms');
-    const requestConfig = this.sr.prepareRequest(
-      imageBlob,
-      this.state.scanSeqId
-    );
+    const requestConfig = this.sr.prepareRequest(imageBlob, this.state.scanSeqId);
     this.submitSearchRequest(requestConfig);
   };
 
@@ -173,13 +162,7 @@ class Camera extends Component {
         this.responseCounter++;
 
         // Store the result, regardless of success or not
-        this.sr.storeSearchedResult(
-          searchSuccess,
-          data,
-          referenceImageUrl,
-          esResponse,
-          searchTime
-        );
+        this.sr.storeSearchedResult(searchSuccess, data, referenceImageUrl, esResponse, searchTime);
 
         // Complete this image search attempt if we've received 9 responses or match was found
         if (this.responseCounter == 9) {
@@ -215,17 +198,15 @@ class Camera extends Component {
   completeImageSearchRequest(searchSuccess, response) {
     if (searchSuccess) {
       const w = screen.width;
-      let artUrl = response["data"]["records"][0].art_url;
+      let artUrl = response['data']['records'][0].art_url;
       // load the match image background first so that it gets cached for faster display.
-      let matchImage = this.loadImage(artUrl + "?w=" + (w - 80));
-      let matchImageBg = this.loadImage(
-        artUrl + "?q=0&auto=compress&crop=faces,entropy&fit=crop&w=" + w
-      );
+      let matchImage = this.loadImage(artUrl + '?w=' + (w - 80));
+      let matchImageBg = this.loadImage(artUrl + '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w);
 
       Promise.all([matchImage, matchImageBg]).then(() => {
         // Navigate to results page
         this.props.history.push({
-          pathname: `/artwork/${response["data"]["records"][0].id}`,
+          pathname: `/artwork/${response['data']['records'][0].id}`,
           state: { result: response }
         });
       });
@@ -268,12 +249,12 @@ class Camera extends Component {
           requestAnimationFrame(this.drawVideoPreview);
         })
         .catch(error => {
-          console.log("Cannot auto play video stream! " + error);
+          console.log('Cannot auto play video stream! ' + error);
         });
   };
 
   async componentDidMount() {
-    console.log("camera >> componentDidMount");
+    console.log('camera >> componentDidMount');
     let previewBox = this.vpreview.getBoundingClientRect();
 
     this.cropRect = {
@@ -287,14 +268,14 @@ class Camera extends Component {
     try {
       const videoStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: this.state.frontCamera ? "user" : "environment",
+          facingMode: this.state.frontCamera ? 'user' : 'environment',
           width: 1920,
           height: 1080
         }
       });
       this.setState({ videoStream: videoStream, cameraPermission: true });
     } catch (error) {
-      this.setState({ error: "An error occurred accessing the device camera" });
+      this.setState({ error: 'An error occurred accessing the device camera' });
     }
   }
 
@@ -303,12 +284,8 @@ class Camera extends Component {
     this.responseCounter = 0;
 
     // When video is able to be captured
-    if (
-      this.state.showVideo &&
-      this.state.videoStream &&
-      !this.state.matchError
-    ) {
-      console.log("camera >> componentDidUpdate");
+    if (this.state.showVideo && this.state.videoStream && !this.state.matchError) {
+      console.log('camera >> componentDidUpdate');
 
       this.video.srcObject = this.state.videoStream;
 
@@ -322,9 +299,9 @@ class Camera extends Component {
   }
 
   componentWillUnmount() {
-    console.log("camera >> componentWillUnmount");
+    console.log('camera >> componentWillUnmount');
     this.video.pause();
-    this.video.removeAttribute("src");
+    this.video.removeAttribute('src');
     this.video.load();
   }
 
@@ -334,12 +311,12 @@ class Camera extends Component {
     let canvas = this.getCanvas();
     if (!this.video || !canvas) return null;
 
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext('2d');
     if (isIOS || !this.camera_capabilities) {
       // Draw rectangle
       let rect = this.video.getBoundingClientRect();
-      let tempCanvas = document.createElement("canvas");
-      let tempCtx = tempCanvas.getContext("2d");
+      let tempCanvas = document.createElement('canvas');
+      let tempCtx = tempCanvas.getContext('2d');
 
       // Draw the video onto a temporary canvas
       tempCanvas.width = rect.width;
@@ -377,14 +354,14 @@ class Camera extends Component {
     if (video && !video.videoHeight) return null;
 
     if (!this.ctx) {
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       const aspectRatio = video.videoWidth / video.videoHeight;
 
       canvas.width = video.clientWidth;
       canvas.height = video.clientWidth / aspectRatio;
 
       this.canvas = canvas;
-      this.ctx = canvas.getContext("2d");
+      this.ctx = canvas.getContext('2d');
     }
 
     const { ctx, canvas } = this;
@@ -396,8 +373,8 @@ class Camera extends Component {
   getTempPreviewCanvas = () => {
     const rect = this.video.getBoundingClientRect();
     if (!this.tempCanvas) {
-      let tempCanvas = document.createElement("canvas");
-      let tempCtx = tempCanvas.getContext("2d");
+      let tempCanvas = document.createElement('canvas');
+      let tempCtx = tempCanvas.getContext('2d');
       tempCanvas.width = rect.width;
       tempCanvas.height = rect.height;
 
@@ -417,7 +394,7 @@ class Camera extends Component {
     let { tempCanvas, tempCtx } = this.getTempPreviewCanvas();
 
     let previewCanvas = this.vpreview;
-    let previewContext = previewCanvas.getContext("2d");
+    let previewContext = previewCanvas.getContext('2d');
     previewCanvas.width = this.cropRect.width;
     previewCanvas.height = this.cropRect.height;
 
@@ -444,7 +421,7 @@ class Camera extends Component {
 
   /** Transitions the alert screen back to camera focus when scan button is clicked */
   handleScan = () => {
-    console.log("Back to scan mode");
+    console.log('Back to scan mode');
     this.setState({ matchError: false, scanSeqId: Date.now() });
   };
 
@@ -470,31 +447,23 @@ class Camera extends Component {
                 muted
                 style={videoStyle}
               />
-              {!matchError && (
-                <canvas id="video-preview" ref={el => (this.vpreview = el)} />
-              )}
+              {!matchError && <canvas id="video-preview" ref={el => (this.vpreview = el)} />}
 
-              <ReactCSSTransitionGroup
-                transitionName="fade"
-                transitionEnterTimeout={500}
-                transitionLeaveTimeout={100}
-              >
+              <ReactCSSTransitionGroup transitionName="fade" transitionEnterTimeout={500} transitionLeaveTimeout={100}>
                 {matchError && (
                   <div id="no-match-overlay" className="no-match-overlay">
                     <div className="hint h2">
                       <span>
-                        {this.props.getTranslation("No_Result_page", "text_1")}{" "}
+                        {this.props.getTranslation('No_Result_page', 'text_1')} <br />
+                        {this.props.getTranslation('No_Result_page', 'text_2')}
                         <br />
-                        {this.props.getTranslation("No_Result_page", "text_2")}
-                        <br />
-                        {this.props.getTranslation("No_Result_page", "text_3")}
+                        {this.props.getTranslation('No_Result_page', 'text_3')}
                       </span>
                     </div>
                     <div
                       className="scan-button"
                       onClick={this.handleScan}
-                      style={{ position: "absolute", bottom: "37px" }}
-                    >
+                      style={{ position: 'absolute', bottom: '37px' }}>
                       <img src={scan_button} alt="scan" />
                     </div>
                   </div>
