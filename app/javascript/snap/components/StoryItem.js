@@ -71,8 +71,8 @@ class StoryItem extends React.Component {
             .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, '-=0.1');
         } else {
           this.t2
-            .fromTo(this.overlayRef, 0.1, { autoAlpha: 0.5 }, { autoAlpha: 0 })
-            .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, '-=0.1')
+            .fromTo(this.overlayRef, 0.1, { autoAlpha: 0.5 }, { autoAlpha: 0 }, 0)
+            .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, 0)
             .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, '-=0.1');
         }
       } else if (this.props.isLastStoryItem) {
@@ -86,7 +86,7 @@ class StoryItem extends React.Component {
       }
     }
 
-    if (this.t2) this.t2.progress(this.props.progress * 5).timeScale(0.1);
+    if (this.t2) this.t2.progress(this.props.progress * 4);
   }
 
   getArtUrl = () => {

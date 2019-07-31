@@ -22,7 +22,6 @@ body {
   //-webkit-overflow-scrolling: touch;
   //overflow-y:scroll;
   scroll-behavior: smooth;
-  overscroll-behavior-y: none; //this is supposed to fix the pull-to-refresh & overscroll glow features of browsers
 }
 
 .h0 {
