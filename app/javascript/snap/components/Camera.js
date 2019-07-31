@@ -387,36 +387,46 @@ class Camera extends Component {
 
   /** Draws the portion of the video visible within the preview onto a canvas, in a loop. */
   drawVideoPreview = () => {
-    if (!this.vpreview || this.state.matchError) {
-      return null;
+    try {
+      if (!this.vpreview || this.state.matchError) {
+        return null;
+      }
+
+      let { tempCanvas, tempCtx } = this.getTempPreviewCanvas();
+
+      let previewCanvas = this.vpreview;
+      let previewContext = previewCanvas.getContext('2d');
+      previewCanvas.width = this.cropRect.width;
+      previewCanvas.height = this.cropRect.height;
+
+      tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+      tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
+
+      previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewContext.drawImage(
+        tempCanvas,
+        this.cropRect.x,
+        this.cropRect.y,
+        this.cropRect.width,
+        this.cropRect.height,
+        0,
+        0,
+        previewCanvas.width,
+        previewCanvas.height
+      );
+
+      setTimeout(() => {
+        requestAnimationFrame(this.drawVideoPreview);
+      }, 10);
+    } catch (error) {
+      console.log('Error setting camera preview');
+      ga('send', {
+        hitType: 'event',
+        eventCategory: constants.GA_EVENT_CATEGORY.CAMERA,
+        eventAction: constants.GA_EVENT_ACTION.MOUNT_CAMERA,
+        eventLabel: constants.GA_EVENT_LABEL.CAMERA_MOUNT_FAILURE
+      });
     }
-
-    let { tempCanvas, tempCtx } = this.getTempPreviewCanvas();
-
-    let previewCanvas = this.vpreview;
-    let previewContext = previewCanvas.getContext('2d');
-    previewCanvas.width = this.cropRect.width;
-    previewCanvas.height = this.cropRect.height;
-
-    tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
-    tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
-
-    previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-    previewContext.drawImage(
-      tempCanvas,
-      this.cropRect.x,
-      this.cropRect.y,
-      this.cropRect.width,
-      this.cropRect.height,
-      0,
-      0,
-      previewCanvas.width,
-      previewCanvas.height
-    );
-
-    setTimeout(() => {
-      requestAnimationFrame(this.drawVideoPreview);
-    }, 10);
   };
 
   /** Transitions the alert screen back to camera focus when scan button is clicked */
