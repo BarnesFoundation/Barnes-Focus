@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { compose } from 'redux';
-import { isIOS, isAndroid, isSafari, isFirefox, isChrome } from 'react-device-detect';
 
 import * as constants from './Constants';
 import withOrientation from './withOrientation';
