@@ -711,7 +711,7 @@ class Artwork extends Component {
     }
     return stories.map((story, index) => {
       const storyDuration = this.state.storyDurationsCurrent[index] * 5;
-      const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33;
+      const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 292 : this.state.infoCardDuration + 33;
       //console.log('renderStory > storyDuration, storySceneOffset :: ', index, storyDuration, storySceneOffset);
       return (
         <Scene
@@ -760,7 +760,7 @@ class Artwork extends Component {
     return stories.map((story, index) => {
       const storyEnterPinDuration =
         index > 0
-          ? this.state.storyDurationsCurrent[index - 1] / 4 - 50
+          ? this.state.storyDurationsCurrent[index - 1] / 4
           : this.state.infoCardDuration + this.contentOffset + 33;
 
       //console.log('renderPinsEnter :: storyEnterPinDuration', index, storyEnterPinDuration);
@@ -776,7 +776,10 @@ class Artwork extends Component {
           duration={storyEnterPinDuration}
           offset="0"
           pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
-          <div />
+          {(progress, event) => {
+            //console.log('renderPinsEnter :: ', index, progress, event.state);
+            return <div />;
+          }}
         </Scene>
       );
     });
