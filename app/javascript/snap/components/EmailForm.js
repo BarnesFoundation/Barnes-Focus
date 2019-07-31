@@ -1,5 +1,5 @@
 import scan_button from 'images/scan-button.svg';
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, TOP_OFFSET, VIEWPORT_HEIGHT } from './Constants';

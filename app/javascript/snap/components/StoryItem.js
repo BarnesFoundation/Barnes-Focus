@@ -1,4 +1,4 @@
-import { Linear, TimelineLite } from 'gsap/TweenMax';
+import { Linear, TimelineLite } from 'gsap/all';
 import barnes_logo from 'images/barnes_email_logo_1x.png';
 import google_logo from 'images/google_translate.svg';
 import scroll_up from 'images/up_wht_1x.png';
