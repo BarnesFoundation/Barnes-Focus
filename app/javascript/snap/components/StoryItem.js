@@ -142,7 +142,7 @@ class StoryItem extends React.Component {
               }>
               {
                 <Tween
-                  from={{ css: { borderRadius: '50px 50px 0px 0px' } }}
+                  from={{ css: { borderRadius: '24px 24px 0px 0px' } }}
                   to={{ css: { borderRadius: '0px 0px 0px 0px' } }}
                   ease="easeOut"
                   duration={0.2}
@@ -152,7 +152,7 @@ class StoryItem extends React.Component {
 
             <Timeline totalProgress={progress * 5} paused target={<div className="overlay" />}>
               <Tween
-                from={{ autoAlpha: 0, borderRadius: '50px 50px 0px 0px' }}
+                from={{ autoAlpha: 0, borderRadius: '24px 24px 0px 0px' }}
                 to={{ autoAlpha: 0.6, borderRadius: '0px 0px 0px 0px' }}
                 ease="easeOut"
                 duration={0.1}

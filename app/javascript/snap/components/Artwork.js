@@ -157,9 +157,9 @@ class Artwork extends Component {
     const durDefault = 300;
 
     if (!this.state.result) {
-      const artworkInfo = await this.sr.getArtworkInformation(imageId);
+      const artworkInfo = this.sr.getArtworkInformation(imageId);
       const { stories, storyId, storyTitle } = await this.setupStory(imageId);
-      const { artwork, roomRecords } = this.constructResultAndInRoomSlider(artworkInfo);
+      const { artwork, roomRecords } = this.constructResultAndInRoomSlider(await artworkInfo);
 
       stories.forEach(story => {
         durationCurArr.push(durDefault);
