@@ -1,10 +1,9 @@
-import { filter } from 'lodash';
-import queryString from 'query-string';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { Controller, Scene } from 'react-scrollmagic';
 import { compose } from 'redux';
 import styled from 'styled-components';
+import queryString from 'query-string';
 import StoryItem from '../components/StoryItem';
 import { SearchRequestService } from '../services/SearchRequestService';
 import * as constants from './Constants';
@@ -76,7 +75,7 @@ class StoryPage extends Component {
         }
       });
     }
-    return filter(this.langOptions, lang => lang.selected === true);
+    return this.langOptions.filter(lang => lang.selected === true);
   };
 
   setupStory = async (slug, lang) => {
@@ -89,7 +88,7 @@ class StoryPage extends Component {
         storyTitle: stories_data.data.content.story_title
       };
     } else {
-      return { stories: undefined, storyId: undefined, storyTitle: undefined };
+      return { stories: [], storyId: undefined, storyTitle: undefined };
     }
   };
 

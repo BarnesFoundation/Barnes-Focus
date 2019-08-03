@@ -300,6 +300,7 @@ class Camera extends Component {
 
   componentWillUnmount() {
     console.log('camera >> componentWillUnmount');
+    this.stopScan();
     this.video.pause();
     this.video.removeAttribute('src');
     this.video.load();
