@@ -107,7 +107,7 @@ class Camera extends Component {
     let start = Date.now();
     const imageBlob = await new Promise(resolve => {
       canvas.toBlob(async blob => {
-        console.log('process.env.CROP_IMAGE :: ', process.env.CROP_IMAGE);
+        //console.log('process.env.CROP_IMAGE :: ', process.env.CROP_IMAGE);
         if (process.env.CROP_IMAGE === 'TRUE') {
           window.URL = window.URL || window.webkitURL;
           let imageUri = window.URL.createObjectURL(blob);
