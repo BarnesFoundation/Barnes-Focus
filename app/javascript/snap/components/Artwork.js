@@ -235,6 +235,22 @@ class Artwork extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.artworkScene && this.artworkScene.remove();
+    this.emailScene && this.emailScene.remove();
+    this.emailSceneTrigger && this.emailSceneTrigger.remove();
+    this.artworkScene && this.artworkScene.destroy(true);
+    this.emailScene && this.emailScene.destroy(true);
+    this.emailSceneTrigger && this.emailSceneTrigger.destroy(true);
+
+    //this.storySceneController && this.storySceneController.destroy(true);
+    this.controller.destroy(true);
+
+    this.emailScene = null;
+    this.artworkScene = null;
+    this.controller = null;
+  }
+
   resetArtworkSceneSettings = () => {
     this.artworkScene.removePin(true);
     this.artworkScene.offset(this.artworkScrollOffset);
@@ -777,10 +793,7 @@ class Artwork extends Component {
           duration={storyEnterPinDuration}
           offset="0"
           pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
-          {(progress, event) => {
-            //console.log('renderPinsEnter :: ', index, progress, event.state);
-            return <div />;
-          }}
+          <div />
         </Scene>
       );
     });

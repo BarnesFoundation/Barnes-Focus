@@ -89,6 +89,11 @@ class StoryItem extends React.Component {
     if (this.t2) this.t2.progress(this.props.progress * 4);
   }
 
+  componentWillUnmount() {
+    this.t2.remove();
+    this.t2.kill();
+  }
+
   getArtUrl = () => {
     return this.props.story.detail.art_url + `?crop=faces,entropy&fit=crop&w=` + screen.width + `&h=` + screen.height;
   };
