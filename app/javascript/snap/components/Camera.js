@@ -253,8 +253,18 @@ class Camera extends Component {
         });
   };
 
+  disablePinchZoom = event => {
+    event.preventDefault();
+  };
+
   async componentDidMount() {
     console.log('camera >> componentDidMount');
+
+    // Since iOS 10, it no longer support "user-scalable=no" attribute.
+    // Adding this, to disable page zoom on pinch on the camera page
+    const cameraContainer = document.querySelector('.camera');
+    cameraContainer.addEventListener('touchmove', this.disablePinchZoom, false);
+
     let previewBox = this.vpreview.getBoundingClientRect();
 
     this.cropRect = {
@@ -304,6 +314,9 @@ class Camera extends Component {
     this.video.pause();
     this.video.removeAttribute('src');
     this.video.load();
+
+    const cameraContainer = document.querySelector('.camera');
+    cameraContainer.removeEventListener('touchmove', this.disablePinchZoom);
   }
 
   /** Gets the video drawn onto the canvas */
