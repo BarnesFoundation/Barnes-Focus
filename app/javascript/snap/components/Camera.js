@@ -264,7 +264,6 @@ class Camera extends Component {
       height: Math.floor(previewBox.height)
     };
 
-    window.addEventListener('touchstart', this.touchHandler, false);
     // Fetch the device camera
     try {
       const videoStream = await navigator.mediaDevices.getUserMedia({
@@ -305,17 +304,7 @@ class Camera extends Component {
     this.video.pause();
     this.video.removeAttribute('src');
     this.video.load();
-
-    window.removeEventListener('touchstart', this.touchHandler);
   }
-
-  touchHandler = event => {
-    if (event.touches.length > 1) {
-      //the event is multi-touch
-      //you can then prevent the behavior
-      event.preventDefault();
-    }
-  };
 
   /** Gets the video drawn onto the canvas */
   getVideoCanvas = () => {
