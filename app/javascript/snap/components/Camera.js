@@ -264,7 +264,7 @@ class Camera extends Component {
       height: Math.floor(previewBox.height)
     };
 
-    window.addEventListener('touchstart', this.touchHandler, true);
+    window.addEventListener('touchstart', this.touchHandler, false);
     // Fetch the device camera
     try {
       const videoStream = await navigator.mediaDevices.getUserMedia({
