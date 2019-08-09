@@ -2,7 +2,7 @@ import axios from 'axios';
 import scan_button from 'images/scan-button.svg';
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import { isIOS } from 'react-device-detect';
+import { isIOS, mobileVendor, mobileModel, fullBrowserVersion, browserName } from 'react-device-detect';
 import posed from 'react-pose';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
@@ -259,6 +259,13 @@ class Camera extends Component {
 
   async componentDidMount() {
     console.log('camera >> componentDidMount');
+    console.log('device info :: ', mobileVendor, mobileModel, browserName, fullBrowserVersion);
+    ga('send', {
+      hitType: 'event',
+      eventCategory: constants.GA_EVENT_CATEGORY.CAMERA,
+      eventAction: constants.GA_EVENT_ACTION.DEVICE_INFO,
+      eventLabel: mobileVendor + ', ' + mobileModel + ', ' + browserName + ', ' + fullBrowserVersion
+    });
 
     // Since iOS 10, it no longer support "user-scalable=no" attribute.
     // Adding this, to disable page zoom on pinch on the camera page
@@ -276,6 +283,7 @@ class Camera extends Component {
 
     // Fetch the device camera
     try {
+      const startTime = Date.now();
       const videoStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: this.state.frontCamera ? 'user' : 'environment',
@@ -283,6 +291,18 @@ class Camera extends Component {
           height: 1080
         }
       });
+      //Assuming it will take atleast 1 sec for user to respond to camera permission dialog.
+      // If the user had previously ganted/ rejected the permission, this promise should resolve in less than a sec.
+      if (Date.now() - startTime > 1000) {
+        // dialog was shown
+        ga('send', {
+          hitType: 'event',
+          eventCategory: constants.GA_EVENT_CATEGORY.CAMERA,
+          eventAction: constants.GA_EVENT_ACTION.CAMERA_PERMISSION,
+          eventLabel: constants.GA_EVENT_LABEL.PERMISSION_GRANTED
+        });
+      }
+
       this.setState({ videoStream: videoStream, cameraPermission: true });
     } catch (error) {
       this.setState({ error: 'An error occurred accessing the device camera' });
@@ -437,8 +457,8 @@ class Camera extends Component {
       ga('send', {
         hitType: 'event',
         eventCategory: constants.GA_EVENT_CATEGORY.CAMERA,
-        eventAction: constants.GA_EVENT_ACTION.MOUNT_CAMERA,
-        eventLabel: constants.GA_EVENT_LABEL.CAMERA_MOUNT_FAILURE
+        eventAction: constants.GA_EVENT_ACTION.SCAN,
+        eventLabel: constants.GA_EVENT_LABEL.SCANNER_MOUNT_FAILURE
       });
     }
   };

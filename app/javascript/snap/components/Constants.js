@@ -60,7 +60,9 @@ export const GA_EVENT_ACTION = {
   SOCIAL_SHARE_NAVIGATOR: 'share_navigator',
   SOCIAL_SHARE_FB: 'share_fb',
   SOCIAL_SHARE_TWT: 'share_twt',
-  MOUNT_CAMERA: 'mount_camera'
+  DEVICE_INFO: 'device_info',
+  SCAN: 'scanner',
+  CAMERA_PERMISSION: 'camera_permission'
 };
 
 export const GA_EVENT_LABEL = {
@@ -71,5 +73,6 @@ export const GA_EVENT_LABEL = {
   SOCIAL_SHARE_NAVIGATOR: 'android navigator share (multiple platforms)',
   SOCIAL_SHARE_FB: 'ios share via facebook',
   SOCIAL_SHARE_TWT: 'ios share via twitter',
-  CAMERA_MOUNT_FAILURE: 'camera mount failed'
+  SCANNER_MOUNT_FAILURE: 'scanner load failed',
+  PERMISSION_GRANTED: 'camera permission granted'
 };
