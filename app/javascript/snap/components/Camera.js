@@ -291,9 +291,12 @@ class Camera extends Component {
           height: 1080
         }
       });
+
       //Assuming it will take atleast 1 sec for user to respond to camera permission dialog.
       // If the user had previously ganted/ rejected the permission, this promise should resolve in less than a sec.
-      if (Date.now() - startTime > 1000) {
+      const permissionGrantTime = Date.now() - startTime;
+      //console.log('Camera Permission granted in :: ', permissionGrantTime, ' ms.');
+      if (permissionGrantTime > 900) {
         // dialog was shown
         ga('send', {
           hitType: 'event',
