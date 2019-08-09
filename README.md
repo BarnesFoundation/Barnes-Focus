@@ -1,15 +1,16 @@
 # Installation Instructions
-* Git clone
-* Install Ruby (using RVM): `rvm install ruby-2.4.3`
-* Install Rails: `gem install rails` OR run `bundle`
-* Install Yarn (for Mac): `brew install yarn`
-* Install Foreman: `gem install foreman`
-* `$ bundle`
-* `$ yarn install`
-* Create Schema: `rake db:create`
-* Migration: `rake db:migrate`
-* Note: You must have a PSQL server running for the above rake commands to run successfully
-* Start server in development mode: `rails server`
+- Git clone
+- Install Ruby (using RVM): `rvm install ruby-2.4.3`
+- Install Rails: `gem install rails` OR run `bundle`
+- Install Yarn (for Mac): `brew install yarn`
+- Install Foreman: `gem install foreman`
+- (MacOS) Install postgres: `brew install postgresql`
+- `$ bundle`
+- `$ yarn install`
+- Note: You must have a PSQL server running for the following rake commands to run successfully, recommend <https://postgresapp.com/> for MacOS
+- Create Schema: `rake db:create`
+- Migration: `rake db:migrate`
+- Start server in development mode: `rails server`
 
 ## About updating ES Cache table
 If you're working locally/on localhost or setting up a new app, then from postman or any other ARC client, you'll have to make a POST request to this url: `POST: http://localhost:3000/jobs/update_es_cache` (make sure server is running)
