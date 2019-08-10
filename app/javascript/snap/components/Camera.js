@@ -2,7 +2,7 @@ import axios from 'axios';
 import scan_button from 'images/scan-button.svg';
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import { isIOS, mobileVendor, mobileModel, fullBrowserVersion, browserName } from 'react-device-detect';
+import { isIOS } from 'react-device-detect';
 import posed from 'react-pose';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
@@ -259,13 +259,6 @@ class Camera extends Component {
 
   async componentDidMount() {
     console.log('camera >> componentDidMount');
-    console.log('device info :: ', mobileVendor, mobileModel, browserName, fullBrowserVersion);
-    ga('send', {
-      hitType: 'event',
-      eventCategory: constants.GA_EVENT_CATEGORY.CAMERA,
-      eventAction: constants.GA_EVENT_ACTION.DEVICE_INFO,
-      eventLabel: mobileVendor + ', ' + mobileModel + ', ' + browserName + ', ' + fullBrowserVersion
-    });
 
     // Since iOS 10, it no longer support "user-scalable=no" attribute.
     // Adding this, to disable page zoom on pinch on the camera page
