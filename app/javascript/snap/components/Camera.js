@@ -305,6 +305,14 @@ class Camera extends Component {
     }
   }
 
+  stopVideo = () => {
+    this.initVideo && clearTimeout(this.initVideo);
+  };
+
+  stopPreview = () => {
+    this.drawPreview && clearTimeout(this.drawPreview);
+  };
+
   componentDidUpdate() {
     this.matchFound = false;
     this.responseCounter = 0;
@@ -315,7 +323,9 @@ class Camera extends Component {
 
       this.video.srcObject = this.state.videoStream;
 
-      setTimeout(() => {
+      this.stopVideo();
+
+      this.initVideo = setTimeout(() => {
         this.playVideo();
       }, 50);
 
@@ -327,6 +337,8 @@ class Camera extends Component {
   componentWillUnmount() {
     console.log('camera >> componentWillUnmount');
     this.stopScan();
+    this.stopVideo();
+    this.stopPreview();
     this.video.pause();
     this.video.removeAttribute('src');
     this.video.load();
@@ -341,12 +353,12 @@ class Camera extends Component {
     let canvas = this.getCanvas();
     if (!this.video || !canvas) return null;
 
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext('2d', { alpha: false });
     if (isIOS || !this.camera_capabilities) {
       // Draw rectangle
       let rect = this.video.getBoundingClientRect();
       let tempCanvas = document.createElement('canvas');
-      let tempCtx = tempCanvas.getContext('2d');
+      let tempCtx = tempCanvas.getContext('2d', { alpha: false });
 
       // Draw the video onto a temporary canvas
       tempCanvas.width = rect.width;
@@ -391,7 +403,7 @@ class Camera extends Component {
       canvas.height = video.clientWidth / aspectRatio;
 
       this.canvas = canvas;
-      this.ctx = canvas.getContext('2d');
+      this.ctx = canvas.getContext('2d', { alpha: false });
     }
 
     const { ctx, canvas } = this;
@@ -404,7 +416,7 @@ class Camera extends Component {
     const rect = this.video.getBoundingClientRect();
     if (!this.tempCanvas) {
       let tempCanvas = document.createElement('canvas');
-      let tempCtx = tempCanvas.getContext('2d');
+      let tempCtx = tempCanvas.getContext('2d', { alpha: false });
       tempCanvas.width = rect.width;
       tempCanvas.height = rect.height;
 
@@ -425,7 +437,7 @@ class Camera extends Component {
       let { tempCanvas, tempCtx } = this.getTempPreviewCanvas();
 
       let previewCanvas = this.vpreview;
-      let previewContext = previewCanvas.getContext('2d');
+      let previewContext = previewCanvas.getContext('2d', { alpha: false });
       previewCanvas.width = this.cropRect.width;
       previewCanvas.height = this.cropRect.height;
 
@@ -445,7 +457,8 @@ class Camera extends Component {
         previewCanvas.height
       );
 
-      setTimeout(() => {
+      this.stopPreview();
+      this.drawPreview = setTimeout(() => {
         requestAnimationFrame(this.drawVideoPreview);
       }, 10);
     } catch (error) {
