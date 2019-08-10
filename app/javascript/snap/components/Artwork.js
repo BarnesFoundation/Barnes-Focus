@@ -90,6 +90,9 @@ class Artwork extends Component {
     this.emailCardRef = null;
 
     this.artworkScrollOffset = 0;
+
+    this.artworkTimeoutCallback = null;
+    this.emailSubmitTimeoutCallback = null;
   }
 
   constructResultAndInRoomSlider = search_result => {
@@ -236,6 +239,8 @@ class Artwork extends Component {
   }
 
   componentWillUnmount() {
+    this.artworkTimeoutCallback && clearTimeout(this.artworkTimeoutCallback);
+    this.emailSubmitTimeoutCallback && clearTimeout(this.emailSubmitTimeoutCallback);
     this.artworkScene && this.artworkScene.remove();
     this.emailScene && this.emailScene.remove();
     this.emailSceneTrigger && this.emailSceneTrigger.remove();
@@ -245,7 +250,6 @@ class Artwork extends Component {
 
     //this.storySceneController && this.storySceneController.destroy(true);
     this.controller.destroy(true);
-
     this.emailScene = null;
     this.artworkScene = null;
     this.controller = null;
@@ -426,7 +430,7 @@ class Artwork extends Component {
     this.setState({ email: email, emailCaptured: true });
     this.sr.submitBookmarksEmail(email);
     // close the email card after 4 secs
-    setTimeout(() => {
+    this.emailSubmitTimeoutCallback = setTimeout(() => {
       this.setState({ emailCaptureAck: true });
     }, 4000);
   };
@@ -477,7 +481,7 @@ class Artwork extends Component {
   setArtworkRef = elem => {
     if (elem) {
       this.artworkRef = elem;
-      setTimeout(() => {
+      this.artworkTimeoutCallback = setTimeout(() => {
         this.setupArtworkScene();
         if (!this.state.showStory) {
           this.setupEmailSceneOnEnter();
