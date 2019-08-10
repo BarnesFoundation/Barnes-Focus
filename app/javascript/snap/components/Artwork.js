@@ -810,7 +810,7 @@ class Artwork extends Component {
       <SectionWipesStyled hasChildCards={hasChildCards}>
         {this.renderArtwork()}
 
-        <Controller refreshInterval={250}>
+        <Controller refreshInterval={0}>
           {this.renderTitleBar()}
 
           {this.renderPinsEnter()}

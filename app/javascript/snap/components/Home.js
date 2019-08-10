@@ -52,6 +52,74 @@ class HomeComponent extends Component {
     }
   };
 
+  getIPhoneModel = () => {
+    // Check if we are seeing an iPhone at all by looking at the user agent
+    if (/iPhone/.test(navigator.userAgent) && !window.MSStream) {
+      // Get details about the current device
+      var currentDeviceInfo = JSON.stringify({
+        width: window.screen.width > window.screen.height ? window.screen.height : window.screen.width,
+        height: window.screen.width > window.screen.height ? window.screen.width : window.screen.height,
+        ratio: window.devicePixelRatio
+      });
+
+      // This is our "database" of possible device configurations
+      var database = {
+        '2G/3G/3GS': {
+          width: 320,
+          height: 480,
+          ratio: 1
+        },
+        '4/4S': {
+          width: 320,
+          height: 480,
+          ratio: 2
+        },
+        '5/5S/5C/SE': {
+          width: 320,
+          height: 568,
+          ratio: 2
+        },
+        '6/6S/7/8': {
+          width: 375,
+          height: 667,
+          ratio: 2
+        },
+        '6+/6S+/7+/8+': {
+          width: 414,
+          height: 736,
+          ratio: 3
+        },
+        'X/XS': {
+          width: 375,
+          height: 812,
+          ratio: 3
+        },
+        XR: {
+          width: 414,
+          height: 896,
+          ratio: 2
+        },
+        'XS Max': {
+          width: 414,
+          height: 896,
+          ratio: 3
+        }
+      };
+
+      // Loop through our database and compare configurations to our current device
+      // Return the device name if a match is found
+      for (var model in database) {
+        if (JSON.stringify(database[model]) == currentDeviceInfo) {
+          return 'iPhone ' + model;
+        }
+      }
+
+      return null;
+    }
+
+    return null;
+  };
+
   checkForGetUserMedia = () => {
     const iOSVersion = parseFloat(osVersion);
 
@@ -83,6 +151,18 @@ class HomeComponent extends Component {
 
   onSelectYes = async () => {
     try {
+      if (isIOS) {
+        const iPhoneModel = this.getIPhoneModel();
+        if (iPhoneModel) {
+          console.log('IPhone model :: ', iPhoneModel);
+          ga('send', {
+            hitType: 'event',
+            eventCategory: constants.GA_EVENT_CATEGORY.CAMERA,
+            eventAction: constants.GA_EVENT_ACTION.DEVICE_INFO,
+            eventLabel: iPhoneModel
+          });
+        }
+      }
       const startTime = Date.now();
       // Attempt to access device camera
       await navigator.mediaDevices.getUserMedia({
