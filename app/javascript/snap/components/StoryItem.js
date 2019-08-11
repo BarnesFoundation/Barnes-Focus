@@ -20,6 +20,10 @@ class StoryItem extends React.Component {
       scrollHeight: 0,
       showTitle: true
     };
+
+    this.masterTimelineGSAP = null;
+    this.imgTopTimelineGSAP = null;
+    this.overlayTimelineGSAP = null;
   }
 
   componentDidMount() {
@@ -27,6 +31,10 @@ class StoryItem extends React.Component {
     this.scrollInProgress = false;
     this.setState({ scrollHeight: this.contentRef.clientHeight });
     this.t2 = new TimelineLite({ paused: true });
+
+    this.masterTimelineGSAP = this.masterTimeline.getGSAP();
+    this.imgTopTimelineGSAP = this.imgTopTimeline.getGSAP();
+    this.overlayTimelineGSAP = this.overlayTimeline.getGSAP();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -90,6 +98,13 @@ class StoryItem extends React.Component {
   }
 
   componentWillUnmount() {
+    this.masterTimelineGSAP.remove();
+    this.masterTimelineGSAP.kill();
+    this.imgTopTimelineGSAP.remove();
+    this.imgTopTimelineGSAP.kill();
+    this.overlayTimelineGSAP.remove();
+    this.overlayTimelineGSAP.kill();
+
     this.t2.remove();
     this.t2.kill();
   }
@@ -132,7 +147,7 @@ class StoryItem extends React.Component {
     const paragraphFontStyle = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `16px` } : {};
     return (
       <div>
-        <Timeline totalProgress={progress} paused>
+        <Timeline totalProgress={progress} paused ref={ref => (this.masterTimeline = ref)}>
           <div className="card story-item">
             {this.props.storyIndex === 0 && this.state.showTitle && !this.props.storyEmailPage && (
               <div className="story-title-bar">
@@ -144,7 +159,8 @@ class StoryItem extends React.Component {
               paused
               target={
                 <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
-              }>
+              }
+              ref={ref => (this.imgTopTimeline = ref)}>
               {
                 <Tween
                   from={{ css: { borderRadius: '24px 24px 0px 0px' } }}
@@ -155,7 +171,11 @@ class StoryItem extends React.Component {
               }
             </Timeline>
 
-            <Timeline totalProgress={progress * 5} paused target={<div className="overlay" />}>
+            <Timeline
+              totalProgress={progress * 5}
+              paused
+              target={<div className="overlay" />}
+              ref={ref => (this.overlayTimeline = ref)}>
               <Tween
                 from={{ autoAlpha: 0, borderRadius: '24px 24px 0px 0px' }}
                 to={{ autoAlpha: 0.6, borderRadius: '0px 0px 0px 0px' }}
