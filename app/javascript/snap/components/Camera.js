@@ -27,7 +27,6 @@ class Camera extends Component {
 
   track;
   camera_capabilities;
-  camera_settings;
   scan;
   cropRect;
 
@@ -77,11 +76,8 @@ class Camera extends Component {
     localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
     localStorage.setItem(constants.SNAP_LAST_TIMESTAMP, Date.now());
 
-    let prefLang = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) || 'en';
     this.intervalExecutions = 0;
-
     this.stopScan();
-
     // Capture a photo scan every third of a second
     this.scan = setInterval(() => {
       if (this.intervalExecutions == 9) {
@@ -242,9 +238,8 @@ class Camera extends Component {
       this.video
         .play()
         .then(() => {
-          this.track = this.state.videoStream.getVideoTracks()[0];
-          this.camera_capabilities = this.track.getCapabilities();
-          this.camera_settings = this.track.getSettings();
+          const track = this.state.videoStream.getVideoTracks()[0];
+          this.camera_capabilities = track.getCapabilities();
           this.capturePhotoShots();
           requestAnimationFrame(this.drawVideoPreview);
         })
@@ -306,11 +301,15 @@ class Camera extends Component {
   }
 
   stopVideo = () => {
-    this.initVideo && clearTimeout(this.initVideo);
+    if (this.initVideo) {
+      clearTimeout(this.initVideo);
+    }
   };
 
   stopPreview = () => {
-    this.drawPreview && clearTimeout(this.drawPreview);
+    if (this.drawPreview) {
+      clearTimeout(this.drawPreview);
+    }
   };
 
   componentDidUpdate() {
