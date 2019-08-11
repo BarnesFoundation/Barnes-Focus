@@ -47,7 +47,7 @@ class Artwork extends Component {
     super(props);
     //console.log('Artwork >> constructor');
     this.sr = new SearchRequestService();
-    this.controller = new ScrollMagic.Controller();
+    this.controller = new ScrollMagic.Controller({ refreshInterval: 0 });
     this.artworkScene = null;
     this.emailScene = null;
     this.emailSceneTrigger = null;
