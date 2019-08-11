@@ -239,8 +239,8 @@ class Artwork extends Component {
   }
 
   componentWillUnmount() {
-    this.artworkTimeoutCallback && clearTimeout(this.artworkTimeoutCallback);
-    this.emailSubmitTimeoutCallback && clearTimeout(this.emailSubmitTimeoutCallback);
+    if (this.artworkTimeoutCallback) clearTimeout(this.artworkTimeoutCallback);
+    if (this.emailSubmitTimeoutCallback) clearTimeout(this.emailSubmitTimeoutCallback);
     this.artworkScene && this.artworkScene.remove();
     this.emailScene && this.emailScene.remove();
     this.emailSceneTrigger && this.emailSceneTrigger.remove();
