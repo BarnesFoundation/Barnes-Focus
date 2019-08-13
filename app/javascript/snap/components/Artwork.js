@@ -470,9 +470,9 @@ class Artwork extends Component {
   setupEmailScene = () => {
     this.emailScene = new ScrollMagic.Scene({
       triggerElement: '#email-form',
-      triggerHook: 'onEnter',
-      duration: 0, // scroll distance
-      offset: this.emailHeight // start this scene after scrolling for 50px
+      triggerHook: 0.5,
+      duration: 0 // scroll distance
+      //offset: this.emailFormHeight // start this scene after scrolling for emailFormHeight px.
     })
       .setPin('#email-form') // pins the element for the the scene's duration
       .addTo(this.controller);
@@ -509,7 +509,8 @@ class Artwork extends Component {
   };
 
   onEmailHeightReady = height => {
-    this.emailHeight = height;
+    const computedHeight = Math.max(height, screen.height / 2);
+    this.emailFormHeight = Math.ceil(computedHeight);
   };
 
   storySceneCallback = showTitle => {
