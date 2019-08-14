@@ -47,7 +47,7 @@ class Artwork extends Component {
     super(props);
     //console.log('Artwork >> constructor');
     this.sr = new SearchRequestService();
-    this.controller = new ScrollMagic.Controller({ refreshInterval: 0 });
+    this.controller = new ScrollMagic.Controller();
     this.artworkScene = null;
     this.emailScene = null;
     this.emailSceneTrigger = null;
@@ -468,11 +468,12 @@ class Artwork extends Component {
   };
 
   setupEmailScene = () => {
+    console.log('Email scene offset: ', this.emailFormHeight);
     this.emailScene = new ScrollMagic.Scene({
       triggerElement: '#email-form',
-      triggerHook: 0.5,
-      duration: 0 // scroll distance
-      //offset: this.emailFormHeight // start this scene after scrolling for emailFormHeight px.
+      triggerHook: 'onEnter',
+      duration: 0, // scroll distance
+      offset: this.emailFormHeight // start this scene after scrolling for emailFormHeight px.
     })
       .setPin('#email-form') // pins the element for the the scene's duration
       .addTo(this.controller);
@@ -509,8 +510,8 @@ class Artwork extends Component {
   };
 
   onEmailHeightReady = height => {
-    const computedHeight = Math.max(height, screen.height / 2);
-    this.emailFormHeight = Math.ceil(computedHeight);
+    //const computedHeight = Math.max(height, screen.height / 2);
+    this.emailFormHeight = height;
   };
 
   storySceneCallback = showTitle => {
@@ -815,7 +816,7 @@ class Artwork extends Component {
       <SectionWipesStyled hasChildCards={hasChildCards}>
         {this.renderArtwork()}
 
-        <Controller refreshInterval={0}>
+        <Controller refreshInterval={250}>
           {this.renderTitleBar()}
 
           {this.renderPinsEnter()}
