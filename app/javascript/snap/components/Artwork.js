@@ -20,6 +20,7 @@ import StoryItem from './StoryItem';
 import scan_button from 'images/scan-button.svg';
 import { isTablet } from 'react-device-detect';
 import ScrollMagic from 'scrollmagic';
+import { isAndroid } from 'react-device-detect';
 
 /**
  * withRouter HOC provides props with location, history and match objects
@@ -441,6 +442,9 @@ class Artwork extends Component {
       0
     );
     this.artworkScrollOffset = artworkVScrollOffset + 100;
+    if (isAndroid) {
+      this.artworkScrollOffset = this.artworkScrollOffset + 56; // 56 (address bar height) compensation for android
+    }
     console.log('setArtworkRef >> offset after setTimeout  == ', this.artworkScrollOffset);
     this.artworkScene = new ScrollMagic.Scene({
       triggerElement: '#search-result',

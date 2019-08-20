@@ -5,6 +5,7 @@ import scroll_up from 'images/up_wht_1x.png';
 import React from 'react';
 import { Timeline, Tween } from 'react-gsap';
 import { LANGUAGE_EN, VIEWPORT_HEIGHT, SNAP_LANGUAGE_PREFERENCE } from './Constants';
+import { isAndroid } from 'react-device-detect';
 
 class StoryItem extends React.Component {
   constructor(props) {
@@ -143,12 +144,16 @@ class StoryItem extends React.Component {
   };
 
   render() {
-    const { story, storyTitle, progress } = this.props;
+    const { story, storyTitle, progress, storyIndex } = this.props;
+    const peekOffsetStyle =
+      isAndroid && storyIndex === 0
+        ? { transform: 'translate3d(0px, -123px, 0px)' } // 67 + 56 (address bar height compensation for android)
+        : { transform: 'translate3d(0px, -67px, 0px)' };
     const paragraphFontStyle = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `16px` } : {};
     return (
       <div>
         <Timeline totalProgress={progress} paused ref={ref => (this.masterTimeline = ref)}>
-          <div className="card story-item">
+          <div className="card story-item" style={peekOffsetStyle}>
             {this.props.storyIndex === 0 && this.state.showTitle && !this.props.storyEmailPage && (
               <div className="story-title-bar">
                 <div className="story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
