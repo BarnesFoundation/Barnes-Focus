@@ -48,7 +48,7 @@ class Artwork extends Component {
     super(props);
     //console.log('Artwork >> constructor');
     this.sr = new SearchRequestService();
-    this.controller = new ScrollMagic.Controller();
+
     this.artworkScene = null;
     this.emailScene = null;
     this.emailSceneTrigger = null;
@@ -181,7 +181,7 @@ class Artwork extends Component {
         storyId: storyId,
         storyTitle: storyTitle,
         result: artworkInfo,
-        showStory: artworkInfo.data.show_story,
+        showStory: true, //artworkInfo.data.show_story,
         artwork: artwork,
         roomRecords: roomRecords,
         emailCaptured: emailCaptured,
@@ -442,9 +442,6 @@ class Artwork extends Component {
       0
     );
     this.artworkScrollOffset = artworkVScrollOffset + 100;
-    if (isAndroid) {
-      this.artworkScrollOffset = this.artworkScrollOffset + 56; // 56 (address bar height) compensation for android
-    }
     console.log('setArtworkRef >> offset after setTimeout  == ', this.artworkScrollOffset);
     this.artworkScene = new ScrollMagic.Scene({
       triggerElement: '#search-result',
@@ -486,6 +483,8 @@ class Artwork extends Component {
   setArtworkRef = elem => {
     if (elem) {
       this.artworkRef = elem;
+      const scrollContainer = isAndroid ? { container: '.sm-container' } : {};
+      this.controller = new ScrollMagic.Controller(scrollContainer);
       this.artworkTimeoutCallback = setTimeout(() => {
         this.setupArtworkScene();
         if (!this.state.showStory) {
@@ -724,7 +723,7 @@ class Artwork extends Component {
         </div>
       );
     } else {
-      return <div />;
+      return <div id="story-title-bar" />;
     }
   };
 
@@ -782,7 +781,7 @@ class Artwork extends Component {
   renderPinsEnter = () => {
     const { showStory, stories, storyTitle } = this.state;
     if (!showStory) {
-      return <div />;
+      return <div id="story-pin-enter" />;
     }
     return stories.map((story, index) => {
       const storyEnterPinDuration =
@@ -803,10 +802,35 @@ class Artwork extends Component {
           duration={storyEnterPinDuration}
           offset="0"
           pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
-          <div />
+          <div id={`story-pin-enter-${index + 1}`} />
         </Scene>
       );
     });
+  };
+
+  /** for android scroll within the fixed container .sm-container because of card peek issue */
+  renderStoryContainer = () => {
+    if (isAndroid) {
+      return (
+        <Controller refreshInterval={250} container=".sm-container">
+          {this.renderTitleBar()}
+
+          {this.renderPinsEnter()}
+
+          {this.renderStory()}
+        </Controller>
+      );
+    } else {
+      return (
+        <Controller refreshInterval={250}>
+          {this.renderTitleBar()}
+
+          {this.renderPinsEnter()}
+
+          {this.renderStory()}
+        </Controller>
+      );
+    }
   };
 
   /**
@@ -820,13 +844,7 @@ class Artwork extends Component {
       <SectionWipesStyled hasChildCards={hasChildCards}>
         {this.renderArtwork()}
 
-        <Controller refreshInterval={250}>
-          {this.renderTitleBar()}
-
-          {this.renderPinsEnter()}
-
-          {this.renderStory()}
-        </Controller>
+        {this.renderStoryContainer()}
 
         {/** this is a placeholder element at the bottom of viewport to control email card enter animation when no stories are present */}
         {<div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }} />}
@@ -842,7 +860,7 @@ class Artwork extends Component {
       return null;
     }
     return (
-      <div>
+      <div className={isAndroid ? 'sm-container' : 'ios-container'}>
         {!imgLoaded && (
           <div style={{ visibility: `hidden` }}>
             <img
