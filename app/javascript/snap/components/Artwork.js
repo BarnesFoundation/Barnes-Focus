@@ -181,7 +181,7 @@ class Artwork extends Component {
         storyId: storyId,
         storyTitle: storyTitle,
         result: artworkInfo,
-        showStory: true, //artworkInfo.data.show_story,
+        showStory: artworkInfo.data.show_story,
         artwork: artwork,
         roomRecords: roomRecords,
         emailCaptured: emailCaptured,
