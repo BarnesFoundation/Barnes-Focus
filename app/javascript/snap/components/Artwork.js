@@ -447,7 +447,7 @@ class Artwork extends Component {
       triggerElement: '#search-result',
       triggerHook: 'onLeave',
       duration: 0, // scroll distance
-      offset: this.artworkScrollOffset // start this scene after scrolling for 50px
+      offset: this.artworkScrollOffset
     })
       .setPin('#search-result', { pushFollowers: false }) // pins the element for the the scene's duration
       .addTo(this.controller);
@@ -457,7 +457,7 @@ class Artwork extends Component {
     this.emailSceneTrigger = new ScrollMagic.Scene({
       triggerElement: '#email-trigger-enter',
       triggerHook: 'onEnter',
-      duration: this.artworkScrollOffset - 100
+      duration: this.artworkScrollOffset - 150
     })
       .setPin('#email-trigger-enter', { pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }) // pins the element for the the scene's duration
       .on('leave', event => {
@@ -471,12 +471,12 @@ class Artwork extends Component {
   setupEmailScene = () => {
     console.log('Email scene offset: ', this.emailFormHeight);
     this.emailScene = new ScrollMagic.Scene({
-      triggerElement: '#email-form',
+      triggerElement: '#email-panel',
       triggerHook: 'onEnter',
       duration: 0, // scroll distance
       offset: this.emailFormHeight // start this scene after scrolling for emailFormHeight px.
     })
-      .setPin('#email-form') // pins the element for the the scene's duration
+      .setPin('#email-panel') // pins the element for the the scene's duration
       .addTo(this.controller);
   };
 
