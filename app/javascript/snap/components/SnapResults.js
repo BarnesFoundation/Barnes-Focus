@@ -547,7 +547,7 @@ class SnapResults extends Component {
                     </Popover>
                   </div>
                 </Child>
-                {
+                {/* {
                   this.state.showSliderOverlay &&
                   this.state.alsoInRoomResults.length > 0 &&
                   <div id="slider-overlay"></div>
@@ -557,7 +557,7 @@ class SnapResults extends Component {
                   <Child id="slider-wrapper" className="slider-wrapper" ref={el => this.sliderContainer = el} style={this.state.slideOverStyle}>
                     <InRoomSlider alsoInRoomResults={this.state.alsoInRoomResults} blurValue={this.state.blurValue} onSelectInRoomArt={this.onSelectInRoomArt} getTranslation={this.props.getTranslation}></InRoomSlider>
                   </Child>
-                }
+                } */}
                 <div className="scan-wrapper">
                   <div className="scan-button" onClick={this.handleScan} style={this.state.scanBtnStyle}>
                     <img src={scan_button} alt="scan" />
