@@ -710,7 +710,7 @@ class Artwork extends Component {
     if (showTitleBar) {
       return (
         <div id="story-title-bar" className="story-title-bar">
-          <div className="story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
+          <div className="story-title">{storyTitle}</div>
 
           <div className="language-dropdown">
             <LanguageDropdown

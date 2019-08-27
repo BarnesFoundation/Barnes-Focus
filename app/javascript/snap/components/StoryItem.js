@@ -156,7 +156,7 @@ class StoryItem extends React.Component {
           <div className="card story-item" style={peekOffsetStyle}>
             {this.props.storyIndex === 0 && this.state.showTitle && !this.props.storyEmailPage && (
               <div className="story-title-bar">
-                <div className="story-title">{this.props.getTranslation('Result_page', 'text_11')}</div>
+                <div className="story-title">{storyTitle}</div>
               </div>
             )}
             <Timeline
