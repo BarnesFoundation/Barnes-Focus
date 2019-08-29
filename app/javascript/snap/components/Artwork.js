@@ -6,6 +6,7 @@ import * as constants from './Constants';
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
 import share from 'images/share.svg';
+import shareButton from 'images/share-icon.svg';
 
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
@@ -441,7 +442,7 @@ class Artwork extends Component {
       Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT),
       0
     );
-    this.artworkScrollOffset = artworkVScrollOffset + 100;
+    this.artworkScrollOffset = artworkVScrollOffset + 300;
     console.log('setArtworkRef >> offset after setTimeout  == ', this.artworkScrollOffset);
     this.artworkScene = new ScrollMagic.Scene({
       triggerElement: '#search-result',
@@ -653,7 +654,7 @@ class Artwork extends Component {
                       this.target = node;
                     }}
                     onClick={this._onClickShare}>
-                    <img src={share} alt="share" />
+                    <img src={shareButton} alt="share" />
                     <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
                   </div>
                   <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
