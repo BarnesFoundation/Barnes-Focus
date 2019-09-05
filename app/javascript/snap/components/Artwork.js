@@ -331,6 +331,7 @@ class Artwork extends Component {
 
   setupStory = async imageId => {
     let stories_data = await this.sr.getStoryItems(imageId);
+    console.log(stories_data);
     if (stories_data.data.total > 0) {
       return {
         stories: stories_data.data.content.stories,
@@ -453,6 +454,13 @@ class Artwork extends Component {
       .setPin('#search-result', { pushFollowers: false }) // pins the element for the the scene's duration
       .addTo(this.controller);
   };
+
+  clickSceneTitle = (e) => {
+    // get the id of the story that was clicked
+    let id = '#story-here-' + e.target.id
+    // scroll to the id
+    this.controller.scrollTo(id);
+  }
 
   setupEmailSceneOnEnter = () => {
     this.emailSceneTrigger = new ScrollMagic.Scene({
@@ -656,7 +664,7 @@ class Artwork extends Component {
                     onClick={this._onClickShare}>
                     <img src={shareButton} alt="share" />
                     <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
-                  </div>
+                    </div>
                   <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
                     <PopoverBody>
                       <div className="share">
@@ -752,6 +760,7 @@ class Artwork extends Component {
           offset={storySceneOffset}>
           {(progress, event) => (
             <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
+              <div className="story-title-click" id={`${index}`} onClick={this.clickSceneTitle}></div>
               <StoryItem
                 key={`storyitem${index + 1}`}
                 progress={progress}
