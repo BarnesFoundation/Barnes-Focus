@@ -459,6 +459,9 @@ class Artwork extends Component {
     // get the id of the story that was clicked
     let id = '#story-here-' + e.target.id
     // scroll to the id
+    this.controller.scrollTo( (id) => {
+      $("html, body").animate({scrollTop: id});
+    });
     this.controller.scrollTo(id);
   }
 
