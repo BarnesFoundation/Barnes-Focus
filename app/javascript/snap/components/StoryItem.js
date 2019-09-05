@@ -209,7 +209,7 @@ class StoryItem extends React.Component {
                   </div>
                 )}
                 <div className="scroll-text" ref={this.refContentCallback}>
-                  {!this.props.storyEmailPage && <div className="story-name">{storyTitle}</div>}
+                  {!this.props.storyEmailPage && <div className="story-name" id={`story-here-${storyIndex}`}>{storyTitle}</div>}
                   <div
                     className="story-text"
                     style={paragraphFontStyle}
