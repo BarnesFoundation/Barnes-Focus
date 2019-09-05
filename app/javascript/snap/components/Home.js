@@ -53,9 +53,6 @@ class HomeComponent extends Component {
 
 	onSelectYes = async () => {
 
-		// They're at the Barnes
-		this.setState({ userAtBarnes: true });
-
 		// If this was an iOS device, log the model to Google Analytics
 		if (isIOS) { logiPhoneModel() }
 
@@ -140,7 +137,7 @@ class HomeComponent extends Component {
 				)}
 
 				{/* If the user has selected that they're not at the Barnes, show this section */}
-				{(this.state.userAtBarnes == false) && (
+				{(this.state.userAtBarnes === false) && (
 					<div>
 						<div className="app-usage-alert h2">
 							<div className="app-usage-msg">
@@ -160,7 +157,7 @@ class HomeComponent extends Component {
 				)}
 
 				{/* If the camera is not accessible */}
-				{(this.state.cameraAccessible == false) && (
+				{(this.state.cameraAccessible === false) && (
 					<div>
 						<div className="app-usage-alert h2">
 							<div className="app-usage-msg">
