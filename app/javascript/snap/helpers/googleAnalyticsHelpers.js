@@ -1,4 +1,4 @@
-import { GA_EVENT_CATEGORY, GA_EVENT_ACTION } from '../components/Constants';
+import { GA_EVENT_CATEGORY, GA_EVENT_ACTION, GA_EVENT_LABEL } from '../components/Constants';
 
 // Database of possible iPhone configurations
 const database = {
@@ -98,9 +98,9 @@ export const shouldLogPermissionGrantTime = (startTime) => {
 		// Camera permission dialog was shown
 		ga('send', {
 			hitType: 'event',
-			eventCategory: constants.GA_EVENT_CATEGORY.CAMERA,
-			eventAction: constants.GA_EVENT_ACTION.CAMERA_PERMISSION,
-			eventLabel: constants.GA_EVENT_LABEL.PERMISSION_GRANTED
+			eventCategory: GA_EVENT_CATEGORY.CAMERA,
+			eventAction: GA_EVENT_ACTION.CAMERA_PERMISSION,
+			eventLabel: GA_EVENT_LABEL.PERMISSION_GRANTED
 		});
 	}
 }
