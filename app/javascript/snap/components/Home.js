@@ -83,7 +83,7 @@ class HomeComponent extends Component {
 	};
 
 	closeCameraErrorScreen = () => {
-		// userAtBarnes needs to be nulled, since there's no screen for when they are at the Barnes but camera is not accessible
+		// The user has seen that camera is not accessible, so essentially close the screen and reset camera access and them being at the Barnes
 		this.setState({ cameraAccessible: null, userAtBarnes: null });
 	};
 
