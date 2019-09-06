@@ -12,6 +12,8 @@ import * as constants from './Constants';
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
 
+import { SearchResponse } from '../classes/searchResponse';
+
 const Container = posed.div({
   enter: { opacity: 1 },
   exit: { opacity: 0 }
@@ -23,7 +25,7 @@ class Camera extends Component {
 
   matchFound;
   responseCounter;
-  intervalExecutions;
+  scansTaken;
 
   track;
   camera_capabilities;
@@ -62,37 +64,70 @@ class Camera extends Component {
         this.setState({ snapAttempts: 0 });
       }
     }
-  };
+  }
 
-  stopScan = () => {
+  stopScanning = () => {
+
     // End the photo scan
     clearInterval(this.scan);
     this.scan = null;
   };
 
-  /** Captures photo over a 3-second duration */
-  capturePhotoShots = () => {
+  /** Starts scanning over a 3-second duration */
+  beginScanning = async () => {
+
     // Update the snap attempts with this scan as a single attempt
     localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
     localStorage.setItem(constants.SNAP_LAST_TIMESTAMP, Date.now());
 
-    this.intervalExecutions = 0;
-    this.stopScan();
-    // Capture a photo scan every third of a second
-    this.scan = setInterval(() => {
-      if (this.intervalExecutions == 9) {
-        this.stopScan();
-      } else {
-        if (this.matchFound == false) {
-          this.scanner();
-        }
-      }
-    }, 1000 / 3);
-  };
+	// Reset scans taken and stop any existing scanning
+    this.scansTaken = 0;
+	this.stopScanning();
 
-  /** Contains the logic for capturing scans */
-  scanner = async () => {
-    this.intervalExecutions++;
+    // Capture a scan every third of a second
+    this.scan = setInterval(this.executeScanSteps(), 1000 / 3);
+  }
+
+  /** Executes steps for completing a scan from image capture to determining a match */
+  executeScanSteps = () => {
+
+	// Stop scanning if we've taken 9 scans	
+	if (this.scansTaken == 9) { this.stopScanning(); } 
+	  
+	else {
+  
+  	  // Otherwise, if still no match found, continue scanning
+  	  if (this.matchFound == false) {
+	  
+		// Get image blob for the scan
+	    const imageBlob = await this.captureSingleScan(); 
+
+		// Prepare and send the request to Catchoom and parse the response
+	  	const requestConfig = this.sr.prepareRequest(imageBlob, this.state.scanSeqId);
+		const searchResponse = await this.submitRequest(requestConfig);
+		
+		const { searchSuccess, esResponse } = searchResponse;
+
+		if (searchSuccess) {
+			this.completeImageSearchRequest(searchSuccess, esResponse);
+		}
+
+		// Store the result, regardless of success or not
+		this.sr.storeSearchedResult(searchResponse);
+
+		// Complete this image search attempt if we've received 9 responses or match was found
+        if (this.responseCounter == 9) {
+			this.completeImageSearchRequest(searchSuccess, esResponse);
+		}
+  	  } 
+    }
+  }
+
+  /** Captures a single scan and returns blob of the scan */
+  captureSingleScan = async () => {
+
+	// Increment number of executions we've taken  
+    this.scansTaken++;
 
     // Get image in canvas
     let canvas = this.getVideoCanvas();
@@ -100,125 +135,125 @@ class Camera extends Component {
     if (!canvas) return null;
 
     // Get the blob from canvas
-    let start = Date.now();
     const imageBlob = await new Promise(resolve => {
       canvas.toBlob(async blob => {
-        //console.log('process.env.CROP_IMAGE :: ', process.env.CROP_IMAGE);
-        if (process.env.CROP_IMAGE === 'TRUE') {
+
+		if (process.env.CROP_IMAGE === 'TRUE') {
+
+		  // Convert the image uri to blob	
           window.URL = window.URL || window.webkitURL;
           let imageUri = window.URL.createObjectURL(blob);
           let imageBlob = await cropPhoto(imageUri);
 
           window.URL.revokeObjectURL(imageUri);
           resolve(imageBlob);
-        } else {
-          resolve(blob);
-        }
+		} 
+		
+		else { resolve(blob); }
       }, 'image/jpeg');
-    });
-    let end = Date.now();
+	});
+	
+	return imageBlob;
+  }
 
-    //console.log('Blob creation time: ' + (end - start) + ' ms');
-    const requestConfig = this.sr.prepareRequest(imageBlob, this.state.scanSeqId);
-    this.submitSearchRequest(requestConfig);
-  };
+  /** Submits the image search request to Catchoom */
+  submitRequest = async (requestConfig) => {
 
-  /** Submits the image search request to the server */
-  submitSearchRequest = async requestConfig => {
-    const { data } = requestConfig;
-    let response;
-
-    let searchSuccess;
-    let referenceImageUrl = null;
-    let esResponse = null;
+	const { data } = requestConfig;
     let searchTime = null;
 
-    if (this.matchFound == false) {
       try {
-        // A match/no match will always have a search time
-        response = await axios(requestConfig);
-        searchTime = response.data.search_time;
+		this.responseCounter++;
 
-        // If a match was found
-        if (response.data.results.length > 0) {
-          this.matchFound = true;
-          let matchData = await this.processImageMatch(response);
+        // A search response will always have a search time
+        const response = await axios(requestConfig);
+		searchTime = response.data.search_time;
+		
+		const resultsCount = response.data.results.length;
 
-          searchSuccess = true;
-          esResponse = matchData.esResponse;
-          referenceImageUrl = matchData.referenceImageUrl;
+        // If a matching result was found
+        if (resultsCount > 0) {	
 
-          this.completeImageSearchRequest(searchSuccess, esResponse);
-        } else {
-          searchSuccess = false;
-        }
-      } catch (error) {
-        searchSuccess = false;
-      } finally {
-        this.responseCounter++;
+		  this.matchFound = true;
+		  
+		  const identifiedItem = response.data.results[0];
+		  const itemInformation = await this.processIdentifiedItem(identifiedItem);
 
-        // Store the result, regardless of success or not
-        this.sr.storeSearchedResult(searchSuccess, data, referenceImageUrl, esResponse, searchTime);
+		  const { esResponse, referenceImageUrl } = itemInformation;
+		  
+		  return new SearchResponse(data, true, referenceImageUrl, esResponse, searchTime);
+		}
 
-        // Complete this image search attempt if we've received 9 responses or match was found
-        if (this.responseCounter == 9) {
-          this.completeImageSearchRequest(searchSuccess, esResponse);
-        }
-      }
-    }
-  };
+		else { return new SearchResponse(data, false, null, null, searchTime); }
+	  } 
+	  
+	  catch (error) {  return new SearchResponse(data, false, null, null, null); } 
+  }
 
   /** Closure function so that a image match response is processed only once */
-  processImageMatch = (response => {
+  processIdentifiedItem = (identifiedItem => {
     let executed = false;
-    return async response => {
-      if (!executed) {
+    return async (identifiedItem) => {
+      if (executed == false) {
+		
+		// We've executed this at least once
         executed = true;
 
-        // Get the image id
-        let imageId = response.data.results[0].item.name;
-        let referenceImageUrl = response.data.results[0].image.thumb_120;
+        // Get the image id and reference image url
+        const imageId = identifiedItem.item.name;
+        const referenceImageUrl = identifiedItem.image.thumb_120;
 
         // Retrieve artwork information
-        let artworkInfo = await this.sr.getArtworkInformation(imageId);
+        const esResponse = await this.sr.getArtworkInformation(imageId);
 
-        return {
-          esResponse: artworkInfo,
-          referenceImageUrl: referenceImageUrl
-        };
+        return { esResponse, referenceImageUrl }
       }
-    };
+    }
   })();
 
   /** Processes the completion of an image search */
-  completeImageSearchRequest(searchSuccess, response) {
-    if (searchSuccess) {
-      const w = screen.width;
-      let artUrl = response['data']['records'][0].art_url;
-      // load the match image background first so that it gets cached for faster display.
-      let matchImage = this.loadImage(artUrl + '?w=' + (w - 80));
-      let matchImageBg = this.loadImage(artUrl + '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w);
+  completeImageSearchRequest(searchWasSuccessful, response) {
+	
+	// If the search yielded a successful match
+    if (searchWasSuccessful) {
+
+	  const { width } = screen;
+
+	  // Get the record and art url from it
+	  const record = response['data']['records'][0];
+	  const { art_url: artUrl, id } = record;
+	  
+      // Load the image background first so that it gets cached for faster displaying
+      const matchImage = this.loadImage(`${artUrl}?w=${(width - 80)}`);
+      const matchImageBg = this.loadImage(`${artUrl}?q=0&auto=compress&crop=faces,entropy&fit=crop&w=${width}`);
 
       Promise.all([matchImage, matchImageBg]).then(() => {
-        // Navigate to results page
+
+        // Navigate to the artwork page
         this.props.history.push({
-          pathname: `/artwork/${response['data']['records'][0].id}`,
+          pathname: `/artwork/${id}`,
           state: { result: response }
         });
       });
-    } else {
-      this.handleSnapFailure();
+	} 
+	
+	// Otherwise, if the search was not successful
+	else {
+      this.displaySearchFailure();
     }
   }
 
-  /** Transitions to an alert screen when no match is found */
-  handleSnapFailure = () => {
-    this.stopScan();
+  /** Updates the state to show that the search did not yield a match */
+  displaySearchFailure = () => {
+
+	// Stop any ongoing scanning
+    this.stopScanning();
+
 
     if (!this.state.matchError) {
       this.setState({ matchError: true });
     }
-  };
+  }
 
   loadImage = url => {
     return new Promise((resolve, reject) => {
@@ -240,7 +275,7 @@ class Camera extends Component {
         .then(() => {
           const track = this.state.videoStream.getVideoTracks()[0];
           this.camera_capabilities = track.getCapabilities();
-          this.capturePhotoShots();
+          this.beginScanning();
           requestAnimationFrame(this.drawVideoPreview);
         })
         .catch(error => {
@@ -335,7 +370,7 @@ class Camera extends Component {
 
   componentWillUnmount() {
     console.log('camera >> componentWillUnmount');
-    this.stopScan();
+    this.stopScanning();
     this.stopVideo();
     this.stopPreview();
     this.video.pause();

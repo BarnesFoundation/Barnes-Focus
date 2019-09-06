@@ -38,20 +38,17 @@ class SearchRequestService {
   };
 
   /** Stores the search attempt in the server */
-  storeSearchedResult = async (
-    searchSuccess,
-    formData,
-    referenceImageUrl,
-    esResponse,
-    searchTime
-  ) => {
+  storeSearchedResult = async (searchResponse) => {
+
+	const { searchSuccess, referenceImageUrl, esResponse, searchTime, data: formData } = searchResponse;
+
     formData.append("searchSuccess", searchSuccess);
     formData.append("referenceImageUrl", referenceImageUrl);
     formData.append("esResponse", JSON.stringify(esResponse));
     formData.append("searchTime", searchTime);
 
     await axios.post(constants.STORE_SEARCHED_RESULT_URL, formData);
-  };
+  }
 
   submitBookmarksEmail = async email => {
     const payload = {};
