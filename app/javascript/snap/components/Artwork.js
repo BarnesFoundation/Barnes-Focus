@@ -458,7 +458,7 @@ class Artwork extends Component {
   clickSceneTitle = (e) => {
     // get the id of the story that was clicked
     let id = '#story-here-' + e.target.id
-    // scroll to the id
+    // scroll to the id, .animate fixes smooth scroll issue on iphone.
     this.controller.scrollTo( (id) => {
       $("html, body").animate({scrollTop: id});
     });
@@ -607,9 +607,9 @@ class Artwork extends Component {
                         <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
                         <td className="text-left item-info">
                           {artwork.artist}{' '}
-                          {artwork.unIdentified
-                            ? ''
-                            : `(${artwork.nationality}, ${artwork.birthDate} - ${artwork.deathDate})`}
+                          {!artwork.unIdentified && artwork.nationality
+                            ? `(${artwork.nationality}, ${artwork.birthDate} - ${artwork.deathDate})`
+                            : ''}
                         </td>
                       </tr>
                       {artwork.unIdentified && (
