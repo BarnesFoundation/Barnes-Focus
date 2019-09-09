@@ -14,8 +14,6 @@ class CameraContainer extends Component {
 
 	sr;
 	snapAttempts;
-
-	matchFound;
 	responseCounter;
 
 	constructor() {
