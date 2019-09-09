@@ -11,6 +11,9 @@ import withTranslation from './withTranslation';
 import { shouldLogPermissionGrantTime } from '../helpers/googleAnalyticsHelpers';
 
 
+const DISABLE_ZOOM="DISABLE_ZOOM";
+const ENABLE_ZOOM="ENABLE_ZOOM";
+
 const Container = posed.div({
   enter: { opacity: 1 },
   exit: { opacity: 0 }
@@ -22,6 +25,9 @@ class Camera extends Component {
   cropRectangle;
   scan;
 
+  ctx;
+  canvas;
+
   constructor(props) {
     super(props);
 
@@ -31,7 +37,6 @@ class Camera extends Component {
       frontCamera: false,
       snapAttempts: this.props.snapAttempts,
       cameraPermission: false,
-      scanSeqId: Date.now(),
     };    
   }
 
@@ -96,19 +101,13 @@ class Camera extends Component {
 		}
 	}
 
-  	disablePinchZoom = (event) => { event.preventDefault(); }
-
 	async componentDidMount() {
 
-		console.log('mounted');
-
-		// Beginning with iOS 10, the "user-scalable=no" attribute is no longer supported, so the below code will disable page zoom on pinch on the camera page
-		const cameraContainer = document.querySelector('.camera');
-		cameraContainer.addEventListener('touchmove', this.disablePinchZoom, false);
+		// Disable zoom
+		this.pinchZoomModifier(DISABLE_ZOOM);
 
 		const previewBox = this.vpreview.getBoundingClientRect();
 		const { x, y, width, height } = previewBox;
-
 		this.cropRectangle = { x: Math.floor(x), y: Math.floor(y), width: Math.floor(width), height: Math.floor(height) };
 
 		// Fetch the device camera
@@ -138,11 +137,19 @@ class Camera extends Component {
 		}
 	}
 
-	stopVideo = () => {
-		if (this.initVideo) {
-			clearTimeout(this.initVideo);
-		}
+	/* Prevents zoom */
+	disablePinchZoom = (event) => { event.preventDefault(); }
+
+	/* Beginning with iOS 10, the "user-scalable=no" attribute is no longer supported. This function will disable page zoom on-pinch for the camera page */
+	pinchZoomModifier = (action) => {
+		const cameraContainer = document.querySelector('.camera');
+
+		if (action === DISABLE_ZOOM) { cameraContainer.addEventListener('touchmove', this.disablePinchZoom, false); }
+
+		if (action === ENABLE_ZOOM) { cameraContainer.removeEventListener('touchmove', this.disablePinchZoom); }
 	}
+
+	stopVideo = () => { if (this.initVideo) { clearTimeout(this.initVideo); } }
 
 	stopPreview = () => {
 		if (this.drawPreview) {
@@ -157,7 +164,6 @@ class Camera extends Component {
 	}
 
   componentDidUpdate(previousProps) {
-
 	if (previousProps.shouldBeScanning !== this.props.shouldBeScanning) {
 		this.setupForCapturing();
 	}	
@@ -166,15 +172,17 @@ class Camera extends Component {
   componentWillUnmount() {
 	console.log('camera >> componentWillUnmount');
 	
-    // this.stopScanning();
+	// Stop drawing the video
     this.stopVideo();
-    this.stopPreview();
+	this.stopPreview();
+	
+	// Turn off video capture
     this.video.pause();
     this.video.removeAttribute('src');
-    this.video.load();
-
-    const cameraContainer = document.querySelector('.camera');
-    cameraContainer.removeEventListener('touchmove', this.disablePinchZoom);
+	this.video.load();
+	
+	// Re-enable zoom
+	this.pinchZoomModifier(ENABLE_ZOOM);
   }
 
   /** Gets the video drawn onto the canvas */

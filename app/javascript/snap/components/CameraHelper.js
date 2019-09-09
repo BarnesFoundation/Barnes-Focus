@@ -74,3 +74,7 @@ export const loadImage = (url) => {
 		image.src = url;
 	});
 }
+
+export const resetScanCounter = () => {
+	
+}
