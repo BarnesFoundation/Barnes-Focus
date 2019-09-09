@@ -204,7 +204,7 @@ class CameraContainer extends Component {
 		const { unsuccessfulAttempt, shouldBeScanning } = this.state;
 
 		return (
-			<Camera updateImageBlob={updateImageBlob} unsuccessfulAttempt={unsuccessfulAttempt} resumeScanning={resumeScanning} /* snapAttempts={snapAttempts} */ shouldBeScanning={shouldBeScanning} />
+			<Camera updateImageBlob={updateImageBlob} unsuccessfulAttempt={unsuccessfulAttempt} resumeScanning={resumeScanning} snapAttempts={snapAttempts} shouldBeScanning={shouldBeScanning} />
 		)
 	}
 }
