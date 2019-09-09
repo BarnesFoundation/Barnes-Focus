@@ -76,7 +76,7 @@ class Camera extends Component {
 				}, 'image/jpeg');
 			});
 
-			this.props.updateImageBlob(imageBlob);
+			this.props.processImageCapture(imageBlob);
 		}
 	}
 
@@ -122,7 +122,7 @@ class Camera extends Component {
 			this.setState({ videoStream, cameraPermission: true }, () => {
 
 				// When video is able to be captured
-				if (this.props.shouldBeScanning && this.state.videoStream && (this.props.unsuccessfulAttempt === null)) {
+				if (this.props.shouldBeScanning && this.state.videoStream && (this.props.sessionYieldedMatch === null)) {
 
 					this.setupForCapturing();
 					this.scan = setInterval(this.captureSingleScan, 1000 / 3);
@@ -157,7 +157,6 @@ class Camera extends Component {
 	}
 
   componentDidUpdate(previousProps) {
-	console.log('update');
 
 	if (previousProps.shouldBeScanning !== this.props.shouldBeScanning) {
 		this.setupForCapturing();
@@ -167,7 +166,7 @@ class Camera extends Component {
   componentWillUnmount() {
 	console.log('camera >> componentWillUnmount');
 	
-    this.stopScanning();
+    // this.stopScanning();
     this.stopVideo();
     this.stopPreview();
     this.video.pause();
@@ -265,7 +264,7 @@ class Camera extends Component {
   /** Draws the portion of the video visible within the preview onto a canvas, in a loop. */
   drawVideoPreview = () => {
     try {
-      if (!this.vpreview || this.props.unsuccessfulAttempt) {
+      if (!this.vpreview/*  || this.props.sessionYieldedMatch === null */) {
         return null;
       }
 
@@ -309,11 +308,11 @@ class Camera extends Component {
 
   
   render() {
-	const { unsuccessfulAttempt, resumeScanning, shouldBeScanning } = this.props;
+	const { beginScanning, sessionYieldedMatch } = this.props;
 
     let videoStyle = { filter: `blur(25px)`, transform: `scale(1.2)` };
 
-    return (
+	return (
 		<Container className="camera-container" initialPose="exit" pose="enter">
 			<div className="camera">
 
@@ -324,11 +323,11 @@ class Camera extends Component {
 						{ <video id="video" ref={c => (this.video = c)} width="100%" autoPlay playsInline muted style={videoStyle} />}
 
 						{/* Show the video preview if an unsuccessful attempt has not occurred */}
-						{!unsuccessfulAttempt && <canvas id="video-preview" ref={el => (this.vpreview = el)} />}
+						{(sessionYieldedMatch !== false) && <canvas id="video-preview" ref={el => (this.vpreview = el)} />}
 
 						{/* If there was an unsuccessful attempt, transition into the no result found */}
 						<ReactCSSTransitionGroup transitionName="fade" transitionEnterTimeout={500} transitionLeaveTimeout={100}>
-							{unsuccessfulAttempt && (
+							{sessionYieldedMatch === false && (
 								<div id="no-match-overlay" className="no-match-overlay">
 									<div className="hint h2">
 										<span>
@@ -340,7 +339,7 @@ class Camera extends Component {
 									</div>
 									<div
 										className="scan-button"
-										onClick={() => { resumeScanning() }}
+										onClick={() => { beginScanning() }}
 										style={{ position: 'absolute', bottom: '37px' }}>
 										<img src={scan_button} alt="scan" />
 									</div>
