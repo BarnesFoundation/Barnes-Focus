@@ -233,6 +233,7 @@ class StoryItem extends React.Component {
                       : ` (${story.detail.nationality}, ${story.detail.birthDate} - ${story.detail.deathDate})`}
 					{this.isUnidentifiedArtist() ? `, ${story.detail.culture}` : ''}
                   </div>
+				  <div id={`story-lower-footer-${this.props.storyIndex}`} />	
 				  
                   {this.props.selectedLanguage.code !== LANGUAGE_EN && (
                     <div className="google-translate-disclaimer" style={{ paddingBottom: `200px` }}>
@@ -242,9 +243,10 @@ class StoryItem extends React.Component {
 				  )}
                 </div>
               </div>
-			</div>
+			  
+			</div>	
           </div>
-		  <div id={`story-lower-footer-${this.props.storyIndex}`} />
+		 
         </Timeline>
       </div>
     );
