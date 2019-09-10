@@ -442,7 +442,7 @@ class Artwork extends Component {
       Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT),
       0
     );
-    this.artworkScrollOffset = artworkVScrollOffset + 300;
+    this.artworkScrollOffset = artworkVScrollOffset + 50;
     console.log('setArtworkRef >> offset after setTimeout  == ', this.artworkScrollOffset);
     this.artworkScene = new ScrollMagic.Scene({
       triggerElement: '#search-result',
