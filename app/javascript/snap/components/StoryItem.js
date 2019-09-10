@@ -231,18 +231,20 @@ class StoryItem extends React.Component {
                     {this.isUnidentifiedArtist()
                       ? ''
                       : ` (${story.detail.nationality}, ${story.detail.birthDate} - ${story.detail.deathDate})`}
-                    {this.isUnidentifiedArtist() ? `, ${story.detail.culture}` : ''}
+					{this.isUnidentifiedArtist() ? `, ${story.detail.culture}` : ''}
                   </div>
+				  
                   {this.props.selectedLanguage.code !== LANGUAGE_EN && (
                     <div className="google-translate-disclaimer" style={{ paddingBottom: `200px` }}>
                       <span>Translated with </span>
                       <img src={google_logo} alt="google_logo" />
                     </div>
-                  )}
+				  )}
                 </div>
               </div>
-            </div>
+			</div>
           </div>
+		  <div id={`story-lower-footer-${this.props.storyIndex}`} />
         </Timeline>
       </div>
     );

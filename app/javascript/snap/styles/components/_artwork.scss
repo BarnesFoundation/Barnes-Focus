@@ -257,3 +257,16 @@
   width: 100%;
   z-index: 10000;
 }
+
+.land-here {
+  position: absolute;
+  top: 135px;
+  height: 10px;
+  width: 100%;
+  z-index: 10000;
+}
+
+.initial {
+	top: unset;
+	bottom: -70px;
+}

@@ -455,15 +455,21 @@ class Artwork extends Component {
       .addTo(this.controller);
   };
 
-  clickSceneTitle = (e) => {
-    // get the id of the story that was clicked
-    let id = '#story-here-' + e.target.id
-    // scroll to the id, .animate fixes smooth scroll issue on iphone.
-    this.controller.scrollTo( (id) => {
-      $("html, body").animate({scrollTop: id});
-    });
-    this.controller.scrollTo(id);
-  }
+	clickSceneTitle = (storyIndex) => {
+
+		let nextStoryPoint = `#land-here-${storyIndex}`;
+
+		if (isAndroid) {
+			this.controller.scrollTo(nextStoryPoint);
+		}
+
+		else {
+			this.controller.scrollTo((nextStoryPoint) => {
+				$("html, body").animate({ scrollTop: nextStoryPoint });
+			});
+			this.controller.scrollTo(nextStoryPoint);
+		}
+	}
 
   setupEmailSceneOnEnter = () => {
     this.emailSceneTrigger = new ScrollMagic.Scene({
@@ -721,7 +727,7 @@ class Artwork extends Component {
     const { showTitleBar, storyTitle } = this.state;
     if (showTitleBar) {
       return (
-        <div id="story-title-bar" className="story-title-bar">
+        <div id="story-title-bar" className="story-title-bar" >
           <div className="story-title">{storyTitle}</div>
 
           <div className="language-dropdown">
@@ -748,6 +754,7 @@ class Artwork extends Component {
       return <div />;
     }
     return stories.map((story, index) => {
+	  const storyIndex = index + 1;
       const storyDuration = this.state.storyDurationsCurrent[index] * 5;
       const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33;
       //console.log('renderStory > storyDuration, storySceneOffset :: ', index, storyDuration, storySceneOffset);
@@ -755,32 +762,35 @@ class Artwork extends Component {
         <Scene
           loglevel={0}
           indicators={false}
-          key={`storyitem${index + 1}`}
+          key={`storyitem${storyIndex}`}
           triggerHook="onLeave"
           pin
           pinSettings={{ pushFollowers: false }}
           duration={storyDuration}
           offset={storySceneOffset}>
           {(progress, event) => (
-            <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
-              <div className="story-title-click" id={`${index}`} onClick={this.clickSceneTitle}></div>
-              <StoryItem
-                key={`storyitem${index + 1}`}
-                progress={progress}
-                sceneStatus={event}
-                storyIndex={index}
-                isLastStoryItem={index === stories.length - 1 ? true : false}
-                story={story}
-                storyTitle={storyTitle}
-                langOptions={this.langOptions}
-                selectedLanguage={this.state.selectedLanguage}
-                onSelectLanguage={this.onSelectLanguage}
-                onStoryReadComplete={this.onStoryReadComplete}
-                getSize={this.onStoryHeightReady}
-                statusCallback={this.storySceneCallback}
-                getTranslation={this.props.getTranslation}
-              />
-            </div>
+				  <div>
+					  <div id={`story-card-${index}`} className={`panel panel${storyIndex}`}>	
+					  <div className={`story-title-click`} id={`${index}`} onClick={() => { this.clickSceneTitle(index) }}/>
+					  <div id={`land-here-${index}`} className={`land-here ${(index == 0) ? 'initial' : 'not-initial'}`} />						  
+						  <StoryItem
+							  key={`storyitem${storyIndex}`}
+							  progress={progress}
+							  sceneStatus={event}
+							  storyIndex={index}
+							  isLastStoryItem={index === stories.length - 1 ? true : false}
+							  story={story}
+							  storyTitle={storyTitle}
+							  langOptions={this.langOptions}
+							  selectedLanguage={this.state.selectedLanguage}
+							  onSelectLanguage={this.onSelectLanguage}
+							  onStoryReadComplete={this.onStoryReadComplete}
+							  getSize={this.onStoryHeightReady}
+							  statusCallback={this.storySceneCallback}
+							  getTranslation={this.props.getTranslation}
+						  />
+					  </div>
+				  </div>
           )}
         </Scene>
       );
@@ -804,7 +814,7 @@ class Artwork extends Component {
 
       //console.log('renderPinsEnter :: storyEnterPinDuration', index, storyEnterPinDuration);
 
-      return (
+	  return (
         <Scene
           loglevel={0}
           key={`storytriggerenter${index + 1}`}
