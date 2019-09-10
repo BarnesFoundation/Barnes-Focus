@@ -457,16 +457,20 @@ class Artwork extends Component {
 
 	clickSceneTitle = (storyIndex) => {
 
-		let nextStoryPoint = `#land-here-${storyIndex}`;
+		let nextStoryPoint;
 
-		if (isAndroid) {
-			this.controller.scrollTo(nextStoryPoint);
+		if (storyIndex == 0) {
+			nextStoryPoint = `#story-lower-footer-0`;
 		}
 
 		else {
-			this.controller.scrollTo((nextStoryPoint) => {
-				$("html, body").animate({ scrollTop: nextStoryPoint });
-			});
+			nextStoryPoint = `#land-here-${storyIndex}`;
+		}
+		
+		if (isAndroid) { this.controller.scrollTo(nextStoryPoint); }
+
+		else {
+			this.controller.scrollTo((nextStoryPoint) => { $("html, body").animate({ scrollTop: nextStoryPoint }); });
 			this.controller.scrollTo(nextStoryPoint);
 		}
 	}
