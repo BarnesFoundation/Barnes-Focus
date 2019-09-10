@@ -459,14 +459,14 @@ class Artwork extends Component {
 
 		let nextStoryPoint;
 
-		if (storyIndex == 0) {
+		/* if (storyIndex == 0) {
 			nextStoryPoint = `#story-lower-footer-0`;
 		}
 
-		else {
+		else { */
 			nextStoryPoint = `#land-here-${storyIndex}`;
-		}
-		
+		/* }
+		 */
 		if (isAndroid) { this.controller.scrollTo(nextStoryPoint); }
 
 		else {
