@@ -707,12 +707,10 @@ class Artwork extends Component {
   };
 
   renderTitleBar = () => {
-    const { showTitleBar, storyTitle } = this.state;
+    const { showTitleBar } = this.state;
     if (showTitleBar) {
       return (
         <div id="story-title-bar" className="story-title-bar">
-          <div className="story-title">{storyTitle}</div>
-
           <div className="language-dropdown">
             <LanguageDropdown
               isStoryItemDropDown={true}
