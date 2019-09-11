@@ -3,6 +3,7 @@ import throttle from 'lodash/throttle';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, TOP_OFFSET, VIEWPORT_HEIGHT } from './Constants';
+import { SearchRequestService } from '../services/SearchRequestService';
 
 const withStoryStyles = {
   backgroundColor: '#fff',
@@ -12,6 +13,7 @@ const withStoryStyles = {
 class EmailForm extends Component {
   constructor(props) {
     super(props);
+    this.sr = new SearchRequestService();
     this.state = {
       email: '',
       floatScanBtn: false,
@@ -75,8 +77,10 @@ class EmailForm extends Component {
   };
 
   validateEmail = () => {
+    const validate = this.sr.validteEmail(this.state.email);
     const emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-    return this.state.email.length > 0 && emailRegex.test(this.state.email);
+
+    return this.state.email.length > 0 && emailRegex.test(this.state.email) && validate === true;
   };
 
   _saveEmail = () => {
