@@ -14,6 +14,14 @@ class Api::SnapsController < Api::BaseController
     render json: translator.supported_languages(preferred_language)
   end
 
+  ## Returns true/false depending on if the email is reachable
+  def validateEmail
+	email = params[:email]
+	emailValid = Truemail.valid?(email)
+
+	render json: emailValid 
+  end
+
   ## Retrieves the artwork information response for a provided image id
   def getArtworkInformation
     # Get parameters from the request
