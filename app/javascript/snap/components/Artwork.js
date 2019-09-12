@@ -21,7 +21,7 @@ import StoryItem from './StoryItem';
 import scan_button from 'images/scan-button.svg';
 import { isTablet } from 'react-device-detect';
 import ScrollMagic from 'scrollmagic';
-import { isAndroid } from 'react-device-detect';
+import { isAndroid, isIOS } from 'react-device-detect';
 
 /**
  * withRouter HOC provides props with location, history and match objects
@@ -455,24 +455,30 @@ class Artwork extends Component {
       .addTo(this.controller);
   };
 
-	clickSceneTitle = (storyIndex) => {
+	handleClickScroll = (storyIndex, isStoryCard) => {
 
-		let nextStoryPoint;
+		let landingPoint;
 
-		/* if (storyIndex == 0) {
-			nextStoryPoint = `#story-lower-footer-0`;
+		// If the click originated from a story card
+		if (isStoryCard) {
+
+			// If the clicked story is the last one
+			if (storyIndex == (this.state.stories.length - 1)) { landingPoint = `#story-text-${storyIndex}`; }
+
+			// Otherwise, use the normal landing area
+			else { landingPoint = `#land-here-${storyIndex}`; }
 		}
-
-		else { */
-			nextStoryPoint = `#land-here-${storyIndex}`;
-		/* }
-		 */
-		if (isAndroid) { this.controller.scrollTo(nextStoryPoint); }
 
 		else {
-			this.controller.scrollTo((nextStoryPoint) => { $("html, body").animate({ scrollTop: nextStoryPoint }); });
-			this.controller.scrollTo(nextStoryPoint);
-		}
+			landingPoint = `.email-disclaimer`;
+		}	
+
+		// For iOS, override the normal scrolling 
+		if (isIOS) { 
+			this.controller.scrollTo((nextStoryPoint) => { $("html, body").animate({ scrollTop: nextStoryPoint }) });
+		 }
+
+		this.controller.scrollTo(landingPoint);
 	}
 
   setupEmailSceneOnEnter = () => {
@@ -536,7 +542,7 @@ class Artwork extends Component {
 
   onEmailHeightReady = height => {
     //const computedHeight = Math.max(height, screen.height / 2);
-    this.emailFormHeight = height;
+    this.emailFormHeight = height * 2 / 2.2;
   };
 
   storySceneCallback = showTitle => {
@@ -714,7 +720,7 @@ class Artwork extends Component {
       );
     } else {
       return (
-        <div id="email-panel" ref={this.emailCardRef} className="panel-email">
+        <div id="email-panel" ref={this.emailCardRef} className="panel-email" onClick={() => { this.handleClickScroll(null, false); }}> 
           <EmailForm
             withStory={showStory}
             isEmailScreen={false}
@@ -722,7 +728,7 @@ class Artwork extends Component {
             getTranslation={this.props.getTranslation}
             getSize={this.onEmailHeightReady}
           />
-        </div>
+		</div>
       );
     }
   };
@@ -775,7 +781,7 @@ class Artwork extends Component {
           {(progress, event) => (
 				  <div>
 					  <div id={`story-card-${index}`} className={`panel panel${storyIndex}`}>	
-					  <div className={`story-title-click`} id={`${index}`} onClick={() => { this.clickSceneTitle(index) }}/>
+					  <div className={`story-title-click`} id={`${index}`} onClick={() => { this.handleClickScroll(index, true) }}/>
 					  <div id={`land-here-${index}`} className={`land-here ${(index == 0) ? 'initial' : 'not-initial'}`} />						  
 						  <StoryItem
 							  key={`storyitem${storyIndex}`}
@@ -874,8 +880,9 @@ class Artwork extends Component {
         {this.renderStoryContainer()}
 
         {/** this is a placeholder element at the bottom of viewport to control email card enter animation when no stories are present */}
-        {<div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }} />}
-
+		{<div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }} />}
+		
+		<div id="land-here-email" />
         {this.renderEmailScreen()}
       </SectionWipesStyled>
     );

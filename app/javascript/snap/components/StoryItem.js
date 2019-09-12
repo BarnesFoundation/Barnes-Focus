@@ -211,7 +211,7 @@ class StoryItem extends React.Component {
                 <div className="scroll-text" ref={this.refContentCallback}>
                   {!this.props.storyEmailPage && <div className="story-name" id={`story-here-${storyIndex}`}>{storyTitle}</div>}
                   <div
-                    className="story-text"
+                    className="story-text" id={`story-text-${this.props.storyIndex}`}
                     style={paragraphFontStyle}
                     dangerouslySetInnerHTML={{
                       __html:
@@ -233,8 +233,6 @@ class StoryItem extends React.Component {
                       : ` (${story.detail.nationality}, ${story.detail.birthDate} - ${story.detail.deathDate})`}
 					{this.isUnidentifiedArtist() ? `, ${story.detail.culture}` : ''}
                   </div>
-				  <div id={`story-lower-footer-${this.props.storyIndex}`} />	
-				  
                   {this.props.selectedLanguage.code !== LANGUAGE_EN && (
                     <div className="google-translate-disclaimer" style={{ paddingBottom: `200px` }}>
                       <span>Translated with </span>
