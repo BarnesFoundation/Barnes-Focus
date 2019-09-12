@@ -76,21 +76,25 @@ class EmailForm extends Component {
     });
   };
 
-  validateEmail = async () => {
-    const validate = await this.sr.validteEmail(this.state.email);
-    console.log(validate)
-    const emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+	validateEmail = async () => {
+		const validated = await this.sr.validteEmail(this.state.email);
+		const emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
-    if (validate === true) {
-      return this.state.email.length > 0 && emailRegex.test(this.state.email) && validate === true;
-    }
-  };
+		console.log(`The email being valid is ${validate}`);
+		return this.state.email.length > 0 && emailRegex.test(this.state.email) && validate === true;
+	};
 
-  _saveEmail = () => {
-    console.log('Save email called!!');
-    if (!this.validateEmail()) {
+  _saveEmail = async () => {
+	// Get whether or not the email is valid
+	const emailIsValid = await this.validateEmail();
+
+	// If email is not valid
+    if (!emailIsValid) {
       this.setState({ errors: { email: true } });
-    } else {
+	} 
+	
+	// Otherwise, it is valid
+	else {
       console.log('Valid email. Call backend API to save email.');
       const userEmail = this.state.email;
       this.setState({ email: '', emailCaptured: true });
