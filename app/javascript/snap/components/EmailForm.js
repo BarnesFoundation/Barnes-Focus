@@ -80,8 +80,8 @@ class EmailForm extends Component {
 		const validated = await this.sr.validteEmail(this.state.email);
 		const emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
-		console.log(`The email being valid is ${validate}`);
-		return this.state.email.length > 0 && emailRegex.test(this.state.email) && validate === true;
+		console.log(`The email being valid is ${validated}`);
+		return this.state.email.length > 0 && emailRegex.test(this.state.email) && validated === true;
 	};
 
   _saveEmail = async () => {
