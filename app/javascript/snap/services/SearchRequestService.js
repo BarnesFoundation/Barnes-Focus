@@ -113,7 +113,7 @@ class SearchRequestService {
   validteEmail = async (email) => {
     try {
       let response = await axios.post(
-        constants.VALIDATE_EMAIL_URL + email 
+        constants.VALIDATE_EMAIL_URL, {'email': email}
       );
       return response.data;
     } catch (error) {
