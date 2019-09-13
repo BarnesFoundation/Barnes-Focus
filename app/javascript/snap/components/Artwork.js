@@ -462,11 +462,19 @@ class Artwork extends Component {
 		// If the click originated from a story card
 		if (isStoryCard) {
 
-			// If the clicked story is the last one
-			if (storyIndex == (this.state.stories.length - 1)) { landingPoint = `#story-text-${storyIndex}`; }
+			if (storyIndex == 0) {
 
-			// Otherwise, use the normal landing area
-			else { landingPoint = `#land-here-${storyIndex}`; }
+				// This amount of offset for the first card seems to work
+				landingPoint = screen.height * 2.2;
+			}
+
+			else {
+				// If the clicked story is the last one
+				if (storyIndex == (this.state.stories.length - 1)) { landingPoint = `#story-text-${storyIndex}`; }
+
+				// Otherwise, use the normal landing area
+				else { landingPoint = `#land-here-${storyIndex}`; }
+			}
 		}
 
 		else {
