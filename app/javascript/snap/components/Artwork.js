@@ -734,7 +734,7 @@ class Artwork extends Component {
   };
 
   renderTitleBar = () => {
-    const { showTitleBar } = this.state;
+    const { showTitleBar, storyTitle } = this.state;
     if (showTitleBar) {
       return (
 
