@@ -18,6 +18,7 @@ class EmailForm extends Component {
       email: '',
       floatScanBtn: false,
       emailCaptured: false,
+      varificationPending: null,
       errors: {
         email: false
       }
@@ -79,16 +80,19 @@ class EmailForm extends Component {
 	validateEmail = async () => {
 		const validated = await this.sr.validteEmail(this.state.email);
 
-		console.log(`The email being valid is ${validated}`);
+    console.log(`The email being valid is ${validated}`);
+    this.setState({varificationPending: false})
 		return this.state.email.length > 0 && validated === true;
 	};
 
   _saveEmail = async () => {
+    this.setState({varificationPending: true});
 	// Get whether or not the email is valid
 	const emailIsValid = await this.validateEmail();
 
 	// If email is not valid
     if (!emailIsValid) {
+      this.setState({varificationPending: false});
       this.setState({ errors: { email: true } });
 	} 
 	
@@ -155,6 +159,9 @@ class EmailForm extends Component {
                   type="button"
                   onClick={() => this._saveEmail()}>
                   {this.props.getTranslation('Bookmark_capture', 'text_7')}
+                  {this.state.varificationPending === true && 
+                    <div className="loader-container"><div className="loader"></div></div>
+                  }
                 </button>
               </div>
             </div>
