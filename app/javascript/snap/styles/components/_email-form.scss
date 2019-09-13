@@ -175,6 +175,10 @@
       text-align: right;
       border-radius: 0;
       color: #6e6e6e;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .email-input-error {
@@ -197,4 +201,25 @@
     left: calc(50% -160px);
     font-family: 'Calibre-Regular', sans-serif;
   }
+}
+
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+}
+
+.loader {
+  border: 5px solid #6e6e6e; /* Light grey */
+  border-top: 5px solid #F74D31;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
