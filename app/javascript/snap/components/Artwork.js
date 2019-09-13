@@ -739,7 +739,6 @@ class Artwork extends Component {
       return (
 
         <div id="story-title-bar" className="story-title-bar" >
-          <div className="story-title">{storyTitle}</div>
 
           <div className="language-dropdown">
             <LanguageDropdown
