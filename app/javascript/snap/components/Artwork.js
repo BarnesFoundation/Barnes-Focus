@@ -21,7 +21,7 @@ import StoryItem from './StoryItem';
 import scan_button from 'images/scan-button.svg';
 import { isTablet } from 'react-device-detect';
 import ScrollMagic from 'scrollmagic';
-import { isAndroid } from 'react-device-detect';
+import { isAndroid, isIOS } from 'react-device-detect';
 
 /**
  * withRouter HOC provides props with location, history and match objects
@@ -331,6 +331,7 @@ class Artwork extends Component {
 
   setupStory = async imageId => {
     let stories_data = await this.sr.getStoryItems(imageId);
+    console.log(stories_data);
     if (stories_data.data.total > 0) {
       return {
         stories: stories_data.data.content.stories,
@@ -454,6 +455,32 @@ class Artwork extends Component {
       .addTo(this.controller);
   };
 
+	handleClickScroll = (storyIndex, isStoryCard) => {
+
+		let landingPoint;
+
+		// If the click originated from a story card
+		if (isStoryCard) {
+
+			// If the clicked story is the last one
+			if (storyIndex == (this.state.stories.length - 1)) { landingPoint = `#story-text-${storyIndex}`; }
+
+			// Otherwise, use the normal landing area
+			else { landingPoint = `#land-here-${storyIndex}`; }
+		}
+
+		else {
+			landingPoint = `.email-disclaimer`;
+		}	
+
+		// For iOS, override the normal scrolling 
+		if (isIOS) { 
+			this.controller.scrollTo((nextStoryPoint) => { $("html, body").animate({ scrollTop: nextStoryPoint }) });
+		 }
+
+		this.controller.scrollTo(landingPoint);
+	}
+
   setupEmailSceneOnEnter = () => {
     this.emailSceneTrigger = new ScrollMagic.Scene({
       triggerElement: '#email-trigger-enter',
@@ -515,7 +542,7 @@ class Artwork extends Component {
 
   onEmailHeightReady = height => {
     //const computedHeight = Math.max(height, screen.height / 2);
-    this.emailFormHeight = height;
+    this.emailFormHeight = height * 2 / 2.2;
   };
 
   storySceneCallback = showTitle => {
@@ -596,9 +623,9 @@ class Artwork extends Component {
                         <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
                         <td className="text-left item-info">
                           {artwork.artist}{' '}
-                          {artwork.unIdentified
-                            ? ''
-                            : `(${artwork.nationality}, ${artwork.birthDate} - ${artwork.deathDate})`}
+                          {!artwork.unIdentified && artwork.nationality
+                            ? `(${artwork.nationality}, ${artwork.birthDate} - ${artwork.deathDate})`
+                            : ''}
                         </td>
                       </tr>
                       {artwork.unIdentified && (
@@ -656,7 +683,7 @@ class Artwork extends Component {
                     onClick={this._onClickShare}>
                     <img src={shareButton} alt="share" />
                     <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
-                  </div>
+                    </div>
                   <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
                     <PopoverBody>
                       <div className="share">
@@ -693,7 +720,7 @@ class Artwork extends Component {
       );
     } else {
       return (
-        <div id="email-panel" ref={this.emailCardRef} className="panel-email">
+        <div id="email-panel" ref={this.emailCardRef} className="panel-email" onClick={() => { this.handleClickScroll(null, false); }}> 
           <EmailForm
             withStory={showStory}
             isEmailScreen={false}
@@ -701,7 +728,7 @@ class Artwork extends Component {
             getTranslation={this.props.getTranslation}
             getSize={this.onEmailHeightReady}
           />
-        </div>
+		</div>
       );
     }
   };
@@ -710,7 +737,10 @@ class Artwork extends Component {
     const { showTitleBar } = this.state;
     if (showTitleBar) {
       return (
-        <div id="story-title-bar" className="story-title-bar">
+
+        <div id="story-title-bar" className="story-title-bar" >
+          <div className="story-title">{storyTitle}</div>
+
           <div className="language-dropdown">
             <LanguageDropdown
               isStoryItemDropDown={true}
@@ -735,6 +765,7 @@ class Artwork extends Component {
       return <div />;
     }
     return stories.map((story, index) => {
+	  const storyIndex = index + 1;
       const storyDuration = this.state.storyDurationsCurrent[index] * 5;
       const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33;
       //console.log('renderStory > storyDuration, storySceneOffset :: ', index, storyDuration, storySceneOffset);
@@ -742,31 +773,35 @@ class Artwork extends Component {
         <Scene
           loglevel={0}
           indicators={false}
-          key={`storyitem${index + 1}`}
+          key={`storyitem${storyIndex}`}
           triggerHook="onLeave"
           pin
           pinSettings={{ pushFollowers: false }}
           duration={storyDuration}
           offset={storySceneOffset}>
           {(progress, event) => (
-            <div id={`story-card-${index}`} className={`panel panel${index + 1}`}>
-              <StoryItem
-                key={`storyitem${index + 1}`}
-                progress={progress}
-                sceneStatus={event}
-                storyIndex={index}
-                isLastStoryItem={index === stories.length - 1 ? true : false}
-                story={story}
-                storyTitle={storyTitle}
-                langOptions={this.langOptions}
-                selectedLanguage={this.state.selectedLanguage}
-                onSelectLanguage={this.onSelectLanguage}
-                onStoryReadComplete={this.onStoryReadComplete}
-                getSize={this.onStoryHeightReady}
-                statusCallback={this.storySceneCallback}
-                getTranslation={this.props.getTranslation}
-              />
-            </div>
+				  <div>
+					  <div id={`story-card-${index}`} className={`panel panel${storyIndex}`}>	
+					  <div className={`story-title-click`} id={`${index}`} onClick={() => { this.handleClickScroll(index, true) }}/>
+					  <div id={`land-here-${index}`} className={`land-here ${(index == 0) ? 'initial' : 'not-initial'}`} />						  
+						  <StoryItem
+							  key={`storyitem${storyIndex}`}
+							  progress={progress}
+							  sceneStatus={event}
+							  storyIndex={index}
+							  isLastStoryItem={index === stories.length - 1 ? true : false}
+							  story={story}
+							  storyTitle={storyTitle}
+							  langOptions={this.langOptions}
+							  selectedLanguage={this.state.selectedLanguage}
+							  onSelectLanguage={this.onSelectLanguage}
+							  onStoryReadComplete={this.onStoryReadComplete}
+							  getSize={this.onStoryHeightReady}
+							  statusCallback={this.storySceneCallback}
+							  getTranslation={this.props.getTranslation}
+						  />
+					  </div>
+				  </div>
           )}
         </Scene>
       );
@@ -790,7 +825,7 @@ class Artwork extends Component {
 
       //console.log('renderPinsEnter :: storyEnterPinDuration', index, storyEnterPinDuration);
 
-      return (
+	  return (
         <Scene
           loglevel={0}
           key={`storytriggerenter${index + 1}`}
@@ -846,8 +881,9 @@ class Artwork extends Component {
         {this.renderStoryContainer()}
 
         {/** this is a placeholder element at the bottom of viewport to control email card enter animation when no stories are present */}
-        {<div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }} />}
-
+		{<div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }} />}
+		
+		<div id="land-here-email" />
         {this.renderEmailScreen()}
       </SectionWipesStyled>
     );
