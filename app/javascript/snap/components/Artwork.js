@@ -775,7 +775,12 @@ class Artwork extends Component {
 	  const storyIndex = index + 1;
       const storyDuration = this.state.storyDurationsCurrent[index] * 5;
       const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33;
-      //console.log('renderStory > storyDuration, storySceneOffset :: ', index, storyDuration, storySceneOffset);
+	  //console.log('renderStory > storyDuration, storySceneOffset :: ', index, storyDuration, storySceneOffset);
+	  
+	  const peekHeight = (isAndroid && index === 0) ? 123 : 67;
+	  const peekOffsetStyle = { height: `${peekHeight}px`, top: `-${peekHeight}px` };
+	  const clickStyling = { ...peekOffsetStyle };
+
       return (
         <Scene
           loglevel={0}
@@ -789,7 +794,7 @@ class Artwork extends Component {
           {(progress, event) => (
 				  <div>
 					  <div id={`story-card-${index}`} className={`panel panel${storyIndex}`}>	
-					  <div className={`story-title-click`} id={`${index}`} onClick={() => { this.handleClickScroll(index, true) }}/>
+					  <div className={`story-title-click click-${index}`} id={`${index}`} style={clickStyling} onClick={() => { this.handleClickScroll(index, true) }}/>
 					  <div id={`land-here-${index}`} className={`land-here ${(index == 0) ? 'initial' : 'not-initial'}`} />						  
 						  <StoryItem
 							  key={`storyitem${storyIndex}`}

@@ -252,8 +252,7 @@
 
 .story-title-click {
   position: absolute;
-  top: -67px;
-  height: 70px;
+ 
   width: 100%;
   z-index: 10000;
 }
@@ -262,11 +261,4 @@
   position: absolute;
   top: 145px;
   height: 10px;
-  width: 100%;
-  z-index: 10000;
-}
-
-.initial {
-	/* top: unset;
-	bottom: -70px; */
 }
