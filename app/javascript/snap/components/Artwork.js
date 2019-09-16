@@ -465,7 +465,7 @@ class Artwork extends Component {
 			if (storyIndex == 0) {
 
 				// This amount of offset for the first card seems to work
-				landingPoint = screen.height * 2.02;
+				landingPoint = 1600;
 			}
 
 			else {
