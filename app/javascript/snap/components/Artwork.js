@@ -464,8 +464,10 @@ class Artwork extends Component {
 
 			if (storyIndex == 0) {
 
+				const peekOffset = (isAndroid) ? 123 : 67;
+
 				// This amount of offset for the first card seems to work
-				landingPoint = 1600;
+				landingPoint = 1600 + peekOffset;
 			}
 
 			else {
