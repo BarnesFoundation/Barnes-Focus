@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
 
 private
 
-  @@supported_languages = [ 'en', 'es', 'fr', 'de', 'it', 'ru', 'zh', 'ja', 'ko' ]
+  @@supported_languages = [ 'En', 'Es', 'Fr', 'De', 'It', 'Ru', 'Zh', 'Ja', 'Ko' ]
 
   def generate_session
     # ideally we should not use reset_session for capturing scanned history. If we do, we may lost all the scanned history captured by the user before
@@ -44,12 +44,14 @@ private
 			pl = pl.slice(0..(pl.index('-') - 1))
 		end
 
-		language_is_supported = @@supported_languages.include? pl
+		# Find the language that is in our supported languages list
+		found_language = @@supported_languages.find do |language| language.downcase == pl
+		end 
 
 		# If we do support the language, set it
-		if language_is_supported
-			@@preferred_language = pl
-			session.update_column(:lang_pref, pl)
+		if found_language
+			@@preferred_language = found_language
+			session.update_column(:lang_pref, found_language.downcase)
 		end
 	end
 
