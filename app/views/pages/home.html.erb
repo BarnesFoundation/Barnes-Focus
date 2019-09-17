@@ -1,3 +1,15 @@
 <div id="app" class="app-container"></div>
 <%= javascript_pack_tag 'snap' %>
 <%= stylesheet_pack_tag 'snap' %>
+
+<script>
+
+	const storedPreferredLanguage = localStorage.getItem('barnes.snap.pref.lang');
+
+	if (!storedPreferredLanguage) {
+		console.log('manually setting language');
+		const determinedPrefLanguage = "<%= @preferred_language =%>";
+		localStorage.setItem('barnes.snap.pref.lang', determinedPrefLanguage);
+	}
+
+</script>
