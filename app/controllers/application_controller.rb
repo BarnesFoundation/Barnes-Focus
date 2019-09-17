@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
+  @@preferred_language = nil
+
 private
 
   @@supported_languages = [ 'en', 'es', 'fr', 'de', 'it', 'ru', 'zh', 'ja', 'ko' ]
@@ -10,8 +12,6 @@ private
     # Just placing it here so we know how to handle reset_session for future cases
 	# reset_session
 	
-	puts "Entered generate_session!"
-
 	# Return true if the session already exists
 	return true if session[ :user_scanned_history ]
 	
@@ -48,6 +48,7 @@ private
 
 		# If we do support the language, set it
 		if language_is_supported
+			@@preferred_language = pl
 			session.update_column(:lang_pref, pl)
 		end
 	end
