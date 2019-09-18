@@ -786,7 +786,7 @@ class Artwork extends Component {
       return (
         <Scene
           loglevel={0}
-          indicators={false}
+          indicators={true}
           key={`storyitem${storyIndex}`}
           triggerHook="onLeave"
           pin
