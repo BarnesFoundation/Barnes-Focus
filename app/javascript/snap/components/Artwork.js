@@ -730,7 +730,7 @@ class Artwork extends Component {
       );
     } else {
       return (
-        <div id="email-panel" ref={this.emailCardRef} className="panel-email" onClick={() => { this.handleClickScroll(null, false); }}> 
+        <div id="email-panel" ref={this.emailCardRef} className="panel-email" style={{ pointerEvents: 'auto' }} onClick={() => { this.handleClickScroll(null, false); }}> 
           <EmailForm
             withStory={showStory}
             isEmailScreen={false}
