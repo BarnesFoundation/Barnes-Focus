@@ -139,6 +139,7 @@
       }
 
       .share-wrapper {
+		pointer-events: auto;
         margin-bottom: 20px;
         display: flex;
         justify-content: space-evenly;
@@ -252,6 +253,7 @@
 
 .story-title-click {
   position: absolute;
+  pointer-events: auto;
  
   width: 100%;
   z-index: 10000;
