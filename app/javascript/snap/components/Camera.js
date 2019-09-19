@@ -55,7 +55,11 @@ class Camera extends Component {
 	/** Captures a single scan and returns blob of the scan */
 	captureSingleScan = async () => {
 
+		console.log(`In captureSingleScan, shouldBeScanning is ${this.props.shouldBeScanning}`);
+
 		if (this.props.shouldBeScanning) {
+
+			console.log('Capturing a scan');
 
 			// Get image in canvas
 			let canvas = this.getVideoCanvas();
@@ -132,9 +136,7 @@ class Camera extends Component {
 			});
 		}
 
-		catch (error) {
-			this.setState({ error: 'An error occurred accessing the device camera' });
-		}
+		catch (error) { this.setState({ error: 'An error occurred accessing the device camera' }); }
 	}
 
 	/* Prevents zoom */
@@ -164,7 +166,8 @@ class Camera extends Component {
 	}
 
   componentDidUpdate(previousProps) {
-	if (previousProps.shouldBeScanning !== this.props.shouldBeScanning) {
+	console.log('component updated' + this.props.shouldBeScanning);
+	if (!previousProps.shouldBeScanning && this.props.shouldBeScanning == true) {
 		this.setupForCapturing();
 	}	
   }

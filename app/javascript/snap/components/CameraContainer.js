@@ -53,17 +53,19 @@ class CameraContainer extends Component {
 			// Prepare and send the request to Catchoom for a response
 			const imageSearchRequestConfig = this.sr.prepareRequest(imageBlob, this.state.scanSeqId);
 			const imageSearchResponse = await this.sr.submitImageSearchRequest(imageSearchRequestConfig);
-			this.responseCounter++;
+			this.responseCounter++;	
 
 			const { data } = imageSearchRequestConfig;
 			const { searchWasSuccessful, searchTime } = imageSearchResponse;
 			let searchResultToStore, elasticSearchResponse = null;
 
+			console.log(`Search was successful ${searchWasSuccessful} at attempt ${this.responseCounter}`);
+
 			// If search was successful
 			if (searchWasSuccessful) {
 
 				// Match found so we should stop scanning
-				this.setState({ sessionYieldedMatch: true });
+				this.setState({ sessionYieldedMatch: true, shouldBeScanning: false });
 
 				// Get the identified image information
 				const identifiedItem = imageSearchResponse.responsePayload.results[0];
@@ -78,9 +80,7 @@ class CameraContainer extends Component {
 			}
 
 			// Otherwise, when it's not successful
-			else {
-				searchResultToStore = new StorableSearch(data, searchWasSuccessful, null, elasticSearchResponse, searchTime);
-			}
+			else { searchResultToStore = new StorableSearch(data, searchWasSuccessful, null, elasticSearchResponse, searchTime); }
 
 			// Store the result, regardless of success or not
 			this.sr.storeSearchedResult(searchResultToStore);
@@ -117,8 +117,8 @@ class CameraContainer extends Component {
 		});
 	}
 
-	componentDidMount() {
-		this.beginScanning();
+	async componentDidMount() {
+		await this.beginScanning();
 	}
 
 	render() {
