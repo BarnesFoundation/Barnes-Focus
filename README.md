@@ -1,6 +1,6 @@
 # Installation Instructions
 - Git clone
-- Install Ruby (using RVM): `rvm install ruby-2.4.3`
+- Install Ruby (using RVM): `rvm install ruby-2.5.0`
 - Install Rails: `gem install rails` OR run `bundle`
 - Install Yarn (for Mac): `brew install yarn`
 - Install Foreman: `gem install foreman`

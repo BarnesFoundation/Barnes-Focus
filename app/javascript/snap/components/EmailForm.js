@@ -3,6 +3,7 @@ import throttle from 'lodash/throttle';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, TOP_OFFSET, VIEWPORT_HEIGHT } from './Constants';
+import { SearchRequestService } from '../services/SearchRequestService';
 
 const withStoryStyles = {
   backgroundColor: '#fff',
@@ -12,10 +13,12 @@ const withStoryStyles = {
 class EmailForm extends Component {
   constructor(props) {
     super(props);
+    this.sr = new SearchRequestService();
     this.state = {
       email: '',
       floatScanBtn: false,
       emailCaptured: false,
+      varificationPending: null,
       errors: {
         email: false
       }
@@ -74,16 +77,27 @@ class EmailForm extends Component {
     });
   };
 
-  validateEmail = () => {
-    const emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-    return this.state.email.length > 0 && emailRegex.test(this.state.email);
-  };
+	validateEmail = async () => {
+		const validated = await this.sr.validteEmail(this.state.email);
 
-  _saveEmail = () => {
-    console.log('Save email called!!');
-    if (!this.validateEmail()) {
+    console.log(`The email being valid is ${validated}`);
+    this.setState({varificationPending: false})
+		return this.state.email.length > 0 && validated === true;
+	};
+
+  _saveEmail = async () => {
+    this.setState({varificationPending: true});
+	// Get whether or not the email is valid
+	const emailIsValid = await this.validateEmail();
+
+	// If email is not valid
+    if (!emailIsValid) {
+      this.setState({varificationPending: false});
       this.setState({ errors: { email: true } });
-    } else {
+	} 
+	
+	// Otherwise, it is valid
+	else {
       console.log('Valid email. Call backend API to save email.');
       const userEmail = this.state.email;
       this.setState({ email: '', emailCaptured: true });
@@ -145,6 +159,9 @@ class EmailForm extends Component {
                   type="button"
                   onClick={() => this._saveEmail()}>
                   {this.props.getTranslation('Bookmark_capture', 'text_7')}
+                  {this.state.varificationPending === true && 
+                    <div className="loader-container"><div className="loader"></div></div>
+                  }
                 </button>
               </div>
             </div>
