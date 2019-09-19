@@ -130,25 +130,18 @@ class SearchRequestService {
 	}
 
 	/** Closure function so that an identified item is processed only once. Returns an IdentifiedImagePayload object */
-	processIdentifiedItem = (identifiedItem => {
-		let executed = false;
-		return async (identifiedItem) => {
-			if (executed == false) {
+	processIdentifiedItem = async (identifiedItem) => {
 
-				// We've executed this at least once
-				executed = true;
+		// Get the image id and reference image url
+		const imageId = identifiedItem.item.name;
+		const referenceImageUrl = identifiedItem.image.thumb_120;
 
-				// Get the image id and reference image url
-				const imageId = identifiedItem.item.name;
-				const referenceImageUrl = identifiedItem.image.thumb_120;
+		// Retrieve artwork information
+		const esResponse = await this.getArtworkInformation(imageId);
 
-				// Retrieve artwork information
-				const esResponse = await this.getArtworkInformation(imageId);
+		return new IdentifiedImagePayload(esResponse, referenceImageUrl);
+	}
 
-				return new IdentifiedImagePayload(esResponse, referenceImageUrl);
-			}
-		}
-	})();
   validteEmail = async (email) => {
     try {
       let response = await axios.post(
