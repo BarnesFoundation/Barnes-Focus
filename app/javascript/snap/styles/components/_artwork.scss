@@ -139,6 +139,7 @@
       }
 
       .share-wrapper {
+		pointer-events: auto;
         margin-bottom: 20px;
         display: flex;
         justify-content: space-evenly;
@@ -248,4 +249,18 @@
 
 /* iPhone 6,7,8  */
 @media only screen and (min-device-width: 320px) and (max-device-height: 667px) and (orientation: portrait) {
+}
+
+.story-title-click {
+  position: absolute;
+  pointer-events: auto;
+ 
+  width: 100%;
+  z-index: 10000;
+}
+
+.land-here {
+  position: absolute;
+  top: 145px;
+  height: 10px;
 }
