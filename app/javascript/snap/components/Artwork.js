@@ -84,7 +84,8 @@ class Artwork extends Component {
       showTitleBar: false,
       storyDuration: 250,
       infoHeightUpdated: false,
-      infoCardDuration: 700
+	  infoCardDuration: 700,
+	  emailCardClickable: true
     };
 
     this.artworkRef = null;
@@ -517,9 +518,11 @@ class Artwork extends Component {
 	  .setPin('#email-panel', { spacerClass: 'email-scene-spacer' }) // pins the element for the the scene's duration
 	  .on('leave', (event) => {
 		  console.log('leaving email panel');
+		  this.setState({ emailCardClickable: true });
 	  })
 	  .on('enter', (event) => {
-		  console.log('entering email panel')
+		console.log('entering email panel');
+		 this.setState({ emailCardClickable: false });
 	  })
       .addTo(this.controller);
   };
@@ -725,7 +728,8 @@ class Artwork extends Component {
    * Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts.
    */
   renderEmailScreen = () => {
-    const { showStory, stories, emailCaptureAck } = this.state;
+	const { showStory, stories, emailCaptureAck } = this.state;
+	const pointerSetting = this.state.emailCardClickable ? 'auto' : 'none';
     if (emailCaptureAck) {
       return (
         <div className="scan-wrapper">
@@ -736,7 +740,7 @@ class Artwork extends Component {
       );
     } else {
       return (
-        <div id="email-panel" ref={this.emailCardRef} className="panel-email" style={{ pointerEvents: 'none' }} onClick={() => { this.handleClickScroll(null, false); }}> 
+        <div id="email-panel" ref={this.emailCardRef} className="panel-email" style={{ pointerEvents: pointerSetting }} onClick={() => { this.handleClickScroll(null, false); }}> 
           <EmailForm
             withStory={showStory}
             isEmailScreen={false}
