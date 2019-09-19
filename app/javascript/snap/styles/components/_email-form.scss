@@ -145,6 +145,7 @@
   }
 
   .email-input {
+	pointer-events: auto;
     width: 320px;
     position: relative;
     left: calc(50% -160px);
