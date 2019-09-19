@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, TOP_OFFSET, VIEWPORT_HEIGHT } from './Constants';
 import { SearchRequestService } from '../services/SearchRequestService';
+import ScanButton from './ScanButton';
 
 const withStoryStyles = {
   backgroundColor: '#fff',
@@ -61,10 +62,6 @@ class EmailForm extends Component {
       requestAnimationFrame(throttle(this.handleScroll, 100));
       this.scrollInProgress = true;
     }
-  };
-
-  handleScan = () => {
-    this.props.history.push({ pathname: '/scan' });
   };
 
   handleEmailInput = event => {
@@ -181,22 +178,16 @@ class EmailForm extends Component {
   };
 
   render() {
-    const { floatScanBtn, emailCaptured } = this.state;
-    let scanBtnClass = ['scan-button'];
-    if (floatScanBtn) {
-      scanBtnClass.push('floating');
-    }
+	const { floatScanBtn, emailCaptured } = this.state;
+	const { history } = this.props;
+	
     return (
       <div
         id="email-form"
         className="email-container"
         style={this.props.withStory ? withStoryStyles : {}}
         ref={this.setEmailRef}>
-        <div className="scan-wrapper">
-          <div className={scanBtnClass.join(' ')} onClick={this.handleScan}>
-            <img src={scan_button} alt="scan" />
-          </div>
-        </div>
+        <ScanButton history={history} float={floatScanBtn} />
         {!emailCaptured && this.renderEmailForm()}
         {emailCaptured && this.renderEmailSuccess()}
       </div>

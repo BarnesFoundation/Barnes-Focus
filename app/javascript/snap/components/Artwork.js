@@ -22,6 +22,7 @@ import scan_button from 'images/scan-button.svg';
 import { isTablet } from 'react-device-detect';
 import ScrollMagic from 'scrollmagic';
 import { isAndroid, isIOS } from 'react-device-detect';
+import ScanButton from './ScanButton';
 
 /**
  * withRouter HOC provides props with location, history and match objects
@@ -582,10 +583,6 @@ class Artwork extends Component {
     this.setState({ imgLoaded: true });
   };
 
-  handleScan = () => {
-    this.props.history.push({ pathname: '/scan' });
-  };
-
   /**
    * Renders the focused artwork card.
    */
@@ -728,17 +725,20 @@ class Artwork extends Component {
    * Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts.
    */
   renderEmailScreen = () => {
-	const { showStory, stories, emailCaptureAck } = this.state;
-	const pointerSetting = this.state.emailCardClickable ? 'auto' : 'none';
+	
+	const { showStory, emailCaptureAck, emailCardClickable } = this.state;
+	const pointerSetting = emailCardClickable ? 'auto' : 'none';
+
+	// If email was captured, just show scan button
     if (emailCaptureAck) {
-      return (
-        <div className="scan-wrapper">
-          <div className="scan-button" onClick={this.handleScan}>
-            <img src={scan_button} alt="scan" />
-          </div>
-        </div>
-      );
-    } else {
+	  
+	  const { history } = this.props;
+
+      return (<ScanButton history={history}/>);
+	} 
+	
+	// Otherwise, display the email panel
+	else {
       return (
         <div id="email-panel" ref={this.emailCardRef} className="panel-email" style={{ pointerEvents: pointerSetting }} onClick={() => { this.handleClickScroll(null, false); }}> 
           <EmailForm
@@ -751,15 +751,15 @@ class Artwork extends Component {
 		</div>
       );
     }
-  };
+  }
 
   renderTitleBar = () => {
-    const { showTitleBar, storyTitle } = this.state;
+	const { showTitleBar } = this.state;
+	
     if (showTitleBar) {
       return (
 
         <div id="story-title-bar" className="story-title-bar" >
-
           <div className="language-dropdown">
             <LanguageDropdown
               isStoryItemDropDown={true}
@@ -770,28 +770,28 @@ class Artwork extends Component {
           </div>
         </div>
       );
-    } else {
-      return <div id="story-title-bar" />;
-    }
-  };
+	} 
+	
+	else { return <div id="story-title-bar" />; }
+  }
 
-  /**
-   * Renders the story cards if * showStory * flag is true.
-   */
+  /** Renders the story cards if the flag is true */
   renderStory = () => {
-    const { showStory, stories, storyTitle } = this.state;
-    if (!showStory) {
-      return <div />;
-    }
+	const { showStory, stories, storyTitle } = this.state;
+	
+	if (!showStory) { return <div />;  }
+	
+	// Iterate through the available stories
     return stories.map((story, index) => {
+
 	  const storyIndex = index + 1;
       const storyDuration = this.state.storyDurationsCurrent[index] * 5;
       const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33;
 	  //console.log('renderStory > storyDuration, storySceneOffset :: ', index, storyDuration, storySceneOffset);
 	  
+	  // Amount that the story should peek
 	  const peekHeight = (isAndroid) ? 123 : 67;
 	  const peekOffsetStyle = { height: `${peekHeight}px`, top: `-${peekHeight}px` };
-	  const clickStyling = { ...peekOffsetStyle };
 
       return (
         <Scene
@@ -806,7 +806,7 @@ class Artwork extends Component {
           {(progress, event) => (
 				  <div>
 					  <div id={`story-card-${index}`} className={`panel panel${storyIndex}`}>	
-					  <div className={`story-title-click click-${index}`} id={`${index}`} style={clickStyling} onClick={() => { this.handleClickScroll(index, true) }}/>
+					  <div className={`story-title-click click-${index}`} id={`${index}`} style={peekOffsetStyle} onClick={() => { this.handleClickScroll(index, true) }}/>
 					  <div id={`land-here-${index}`} className={`land-here`} />						  
 						  <StoryItem
 							  key={`storyitem${storyIndex}`}
