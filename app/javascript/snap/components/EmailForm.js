@@ -1,4 +1,3 @@
-import scan_button from 'images/scan-button.svg';
 import throttle from 'lodash/throttle';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
@@ -182,16 +181,16 @@ class EmailForm extends Component {
 	const { history } = this.props;
 	
     return (
-      <div
-        id="email-form"
-        className="email-container"
-        style={this.props.withStory ? withStoryStyles : {}}
-        ref={this.setEmailRef}>
-        <ScanButton history={history} float={floatScanBtn} />
-        {!emailCaptured && this.renderEmailForm()}
-        {emailCaptured && this.renderEmailSuccess()}
-      </div>
-    );
+		<div id="email-form" className="email-container" style={this.props.withStory ? withStoryStyles : {}} ref={this.setEmailRef}>
+
+			{/* Render the scan button and whether or not it should float */}
+			<ScanButton history={history} float={floatScanBtn} />
+
+			{/* Render the email form based on whether or not captured/success */}
+			{!emailCaptured && this.renderEmailForm()}
+			{emailCaptured && this.renderEmailSuccess()}
+		</div>
+    )
   }
 }
 
