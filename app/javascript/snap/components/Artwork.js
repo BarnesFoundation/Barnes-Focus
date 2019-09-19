@@ -297,39 +297,29 @@ class Artwork extends Component {
     });
   };
 
-  onSelectLanguage = async lang => {
-    console.log('Selected lang changed in Artwork >> : ' + JSON.stringify(lang));
-    //scroll to top when language changes. This should help re-calculate correct offsets on language change.
-    window.scroll({
-      top: 0,
-      behavior: 'smooth'
-    });
+  onSelectLanguage = async selectedLanguage => {
+	
+    // Scroll to top when language changes. This should help re-calculate correct offsets on language change
+    window.scroll({ top: 0, behavior: 'smooth' });
 
-    localStorage.setItem(constants.SNAP_LANGUAGE_PREFERENCE, lang.code);
-    /** Save the user selected language in the server session and call the getArtworksInfo API again to refresh the page with translated result. */
-    const languageUpdated = await this.sr.saveLanguagePreference(lang.code);
+	// Update local storage with the new set language and then update the server session 
+    localStorage.setItem(constants.SNAP_LANGUAGE_PREFERENCE, selectedLanguage.code);
+    await this.sr.saveLanguagePreference(selectedLanguage.code);
 
     await this.props.updateTranslations();
-    this.updateSelectedLanguage(lang);
+    this.updateSelectedLanguage(selectedLanguage);
 
+	// Get the new language translations
     const imageId = this.getFocusedArtworkImageId();
-    const artworkInfo = this.sr.getArtworkInformation(imageId);
+	const result = this.sr.getArtworkInformation(imageId);
+	
     const { stories, storyId, storyTitle } = await this.setupStory(imageId);
-    const { artwork, roomRecords } = this.constructResultAndInRoomSlider(await artworkInfo);
-    this.setState({
-      result: artworkInfo,
-      selectedLanguage: lang,
-      stories: stories,
-      storyId: storyId,
-      storyTitle: storyTitle,
-      artwork: artwork,
-      roomRecords: roomRecords
-    });
-  };
+	const { artwork, roomRecords } = this.constructResultAndInRoomSlider(await artworkInfo);
+	
+    this.setState({ result, selectedLanguage, stories, storyId, storyTitle, artwork, roomRecords });
+  }
 
-  getFocusedArtworkImageId = () => {
-    return this.state.artwork ? this.state.artwork.id : this.props.match.params.imageId;
-  };
+  getFocusedArtworkImageId = () => { return this.state.artwork ? this.state.artwork.id : this.props.match.params.imageId; }
 
   setupStory = async imageId => {
     let stories_data = await this.sr.getStoryItems(imageId);
@@ -343,7 +333,7 @@ class Artwork extends Component {
     } else {
       return { stories: [], storyId: undefined, storyTitle: undefined };
     }
-  };
+  }
 
   onSelectInRoomArt = aitrId => {
     localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
@@ -579,13 +569,9 @@ class Artwork extends Component {
     }
   };
 
-  onArtworkImgLoad = ({ target: img }) => {
-    this.setState({ imgLoaded: true });
-  };
+  onArtworkImgLoad = ({ target: img }) => { this.setState({ imgLoaded: true }); }
 
-  /**
-   * Renders the focused artwork card.
-   */
+  /* Renders the focused artwork card */
   renderArtwork = () => {
     const { artwork, selectedLanguage } = this.state;
     const shortDescFontStyle =
@@ -721,9 +707,7 @@ class Artwork extends Component {
     );
   };
 
-  /**
-   * Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts.
-   */
+  /* Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts */
   renderEmailScreen = () => {
 	
 	const { showStory, emailCaptureAck, emailCardClickable } = this.state;
@@ -733,7 +717,6 @@ class Artwork extends Component {
     if (emailCaptureAck) {
 	  
 	  const { history } = this.props;
-
       return (<ScanButton history={history}/>);
 	} 
 	
@@ -753,23 +736,18 @@ class Artwork extends Component {
     }
   }
 
+  /** Renders the title bar based on whether it should be shown */
   renderTitleBar = () => {
 	const { showTitleBar } = this.state;
 	
     if (showTitleBar) {
       return (
-
         <div id="story-title-bar" className="story-title-bar" >
           <div className="language-dropdown">
-            <LanguageDropdown
-              isStoryItemDropDown={true}
-              langOptions={this.langOptions}
-              selected={this.state.selectedLanguage}
-              onSelectLanguage={this.onSelectLanguage}
-            />
+            <LanguageDropdown  isStoryItemDropDown={true} langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
           </div>
         </div>
-      );
+      )
 	} 
 	
 	else { return <div id="story-title-bar" />; }
