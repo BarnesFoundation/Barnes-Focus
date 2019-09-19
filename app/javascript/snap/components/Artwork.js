@@ -514,7 +514,7 @@ class Artwork extends Component {
       duration: 0, // scroll distance
       offset: this.emailFormHeight // start this scene after scrolling for emailFormHeight px.
     })
-      .setPin('#email-panel') // pins the element for the the scene's duration
+      .setPin('#email-panel', { spacerClass: 'email-scene-spacer' }) // pins the element for the the scene's duration
       .addTo(this.controller);
   };
 
@@ -730,7 +730,7 @@ class Artwork extends Component {
       );
     } else {
       return (
-        <div id="email-panel" ref={this.emailCardRef} className="panel-email" style={{ pointerEvents: 'auto' }} onClick={() => { this.handleClickScroll(null, false); }}> 
+        <div id="email-panel" ref={this.emailCardRef} className="panel-email" style={{ pointerEvents: 'none' }} onClick={() => { this.handleClickScroll(null, false); }}> 
           <EmailForm
             withStory={showStory}
             isEmailScreen={false}
