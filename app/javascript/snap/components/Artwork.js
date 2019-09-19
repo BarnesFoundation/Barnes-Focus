@@ -514,7 +514,13 @@ class Artwork extends Component {
       duration: 0, // scroll distance
       offset: this.emailFormHeight // start this scene after scrolling for emailFormHeight px.
     })
-      .setPin('#email-panel', { spacerClass: 'email-scene-spacer' }) // pins the element for the the scene's duration
+	  .setPin('#email-panel', { spacerClass: 'email-scene-spacer' }) // pins the element for the the scene's duration
+	  .on('leave', (event) => {
+		  console.log('leaving email panel');
+	  })
+	  .on('enter', (event) => {
+		  console.log('entering email panel')
+	  })
       .addTo(this.controller);
   };
 
@@ -897,7 +903,6 @@ class Artwork extends Component {
         {/** this is a placeholder element at the bottom of viewport to control email card enter animation when no stories are present */}
 		{<div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }} />}
 		
-		<div id="land-here-email" />
         {this.renderEmailScreen()}
       </SectionWipesStyled>
     );
