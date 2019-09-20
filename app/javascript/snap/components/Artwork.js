@@ -445,7 +445,7 @@ class Artwork extends Component {
       Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT),
       0
     );
-    this.artworkScrollOffset = artworkVScrollOffset + 100;
+    this.artworkScrollOffset = artworkVScrollOffset + 150;
     console.log('setArtworkRef >> offset after setTimeout  == ', this.artworkScrollOffset);
     this.artworkScene = new ScrollMagic.Scene({
       triggerElement: '#search-result',
@@ -617,8 +617,42 @@ class Artwork extends Component {
                   <div className="card-artist">{artwork.artist}</div>
                   <div className="card-title">{artwork.title}</div>
                 </div>
+                
               </div>
               <div className="card-body" id="focussed-artwork-body" ref={this.setArtworkRef}>
+              <div className="share-wrapper">
+                  <div className="language-dropdown-wrapper">
+                    <div className="language-dropdown">
+                      <LanguageDropdown
+                        langOptions={this.langOptions}
+                        selected={this.state.selectedLanguage}
+                        onSelectLanguage={this.onSelectLanguage}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    id="share-it"
+                    className="btn-share-result"
+                    ref={node => {
+                      this.target = node;
+                    }}
+                    onClick={this._onClickShare}>
+                    <img src={shareButton} alt="share" />
+                    <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
+                    </div>
+                  <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
+                    <PopoverBody>
+                      <div className="share">
+                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                          <i className="fa fa-lg fa-twitter" aria-hidden="true" />
+                        </a>
+                        <a target="_blank" href={this.getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
+                          <i className="fa fa-lg fa-facebook" aria-hidden="true" />
+                        </a>
+                      </div>
+                    </PopoverBody>
+                  </Popover>
+                </div>
                 <div className="short-desc-container" ref={elem => (this.shortDescContainer = elem)}>
                   {artwork.shortDescription && (
                     <div className="card-text paragraph" style={shortDescFontStyle}>
@@ -678,40 +712,6 @@ class Artwork extends Component {
                       )}
                     </tbody>
                   </table>
-                </div>
-
-                <div className="share-wrapper">
-                  <div className="language-dropdown-wrapper">
-                    <div className="language-dropdown">
-                      <LanguageDropdown
-                        langOptions={this.langOptions}
-                        selected={this.state.selectedLanguage}
-                        onSelectLanguage={this.onSelectLanguage}
-                      />
-                    </div>
-                  </div>
-                  <div
-                    id="share-it"
-                    className="btn-share-result"
-                    ref={node => {
-                      this.target = node;
-                    }}
-                    onClick={this._onClickShare}>
-                    <img src={shareButton} alt="share" />
-                    <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
-                    </div>
-                  <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
-                    <PopoverBody>
-                      <div className="share">
-                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
-                          <i className="fa fa-lg fa-twitter" aria-hidden="true" />
-                        </a>
-                        <a target="_blank" href={this.getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
-                          <i className="fa fa-lg fa-facebook" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </PopoverBody>
-                  </Popover>
                 </div>
               </div>
             </div>
