@@ -144,7 +144,7 @@ class StoryItem extends React.Component {
   };
 
   render() {
-    const { story, storyTitle, progress, storyIndex } = this.props;
+	const { story, storyTitle, progress, storyIndex } = this.props;
     const peekOffsetStyle =
       isAndroid && storyIndex === 0
         ? { transform: 'translate3d(0px, -123px, 0px)' } // 67 + 56 (address bar height compensation for android)
@@ -241,7 +241,6 @@ class StoryItem extends React.Component {
 				  )}
                 </div>
               </div>
-			  
 			</div>	
           </div>
 		 

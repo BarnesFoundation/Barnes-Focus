@@ -447,38 +447,28 @@ class Artwork extends Component {
       .addTo(this.controller);
   };
 
+  
 	handleClickScroll = (storyIndex, isStoryCard) => {
 
 		let landingPoint;
+		let heightOffset = (screen.height < 800) ? 800 : screen.height;
+		let peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
+		let initial = Math.abs(this.sceneRefs[0].props.duration) + peekOffset;
 
 		// If the click originated from a story card
 		if (isStoryCard) {
 
-			if (storyIndex == 0) {
 
-				const deviceOffset = (isAndroid) ? 123 : 67;
+			if (storyIndex == 0) { landingPoint = initial; }
 
-				// This amount of offset for the first card seems to work
-				landingPoint = 1600 + deviceOffset;
-			}
-
-			else {
-				// If the clicked story is the last one
-				if (storyIndex == (this.state.stories.length - 1)) { landingPoint = `#story-text-${storyIndex}`; }
-
-				// Otherwise, use the normal landing area
-				else { landingPoint = `#land-here-${storyIndex}`; }
-			}
-		}
+			else { landingPoint = initial + (heightOffset * storyIndex) + (storyIndex * 25); } }
 
 		else {
 			landingPoint = `.email-disclaimer`;
 		}	
 
 		// For iOS, override the normal scrolling 
-		if (isIOS) { 
-			this.controller.scrollTo((nextStoryPoint) => { $("html, body").animate({ scrollTop: nextStoryPoint }) });
-		 }
+		if (isIOS) { this.controller.scrollTo((nextStoryPoint) => { $("html, body").animate({ scrollTop: nextStoryPoint }) }); }
 
 		this.controller.scrollTo(landingPoint);
 	}
@@ -753,6 +743,8 @@ class Artwork extends Component {
 	else { return <div id="story-title-bar" />; }
   }
 
+  sceneRefs = {};
+
   /** Renders the story cards if the flag is true */
   renderStory = () => {
 	const { showStory, stories, storyTitle } = this.state;
@@ -768,9 +760,10 @@ class Artwork extends Component {
 	  //console.log('renderStory > storyDuration, storySceneOffset :: ', index, storyDuration, storySceneOffset);
 	  
 	  // Amount that the story should peek
-	  const peekHeight = (isAndroid) ? 123 : 67;
-	  const peekOffsetStyle = { height: `${peekHeight}px`, top: `-${peekHeight}px` };
-
+	  const peekHeight = isAndroid && index === 0 ? 123 : 67;
+	  const peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
+	  const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px` };
+	  
       return (
         <Scene
           loglevel={0}
@@ -780,12 +773,12 @@ class Artwork extends Component {
           pin
           pinSettings={{ pushFollowers: false }}
           duration={storyDuration}
-          offset={storySceneOffset}>
+          offset={storySceneOffset}
+		  ref={(element) => { if (element) { this.sceneRefs[index] = element } }}>
           {(progress, event) => (
 				  <div>
-					  <div id={`story-card-${index}`} className={`panel panel${storyIndex}`}>	
+					  <div id={`story-card-${index}`} className={`panel panel${storyIndex}`} >	
 					  <div className={`story-title-click click-${index}`} id={`${index}`} style={peekOffsetStyle} onClick={() => { this.handleClickScroll(index, true) }}/>
-					  <div id={`land-here-${index}`} className={`land-here`} />						  
 						  <StoryItem
 							  key={`storyitem${storyIndex}`}
 							  progress={progress}
@@ -803,6 +796,7 @@ class Artwork extends Component {
 							  getTranslation={this.props.getTranslation}
 						  />
 					  </div>
+					  <div id={`bottom-${index}`} style={{ position: 'absolute', bottom: '0' }}/>
 				  </div>
           )}
         </Scene>
