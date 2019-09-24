@@ -24,6 +24,7 @@ import ScrollMagic from 'scrollmagic';
 import { isAndroid, isIOS } from 'react-device-detect';
 import ScanButton from './ScanButton';
 
+
 /**
  * withRouter HOC provides props with location, history and match objects
  */
@@ -86,7 +87,8 @@ class Artwork extends Component {
       storyDuration: 250,
       infoHeightUpdated: false,
 	  infoCardDuration: 700,
-	  emailCardClickable: true
+	  emailCardClickable: true,
+	  storyTopsClickable: {}
     };
 
     this.artworkRef = null;
@@ -762,7 +764,8 @@ class Artwork extends Component {
 	  // Amount that the story should peek
 	  const peekHeight = isAndroid && index === 0 ? 123 : 67;
 	  const peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
-	  const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px` };
+	  const pointerEvent = this.state.storyTopsClickable[index] ? 'none' : 'auto';
+	  const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
 	  
       return (
         <Scene
@@ -794,15 +797,28 @@ class Artwork extends Component {
 							  getSize={this.onStoryHeightReady}
 							  statusCallback={this.storySceneCallback}
 							  getTranslation={this.props.getTranslation}
+							  onVisChange={this.onVisibilityChange}
 						  />
 					  </div>
-					  <div id={`bottom-${index}`} style={{ position: 'absolute', bottom: '0' }}/>
+					  
 				  </div>
           )}
         </Scene>
       );
     });
   };
+
+  onVisibilityChange = (isVisible, storyIndex) => {
+	this.setState((pState) => {
+		const storyTopsClickable = { ...pState.storyTopsClickable };
+		storyTopsClickable[storyIndex] = isVisible;
+
+		return {
+			...pState,
+			storyTopsClickable
+		};
+	});
+  }
 
   /**
    * Renders the story cards if * showStory * flag is true.
