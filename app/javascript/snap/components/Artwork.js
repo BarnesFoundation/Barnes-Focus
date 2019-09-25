@@ -458,7 +458,7 @@ class Artwork extends Component {
 		
 		// If the click originated from a story card
 		if (isStoryCard) {
-			
+
 			let initial = Math.abs(this.sceneRefs[0].props.duration) + peekOffset;
 
 			if (storyIndex == 0) { landingPoint = initial; }
@@ -825,6 +825,9 @@ class Artwork extends Component {
    */
   renderPinsEnter = () => {
 	const { showStory, stories, storyTitle } = this.state;
+
+	const duration = (screen.height < 800) ? 800 : screen.height;
+	const offsettedDuration = duration + this.artworkScrollOffset - 150;
     if (!showStory) {
 		return (
 			<Scene
@@ -834,7 +837,7 @@ class Artwork extends Component {
  			  triggerElement={`#email-panel`}
 			  triggerHook="onEnter"
 			  indicators={true}
-			  duration={(screen.height / 3)}
+			  duration={offsettedDuration}
 			  offset="0"
 			  pinSettings={{ pushFollowers: true, spacerClass: 'email-spacer' }}>
 			  <div id={`story-pin-enter`} />
