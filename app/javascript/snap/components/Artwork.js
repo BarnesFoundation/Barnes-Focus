@@ -859,7 +859,7 @@ class Artwork extends Component {
           pin={`#story-card-${index}`}
           triggerElement={`#story-card-${index}`}
           triggerHook="onEnter"
-          indicators={true}
+          indicators={false}
           duration={storyEnterPinDuration}
           offset="0"
           pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
