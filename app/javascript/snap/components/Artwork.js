@@ -466,7 +466,7 @@ class Artwork extends Component {
 			else { landingPoint = initial + (heightOffset * storyIndex) + (storyIndex * 25); } }
 
 		else {
-			landingPoint = `.email-disclaimer`;
+			landingPoint = heightOffset + this.emailFormHeight;
 		}	
 
 		// For iOS, override the normal scrolling 
