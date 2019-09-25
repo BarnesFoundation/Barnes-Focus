@@ -839,7 +839,7 @@ class Artwork extends Component {
 			  indicators={false}
 			  duration={offsettedDuration}
 			  offset="0"
-			  pinSettings={{ pushFollowers: true, spacerClass: 'email-spacer' }}>
+			  pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
 			  <div id={`story-pin-enter`} />
 			</Scene>
 		  );
