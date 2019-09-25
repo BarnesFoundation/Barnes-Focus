@@ -836,7 +836,7 @@ class Artwork extends Component {
 			  pin={`#email-panel`}
  			  triggerElement={`#email-panel`}
 			  triggerHook="onEnter"
-			  indicators={true}
+			  indicators={false}
 			  duration={offsettedDuration}
 			  offset="0"
 			  pinSettings={{ pushFollowers: true, spacerClass: 'email-spacer' }}>
