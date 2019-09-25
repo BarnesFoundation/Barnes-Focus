@@ -455,11 +455,11 @@ class Artwork extends Component {
 		let landingPoint;
 		let heightOffset = (screen.height < 800) ? 800 : screen.height;
 		let peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
-		let initial = Math.abs(this.sceneRefs[0].props.duration) + peekOffset;
-
+		
 		// If the click originated from a story card
 		if (isStoryCard) {
 
+			let initial = Math.abs(this.sceneRefs[0].props.duration) + peekOffset;
 
 			if (storyIndex == 0) { landingPoint = initial; }
 
@@ -481,9 +481,7 @@ class Artwork extends Component {
       triggerHook: 'onEnter',
       duration: this.artworkScrollOffset - 150
     })
-      .setPin('#email-trigger-enter', { pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }) // pins the element for the the scene's duration
       .on('leave', event => {
-        //console.log(event.type);
         this.emailSceneTrigger.removePin();
         this.emailSceneTrigger.refresh();
       })
@@ -491,14 +489,12 @@ class Artwork extends Component {
   };
 
   setupEmailScene = () => {
-    console.log('Email scene offset: ', this.emailFormHeight);
     this.emailScene = new ScrollMagic.Scene({
       triggerElement: '#email-panel',
       triggerHook: 'onEnter',
       duration: 0, // scroll distance
       offset: this.emailFormHeight // start this scene after scrolling for emailFormHeight px.
     })
-	  .setPin('#email-panel', { spacerClass: 'email-scene-spacer' }) // pins the element for the the scene's duration
 	  .on('leave', (event) => {
 		  console.log('leaving email panel');
 		  this.setState({ emailCardClickable: true });
@@ -507,7 +503,7 @@ class Artwork extends Component {
 		console.log('entering email panel');
 		 this.setState({ emailCardClickable: false });
 	  })
-      .addTo(this.controller);
+	  .addTo(this.controller);	  
   };
 
   setArtworkRef = elem => {
@@ -701,9 +697,12 @@ class Artwork extends Component {
 
   /* Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts */
   renderEmailScreen = () => {
-	
 	const { showStory, emailCaptureAck, emailCardClickable } = this.state;
 	const pointerSetting = emailCardClickable ? 'auto' : 'none';
+
+	// If the story should not be shown -- which occurs, only when no stories are available
+	const peekOffsetValue = (isAndroid) ? 123 : 67;
+	const peekOffset = (showStory) ? '0' : `${peekOffsetValue}`;
 
 	// If email was captured, just show scan button
     if (emailCaptureAck) {
@@ -715,7 +714,7 @@ class Artwork extends Component {
 	// Otherwise, display the email panel
 	else {
       return (
-        <div id="email-panel" ref={this.emailCardRef} className="panel-email" style={{ pointerEvents: pointerSetting }} onClick={() => { this.handleClickScroll(null, false); }}> 
+        <div id="email-panel" ref={this.emailCardRef} className="panel-email" style={{ pointerEvents: pointerSetting, height: `calc(60vh - ${peekOffset}px)` }} onClick={() => { this.handleClickScroll(null, false); }}> 
           <EmailForm
             withStory={showStory}
             isEmailScreen={false}
@@ -825,9 +824,25 @@ class Artwork extends Component {
    * IMP:: For index > 0, storySceneOffset = storyEnterPinDuration + 8;
    */
   renderPinsEnter = () => {
-    const { showStory, stories, storyTitle } = this.state;
+	const { showStory, stories, storyTitle } = this.state;
+
+	const duration = (screen.height < 800) ? 800 : screen.height;
+	const offsettedDuration = duration + this.artworkScrollOffset - 150;
     if (!showStory) {
-      return <div id="story-pin-enter" />;
+		return (
+			<Scene
+			  loglevel={0}
+			  key={`story-pin-enter-key`}
+			  pin={`#email-panel`}
+ 			  triggerElement={`#email-panel`}
+			  triggerHook="onEnter"
+			  indicators={false}
+			  duration={offsettedDuration}
+			  offset="0"
+			  pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
+			  <div id={`story-pin-enter`} />
+			</Scene>
+		  );
     }
     return stories.map((story, index) => {
       const storyEnterPinDuration =
