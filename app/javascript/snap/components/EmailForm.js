@@ -4,6 +4,8 @@ import { withRouter } from 'react-router';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, TOP_OFFSET, VIEWPORT_HEIGHT } from './Constants';
 import { SearchRequestService } from '../services/SearchRequestService';
 import ScanButton from './ScanButton';
+import { isAndroid } from 'react-device-detect';
+
 
 const withStoryStyles = {
   backgroundColor: '#fff',
@@ -179,9 +181,10 @@ class EmailForm extends Component {
   render() {
 	const { floatScanBtn, emailCaptured } = this.state;
 	const { history } = this.props;
+	const peekOffset = (isAndroid) ? 123 : 67;
 	
     return (
-		<div id="email-form" className="email-container" style={this.props.withStory ? withStoryStyles : {}} ref={this.setEmailRef}>
+		<div id="email-form" className="email-container" style={this.props.withStory ? withStoryStyles : { top: `-${peekOffset}px`}} ref={this.setEmailRef}>
 
 			{/* Render the scan button and whether or not it should float */}
 			<ScanButton history={history} float={floatScanBtn} />
