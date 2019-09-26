@@ -97,6 +97,7 @@ class EmailForm extends Component {
 	// Otherwise, it is valid
 	else {
       console.log('Valid email. Call backend API to save email.');
+      this.setState({varificationPending: false});
       const userEmail = this.state.email;
       this.setState({ email: '', emailCaptured: true });
       localStorage.setItem(SNAP_USER_EMAIL, userEmail);
