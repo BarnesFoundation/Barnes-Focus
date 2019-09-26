@@ -153,6 +153,7 @@ class Artwork extends Component {
   };
 
   async componentWillMount() {
+	  console.log('component is mounting');
     //console.log('Artwork >> componentWillMount');
 
     let imageId = this.state.result ? this.state.result.data.records[0].id : this.props.match.params.imageId;
@@ -272,7 +273,7 @@ class Artwork extends Component {
     this.emailSceneTrigger.removePin();
     this.emailSceneTrigger.duration(this.artworkScrollOffset - 100);
     this.emailSceneTrigger.setPin('#email-trigger-enter');
-    this.emailSceneTrigger.refresh();
+	this.emailSceneTrigger.refresh();
   };
 
   getSelectedLanguage = async () => {
@@ -424,21 +425,25 @@ class Artwork extends Component {
 
   onSubmitEmail = email => {
     console.log('Submitted email :: ' + email);
-    this.setState({ email: email, emailCaptured: true });
-    this.sr.submitBookmarksEmail(email);
-    // close the email card after 4 secs
-    this.emailSubmitTimeoutCallback = setTimeout(() => {
-      this.setState({ emailCaptureAck: true });
-    }, 4000);
-  };
+	this.setState({ email: email, emailCaptured: true }, () => {
+
+		// Store the email
+		this.sr.submitBookmarksEmail(email);
+
+		// Close the email card after 4 secs
+		this.emailSubmitTimeoutCallback = setTimeout(() => {
+		  this.setState({ emailCaptureAck: true });
+		}, 4000);
+	});
+  }
 
   setupArtworkScene = () => {
+	  console.log('did the error occurr at setupArtworkScene')
     const artworkVScrollOffset = Math.max(
       Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT),
       0
     );
     this.artworkScrollOffset = artworkVScrollOffset + 150;
-    console.log('setArtworkRef >> offset after setTimeout  == ', this.artworkScrollOffset);
     this.artworkScene = new ScrollMagic.Scene({
       triggerElement: '#search-result',
       triggerHook: 'onLeave',
@@ -496,11 +501,9 @@ class Artwork extends Component {
       offset: this.emailFormHeight // start this scene after scrolling for emailFormHeight px.
     })
 	  .on('leave', (event) => {
-		  console.log('leaving email panel');
 		  this.setState({ emailCardClickable: true });
 	  })
 	  .on('enter', (event) => {
-		console.log('entering email panel');
 		 this.setState({ emailCardClickable: false });
 	  })
 	  .addTo(this.controller);	  
@@ -513,7 +516,7 @@ class Artwork extends Component {
       this.controller = new ScrollMagic.Controller(scrollContainer);
       this.artworkTimeoutCallback = setTimeout(() => {
 		this.setupArtworkScene();
-        if (!this.state.showStory && !this.state.emailCaptureAck) {
+        if (!this.state.showStory && !this.state.emailCaptured) {
           this.setupEmailSceneOnEnter();
         }
         if (!this.state.emailCaptured) {
@@ -697,7 +700,7 @@ class Artwork extends Component {
 
   /* Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts */
   renderEmailScreen = () => {
-	const { showStory, emailCaptureAck, emailCardClickable } = this.state;
+	const { showStory, emailCardClickable, emailCaptured } = this.state;
 	const pointerSetting = emailCardClickable ? 'auto' : 'none';
 
 	// If the story should not be shown -- which occurs, only when no stories are available
@@ -705,8 +708,7 @@ class Artwork extends Component {
 	const peekOffset = (showStory) ? '0' : `${peekOffsetValue}`;
 
 	// If email was captured, just show scan button
-    if (emailCaptureAck) {
-	  
+    if (emailCaptured) {  
 	  const { history } = this.props;
       return (<ScanButton history={history}/>);
 	} 
@@ -714,7 +716,7 @@ class Artwork extends Component {
 	// Otherwise, display the email panel
 	else {
       return (
-        <div id="email-panel" ref={(elem) => { this.emailCardRef = elem; }} className="panel-email" style={{ pointerEvents: pointerSetting, height: `calc(60vh - ${peekOffset}px)` }} onClick={() => { this.handleClickScroll(null, false); }}> 
+        <div id="email-panel" className="panel-email" style={{ pointerEvents: pointerSetting, height: `calc(60vh - ${peekOffset}px)` }} onClick={() => { this.handleClickScroll(null, false); }}> 
           <EmailForm
             withStory={showStory}
             isEmailScreen={false}
@@ -819,38 +821,15 @@ class Artwork extends Component {
 	});
   }
 
-  /**
-   * Renders the story cards if * showStory * flag is true.
-   * IMP:: For index > 0, storySceneOffset = storyEnterPinDuration + 8;
-   */
+  /* Renders the story cards if * showStory * flag is true */
   renderPinsEnter = () => {
-	const { showStory, stories, storyTitle, emailCaptureAck } = this.state;
+	const { stories } = this.state;
 
-	const duration = (screen.height < 800) ? 800 : screen.height;
-	const offsettedDuration = duration + this.artworkScrollOffset - 150;
-    if (!showStory && !emailCaptureAck) {
-		return (
-			<Scene
-			  loglevel={0}
-			  key={`story-pin-enter-key`}
-			  pin={`#email-panel`}
- 			  triggerElement={`#email-panel`}
-			  triggerHook="onEnter"
-			  indicators={false}
-			  duration={offsettedDuration}
-			  offset="0"
-			  pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
-			  <div id={`story-pin-enter`} />
-			</Scene>
-		  );
-    }
     return stories.map((story, index) => {
       const storyEnterPinDuration =
         index > 0
           ? this.state.storyDurationsCurrent[index - 1] / 4 - 50
           : this.state.infoCardDuration + this.contentOffset + 33;
-
-      //console.log('renderPinsEnter :: storyEnterPinDuration', index, storyEnterPinDuration);
 
 	  return (
         <Scene
@@ -869,14 +848,47 @@ class Artwork extends Component {
     });
   };
 
+  renderEmailPin = () => {
+	const { emailCaptured } = this.state;
+	const duration = (screen.height < 800) ? 800 : screen.height;
+	const offsettedDuration = duration + this.artworkScrollOffset - 150;
+
+	  if (emailCaptured) {
+		  return (
+			<div />
+		  )
+	  }
+
+	  else {
+		return (
+			<Scene
+			  loglevel={0}
+			  pin={`#email-panel`}
+			  triggerElement={`#email-panel`}
+			  triggerHook="onEnter"
+			  indicators={false}
+			  duration={offsettedDuration}
+			  offset="0"
+			  pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
+			  <div id={`story-pin-enter`} />
+		  </Scene>
+		  )
+	  }
+  }
+
   /** for android scroll within the fixed container .sm-container because of card peek issue */
   renderStoryContainer = () => {
+
+	const { showStory } = this.state;
+
     if (isAndroid) {
       return (
         <Controller refreshInterval={250} container=".sm-container">
-          {this.renderTitleBar()}
+		  {this.renderTitleBar()}
+		  
+		  {this.renderEmailPin()}
 
-          {this.renderPinsEnter()}
+          {(showStory) ? this.renderPinsEnter(): <div />}
 
           {this.renderStory()}
         </Controller>
@@ -886,7 +898,9 @@ class Artwork extends Component {
         <Controller refreshInterval={250}>
           {this.renderTitleBar()}
 
-          {this.renderPinsEnter()}
+		  {(this.renderEmailPin())}
+
+          {(showStory) ? this.renderPinsEnter(): <div/>}
 
           {this.renderStory()}
         </Controller>
