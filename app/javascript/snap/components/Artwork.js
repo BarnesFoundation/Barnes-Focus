@@ -5,7 +5,6 @@ import { compose } from 'redux';
 import * as constants from './Constants';
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
-import share from 'images/share.svg';
 import shareButton from 'images/share-icon.svg';
 
 import LanguageDropdown from './LanguageDropdown';
@@ -18,7 +17,6 @@ import ProgressiveImage from 'react-progressive-image';
 import { Controller, Scene } from 'react-scrollmagic';
 import styled, { css } from 'styled-components';
 import StoryItem from './StoryItem';
-import scan_button from 'images/scan-button.svg';
 import { isTablet } from 'react-device-detect';
 import ScrollMagic from 'scrollmagic';
 import { isAndroid, isIOS } from 'react-device-detect';
@@ -48,15 +46,23 @@ const SectionWipesStyled = styled.div`
 
 class Artwork extends Component {
   constructor(props) {
-    super(props);
-    //console.log('Artwork >> constructor');
+	super(props);
+	
+	// Initialize the search request services 
     this.sr = new SearchRequestService();
 
+	// Scenes that end up being created by ScrollMagic
     this.artworkScene = null;
     this.emailScene = null;
-    this.emailSceneTrigger = null;
+	this.emailSceneTrigger = null;
+	
+	// Refs that end up being assigned to
+	this.artworkRef = null;
+    this.infoCardRef = null;
+    this.emailCardRef = null;
 
-    this.contentOffset = 67;
+	this.contentOffset = 67;
+	this.artworkScrollOffset = 0;
 
     this.langOptions = [
       { name: 'English', code: 'En', selected: true },
@@ -80,9 +86,7 @@ class Artwork extends Component {
       alsoInRoomResults: [],
       email: localStorage.getItem(constants.SNAP_USER_EMAIL) || '',
       snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 1,
-      errors: {
-        email: false
-      },
+      errors: { email: false },
       showTitleBar: false,
       storyDuration: 250,
       infoHeightUpdated: false,
@@ -90,12 +94,6 @@ class Artwork extends Component {
 	  emailCardClickable: true,
 	  storyTopsClickable: {}
     };
-
-    this.artworkRef = null;
-    this.infoCardRef = null;
-    this.emailCardRef = null;
-
-    this.artworkScrollOffset = 0;
 
     this.artworkTimeoutCallback = null;
     this.emailSubmitTimeoutCallback = null;
@@ -139,7 +137,6 @@ class Artwork extends Component {
         roomRecords = search_result['data']['roomRecords'];
       }
 
-      //this.slideOverAnimationThreshold = (roomRecords.length > 0) ? 540 : 0;
       return {
         artwork: result,
         roomRecords: roomRecords
@@ -150,11 +147,9 @@ class Artwork extends Component {
         roomRecords: []
       };
     }
-  };
+  }
 
   async componentWillMount() {
-	  console.log('component is mounting');
-    //console.log('Artwork >> componentWillMount');
 
     let imageId = this.state.result ? this.state.result.data.records[0].id : this.props.match.params.imageId;
     const selectedLang = await this.getSelectedLanguage();
