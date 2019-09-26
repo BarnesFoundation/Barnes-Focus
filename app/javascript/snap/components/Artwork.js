@@ -512,8 +512,8 @@ class Artwork extends Component {
       const scrollContainer = isAndroid ? { container: '.sm-container' } : {};
       this.controller = new ScrollMagic.Controller(scrollContainer);
       this.artworkTimeoutCallback = setTimeout(() => {
-        this.setupArtworkScene();
-        if (!this.state.showStory) {
+		this.setupArtworkScene();
+        if (!this.state.showStory && !this.state.emailCaptureAck) {
           this.setupEmailSceneOnEnter();
         }
         if (!this.state.emailCaptured) {
@@ -824,11 +824,11 @@ class Artwork extends Component {
    * IMP:: For index > 0, storySceneOffset = storyEnterPinDuration + 8;
    */
   renderPinsEnter = () => {
-	const { showStory, stories, storyTitle } = this.state;
+	const { showStory, stories, storyTitle, emailCaptureAck } = this.state;
 
 	const duration = (screen.height < 800) ? 800 : screen.height;
 	const offsettedDuration = duration + this.artworkScrollOffset - 150;
-    if (!showStory) {
+    if (!showStory && !emailCaptureAck) {
 		return (
 			<Scene
 			  loglevel={0}
