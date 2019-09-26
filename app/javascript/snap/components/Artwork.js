@@ -99,55 +99,52 @@ class Artwork extends Component {
     this.emailSubmitTimeoutCallback = null;
   }
 
-  constructResultAndInRoomSlider = search_result => {
-    if (search_result['success']) {
-      let result = {};
-      let roomRecords = [];
-      if (search_result['data']['records'].length > 0) {
-        const w = screen.width;
-        const h = isTablet ? screen.height : 95;
-        const artUrlParams = '?w=' + (w - 120);
-        const cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
-        const topCropParams = '?q=0&auto=compress&crop=top&fit=crop&h=' + h + '&w=' + w;
-        const lowQualityParams = '?q=0&auto=compress&w=' + (w - 120);
+	constructResultAndInRoomSlider = (artworkResult) => {
 
-        const art_obj = search_result['data']['records'][0];
-        result['id'] = art_obj.id;
-        result['title'] = art_obj.title;
-        result['shortDescription'] = art_obj.shortDescription;
-        result['artist'] = art_obj.people;
-        result['nationality'] = art_obj.nationality;
-        result['birthDate'] = art_obj.birthDate;
-        result['deathDate'] = art_obj.deathDate;
-        result['culture'] = art_obj.culture;
-        result['classification'] = art_obj.classification;
-        result['locations'] = art_obj.locations;
-        result['medium'] = art_obj.medium;
-        result['url'] = art_obj.art_url + artUrlParams;
-        result['url_low_quality'] = art_obj.art_url + lowQualityParams;
-        result['bg_url'] = art_obj.art_url + topCropParams;
-        result['invno'] = art_obj.invno;
-        result['displayDate'] = art_obj.displayDate;
-        result['dimensions'] = art_obj.dimensions;
-        result['curatorialApproval'] = art_obj.curatorialApproval === 'false' ? false : true;
-        result['unIdentified'] = art_obj.people.toLowerCase().includes('unidentified');
-      }
+		const { success } = artworkResult;
 
-      if (search_result['data']['roomRecords'].length > 0) {
-        roomRecords = search_result['data']['roomRecords'];
-      }
+		let artwork = {};
+		let roomRecords = [];
 
-      return {
-        artwork: result,
-        roomRecords: roomRecords
-      };
-    } else {
-      return {
-        artwork: {},
-        roomRecords: []
-      };
-    }
-  }
+		if (success) {
+
+			// If the artwork result has records
+			if (artworkResult['data']['records'].length > 0) {
+				const w = screen.width;
+				const h = isTablet ? screen.height : 95;
+				const artUrlParams = `?w=${(w - 120)}`;
+				const cropParams = `?q=0&auto=compress&crop=faces,entropy&fit=crop&w=${w}`;
+				const topCropParams = `?q=0&auto=compress&crop=top&fit=crop&h=${h}&w=${w}`;
+				const lowQualityParams = `?q=0&auto=compress&w=${(w - 120)}`;
+
+				// Extract needed data from the art object 
+				const artObject = artworkResult['data']['records'][0];
+				const { id, title, shortDescription, artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions } = artObject;
+
+				// Determine the flags
+				const curatorialApproval = (artObject.curatorialApproval === 'false') ? false : true;
+				const unIdentified = artObject.people.toLowerCase().includes('unidentified');
+
+				// Assign into artwork
+				artwork = {
+					id, title, shortDescription, people: artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions,
+
+					// Set the urls	
+					url: `${artObject.art_url}${artUrlParams}`,
+					url_low_quality: `${artObject.art_url}${lowQualityParams}`,
+					bg_url: `${artObject.art_url}${topCropParams}`,
+
+					// Set the flags
+					curatorialApproval, unIdentified
+				}
+			}
+			// Get the room records array
+			const rr = artworkResult['data']['roomRecords'];
+
+			if (rr.length > 0) { roomRecords = rr; }
+		}
+		return { artwork, roomRecords };
+	}
 
   async componentWillMount() {
 
