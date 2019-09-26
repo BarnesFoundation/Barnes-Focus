@@ -708,7 +708,10 @@ class Artwork extends Component {
     if (emailCaptureAck) {
 	  
 	  const { history } = this.props;
-      return (<ScanButton history={history}/>);
+      return (
+      <div>
+        <ScanButton history={history}/> 
+      </div>);
 	} 
 	
 	// Otherwise, display the email panel
