@@ -466,7 +466,7 @@ class Artwork extends Component {
 			else { landingPoint = initial + (heightOffset * storyIndex) + (storyIndex * 25); } }
 
 		else {
-			landingPoint = heightOffset + this.emailFormHeight;
+			landingPoint = this.emailScene.scrollOffset() + heightOffset;
 		}	
 
 		// For iOS, override the normal scrolling 
@@ -714,7 +714,7 @@ class Artwork extends Component {
 	// Otherwise, display the email panel
 	else {
       return (
-        <div id="email-panel" ref={this.emailCardRef} className="panel-email" style={{ pointerEvents: pointerSetting, height: `calc(60vh - ${peekOffset}px)` }} onClick={() => { this.handleClickScroll(null, false); }}> 
+        <div id="email-panel" ref={(elem) => { this.emailCardRef = elem; }} className="panel-email" style={{ pointerEvents: pointerSetting, height: `calc(60vh - ${peekOffset}px)` }} onClick={() => { this.handleClickScroll(null, false); }}> 
           <EmailForm
             withStory={showStory}
             isEmailScreen={false}
