@@ -710,7 +710,10 @@ class Artwork extends Component {
 	// If email was captured, just show scan button
     if (emailCaptured) {  
 	  const { history } = this.props;
-      return (<ScanButton history={history}/>);
+      return (
+      <div>
+        <ScanButton history={history}/> 
+      </div>);
 	} 
 	
 	// Otherwise, display the email panel
