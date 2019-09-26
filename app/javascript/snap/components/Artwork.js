@@ -438,7 +438,6 @@ class Artwork extends Component {
   }
 
   setupArtworkScene = () => {
-	  console.log('did the error occurr at setupArtworkScene')
     const artworkVScrollOffset = Math.max(
       Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT),
       0
@@ -711,9 +710,10 @@ class Artwork extends Component {
     if (emailCaptured) {  
 	  const { history } = this.props;
       return (
-      <div>
-        <ScanButton history={history}/> 
-      </div>);
+		  <div>
+       	 <ScanButton history={history}/> 
+		</div>
+		);
 	} 
 	
 	// Otherwise, display the email panel
@@ -889,7 +889,7 @@ class Artwork extends Component {
         <Controller refreshInterval={250} container=".sm-container">
 		  {this.renderTitleBar()}
 		  
-		  {this.renderEmailPin()}
+		  {(showStory) ? <div /> : this.renderEmailPin()}
 
           {(showStory) ? this.renderPinsEnter(): <div />}
 
@@ -901,7 +901,7 @@ class Artwork extends Component {
         <Controller refreshInterval={250}>
           {this.renderTitleBar()}
 
-		  {(this.renderEmailPin())}
+		  {(showStory) ? <div /> : this.renderEmailPin()}
 
           {(showStory) ? this.renderPinsEnter(): <div/>}
 
