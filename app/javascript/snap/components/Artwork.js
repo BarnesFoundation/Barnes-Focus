@@ -729,29 +729,21 @@ class Artwork extends Component {
     }
   }
 
-  /** Renders the title bar based on whether it should be shown */
-  renderTitleBar = () => {
-	const { showTitleBar } = this.state;
-	
-    if (showTitleBar) {
-      return (
-        <div id="story-title-bar" className="story-title-bar" >
-          <div className="language-dropdown">
-            <LanguageDropdown  isStoryItemDropDown={true} langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
-          </div>
-        </div>
-      )
-	} 
-	
-	else { return <div id="story-title-bar" />; }
-  }
+  /** Renders the title bar with language dropdown */
+	renderTitleBar = () => {
+		return (
+			<div id="story-title-bar" className="story-title-bar" >
+				<div className="language-dropdown">
+					<LanguageDropdown isStoryItemDropDown={true} langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+				</div>
+			</div>
+		)
+	}
 
-  /** Renders the story cards if the flag is true */
+  /** Renders each of the story cards */
   renderStory = () => {
-	const { showStory, stories, storyTitle } = this.state;
-	
-	if (!showStory) { return <div />;  }
-	
+	const { stories, storyTitle } = this.state;	
+
 	// Iterate through the available stories
     return stories.map((story, index) => {
 
@@ -798,14 +790,14 @@ class Artwork extends Component {
 							  onVisChange={this.onVisibilityChange}
 						  />
 					  </div>
-					  
 				  </div>
           )}
         </Scene>
       );
     });
-  };
+  }
 
+  /** Changes whether or not the top of a story card is clickable */
   onVisibilityChange = (isVisible, storyIndex) => {
 	this.setState((pState) => {
 		const storyTopsClickable = { ...pState.storyTopsClickable };
@@ -829,16 +821,8 @@ class Artwork extends Component {
           : this.state.infoCardDuration + this.contentOffset + 33;
 
 	  return (
-        <Scene
-          loglevel={0}
-          key={`storytriggerenter${index + 1}`}
-          pin={`#story-card-${index}`}
-          triggerElement={`#story-card-${index}`}
-          triggerHook="onEnter"
-          indicators={false}
-          duration={storyEnterPinDuration}
-          offset="0"
-          pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
+        <Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`}
+          triggerHook="onEnter" indicators={false}  duration={storyEnterPinDuration} offset="0" pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
           <div id={`story-pin-enter-${index + 1}`} />
         </Scene>
       );
@@ -851,58 +835,38 @@ class Artwork extends Component {
 
 		return (
 			<Scene
-				loglevel={0}
-				pin={`#email-panel`}
-				triggerElement={`#email-panel`}
-				triggerHook="onEnter"
-				indicators={false}
-				duration={offsettedDuration}
-				offset="0"
-				pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
+				loglevel={0} pin={`#email-panel`} triggerElement={`#email-panel`} triggerHook="onEnter" indicators={false}
+				duration={offsettedDuration} offset="0" pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
 				<div id={`story-pin-enter`} />
 			</Scene>
 		)
 	}
 
-  /** for android scroll within the fixed container .sm-container because of card peek issue */
-  renderStoryContainer = () => {
+  	/** For Android, scroll within the fixed container .sm-container because of card peek issue */
+	renderStoryContainer = () => {
 
-	const { showStory, emailCaptured } = this.state;
-	const showEmailPin = (!showStory && !emailCaptured) ? true : false;
+		const { showTitleBar, showStory, emailCaptured } = this.state;
+		const showEmailPin = (!showStory && !emailCaptured) ? true : false;
 
-	// For Android
-    if (isAndroid) {
-      return (
-        <Controller refreshInterval={250} container=".sm-container">
-		  {this.renderTitleBar()}
-		  
-		  {(showEmailPin) ?  this.renderEmailPin() : <div />}
+		// Props for the controller, add container prop for Android
+		const controllerProps = { refreshInterval: 250 };
+		if (isAndroid) { controllerProps['container'] = '.sm-container'; }
 
-          {(showStory) ? this.renderPinsEnter(): <div />}
+		return (
+			<Controller {...controllerProps}>
+				
+				{/* Render these components conditionally, otherwise render empty divs */}
+				{(showTitleBar) ? this.renderTitleBar() : <div id="story-title-bar" />}
+				{(showEmailPin) ? this.renderEmailPin() : <div />}
+				{(showStory) ? this.renderPinsEnter() : <div />}
+				{(showStory) ? this.renderStory(): <div /> }
+			</Controller>
+		)
+	}
 
-          {this.renderStory()}
-        </Controller>
-      );
-    } else {
-      return (
-        <Controller refreshInterval={250}>
-          {this.renderTitleBar()}
-
-		  {(showEmailPin) ?  this.renderEmailPin() : <div />}
-
-          {(showStory) ? this.renderPinsEnter(): <div/>}
-
-          {this.renderStory()}
-        </Controller>
-      );
-    }
-  };
-
-  /**
-   * Main render screen setup
-   */
+  /**  Main render screen setup */
   renderResult = () => {
-    const { stories, showStory, emailCaptureAck } = this.state;
+    const { showStory, emailCaptureAck } = this.state;
     const hasChildCards = showStory || !emailCaptureAck;
 
     return (
@@ -917,7 +881,7 @@ class Artwork extends Component {
         {this.renderEmailScreen()}
       </SectionWipesStyled>
     );
-  };
+  }
 
   render() {
     const { artwork, imgLoaded } = this.state;
