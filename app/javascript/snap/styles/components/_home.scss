@@ -42,22 +42,25 @@
 
 .home-action {
     position: absolute;
-    top: 290px;
-    width: 160px;
-    left: calc(50% - 80px);
+    top: 320px;
+    width: 280px;
+    left: 50%;
+    transform: translate(-50%);
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
 
     .action-btn {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
         display: flex;
         align-items: center;
+        justify-content: center;
         border: 3px solid rgba(255, 255, 255, .3);
         border-radius: 50%;
         box-sizing: border-box;
         color: #FFFFFF;
         background: transparent;
+        margin: 0 30px;
 
         &:focus {
             outline: none;

@@ -16,6 +16,7 @@
   display: flex;
   //justify-content: space-between;
   padding: 0 25px;
+  pointer-events: none;
 
   .story-title {
     font-weight: bold;
@@ -37,6 +38,7 @@
       background-color: transparent;
       color: #fff;
       border: 2px solid rgba(255, 255, 255, 0.85);
+      pointer-events: auto;
     }
 
     .dd-list {

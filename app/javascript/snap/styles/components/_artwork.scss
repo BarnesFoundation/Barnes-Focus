@@ -21,6 +21,7 @@
     border-radius: 24px;
     text-align: center;
     background-color: transparent;
+    padding-bottom: 70px;
 
     &.story-item {
       background-color: transparent;
@@ -263,4 +264,8 @@
   position: absolute;
   top: 145px;
   height: 10px;
+}
+
+.email-scene-spacer {
+	pointer-events: auto;
 }
