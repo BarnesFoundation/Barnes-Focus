@@ -693,40 +693,27 @@ class Artwork extends Component {
     );
   };
 
-  /* Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts */
-  renderEmailScreen = () => {
-	const { showStory, emailCardClickable, emailCaptured } = this.state;
-	const pointerSetting = emailCardClickable ? 'auto' : 'none';
+	/* Renders the email screen. withStory flag determines whether the email screen is displayed along with story parts */
+	renderEmailScreen = () => {
+		const { showStory, emailCardClickable } = this.state;
+		const pointerSetting = emailCardClickable ? 'auto' : 'none';
 
-	// If the story should not be shown -- which occurs, only when no stories are available
-	const peekOffsetValue = (isAndroid) ? 123 : 67;
-	const peekOffset = (showStory) ? '0' : `${peekOffsetValue}`;
+		// If the story should not be shown -- which occurs, only when no stories are available
+		const peekOffsetValue = (isAndroid) ? 123 : 67;
+		const peekOffset = (showStory) ? '0' : `${peekOffsetValue}`;
 
-	// If email was captured, just show scan button
-    if (emailCaptured) {  
-	  const { history } = this.props;
-      return (
-		  <div>
-       	 <ScanButton history={history}/> 
-		</div>
+		return (
+			<div id="email-panel" className="panel-email" style={{ pointerEvents: pointerSetting, height: `calc(60vh - ${peekOffset}px)` }} onClick={() => { this.handleClickScroll(null, false); }}>
+				<EmailForm
+					withStory={showStory}
+					isEmailScreen={false}
+					onSubmitEmail={this.onSubmitEmail}
+					getTranslation={this.props.getTranslation}
+					getSize={this.onEmailHeightReady}
+				/>
+			</div>
 		);
-	} 
-	
-	// Otherwise, display the email panel
-	else {
-      return (
-        <div id="email-panel" className="panel-email" style={{ pointerEvents: pointerSetting, height: `calc(60vh - ${peekOffset}px)` }} onClick={() => { this.handleClickScroll(null, false); }}> 
-          <EmailForm
-            withStory={showStory}
-            isEmailScreen={false}
-            onSubmitEmail={this.onSubmitEmail}
-            getTranslation={this.props.getTranslation}
-            getSize={this.onEmailHeightReady}
-          />
-		</div>
-      );
-    }
-  }
+	}
 
   /** Renders the title bar with language dropdown */
 	renderTitleBar = () => {
@@ -844,7 +831,6 @@ class Artwork extends Component {
 
   	/** For Android, scroll within the fixed container .sm-container because of card peek issue */
 	renderStoryContainer = () => {
-
 		const { showTitleBar, showStory, emailCaptured } = this.state;
 		const showEmailPin = (!showStory && !emailCaptured) ? true : false;
 
@@ -854,7 +840,6 @@ class Artwork extends Component {
 
 		return (
 			<Controller {...controllerProps}>
-				
 				{/* Render these components conditionally, otherwise render empty divs */}
 				{(showTitleBar) ? this.renderTitleBar() : <div/>}
 				{(showEmailPin) ? this.renderEmailPin() : <div />}
@@ -864,10 +849,11 @@ class Artwork extends Component {
 		)
 	}
 
-  /**  Main render screen setup */
+  /** Responsible for rendering the entirety of the page */
   renderResult = () => {
     const { showStory, emailCaptureAck, emailCaptured } = this.state;
-    const hasChildCards = showStory || !emailCaptureAck;
+	const hasChildCards = showStory || !emailCaptureAck;
+	const { history } = this.props;
 
     return (
       <SectionWipesStyled hasChildCards={hasChildCards}>
@@ -875,10 +861,11 @@ class Artwork extends Component {
 
         {this.renderStoryContainer()}
 
-		{/** this is a placeholder element at the bottom of viewport to control email card enter animation when no stories are present */}
+		{/** Placeholder element to control email card enter when no stories are available. Only show when email has not been captured */}
 		{!emailCaptured && <div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }} />}
 		
-        {this.renderEmailScreen()}
+		{/** If email was captured, show just the scan button. Otherwise, render the email screen */}
+        {(emailCaptured) ? (<div> <ScanButton history={history}/> </div>) : this.renderEmailScreen()}
       </SectionWipesStyled>
     );
   }
