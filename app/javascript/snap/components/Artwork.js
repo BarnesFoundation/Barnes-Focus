@@ -810,24 +810,24 @@ class Artwork extends Component {
 	});
   }
 
-  /* Renders the story cards if * showStory * flag is true */
-  renderPinsEnter = () => {
-	const { stories } = this.state;
+	/* Renders the story cards if * showStory * flag is true */
+	renderPinsEnter = () => {
+		const { stories } = this.state;
 
-    return stories.map((story, index) => {
-      const storyEnterPinDuration =
-        index > 0
-          ? this.state.storyDurationsCurrent[index - 1] / 4 - 50
-          : this.state.infoCardDuration + this.contentOffset + 33;
+		return stories.map((story, index) => {
+			const storyEnterPinDuration =
+				index > 0
+					? this.state.storyDurationsCurrent[index - 1] / 4 - 50
+					: this.state.infoCardDuration + this.contentOffset + 33;
 
-	  return (
-        <Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`}
-          triggerHook="onEnter" indicators={false}  duration={storyEnterPinDuration} offset="0" pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
-          <div id={`story-pin-enter-${index + 1}`} />
-        </Scene>
-      );
-    });
-  };
+			return (
+				<Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`}
+					triggerHook="onEnter" indicators={false} duration={storyEnterPinDuration} offset="0" pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
+					<div id={`story-pin-enter-${index + 1}`} />
+				</Scene>
+			);
+		});
+	}
 
 	renderEmailPin = () => {
 		const duration = (screen.height < 800) ? 800 : screen.height;
