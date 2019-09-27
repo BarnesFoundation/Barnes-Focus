@@ -120,7 +120,7 @@ class Artwork extends Component {
 
 				// Extract needed data from the art object 
 				const artObject = artworkResult['data']['records'][0];
-				const { id, title, shortDescription, artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions } = artObject;
+				const { id, title, shortDescription, people: artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions } = artObject;
 
 				// Determine the flags
 				const curatorialApproval = (artObject.curatorialApproval === 'false') ? false : true;
@@ -128,7 +128,7 @@ class Artwork extends Component {
 
 				// Assign into artwork
 				artwork = {
-					id, title, shortDescription, people: artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions,
+					id, title, shortDescription, artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions,
 
 					// Set the urls	
 					url: `${artObject.art_url}${artUrlParams}`,
@@ -340,9 +340,9 @@ class Artwork extends Component {
 
   nativeAppShareWithWebFallback = e => {
     const socialMediaType = e.currentTarget.dataset.id;
-    this.setState({ sharePopoverIsOpen: false });
-
-    let appUriScheme;
+	this.setState({ sharePopoverIsOpen: false });
+	
+	let appUriScheme;
     let webFallbackURL;
     let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
 
@@ -350,7 +350,7 @@ class Artwork extends Component {
       case constants.SOCIAL_MEDIA_TWITTER: {
         let hashtag = 'barnesfoundation';
 
-        let title_author = this.state.artwork.title;
+		let title_author = this.state.artwork.title;
         if (this.state.artwork.artist) {
           title_author += ' by ' + this.state.artwork.artist;
           hashtag +=
@@ -361,7 +361,7 @@ class Artwork extends Component {
               .split('-')
               .join('');
         }
-        title_author = title_author.split(' ').join('+');
+		title_author = title_author.split(' ').join('+');
         //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.artwork.id;
         //appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
         webFallbackURL =
@@ -375,36 +375,36 @@ class Artwork extends Component {
     e.preventDefault();
   };
 
-  _onClickShare = () => {
-    if (navigator.share) {
-      let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
-      let hashtag = '#barnesfoundation';
+	_onClickShare = () => {
+		if (navigator.share) {
+			const url = `https://collection.barnesfoundation.org/objects/${this.state.artwork.id}`;
 
-      let title_author = this.state.artwork.title;
-      if (this.state.artwork.artist) {
-        title_author += ' by ' + this.state.artwork.artist;
-        hashtag += ' #' + this.state.artwork.artist.split(' ').join('');
-      }
-      title_author = title_author + '. ';
+			let hashtag = '#barnesfoundation';
+			let titleAuthor = this.state.artwork.title;
 
-      navigator
-        .share({
-          title: 'Barnes Foundation',
-          text: title_author + ' ' + hashtag,
-          url: urlToShare
-        })
-        .then(() => {
-          console.log('Successful share');
-        })
-        .catch(error => console.log('Error sharing', error));
-    } else {
-      this.toggleShareModal();
-    }
-  };
+			if (this.state.artwork.artist) {
+				
+				const { artist } = this.state.artwork;
+				titleAuthor += ` by ${artist}`;
+				hashtag += ` #${artist.split(' ').join('')}`;
+			}
 
-  toggleShareModal = () => {
-    this.setState({ sharePopoverIsOpen: !this.state.sharePopoverIsOpen });
-  };
+			titleAuthor = `${titleAuthor}. `;
+
+			navigator
+				.share({
+					title: 'Barnes Foundation',
+					text: `${titleAuthor} ${hashtag}`,
+					url
+				})
+				.then(() => { console.log('Successful share'); })
+				.catch(error => console.log('Error sharing', error));
+		}
+
+		else { this.toggleShareModal(); }
+	}
+
+  toggleShareModal = () => { this.setState({ sharePopoverIsOpen: !this.state.sharePopoverIsOpen }); }
 
   /** Updates state that email was captured and submits it to the server session */
   onSubmitEmail = (email) => {
