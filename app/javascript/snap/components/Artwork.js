@@ -5,7 +5,6 @@ import { compose } from 'redux';
 import * as constants from './Constants';
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
-import share from 'images/share.svg';
 import shareButton from 'images/share-icon.svg';
 
 import LanguageDropdown from './LanguageDropdown';
@@ -18,7 +17,6 @@ import ProgressiveImage from 'react-progressive-image';
 import { Controller, Scene } from 'react-scrollmagic';
 import styled, { css } from 'styled-components';
 import StoryItem from './StoryItem';
-import scan_button from 'images/scan-button.svg';
 import { isTablet } from 'react-device-detect';
 import ScrollMagic from 'scrollmagic';
 import { isAndroid, isIOS } from 'react-device-detect';
@@ -48,15 +46,24 @@ const SectionWipesStyled = styled.div`
 
 class Artwork extends Component {
   constructor(props) {
-    super(props);
-    //console.log('Artwork >> constructor');
+	super(props);
+	
+	// Initialize the search request services 
     this.sr = new SearchRequestService();
 
+	// Scenes that end up being created by ScrollMagic
     this.artworkScene = null;
     this.emailScene = null;
-    this.emailSceneTrigger = null;
+	this.emailSceneTrigger = null;
+	
+	// Refs that end up being assigned to
+	this.artworkRef = null;
+    this.infoCardRef = null;
+	this.emailCardRef = null;
+	this.sceneRefs = {};
 
-    this.contentOffset = 67;
+	this.contentOffset = 67;
+	this.artworkScrollOffset = 0;
 
     this.langOptions = [
       { name: 'English', code: 'En', selected: true },
@@ -80,9 +87,7 @@ class Artwork extends Component {
       alsoInRoomResults: [],
       email: localStorage.getItem(constants.SNAP_USER_EMAIL) || '',
       snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 1,
-      errors: {
-        email: false
-      },
+      errors: { email: false },
       showTitleBar: false,
       storyDuration: 250,
       infoHeightUpdated: false,
@@ -91,70 +96,58 @@ class Artwork extends Component {
 	  storyTopsClickable: {}
     };
 
-    this.artworkRef = null;
-    this.infoCardRef = null;
-    this.emailCardRef = null;
-
-    this.artworkScrollOffset = 0;
-
     this.artworkTimeoutCallback = null;
     this.emailSubmitTimeoutCallback = null;
   }
 
-  constructResultAndInRoomSlider = search_result => {
-    if (search_result['success']) {
-      let result = {};
-      let roomRecords = [];
-      if (search_result['data']['records'].length > 0) {
-        const w = screen.width;
-        const h = isTablet ? screen.height : 95;
-        const artUrlParams = '?w=' + (w - 120);
-        const cropParams = '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w;
-        const topCropParams = '?q=0&auto=compress&crop=top&fit=crop&h=' + h + '&w=' + w;
-        const lowQualityParams = '?q=0&auto=compress&w=' + (w - 120);
+	constructResultAndInRoomSlider = (artworkResult) => {
 
-        const art_obj = search_result['data']['records'][0];
-        result['id'] = art_obj.id;
-        result['title'] = art_obj.title;
-        result['shortDescription'] = art_obj.shortDescription;
-        result['artist'] = art_obj.people;
-        result['nationality'] = art_obj.nationality;
-        result['birthDate'] = art_obj.birthDate;
-        result['deathDate'] = art_obj.deathDate;
-        result['culture'] = art_obj.culture;
-        result['classification'] = art_obj.classification;
-        result['locations'] = art_obj.locations;
-        result['medium'] = art_obj.medium;
-        result['url'] = art_obj.art_url + artUrlParams;
-        result['url_low_quality'] = art_obj.art_url + lowQualityParams;
-        result['bg_url'] = art_obj.art_url + topCropParams;
-        result['invno'] = art_obj.invno;
-        result['displayDate'] = art_obj.displayDate;
-        result['dimensions'] = art_obj.dimensions;
-        result['curatorialApproval'] = art_obj.curatorialApproval === 'false' ? false : true;
-        result['unIdentified'] = art_obj.people.toLowerCase().includes('unidentified');
-      }
+		const { success } = artworkResult;
 
-      if (search_result['data']['roomRecords'].length > 0) {
-        roomRecords = search_result['data']['roomRecords'];
-      }
+		let artwork = {};
+		let roomRecords = [];
 
-      //this.slideOverAnimationThreshold = (roomRecords.length > 0) ? 540 : 0;
-      return {
-        artwork: result,
-        roomRecords: roomRecords
-      };
-    } else {
-      return {
-        artwork: {},
-        roomRecords: []
-      };
-    }
-  };
+		if (success) {
+
+			// If the artwork result has records
+			if (artworkResult['data']['records'].length > 0) {
+				const w = screen.width;
+				const h = isTablet ? screen.height : 95;
+				const artUrlParams = `?w=${(w - 120)}`;
+				const cropParams = `?q=0&auto=compress&crop=faces,entropy&fit=crop&w=${w}`;
+				const topCropParams = `?q=0&auto=compress&crop=top&fit=crop&h=${h}&w=${w}`;
+				const lowQualityParams = `?q=0&auto=compress&w=${(w - 120)}`;
+
+				// Extract needed data from the art object 
+				const artObject = artworkResult['data']['records'][0];
+				const { id, title, shortDescription, artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions } = artObject;
+
+				// Determine the flags
+				const curatorialApproval = (artObject.curatorialApproval === 'false') ? false : true;
+				const unIdentified = artObject.people.toLowerCase().includes('unidentified');
+
+				// Assign into artwork
+				artwork = {
+					id, title, shortDescription, people: artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions,
+
+					// Set the urls	
+					url: `${artObject.art_url}${artUrlParams}`,
+					url_low_quality: `${artObject.art_url}${lowQualityParams}`,
+					bg_url: `${artObject.art_url}${topCropParams}`,
+
+					// Set the flags
+					curatorialApproval, unIdentified
+				}
+			}
+			// Get the room records array
+			const rr = artworkResult['data']['roomRecords'];
+
+			if (rr.length > 0) { roomRecords = rr; }
+		}
+		return { artwork, roomRecords };
+	}
 
   async componentWillMount() {
-	  console.log('component is mounting');
-    //console.log('Artwork >> componentWillMount');
 
     let imageId = this.state.result ? this.state.result.data.records[0].id : this.props.match.params.imageId;
     const selectedLang = await this.getSelectedLanguage();
@@ -255,7 +248,6 @@ class Artwork extends Component {
     this.emailScene && this.emailScene.destroy(true);
     this.emailSceneTrigger && this.emailSceneTrigger.destroy(true);
 
-    //this.storySceneController && this.storySceneController.destroy(true);
     this.controller.destroy(true);
     this.emailScene = null;
     this.artworkScene = null;
@@ -300,7 +292,7 @@ class Artwork extends Component {
     });
   };
 
-  onSelectLanguage = async selectedLanguage => {
+  onSelectLanguage = async (selectedLanguage) => {
 	
     // Scroll to top when language changes. This should help re-calculate correct offsets on language change
     window.scroll({ top: 0, behavior: 'smooth' });
@@ -314,29 +306,27 @@ class Artwork extends Component {
 
 	// Get the new language translations
     const imageId = this.getFocusedArtworkImageId();
-	const result = this.sr.getArtworkInformation(imageId);
+	const artworkInfo = await this.sr.getArtworkInformation(imageId);
 	
     const { stories, storyId, storyTitle } = await this.setupStory(imageId);
-	const { artwork, roomRecords } = this.constructResultAndInRoomSlider(await artworkInfo);
+	const { artwork, roomRecords } = this.constructResultAndInRoomSlider(artworkInfo);
 	
-    this.setState({ result, selectedLanguage, stories, storyId, storyTitle, artwork, roomRecords });
+    this.setState({ result: artworkInfo, selectedLanguage, stories, storyId, storyTitle, artwork, roomRecords });
   }
 
-  getFocusedArtworkImageId = () => { return this.state.artwork ? this.state.artwork.id : this.props.match.params.imageId; }
+	getFocusedArtworkImageId = () => { return this.state.artwork ? this.state.artwork.id : this.props.match.params.imageId; }
 
-  setupStory = async imageId => {
-    let stories_data = await this.sr.getStoryItems(imageId);
-    console.log(stories_data);
-    if (stories_data.data.total > 0) {
-      return {
-        stories: stories_data.data.content.stories,
-        storyId: stories_data.data.unique_identifier,
-        storyTitle: stories_data.data.content.story_title
-      };
-    } else {
-      return { stories: [], storyId: undefined, storyTitle: undefined };
-    }
-  }
+	setupStory = async (imageId) => {
+		const storyInformation = await this.sr.getStoryItems(imageId);
+		let stories = [], storyId = undefined, storyTitle = undefined;
+
+		if (storyInformation.data.total > 0) {
+			({ stories, story_title: storyTitle } = storyInformation.data.content);
+			storyId = storyInformation.data.unique_identifier;
+		}
+
+		return { stories, storyId, storyTitle };
+	}
 
   onSelectInRoomArt = aitrId => {
     localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
@@ -346,7 +336,7 @@ class Artwork extends Component {
   getFacebookShareUrl = () => {
     let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
     return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare);
-  };
+  }
 
   nativeAppShareWithWebFallback = e => {
     const socialMediaType = e.currentTarget.dataset.id;
@@ -423,9 +413,9 @@ class Artwork extends Component {
     localStorage.removeItem(constants.SNAP_LANGUAGE_TRANSLATION);
   };
 
-  onSubmitEmail = email => {
-    console.log('Submitted email :: ' + email);
-	this.setState({ email: email, emailCaptured: true }, () => {
+  /** Updates state that email was captured and submits it to the server session */
+  onSubmitEmail = (email) => {
+	this.setState({ email, emailCaptured: true }, () => {
 
 		// Store the email
 		this.sr.submitBookmarksEmail(email);
@@ -437,41 +427,46 @@ class Artwork extends Component {
 	});
   }
 
+  /** Sets up the ScrollMagic scene for the artwork result section */
   setupArtworkScene = () => {
-    const artworkVScrollOffset = Math.max(
-      Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT),
-      0
-    );
-    this.artworkScrollOffset = artworkVScrollOffset + 150;
-    this.artworkScene = new ScrollMagic.Scene({
-      triggerElement: '#search-result',
-      triggerHook: 'onLeave',
-      duration: 0, // scroll distance
-      offset: this.artworkScrollOffset
-    })
+
+	  // Calculate the vertical offset for the artwork result
+	  const artworkVerticalOffset = Math.max(Math.ceil(this.artworkRef.getBoundingClientRect().bottom - constants.VIEWPORT_HEIGHT), 0);
+	  this.artworkScrollOffset = artworkVerticalOffset + 150;
+
+	  this.artworkScene = new ScrollMagic.Scene({
+		  triggerElement: '#search-result', triggerHook: 'onLeave',
+		  duration: 0, // scroll distance
+		  offset: this.artworkScrollOffset
+	  })
       .setPin('#search-result', { pushFollowers: false }) // pins the element for the the scene's duration
       .addTo(this.controller);
-  };
+  }
 
   
+  	/** Handles the tap-to-scroll functionality for cards */
 	handleClickScroll = (storyIndex, isStoryCard) => {
 
 		let landingPoint;
+
+		// Determine the offset needed for the height of each story card and the amount it should peek up
 		let heightOffset = (screen.height < 800) ? 800 : screen.height;
 		let peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
-		
+
 		// If the click originated from a story card
 		if (isStoryCard) {
 
+			// Amount needed for getting past the first card
 			let initial = Math.abs(this.sceneRefs[0].props.duration) + peekOffset;
 
 			if (storyIndex == 0) { landingPoint = initial; }
 
-			else { landingPoint = initial + (heightOffset * storyIndex) + (storyIndex * 25); } }
+			// Each subsequent card uses the initial offset plus its own height offset calculation
+			else { landingPoint = initial + (heightOffset * storyIndex) + (storyIndex * 25); }
+		}
 
-		else {
-			landingPoint = this.emailScene.scrollOffset() + heightOffset;
-		}	
+		// For email clicks
+		else { landingPoint = this.emailScene.scrollOffset() + heightOffset; }
 
 		// For iOS, override the normal scrolling 
 		if (isIOS) { this.controller.scrollTo((nextStoryPoint) => { $("html, body").animate({ scrollTop: nextStoryPoint }) }); }
@@ -479,19 +474,21 @@ class Artwork extends Component {
 		this.controller.scrollTo(landingPoint);
 	}
 
-  setupEmailSceneOnEnter = () => {
-    this.emailSceneTrigger = new ScrollMagic.Scene({
-      triggerElement: '#email-trigger-enter',
-      triggerHook: 'onEnter',
-      duration: this.artworkScrollOffset - 150
-    })
-      .on('leave', event => {
-        this.emailSceneTrigger.removePin();
-        this.emailSceneTrigger.refresh();
-      })
-      .addTo(this.controller);
-  };
+	/** Sets up the ScrollMagic scene for the email on-enter scene */
+	setupEmailSceneOnEnter = () => {
+		this.emailSceneTrigger = new ScrollMagic.Scene({
+			triggerElement: '#email-trigger-enter',
+			triggerHook: 'onEnter',
+			duration: this.artworkScrollOffset - 150
+		})
+			.on('leave', event => {
+				this.emailSceneTrigger.removePin();
+				this.emailSceneTrigger.refresh();
+			})
+			.addTo(this.controller);
+	}
 
+  /** Sets up the ScrollMagic for the email panel */
   setupEmailScene = () => {
     this.emailScene = new ScrollMagic.Scene({
       triggerElement: '#email-panel',
@@ -506,9 +503,9 @@ class Artwork extends Component {
 		 this.setState({ emailCardClickable: false });
 	  })
 	  .addTo(this.controller);	  
-  };
+  }
 
-  setArtworkRef = elem => {
+  setArtworkRef = (elem) => {
     if (elem) {
       this.artworkRef = elem;
       const scrollContainer = isAndroid ? { container: '.sm-container' } : {};
@@ -527,9 +524,9 @@ class Artwork extends Component {
 
   onStoryReadComplete = () => {
     const imageId = this.getFocusedArtworkImageId();
-    const storyId = this.state.storyId;
+    const { storyId } = this.state;
     this.sr.markStoryAsRead(imageId, storyId);
-  };
+  }
 
   onStoryHeightReady = (height, index) => {
     if (index > -1) {
@@ -563,12 +560,14 @@ class Artwork extends Component {
 
   /* Renders the focused artwork card */
   renderArtwork = () => {
-    const { artwork, selectedLanguage } = this.state;
-    const shortDescFontStyle =
-      localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `14px` } : {};
+    const { artwork, selectedLanguage, sharePopoverIsOpen } = this.state;
+	const shortDescFontStyle = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `14px` } : {};
+
+	const { refCallbackInfo, setArtworkRef, langOptions, onSelectLanguage, _onClickShare, nativeAppShareWithWebFallback, getFacebookShareUrl } = this;
+
     return (
       <div className="container-fluid artwork-container" id="search-result">
-        <div className="row" ref={this.refCallbackInfo}>
+        <div className="row" ref={refCallbackInfo}>
           <div className="artwork-top-bg">
             <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" />
           </div>
@@ -595,34 +594,31 @@ class Artwork extends Component {
                 </div>
                 
               </div>
-              <div className="card-body" id="focussed-artwork-body" ref={this.setArtworkRef}>
+              <div className="card-body" id="focussed-artwork-body" ref={setArtworkRef}>
               <div className="share-wrapper">
                   <div className="language-dropdown-wrapper">
                     <div className="language-dropdown">
                       <LanguageDropdown
-                        langOptions={this.langOptions}
-                        selected={this.state.selectedLanguage}
-                        onSelectLanguage={this.onSelectLanguage}
+                        langOptions={langOptions}
+                        selected={selectedLanguage}
+                        onSelectLanguage={onSelectLanguage}
                       />
                     </div>
                   </div>
                   <div
                     id="share-it"
                     className="btn-share-result"
-                    ref={node => {
-                      this.target = node;
-                    }}
-                    onClick={this._onClickShare}>
+                    onClick={_onClickShare}>
                     <img src={shareButton} alt="share" />
                     <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
                     </div>
-                  <Popover placement="top" isOpen={this.state.sharePopoverIsOpen} target="share-it">
+                  <Popover placement="top" isOpen={sharePopoverIsOpen} target="share-it">
                     <PopoverBody>
                       <div className="share">
-                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={this.nativeAppShareWithWebFallback}>
+                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={nativeAppShareWithWebFallback}>
                           <i className="fa fa-lg fa-twitter" aria-hidden="true" />
                         </a>
-                        <a target="_blank" href={this.getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
+                        <a target="_blank" href={getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
                           <i className="fa fa-lg fa-facebook" aria-hidden="true" />
                         </a>
                       </div>
@@ -732,190 +728,145 @@ class Artwork extends Component {
     }
   }
 
-  /** Renders the title bar based on whether it should be shown */
-  renderTitleBar = () => {
-	const { showTitleBar } = this.state;
-	
-    if (showTitleBar) {
-      return (
-        <div id="story-title-bar" className="story-title-bar" >
-          <div className="language-dropdown">
-            <LanguageDropdown  isStoryItemDropDown={true} langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
-          </div>
-        </div>
-      )
-	} 
-	
-	else { return <div id="story-title-bar" />; }
-  }
+  /** Renders the title bar with language dropdown */
+	renderTitleBar = () => {
+		return (
+			<div id="story-title-bar" className="story-title-bar" >
+				<div className="language-dropdown">
+					<LanguageDropdown isStoryItemDropDown={true} langOptions={this.langOptions} selected={this.state.selectedLanguage} onSelectLanguage={this.onSelectLanguage} />
+				</div>
+			</div>
+		)
+	}
 
-  sceneRefs = {};
+	/** Renders each of the story cards */
+	renderStory = () => {
+		const { stories, storyTitle } = this.state;
 
-  /** Renders the story cards if the flag is true */
-  renderStory = () => {
-	const { showStory, stories, storyTitle } = this.state;
-	
-	if (!showStory) { return <div />;  }
-	
-	// Iterate through the available stories
-    return stories.map((story, index) => {
+		// Iterate through the available stories
+		return stories.map((story, index) => {
 
-	  const storyIndex = index + 1;
-      const storyDuration = this.state.storyDurationsCurrent[index] * 5;
-      const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33;
-	  //console.log('renderStory > storyDuration, storySceneOffset :: ', index, storyDuration, storySceneOffset);
-	  
-	  // Amount that the story should peek
-	  const peekHeight = isAndroid && index === 0 ? 123 : 67;
-	  const peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
-	  const pointerEvent = this.state.storyTopsClickable[index] ? 'none' : 'auto';
-	  const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
-	  
-      return (
-        <Scene
-          loglevel={0}
-          indicators={false}
-          key={`storyitem${storyIndex}`}
-          triggerHook="onLeave"
-          pin
-          pinSettings={{ pushFollowers: false }}
-          duration={storyDuration}
-          offset={storySceneOffset}
-		  ref={(element) => { if (element) { this.sceneRefs[index] = element } }}>
-          {(progress, event) => (
-				  <div>
-					  <div id={`story-card-${index}`} className={`panel panel${storyIndex}`} >	
-					  <div className={`story-title-click click-${index}`} id={`${index}`} style={peekOffsetStyle} onClick={() => { this.handleClickScroll(index, true) }}/>
-						  <StoryItem
-							  key={`storyitem${storyIndex}`}
-							  progress={progress}
-							  sceneStatus={event}
-							  storyIndex={index}
-							  isLastStoryItem={index === stories.length - 1 ? true : false}
-							  story={story}
-							  storyTitle={storyTitle}
-							  langOptions={this.langOptions}
-							  selectedLanguage={this.state.selectedLanguage}
-							  onSelectLanguage={this.onSelectLanguage}
-							  onStoryReadComplete={this.onStoryReadComplete}
-							  getSize={this.onStoryHeightReady}
-							  statusCallback={this.storySceneCallback}
-							  getTranslation={this.props.getTranslation}
-							  onVisChange={this.onVisibilityChange}
-						  />
-					  </div>
-					  
-				  </div>
-          )}
-        </Scene>
-      );
-    });
-  };
+			const storyIndex = index + 1;
+			const storyDuration = this.state.storyDurationsCurrent[index] * 5;
+			const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33;
 
-  onVisibilityChange = (isVisible, storyIndex) => {
-	this.setState((pState) => {
-		const storyTopsClickable = { ...pState.storyTopsClickable };
-		storyTopsClickable[storyIndex] = isVisible;
+			// Amount that the story should peek
+			const peekHeight = isAndroid && index === 0 ? 123 : 67;
+			const peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
+			const pointerEvent = this.state.storyTopsClickable[index] ? 'none' : 'auto';
+			const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
 
-		return {
-			...pState,
-			storyTopsClickable
-		};
-	});
-  }
+			return (
+				<Scene
+					loglevel={0}
+					indicators={false}
+					key={`storyitem${storyIndex}`}
+					triggerHook="onLeave"
+					pin
+					pinSettings={{ pushFollowers: false }}
+					duration={storyDuration}
+					offset={storySceneOffset}
+					ref={(element) => { if (element) { this.sceneRefs[index] = element } }}>
+					{(progress, event) => (
+						<div>
+							<div id={`story-card-${index}`} className={`panel panel${storyIndex}`} >
+								<div className={`story-title-click click-${index}`} id={`${index}`} style={peekOffsetStyle} onClick={() => { this.handleClickScroll(index, true) }} />
+								<StoryItem
+									key={`storyitem${storyIndex}`}
+									progress={progress}
+									sceneStatus={event}
+									storyIndex={index}
+									isLastStoryItem={index === stories.length - 1 ? true : false}
+									story={story}
+									storyTitle={storyTitle}
+									langOptions={this.langOptions}
+									selectedLanguage={this.state.selectedLanguage}
+									onSelectLanguage={this.onSelectLanguage}
+									onStoryReadComplete={this.onStoryReadComplete}
+									getSize={this.onStoryHeightReady}
+									statusCallback={this.storySceneCallback}
+									getTranslation={this.props.getTranslation}
+									onVisChange={this.onVisibilityChange}
+								/>
+							</div>
+						</div>
+					)}
+				</Scene>
+			);
+		});
+	}
 
-  /* Renders the story cards if * showStory * flag is true */
-  renderPinsEnter = () => {
-	const { stories } = this.state;
+	/** Changes whether or not the top of a story card is clickable */
+	onVisibilityChange = (isVisible, storyIndex) => {
+		this.setState((pState) => {
+			const storyTopsClickable = { ...pState.storyTopsClickable };
+			storyTopsClickable[storyIndex] = isVisible;
 
-    return stories.map((story, index) => {
-      const storyEnterPinDuration =
-        index > 0
-          ? this.state.storyDurationsCurrent[index - 1] / 4 - 50
-          : this.state.infoCardDuration + this.contentOffset + 33;
+			return {
+				...pState,
+				storyTopsClickable
+			};
+		});
+	}
 
-	  return (
-        <Scene
-          loglevel={0}
-          key={`storytriggerenter${index + 1}`}
-          pin={`#story-card-${index}`}
-          triggerElement={`#story-card-${index}`}
-          triggerHook="onEnter"
-          indicators={false}
-          duration={storyEnterPinDuration}
-          offset="0"
-          pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
-          <div id={`story-pin-enter-${index + 1}`} />
-        </Scene>
-      );
-    });
-  };
+	/* Renders the pins for the story cards to get pinned on */
+	renderPinsEnter = () => {
+		const { stories } = this.state;
 
-  renderEmailPin = () => {
-	const { emailCaptured } = this.state;
-	const duration = (screen.height < 800) ? 800 : screen.height;
-	const offsettedDuration = duration + this.artworkScrollOffset - 150;
+		return stories.map((story, index) => {
+			const storyEnterPinDuration =
+				index > 0
+					? this.state.storyDurationsCurrent[index - 1] / 4 - 50
+					: this.state.infoCardDuration + this.contentOffset + 33;
 
-	  if (emailCaptured) {
-		  return (
-			<div />
-		  )
-	  }
+			return (
+				<Scene loglevel={0} key={`storytriggerenter${index + 1}`} pin={`#story-card-${index}`} triggerElement={`#story-card-${index}`}
+					triggerHook="onEnter" indicators={false} duration={storyEnterPinDuration} offset="0" pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
+					<div id={`story-pin-enter-${index + 1}`} />
+				</Scene>
+			);
+		});
+	}
 
-	  else {
+	/** Renders the email pin for the panel to get pinned on */
+	renderEmailPin = () => {
+		const duration = (screen.height < 800) ? 800 : screen.height;
+		const offsettedDuration = duration + this.artworkScrollOffset - 150;
+
 		return (
 			<Scene
-			  loglevel={0}
-			  pin={`#email-panel`}
-			  triggerElement={`#email-panel`}
-			  triggerHook="onEnter"
-			  indicators={false}
-			  duration={offsettedDuration}
-			  offset="0"
-			  pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
-			  <div id={`story-pin-enter`} />
-		  </Scene>
-		  )
-	  }
-  }
+				loglevel={0} pin={`#email-panel`} triggerElement={`#email-panel`} triggerHook="onEnter" indicators={false}
+				duration={offsettedDuration} offset="0" pinSettings={{ pushFollowers: true, spacerClass: 'scrollmagic-pin-spacer-pt' }}>
+				<div id={`story-pin-enter`} />
+			</Scene>
+		)
+	}
 
-  /** for android scroll within the fixed container .sm-container because of card peek issue */
-  renderStoryContainer = () => {
+  	/** For Android, scroll within the fixed container .sm-container because of card peek issue */
+	renderStoryContainer = () => {
 
-	const { showStory } = this.state;
+		const { showTitleBar, showStory, emailCaptured } = this.state;
+		const showEmailPin = (!showStory && !emailCaptured) ? true : false;
 
-    if (isAndroid) {
-      return (
-        <Controller refreshInterval={250} container=".sm-container">
-		  {this.renderTitleBar()}
-		  
-		  {(showStory) ? <div /> : this.renderEmailPin()}
+		// Props for the controller, add container prop for Android
+		const controllerProps = { refreshInterval: 250 };
+		if (isAndroid) { controllerProps['container'] = '.sm-container'; }
 
-          {(showStory) ? this.renderPinsEnter(): <div />}
+		return (
+			<Controller {...controllerProps}>
+				
+				{/* Render these components conditionally, otherwise render empty divs */}
+				{(showTitleBar) ? this.renderTitleBar() : <div id="story-title-bar" />}
+				{(showEmailPin) ? this.renderEmailPin() : <div />}
+				{(showStory) ? this.renderPinsEnter() : <div />}
+				{(showStory) ? this.renderStory(): <div /> }
+			</Controller>
+		)
+	}
 
-          {this.renderStory()}
-        </Controller>
-      );
-    } else {
-      return (
-        <Controller refreshInterval={250}>
-          {this.renderTitleBar()}
-
-		  {(showStory) ? <div /> : this.renderEmailPin()}
-
-          {(showStory) ? this.renderPinsEnter(): <div/>}
-
-          {this.renderStory()}
-        </Controller>
-      );
-    }
-  };
-
-  /**
-   * Main render screen setup
-   */
+  /**  Main render screen setup */
   renderResult = () => {
-    const { stories, showStory, emailCaptureAck } = this.state;
+    const { showStory, emailCaptureAck } = this.state;
     const hasChildCards = showStory || !emailCaptureAck;
 
     return (
@@ -930,7 +881,7 @@ class Artwork extends Component {
         {this.renderEmailScreen()}
       </SectionWipesStyled>
     );
-  };
+  }
 
   render() {
     const { artwork, imgLoaded } = this.state;
