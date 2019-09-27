@@ -856,7 +856,7 @@ class Artwork extends Component {
 			<Controller {...controllerProps}>
 				
 				{/* Render these components conditionally, otherwise render empty divs */}
-				{(showTitleBar) ? this.renderTitleBar() : <div id="story-title-bar" />}
+				{(showTitleBar) ? this.renderTitleBar() : <div/>}
 				{(showEmailPin) ? this.renderEmailPin() : <div />}
 				{(showStory) ? this.renderPinsEnter() : <div />}
 				{(showStory) ? this.renderStory(): <div /> }
@@ -866,7 +866,7 @@ class Artwork extends Component {
 
   /**  Main render screen setup */
   renderResult = () => {
-    const { showStory, emailCaptureAck } = this.state;
+    const { showStory, emailCaptureAck, emailCaptured } = this.state;
     const hasChildCards = showStory || !emailCaptureAck;
 
     return (
@@ -875,8 +875,8 @@ class Artwork extends Component {
 
         {this.renderStoryContainer()}
 
-        {/** this is a placeholder element at the bottom of viewport to control email card enter animation when no stories are present */}
-		{<div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }} />}
+		{/** this is a placeholder element at the bottom of viewport to control email card enter animation when no stories are present */}
+		{!emailCaptured && <div id="email-trigger-enter" style={{ visibility: `hidden`, bottom: 0 }} />}
 		
         {this.renderEmailScreen()}
       </SectionWipesStyled>
