@@ -740,77 +740,77 @@ class Artwork extends Component {
 		)
 	}
 
-  /** Renders each of the story cards */
-  renderStory = () => {
-	const { stories, storyTitle } = this.state;	
+	/** Renders each of the story cards */
+	renderStory = () => {
+		const { stories, storyTitle } = this.state;
 
-	// Iterate through the available stories
-    return stories.map((story, index) => {
+		// Iterate through the available stories
+		return stories.map((story, index) => {
 
-	  const storyIndex = index + 1;
-      const storyDuration = this.state.storyDurationsCurrent[index] * 5;
-      const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33;
-	  
-	  // Amount that the story should peek
-	  const peekHeight = isAndroid && index === 0 ? 123 : 67;
-	  const peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
-	  const pointerEvent = this.state.storyTopsClickable[index] ? 'none' : 'auto';
-	  const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
-	  
-      return (
-        <Scene
-          loglevel={0}
-          indicators={false}
-          key={`storyitem${storyIndex}`}
-          triggerHook="onLeave"
-          pin
-          pinSettings={{ pushFollowers: false }}
-          duration={storyDuration}
-          offset={storySceneOffset}
-		  ref={(element) => { if (element) { this.sceneRefs[index] = element } }}>
-          {(progress, event) => (
-				  <div>
-					  <div id={`story-card-${index}`} className={`panel panel${storyIndex}`} >	
-					  <div className={`story-title-click click-${index}`} id={`${index}`} style={peekOffsetStyle} onClick={() => { this.handleClickScroll(index, true) }}/>
-						  <StoryItem
-							  key={`storyitem${storyIndex}`}
-							  progress={progress}
-							  sceneStatus={event}
-							  storyIndex={index}
-							  isLastStoryItem={index === stories.length - 1 ? true : false}
-							  story={story}
-							  storyTitle={storyTitle}
-							  langOptions={this.langOptions}
-							  selectedLanguage={this.state.selectedLanguage}
-							  onSelectLanguage={this.onSelectLanguage}
-							  onStoryReadComplete={this.onStoryReadComplete}
-							  getSize={this.onStoryHeightReady}
-							  statusCallback={this.storySceneCallback}
-							  getTranslation={this.props.getTranslation}
-							  onVisChange={this.onVisibilityChange}
-						  />
-					  </div>
-				  </div>
-          )}
-        </Scene>
-      );
-    });
-  }
+			const storyIndex = index + 1;
+			const storyDuration = this.state.storyDurationsCurrent[index] * 5;
+			const storySceneOffset = index > 0 ? this.state.storyOffsets[index] - 342 : this.state.infoCardDuration + 33;
 
-  /** Changes whether or not the top of a story card is clickable */
-  onVisibilityChange = (isVisible, storyIndex) => {
-	this.setState((pState) => {
-		const storyTopsClickable = { ...pState.storyTopsClickable };
-		storyTopsClickable[storyIndex] = isVisible;
+			// Amount that the story should peek
+			const peekHeight = isAndroid && index === 0 ? 123 : 67;
+			const peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
+			const pointerEvent = this.state.storyTopsClickable[index] ? 'none' : 'auto';
+			const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
 
-		return {
-			...pState,
-			storyTopsClickable
-		};
-	});
-  }
+			return (
+				<Scene
+					loglevel={0}
+					indicators={false}
+					key={`storyitem${storyIndex}`}
+					triggerHook="onLeave"
+					pin
+					pinSettings={{ pushFollowers: false }}
+					duration={storyDuration}
+					offset={storySceneOffset}
+					ref={(element) => { if (element) { this.sceneRefs[index] = element } }}>
+					{(progress, event) => (
+						<div>
+							<div id={`story-card-${index}`} className={`panel panel${storyIndex}`} >
+								<div className={`story-title-click click-${index}`} id={`${index}`} style={peekOffsetStyle} onClick={() => { this.handleClickScroll(index, true) }} />
+								<StoryItem
+									key={`storyitem${storyIndex}`}
+									progress={progress}
+									sceneStatus={event}
+									storyIndex={index}
+									isLastStoryItem={index === stories.length - 1 ? true : false}
+									story={story}
+									storyTitle={storyTitle}
+									langOptions={this.langOptions}
+									selectedLanguage={this.state.selectedLanguage}
+									onSelectLanguage={this.onSelectLanguage}
+									onStoryReadComplete={this.onStoryReadComplete}
+									getSize={this.onStoryHeightReady}
+									statusCallback={this.storySceneCallback}
+									getTranslation={this.props.getTranslation}
+									onVisChange={this.onVisibilityChange}
+								/>
+							</div>
+						</div>
+					)}
+				</Scene>
+			);
+		});
+	}
 
-	/* Renders the story cards if * showStory * flag is true */
+	/** Changes whether or not the top of a story card is clickable */
+	onVisibilityChange = (isVisible, storyIndex) => {
+		this.setState((pState) => {
+			const storyTopsClickable = { ...pState.storyTopsClickable };
+			storyTopsClickable[storyIndex] = isVisible;
+
+			return {
+				...pState,
+				storyTopsClickable
+			};
+		});
+	}
+
+	/* Renders the pins for the story cards to get pinned on */
 	renderPinsEnter = () => {
 		const { stories } = this.state;
 
@@ -829,6 +829,7 @@ class Artwork extends Component {
 		});
 	}
 
+	/** Renders the email pin for the panel to get pinned on */
 	renderEmailPin = () => {
 		const duration = (screen.height < 800) ? 800 : screen.height;
 		const offsettedDuration = duration + this.artworkScrollOffset - 150;
