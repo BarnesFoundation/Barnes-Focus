@@ -606,9 +606,6 @@ class Artwork extends Component {
                   <div
                     id="share-it"
                     className="btn-share-result"
-                    ref={node => {
-                      this.target = node;
-                    }}
                     onClick={this._onClickShare}>
                     <img src={shareButton} alt="share" />
                     <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
