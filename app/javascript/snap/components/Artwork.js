@@ -406,13 +406,6 @@ class Artwork extends Component {
     this.setState({ sharePopoverIsOpen: !this.state.sharePopoverIsOpen });
   };
 
-  resetExperience = () => {
-    localStorage.removeItem(constants.SNAP_LANGUAGE_PREFERENCE);
-    localStorage.removeItem(constants.SNAP_USER_EMAIL);
-    localStorage.removeItem(constants.SNAP_ATTEMPTS);
-    localStorage.removeItem(constants.SNAP_LANGUAGE_TRANSLATION);
-  };
-
   /** Updates state that email was captured and submits it to the server session */
   onSubmitEmail = (email) => {
 	this.setState({ email, emailCaptured: true }, () => {
