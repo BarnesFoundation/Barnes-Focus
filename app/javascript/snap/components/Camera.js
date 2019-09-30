@@ -55,7 +55,7 @@ class Camera extends Component {
 		if (this.captureCounter < 10) {
 
 			// Get image in canvas
-			let canvas = this.getVideoCanvas();
+			let canvas = this.previewCanvas;
 
 			if (!canvas) return null;
 
@@ -66,12 +66,12 @@ class Camera extends Component {
 					if (process.env.CROP_IMAGE === 'TRUE') {
 
 						// Convert the image uri to blob	
-						window.URL = window.URL || window.webkitURL;
+						/* window.URL = window.URL || window.webkitURL;
 						let imageUri = window.URL.createObjectURL(blob);
 						let imageBlob = await cropPhoto(imageUri);
+						window.URL.revokeObjectURL(imageUri); */
 
-						window.URL.revokeObjectURL(imageUri);
-						resolve(imageBlob);
+						resolve(blob);
 					}
 
 					else { resolve(blob); }
@@ -143,26 +143,28 @@ class Camera extends Component {
 
 	stopVideo = () => { if (this.initVideo) { clearTimeout(this.initVideo); } }
 
-	stopPreview = () => {
-		if (this.drawPreview) {
-			clearTimeout(this.drawPreview);
-		}
-	}
+	stopPreview = () => { if (this.drawPreview) { clearTimeout(this.drawPreview); } }
 
-	setupForCapturing = () => {
+	setupForCapturing = async () => {
 		this.video.srcObject = this.state.videoStream;
 		this.stopVideo();
 		this.initVideo = setTimeout(() => { this.playVideo(); }, 50);
 		this.captureCounter = 0;
-		this.scan = setInterval(this.captureSingleScan, 1000 / 3);
+
+		this.scan = await new Promise((resolve) => {
+			setTimeout(() => {
+				const scan = setInterval(this.captureSingleScan, 1000 / 3);
+				resolve(scan);
+			}, 1500);
+		});
 	}
 
-  componentDidUpdate(previousProps) {
+  async componentDidUpdate(previousProps) {
 
 	console.log(`previous shouldBeScanning: ${previousProps.shouldBeScanning} current shouldBeScanning: ${this.props.shouldBeScanning}, current sessionYieldedMatch: ${this.props.sessionYieldedMatch}`);
 
 	if (!previousProps.shouldBeScanning && this.props.shouldBeScanning == true) {
-		this.setupForCapturing();
+		await this.setupForCapturing();
 	}
 	
 	if (this.props.shouldBeScanning == false) { clearInterval(this.scan); }
@@ -295,7 +297,9 @@ class Camera extends Component {
         0,
         previewCanvas.width,
         previewCanvas.height
-      );
+	  );
+	  
+	  this.previewCanvas = previewContext.canvas;
 
       this.stopPreview();
       this.drawPreview = setTimeout(() => {
