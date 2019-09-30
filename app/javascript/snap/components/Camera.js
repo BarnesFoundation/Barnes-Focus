@@ -165,7 +165,7 @@ class Camera extends Component {
 
   componentDidUpdate(previousProps) {
 
-	console.log(`previous shouldBeScanning: ${previousProps.shouldBeScanning} curreent shouldBeScanning: ${this.props.shouldBeScanning}`);
+	console.log(`previous shouldBeScanning: ${previousProps.shouldBeScanning} current shouldBeScanning: ${this.props.shouldBeScanning}, current sessionYieldedMatch: ${this.props.sessionYieldedMatch}`);
 
 	if (!previousProps.shouldBeScanning && this.props.shouldBeScanning == true) {
 		this.setupForCapturing();
@@ -336,7 +336,7 @@ class Camera extends Component {
 						{ <video id="video" ref={c => (this.video = c)} width="100%" autoPlay playsInline muted style={videoStyle} />}
 
 						{/* Show the video preview if an unsuccessful attempt has not occurred */}
-						{(shouldBeScanning) && <canvas id="video-preview" ref={el => (this.vpreview = el)} />}
+						{(sessionYieldedMatch !== false) && <canvas id="video-preview" ref={el => (this.vpreview = el)} />}
 
 						{/* If there was an unsuccessful attempt, transition into the no result found */}
 						<ReactCSSTransitionGroup transitionName="fade" transitionEnterTimeout={500} transitionLeaveTimeout={100}>
