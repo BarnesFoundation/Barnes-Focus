@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 
+import posed from 'react-pose';
 
 import Camera from './Camera';
 import { StorableSearch, ImageSearchResponse } from '../classes/searchResponse';
 import { SearchRequestService } from '../services/SearchRequestService';
 import { loadImage } from './CameraHelper';
 import * as constants from './Constants';
+
+const Container = posed.div({
+	enter: { opacity: 1 },
+	exit: { opacity: 0 }
+  });
 
 class CameraContainer extends Component {
 
@@ -123,7 +128,9 @@ class CameraContainer extends Component {
 		const { sessionYieldedMatch, shouldBeScanning } = this.state;
 
 		return (
-			<Camera processImageCapture={processImageCapture} sessionYieldedMatch={sessionYieldedMatch} beginScanning={beginScanning} snapAttempts={snapAttempts} shouldBeScanning={shouldBeScanning} />
+			<Container className="camera-container" initialPose="exit" pose="enter">
+				<Camera processImageCapture={processImageCapture} sessionYieldedMatch={sessionYieldedMatch} beginScanning={beginScanning} snapAttempts={snapAttempts} shouldBeScanning={shouldBeScanning} />
+			</Container>
 		)
 	}
 }

@@ -2,7 +2,6 @@ import scan_button from 'images/scan-button.svg';
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { isIOS } from 'react-device-detect';
-import posed from 'react-pose';
 import { compose } from 'redux';
 import { cropPhoto } from './CameraHelper';
 import * as constants from './Constants';
@@ -13,11 +12,6 @@ import { shouldLogPermissionGrantTime } from '../helpers/googleAnalyticsHelpers'
 
 const DISABLE_ZOOM="DISABLE_ZOOM";
 const ENABLE_ZOOM="ENABLE_ZOOM";
-
-const Container = posed.div({
-  enter: { opacity: 1 },
-  exit: { opacity: 0 }
-});
 
 class Camera extends Component {
   
@@ -175,7 +169,6 @@ class Camera extends Component {
   }
 
   componentWillUnmount() {
-	console.log('camera >> componentWillUnmount');
 	
 	// Stop drawing the video
     this.stopVideo();
@@ -326,7 +319,6 @@ class Camera extends Component {
     let videoStyle = { filter: `blur(25px)`, transform: `scale(1.2)` };
 
 	return (
-		<Container className="camera-container" initialPose="exit" pose="enter">
 			<div className="camera">
 
 				{/* If scanning should be occurring */}
@@ -362,7 +354,6 @@ class Camera extends Component {
 					</div>
 				}
 			</div>
-		</Container>
     );
   }
 }
