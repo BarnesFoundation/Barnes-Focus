@@ -24,19 +24,20 @@ class Camera extends Component {
   cameraCapabilities;  
   cropRectangle;
   scan;
+  captureCounter;
 
   ctx;
   canvas;
 
   constructor(props) {
-    super(props);
+	super(props);
 
     // Set state variables
     this.state = {
       videoStream: null,
       frontCamera: false,
       snapAttempts: this.props.snapAttempts,
-      cameraPermission: false,
+	  cameraPermission: false,
     };    
   }
 
@@ -55,11 +56,9 @@ class Camera extends Component {
 	/** Captures a single scan and returns blob of the scan */
 	captureSingleScan = async () => {
 
-		console.log(`In captureSingleScan, shouldBeScanning is ${this.props.shouldBeScanning}`);
+		this.captureCounter++;
 
-		if (this.props.shouldBeScanning) {
-
-			console.log('Capturing a scan');
+		if (this.captureCounter < 10) {
 
 			// Get image in canvas
 			let canvas = this.getVideoCanvas();
@@ -125,12 +124,9 @@ class Camera extends Component {
 			this.setState({ videoStream, cameraPermission: true }, () => {
 
 				// When video is able to be captured
-				if (this.props.shouldBeScanning && this.state.videoStream && (this.props.sessionYieldedMatch === null)) {
+				if (this.state.videoStream) {
 
 					this.setupForCapturing();
-					this.scan = setInterval(this.captureSingleScan, 1000 / 3);
-
-					// Reset snap attemps count if last_snap_timestamp is 12 hours or before.
 					this.resetSnapCounter();
 				}
 			});
@@ -163,13 +159,19 @@ class Camera extends Component {
 		this.video.srcObject = this.state.videoStream;
 		this.stopVideo();
 		this.initVideo = setTimeout(() => { this.playVideo(); }, 50);
+		this.captureCounter = 0;
+		this.scan = setInterval(this.captureSingleScan, 1000 / 3);
 	}
 
   componentDidUpdate(previousProps) {
-	console.log('component updated' + this.props.shouldBeScanning);
+
+	console.log(`previous shouldBeScanning: ${previousProps.shouldBeScanning} curreent shouldBeScanning: ${this.props.shouldBeScanning}`);
+
 	if (!previousProps.shouldBeScanning && this.props.shouldBeScanning == true) {
 		this.setupForCapturing();
-	}	
+	}
+	
+	if (this.props.shouldBeScanning == false) { clearInterval(this.scan); }
   }
 
   componentWillUnmount() {
@@ -319,7 +321,7 @@ class Camera extends Component {
 
   
   render() {
-	const { beginScanning, sessionYieldedMatch } = this.props;
+	const { beginScanning, sessionYieldedMatch, shouldBeScanning } = this.props;
 
     let videoStyle = { filter: `blur(25px)`, transform: `scale(1.2)` };
 
@@ -334,11 +336,11 @@ class Camera extends Component {
 						{ <video id="video" ref={c => (this.video = c)} width="100%" autoPlay playsInline muted style={videoStyle} />}
 
 						{/* Show the video preview if an unsuccessful attempt has not occurred */}
-						{(sessionYieldedMatch !== false) && <canvas id="video-preview" ref={el => (this.vpreview = el)} />}
+						{(shouldBeScanning) && <canvas id="video-preview" ref={el => (this.vpreview = el)} />}
 
 						{/* If there was an unsuccessful attempt, transition into the no result found */}
 						<ReactCSSTransitionGroup transitionName="fade" transitionEnterTimeout={500} transitionLeaveTimeout={100}>
-							{sessionYieldedMatch === false && (
+							{(shouldBeScanning === false && sessionYieldedMatch === false) && (
 								<div id="no-match-overlay" className="no-match-overlay">
 									<div className="hint h2">
 										<span>
