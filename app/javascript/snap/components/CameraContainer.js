@@ -30,7 +30,7 @@ class CameraContainer extends Component {
 	}
 
 	/** Starts a scanning session over a 3-second duration */
-	beginScanning = async () => {
+	beginScanning = () => {
 
 		// Update the snap attempts with this scan as a single attempt
 		localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
@@ -113,8 +113,8 @@ class CameraContainer extends Component {
 		 });
 	}
 
-	async componentDidMount() {
-		await this.beginScanning();
+	componentDidMount() {
+		this.beginScanning();
 	}
 
 	render() {
