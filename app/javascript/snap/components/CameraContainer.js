@@ -22,9 +22,6 @@ class CameraContainer extends Component {
 		this.sr = new SearchRequestService();
 		this.snapAttempts = localStorage.getItem(constants.SNAP_ATTEMPTS) || 0;
 
-		// Initialize match found and counter
-		this.responseCounter = 0;
-
 		this.state = {
 			scanSeqId: null,
 			shouldBeScanning: null,
@@ -48,24 +45,23 @@ class CameraContainer extends Component {
 	processImageCapture = async (imageBlob) => {
 
 		// Only process image capture when we haven't determined if session yielded a match
-		if (this.state.sessionYieldedMatch === null) {
+		if (this.state.sessionYieldedMatch === null && this.responseCounter <= 9) {
 
 			// Prepare and send the request to Catchoom for a response
 			const imageSearchRequestConfig = this.sr.prepareRequest(imageBlob, this.state.scanSeqId);
 			const imageSearchResponse = await this.sr.submitImageSearchRequest(imageSearchRequestConfig);
-			this.responseCounter++;	
-
+			
 			const { data } = imageSearchRequestConfig;
 			const { searchWasSuccessful, searchTime } = imageSearchResponse;
 			let searchResultToStore, elasticSearchResponse = null;
 
-			console.log(`Search was successful ${searchWasSuccessful} at attempt ${this.responseCounter}`);
+			// Increment the response counter
+			this.responseCounter ++;
 
 			// If search was successful
-			if (searchWasSuccessful) {
+			if (searchWasSuccessful && this.state.shouldBeScanning) {
 
-				// Match found so we should stop scanning
-				this.setState({ sessionYieldedMatch: true, shouldBeScanning: false });
+				this.setState({ shouldBeScanning: false, sessionYieldedMatch: true });
 
 				// Get the identified image information
 				const identifiedItem = imageSearchResponse.responsePayload.results[0];
@@ -86,10 +82,10 @@ class CameraContainer extends Component {
 			this.sr.storeSearchedResult(searchResultToStore);
 
 			// If we've received 9 responses and haven't completed the search, the session yielded no match
-			if (this.responseCounter >= 9 || this.state.sessionYieldedMatch) {
-
-				// Updates the state to show that the search did not yield a match
-				this.setState({ shouldBeScanning: false, sessionYieldedMatch: searchWasSuccessful });
+			if (this.responseCounter === 9 && (this.state.sessionYieldedMatch == null) && this.state.shouldBeScanning) {
+				
+				// Updates the state to show that the search did not yield a match and scanning should end
+				this.setState({ shouldBeScanning: false, sessionYieldedMatch: false  });
 			}
 		}
 	}
@@ -114,7 +110,7 @@ class CameraContainer extends Component {
 				pathname: `/artwork/${id}`,
 				state: { result: response }
 			});
-		});
+		 });
 	}
 
 	async componentDidMount() {
@@ -134,5 +130,4 @@ class CameraContainer extends Component {
 
 export default compose(
 	withRouter
-)
-	(CameraContainer);
+)(CameraContainer);
