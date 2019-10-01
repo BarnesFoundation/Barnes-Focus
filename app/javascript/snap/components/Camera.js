@@ -75,7 +75,7 @@ class Camera extends Component {
 					}
 
 					else { resolve(blob); }
-				}, 'image/jpeg');
+				}, 'image/jpeg', 0.75);
 			});
 
 			this.props.processImageCapture(imageBlob);
@@ -155,7 +155,7 @@ class Camera extends Component {
 			setTimeout(() => {
 				const scan = setInterval(this.captureSingleScan, 1000 / 3);
 				resolve(scan);
-			}, 1500);
+			}, 500);
 		});
 	}
 
