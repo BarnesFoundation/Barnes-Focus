@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
-  @@preferred_language = nil
+  @@preferred_language = 'null'
 
 private
 
@@ -32,26 +32,31 @@ private
 	
 	if session
 
-		accept_language_header = request.headers.fetch('HTTP_ACCEPT_LANGUAGE')
+		accept_language_header = request.headers['HTTP_ACCEPT_LANGUAGE']
 
-		# Modern browsers order the languages by preference, so the first element would be the most preferred. We then strip the dash if it's there
-		pl = HTTP::Accept::Languages.parse(accept_language_header)[0].locale
+		if (accept_language_header.present?)
 
-		# Check if the language is hyphenated 
-		if pl.index('-')
+			puts "The language header was present"
 
-			# Remove it as we only support base language codes
-			pl = pl.slice(0..(pl.index('-') - 1))
-		end
+			# Modern browsers order the languages by preference, so the first element would be the most preferred. We then strip the dash if it's there
+			pl = HTTP::Accept::Languages.parse(accept_language_header)[0].locale
 
-		# Find the language that is in our supported languages list
-		found_language = @@supported_languages.find do |language| language.downcase == pl
-		end 
+			# Check if the language is hyphenated 
+			if pl.index('-')
 
-		# If we do support the language, set it
-		if found_language
-			@@preferred_language = found_language
-			session.update_column(:lang_pref, found_language.downcase)
+				# Remove it as we only support base language codes
+				pl = pl.slice(0..(pl.index('-') - 1))
+			end
+
+			# Find the language that is in our supported languages list
+			found_language = @@supported_languages.find do |language| language.downcase == pl
+			end 
+
+			# If we do support the language, set it
+			if found_language
+				@@preferred_language = found_language
+				session.update_column(:lang_pref, found_language.downcase)		
+			end
 		end
 	end
 
