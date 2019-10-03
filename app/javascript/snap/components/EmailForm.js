@@ -149,7 +149,8 @@ class EmailForm extends Component {
                 className="form-control"
                 name="email"
                 value={this.state.email}
-                onChange={this.handleEmailInput}
+				onChange={this.handleEmailInput}
+				aria-label="email"
               />
               <div className="input-group-append">
                 <button

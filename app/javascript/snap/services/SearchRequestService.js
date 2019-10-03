@@ -1,5 +1,6 @@
 import * as constants from "../components/Constants";
 import axios from "axios";
+import { IdentifiedImagePayload, ImageSearchResponse } from '../classes/searchResponse';
 
 class SearchRequestService {
   /** Prepares scan data for a request and returns a requetsConfig object with { url, data, config } */
@@ -38,20 +39,17 @@ class SearchRequestService {
   };
 
   /** Stores the search attempt in the server */
-  storeSearchedResult = async (
-    searchSuccess,
-    formData,
-    referenceImageUrl,
-    esResponse,
-    searchTime
-  ) => {
+  storeSearchedResult = async (searchResponse) => {
+
+	const { searchSuccess, referenceImageUrl, esResponse, searchTime, data: formData } = searchResponse;
+
     formData.append("searchSuccess", searchSuccess);
     formData.append("referenceImageUrl", referenceImageUrl);
     formData.append("esResponse", JSON.stringify(esResponse));
     formData.append("searchTime", searchTime);
 
     await axios.post(constants.STORE_SEARCHED_RESULT_URL, formData);
-  };
+  }
 
   submitBookmarksEmail = async email => {
     const payload = {};
@@ -110,6 +108,40 @@ class SearchRequestService {
     }
   };
 
+	/** Submits the image search request to Catchoom and returns and ImageSearchResponse object */
+	submitImageSearchRequest = async (requestConfig) => {
+
+		try {
+			const response = (await axios(requestConfig)).data;
+
+			// Get the search time and number of results
+			const searchTime = response.search_time;
+			const resultsCount = response.results.length;
+
+			// If a matching result was found, this image search was successful
+			if (resultsCount > 0) { return new ImageSearchResponse(true, response, searchTime); }
+
+			// Else, this image search was not successful
+			else { return new ImageSearchResponse(false, response, searchTIme); }
+		}
+
+		catch (error) { 
+			return new ImageSearchResponse(false, null, null); }
+	}
+
+	/** Closure function so that an identified item is processed only once. Returns an IdentifiedImagePayload object */
+	processIdentifiedItem = async (identifiedItem) => {
+
+		// Get the image id and reference image url
+		const imageId = identifiedItem.item.name;
+		const referenceImageUrl = identifiedItem.image.thumb_120;
+
+		// Retrieve artwork information
+		const esResponse = await this.getArtworkInformation(imageId);
+
+		return new IdentifiedImagePayload(esResponse, referenceImageUrl);
+	}
+
   validteEmail = async (email) => {
     try {
       let response = await axios.post(
@@ -123,5 +155,7 @@ class SearchRequestService {
     }
   }
 }
+
+
 
 export { SearchRequestService };
