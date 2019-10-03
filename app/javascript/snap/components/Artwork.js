@@ -375,9 +375,12 @@ class Artwork extends Component {
     e.preventDefault();
   };
 
-	_onClickShare = () => {
+	_onClickShare = async () => {
+
+		// For mobile devices where native share is available
 		if (navigator.share) {
 			const url = `https://collection.barnesfoundation.org/objects/${this.state.artwork.id}`;
+			const title = `Barnes Foundation`
 
 			let hashtag = '#barnesfoundation';
 			let titleAuthor = this.state.artwork.title;
@@ -390,17 +393,14 @@ class Artwork extends Component {
 			}
 
 			titleAuthor = `${titleAuthor}. `;
+			const text = `${titleAuthor} ${hashtag}`;
 
-			navigator
-				.share({
-					title: 'Barnes Foundation',
-					text: `${titleAuthor} ${hashtag}`,
-					url
-				})
-				.then(() => { console.log('Successful share'); })
-				.catch(error => console.log('Error sharing', error));
+			try { await navigator.share({ title, text, url }); }
+
+			catch (error) { console.log(`An error occurred during sharing`, error); }
 		}
 
+		// Otherwise, normal share modal
 		else { this.toggleShareModal(); }
 	}
 
