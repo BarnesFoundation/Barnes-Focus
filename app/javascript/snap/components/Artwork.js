@@ -721,7 +721,7 @@ class Artwork extends Component {
 
 	/** Renders each of the story cards */
 	renderStory = () => {
-		const { stories, storyTitle } = this.state;
+		const { stories, storyTitle, emailCaptured } = this.state;
 
 		// Iterate through the available stories
 		return stories.map((story, index) => {
@@ -734,7 +734,9 @@ class Artwork extends Component {
 			const peekHeight = isAndroid && index === 0 ? 123 : 67;
 			const peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
 			const pointerEvent = this.state.storyTopsClickable[index] ? 'none' : 'auto';
-			const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
+      const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
+      // after email is captured, set padding botttom to 200px on the last story card
+      const emailCapturedBottomStyle = stories.length === index + 1 && emailCaptured ? {paddingBottom: `200px`} : {paddingBottom: `0`};
 
 			return (
 				<Scene
@@ -749,7 +751,7 @@ class Artwork extends Component {
 					ref={(element) => { if (element) { this.sceneRefs[index] = element } }}>
 					{(progress, event) => (
 						<div>
-							<div id={`story-card-${index}`} className={`panel panel${storyIndex}`} >
+							<div id={`story-card-${index}`} className={`panel panel${storyIndex}`} style={emailCapturedBottomStyle} >
 								<div className={`story-title-click click-${index}`} id={`${index}`} style={peekOffsetStyle} onClick={() => { this.handleClickScroll(index, true) }} />
 								<StoryItem
 									key={`storyitem${storyIndex}`}
