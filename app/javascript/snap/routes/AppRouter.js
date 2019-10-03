@@ -4,7 +4,7 @@ import posed, { PoseGroup } from "react-pose";
 
 
 import Home from '../components/Home';
-import Camera from '../components/Camera';
+import CameraContainer from '../components/CameraContainer';
 import Artwork from '../components/Artwork';
 import StoryPage from '../components/StoryPage';
 import * as constants from '../components/Constants';
@@ -21,7 +21,7 @@ const Routes = () => (
         <RouteContainer key={location.pathname}>
           <Switch location={location}>
             <Route path="/" component={Home} exact={true} key="home" />
-            <Route path="/scan" component={Camera} exact={true} key="scan" />
+            <Route path="/scan" component={CameraContainer} exact={true} key="scan" />
             <Route
               path="/artwork/:imageId?"
               component={Artwork}

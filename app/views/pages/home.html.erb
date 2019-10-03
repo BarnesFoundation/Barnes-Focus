@@ -5,12 +5,12 @@
 <script>
 	// Attempt to get the preferred language from local storage in case it was previously set -- will be null if non-existent
 	var storedPreferredLanguage = window.localStorage.getItem('barnes.snap.pref.lang');
+	var detectedPreferredLanguage = "<%= @preferred_language %>"
 
-	// If it's falsey
-	if (!storedPreferredLanguage) {
+	// If the stored preferred language was null but detected preferred language was not
+	if (!storedPreferredLanguage && !(detectedPreferredLanguage === 'null')) {
 
 		// Get the preferred language we detected from the server and set it
-		var detectedPreferredLanguage = "<%= @preferred_language %>";
 		window.localStorage.setItem('barnes.snap.pref.lang', detectedPreferredLanguage);
 	}
 </script>
