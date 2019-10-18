@@ -9,8 +9,9 @@ Rails.application.routes.draw do
     resources :snaps, only: [ :show ] do
       collection do
         post 'storeSearchedResult'
-        post 'getArtworkInformation'
-        post :mark_story_as_read
+		post 'getArtworkInformation'
+		post 'validateEmail'
+		post :mark_story_as_read
         get :getArtworkInformation
         get 'languages'
         get :similar_arts

@@ -1,372 +1,213 @@
-import axios from 'axios';
 import scan_button from 'images/scan-button.svg';
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { isIOS } from 'react-device-detect';
-import posed from 'react-pose';
-import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
-import { SearchRequestService } from '../services/SearchRequestService';
 import { cropPhoto } from './CameraHelper';
 import * as constants from './Constants';
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
+import { shouldLogPermissionGrantTime } from '../helpers/googleAnalyticsHelpers';
 
-const Container = posed.div({
-  enter: { opacity: 1 },
-  exit: { opacity: 0 }
-});
+
+const DISABLE_ZOOM="DISABLE_ZOOM";
+const ENABLE_ZOOM="ENABLE_ZOOM";
 
 class Camera extends Component {
-  sr;
-  snapAttempts;
-
-  matchFound;
-  responseCounter;
-  intervalExecutions;
-
-  track;
-  camera_capabilities;
+  
+  cameraCapabilities;  
+  cropRectangle;
   scan;
-  cropRect;
+  captureCounter;
 
-  constructor() {
-    super();
+  ctx;
+  canvas;
 
-    this.sr = new SearchRequestService();
-    this.snapAttempts = localStorage.getItem(constants.SNAP_ATTEMPTS) || 0;
+  constructor(props) {
+	super(props);
 
     // Set state variables
     this.state = {
       videoStream: null,
       frontCamera: false,
-      showVideo: true,
-      searchInProgress: false,
-      snapAttempts: this.snapAttempts,
-      cameraPermission: false,
-      scanSeqId: Date.now(),
-      matchError: false
-    };
-
-    // Set flag and counter
-    this.matchFound = false;
-    this.responseCounter = 0;
+      snapAttempts: this.props.snapAttempts,
+	  cameraPermission: false,
+    };    
   }
 
   resetSnapCounter = () => {
-    let last_snap_timestamp = parseInt(localStorage.getItem(constants.SNAP_LAST_TIMESTAMP));
-    if (last_snap_timestamp) {
-      let ttl = last_snap_timestamp + parseInt(constants.SNAP_COUNT_RESET_INTERVAL) - Date.now();
+    let lastSnapTimestamp = parseInt(localStorage.getItem(constants.SNAP_LAST_TIMESTAMP));
+    if (lastSnapTimestamp) {
+      let ttl = lastSnapTimestamp + parseInt(constants.SNAP_COUNT_RESET_INTERVAL) - Date.now();
       if (ttl <= 0 && this.state.snapAttempts > 0) {
         localStorage.removeItem(constants.SNAP_ATTEMPTS);
         this.setState({ snapAttempts: 0 });
       }
     }
-  };
-
-  stopScan = () => {
-    // End the photo scan
-    clearInterval(this.scan);
-    this.scan = null;
-  };
-
-  /** Captures photo over a 3-second duration */
-  capturePhotoShots = () => {
-    // Update the snap attempts with this scan as a single attempt
-    localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
-    localStorage.setItem(constants.SNAP_LAST_TIMESTAMP, Date.now());
-
-    this.intervalExecutions = 0;
-    this.stopScan();
-    // Capture a photo scan every third of a second
-    this.scan = setInterval(() => {
-      if (this.intervalExecutions == 9) {
-        this.stopScan();
-      } else {
-        if (this.matchFound == false) {
-          this.scanner();
-        }
-      }
-    }, 1000 / 3);
-  };
-
-  /** Contains the logic for capturing scans */
-  scanner = async () => {
-    this.intervalExecutions++;
-
-    // Get image in canvas
-    let canvas = this.getVideoCanvas();
-
-    if (!canvas) return null;
-
-    // Get the blob from canvas
-    let start = Date.now();
-    const imageBlob = await new Promise(resolve => {
-      canvas.toBlob(async blob => {
-        //console.log('process.env.CROP_IMAGE :: ', process.env.CROP_IMAGE);
-        if (process.env.CROP_IMAGE === 'TRUE') {
-          window.URL = window.URL || window.webkitURL;
-          let imageUri = window.URL.createObjectURL(blob);
-          let imageBlob = await cropPhoto(imageUri);
-
-          window.URL.revokeObjectURL(imageUri);
-          resolve(imageBlob);
-        } else {
-          resolve(blob);
-        }
-      }, 'image/jpeg');
-    });
-    let end = Date.now();
-
-    //console.log('Blob creation time: ' + (end - start) + ' ms');
-    const requestConfig = this.sr.prepareRequest(imageBlob, this.state.scanSeqId);
-    this.submitSearchRequest(requestConfig);
-  };
-
-  /** Submits the image search request to the server */
-  submitSearchRequest = async requestConfig => {
-    const { data } = requestConfig;
-    let response;
-
-    let searchSuccess;
-    let referenceImageUrl = null;
-    let esResponse = null;
-    let searchTime = null;
-
-    if (this.matchFound == false) {
-      try {
-        // A match/no match will always have a search time
-        response = await axios(requestConfig);
-        searchTime = response.data.search_time;
-
-        // If a match was found
-        if (response.data.results.length > 0) {
-          this.matchFound = true;
-          let matchData = await this.processImageMatch(response);
-
-          searchSuccess = true;
-          esResponse = matchData.esResponse;
-          referenceImageUrl = matchData.referenceImageUrl;
-
-          this.completeImageSearchRequest(searchSuccess, esResponse);
-        } else {
-          searchSuccess = false;
-        }
-      } catch (error) {
-        searchSuccess = false;
-      } finally {
-        this.responseCounter++;
-
-        // Store the result, regardless of success or not
-        this.sr.storeSearchedResult(searchSuccess, data, referenceImageUrl, esResponse, searchTime);
-
-        // Complete this image search attempt if we've received 9 responses or match was found
-        if (this.responseCounter == 9) {
-          this.completeImageSearchRequest(searchSuccess, esResponse);
-        }
-      }
-    }
-  };
-
-  /** Closure function so that a image match response is processed only once */
-  processImageMatch = (response => {
-    let executed = false;
-    return async response => {
-      if (!executed) {
-        executed = true;
-
-        // Get the image id
-        let imageId = response.data.results[0].item.name;
-        let referenceImageUrl = response.data.results[0].image.thumb_120;
-
-        // Retrieve artwork information
-        let artworkInfo = await this.sr.getArtworkInformation(imageId);
-
-        return {
-          esResponse: artworkInfo,
-          referenceImageUrl: referenceImageUrl
-        };
-      }
-    };
-  })();
-
-  /** Processes the completion of an image search */
-  completeImageSearchRequest(searchSuccess, response) {
-    if (searchSuccess) {
-      const w = screen.width;
-      let artUrl = response['data']['records'][0].art_url;
-      // load the match image background first so that it gets cached for faster display.
-      let matchImage = this.loadImage(artUrl + '?w=' + (w - 80));
-      let matchImageBg = this.loadImage(artUrl + '?q=0&auto=compress&crop=faces,entropy&fit=crop&w=' + w);
-
-      Promise.all([matchImage, matchImageBg]).then(() => {
-        // Navigate to results page
-        this.props.history.push({
-          pathname: `/artwork/${response['data']['records'][0].id}`,
-          state: { result: response }
-        });
-      });
-    } else {
-      this.handleSnapFailure();
-    }
   }
 
-  /** Transitions to an alert screen when no match is found */
-  handleSnapFailure = () => {
-    this.stopScan();
 
-    if (!this.state.matchError) {
-      this.setState({ matchError: true });
-    }
-  };
+	/** Captures a single scan and returns blob of the scan */
+	captureSingleScan = async () => {
 
-  loadImage = url => {
-    return new Promise((resolve, reject) => {
-      // Create a new image from JavaScript
-      let image = new Image();
-      // Bind an event listener on the load to call the `resolve` function
-      image.onload = resolve;
-      // If the image fails to be downloaded, we don't want the whole system
-      // to collapse so we `resolve` instead of `reject`, even on error
-      image.onerror = resolve;
-      image.src = url;
-    });
-  };
+		this.captureCounter++;
 
-  playVideo = () => {
-    this.video &&
-      this.video
-        .play()
-        .then(() => {
-          const track = this.state.videoStream.getVideoTracks()[0];
-          this.camera_capabilities = track.getCapabilities();
-          this.capturePhotoShots();
-          requestAnimationFrame(this.drawVideoPreview);
-        })
-        .catch(error => {
-          console.log('Cannot auto play video stream! ' + error);
-        });
-  };
+		if (this.captureCounter < 10) {
 
-  disablePinchZoom = event => {
-    event.preventDefault();
-  };
+			// Get image in canvas
+			let canvas = this.previewCanvas;
 
-  async componentDidMount() {
-    console.log('camera >> componentDidMount');
+			if (!canvas) return null;
 
-    // Since iOS 10, it no longer support "user-scalable=no" attribute.
-    // Adding this, to disable page zoom on pinch on the camera page
-    const cameraContainer = document.querySelector('.camera');
-    cameraContainer.addEventListener('touchmove', this.disablePinchZoom, false);
+			// Get the blob from canvas
+			const imageBlob = await new Promise(resolve => {
+				canvas.toBlob(async blob => {
 
-    let previewBox = this.vpreview.getBoundingClientRect();
+					if (process.env.CROP_IMAGE === 'TRUE') {
 
-    this.cropRect = {
-      x: Math.floor(previewBox.x),
-      y: Math.floor(previewBox.y),
-      width: Math.floor(previewBox.width),
-      height: Math.floor(previewBox.height)
-    };
+						// Convert the image uri to blob	
+						/* window.URL = window.URL || window.webkitURL;
+						let imageUri = window.URL.createObjectURL(blob);
+						let imageBlob = await cropPhoto(imageUri);
+						window.URL.revokeObjectURL(imageUri); */
 
-    // Fetch the device camera
-    try {
-      const startTime = Date.now();
-      const videoStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: this.state.frontCamera ? 'user' : 'environment',
-          width: 1920,
-          height: 1080
-        }
-      });
+						resolve(blob);
+					}
 
-      //Assuming it will take atleast 1 sec for user to respond to camera permission dialog.
-      // If the user had previously ganted/ rejected the permission, this promise should resolve in less than a sec.
-      const permissionGrantTime = Date.now() - startTime;
-      //console.log('Camera Permission granted in :: ', permissionGrantTime, ' ms.');
-      if (permissionGrantTime > 900) {
-        // dialog was shown
-        ga('send', {
-          hitType: 'event',
-          eventCategory: constants.GA_EVENT_CATEGORY.CAMERA,
-          eventAction: constants.GA_EVENT_ACTION.CAMERA_PERMISSION,
-          eventLabel: constants.GA_EVENT_LABEL.PERMISSION_GRANTED
-        });
-      }
+					else { resolve(blob); }
+				}, 'image/jpeg', 0.75);
+			});
 
-      this.setState({ videoStream: videoStream, cameraPermission: true });
-    } catch (error) {
-      this.setState({ error: 'An error occurred accessing the device camera' });
-    }
-  }
+			this.props.processImageCapture(imageBlob);
+		}
+	}
 
-  stopVideo = () => {
-    if (this.initVideo) {
-      clearTimeout(this.initVideo);
-    }
-  };
+	playVideo = async () => {
+		if (this.video) {
+			try {
+				await this.video.play();
 
-  stopPreview = () => {
-    if (this.drawPreview) {
-      clearTimeout(this.drawPreview);
-    }
-  };
+				const track = this.state.videoStream.getVideoTracks()[0];
+				this.cameraCapabilities = track.getCapabilities();
 
-  componentDidUpdate() {
-    this.matchFound = false;
-    this.responseCounter = 0;
+				// Begin scanning
+				requestAnimationFrame(this.drawVideoPreview);
+			}
 
-    // When video is able to be captured
-    if (this.state.showVideo && this.state.videoStream && !this.state.matchError) {
-      console.log('camera >> componentDidUpdate');
+			catch (error) { console.log('Cannot play video stream', error); }
+		}
+	}
 
-      this.video.srcObject = this.state.videoStream;
+	async componentDidMount() {
 
-      this.stopVideo();
+		// Disable zoom
+		this.pinchZoomModifier(DISABLE_ZOOM);
 
-      this.initVideo = setTimeout(() => {
-        this.playVideo();
-      }, 50);
+		const previewBox = this.vpreview.getBoundingClientRect();
+		const { x, y, width, height } = previewBox;
+		this.cropRectangle = { x: Math.floor(x), y: Math.floor(y), width: Math.floor(width), height: Math.floor(height) };
 
-      // Reset snap attemps count if last_snap_timestamp is 12 hours or before.
-      this.resetSnapCounter();
-    }
+		// Fetch the device camera
+		try {
+			const startTime = Date.now();
+			const videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: this.state.frontCamera ? 'user' : 'environment', width: 1920, height: 1080 } });
+
+			// Log the permission grant time if it took more than 900 ms
+			shouldLogPermissionGrantTime(startTime);
+
+			this.setState({ videoStream, cameraPermission: true }, () => {
+
+				// When video is able to be captured
+				if (this.state.videoStream) {
+
+					this.setupForCapturing();
+					this.resetSnapCounter();
+				}
+			});
+		}
+
+		catch (error) { this.setState({ error: 'An error occurred accessing the device camera' }); }
+	}
+
+	/* Prevents zoom */
+	disablePinchZoom = (event) => { event.preventDefault(); }
+
+	/* Beginning with iOS 10, the "user-scalable=no" attribute is no longer supported. This function will disable page zoom on-pinch for the camera page */
+	pinchZoomModifier = (action) => {
+		const cameraContainer = document.querySelector('.camera');
+
+		if (action === DISABLE_ZOOM) { cameraContainer.addEventListener('touchmove', this.disablePinchZoom, false); }
+
+		if (action === ENABLE_ZOOM) { cameraContainer.removeEventListener('touchmove', this.disablePinchZoom); }
+	}
+
+	stopVideo = () => { if (this.initVideo) { clearTimeout(this.initVideo); } }
+
+	stopPreview = () => { if (this.drawPreview) { clearTimeout(this.drawPreview); } }
+
+	setupForCapturing = async () => {
+		this.video.srcObject = this.state.videoStream;
+		this.stopVideo();
+		this.initVideo = setTimeout(() => { this.playVideo(); }, 50);
+		this.captureCounter = 0;
+
+		this.scan = await new Promise((resolve) => {
+			setTimeout(() => {
+				const scan = setInterval(this.captureSingleScan, 1000 / 3);
+				resolve(scan);
+			}, 500);
+		});
+	}
+
+  async componentDidUpdate(previousProps) {
+
+	console.log(`previous shouldBeScanning: ${previousProps.shouldBeScanning} current shouldBeScanning: ${this.props.shouldBeScanning}, current sessionYieldedMatch: ${this.props.sessionYieldedMatch}`);
+
+	if (!previousProps.shouldBeScanning && this.props.shouldBeScanning == true) {
+		await this.setupForCapturing();
+	}
+	
+	if (this.props.shouldBeScanning == false) { clearInterval(this.scan); }
   }
 
   componentWillUnmount() {
-    console.log('camera >> componentWillUnmount');
-    this.stopScan();
+	
+	// Stop drawing the video
     this.stopVideo();
-    this.stopPreview();
+	this.stopPreview();
+	
+	// Turn off video capture
     this.video.pause();
     this.video.removeAttribute('src');
-    this.video.load();
-
-    const cameraContainer = document.querySelector('.camera');
-    cameraContainer.removeEventListener('touchmove', this.disablePinchZoom);
+	this.video.load();
+	
+	// Re-enable zoom
+	this.pinchZoomModifier(ENABLE_ZOOM);
   }
 
   /** Gets the video drawn onto the canvas */
   getVideoCanvas = () => {
+
     // Get the canvas
     let canvas = this.getCanvas();
     if (!this.video || !canvas) return null;
 
-    const context = canvas.getContext('2d', { alpha: false });
-    if (isIOS || !this.camera_capabilities) {
+	const context = canvas.getContext('2d', { alpha: false });
+	
+    if (isIOS || !this.cameraCapabilities) {
       // Draw rectangle
-      let rect = this.video.getBoundingClientRect();
+      let rectangle = this.video.getBoundingClientRect();
       let tempCanvas = document.createElement('canvas');
       let tempCtx = tempCanvas.getContext('2d', { alpha: false });
 
       // Draw the video onto a temporary canvas
-      tempCanvas.width = rect.width;
-      tempCanvas.height = rect.height;
+      tempCanvas.width = rectangle.width;
+      tempCanvas.height = rectangle.height;
       tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
 
       // Now copy the viewport image onto our original canvas
-      let x = rect.x < 0 ? -rect.x : rect.x;
-      let y = rect.y < 0 ? -rect.y : rect.y;
+      let x = rectangle.x < 0 ? -rectangle.x : rectangle.x;
+      let y = rectangle.y < 0 ? -rectangle.y : rectangle.y;
 
       if (x > 0 && y > 0) {
         context.drawImage(
@@ -387,11 +228,13 @@ class Camera extends Component {
       context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
     }
     return canvas;
-  };
+  }
 
   /** Gets a blank canvas of same size as the video */
   getCanvas = () => {
-    const video = this.video;
+
+	const { video } = this;
+	
     if (video && !video.videoHeight) return null;
 
     if (!this.ctx) {
@@ -405,10 +248,10 @@ class Camera extends Component {
       this.ctx = canvas.getContext('2d', { alpha: false });
     }
 
-    const { ctx, canvas } = this;
+    const { canvas } = this;
 
     return canvas;
-  };
+  }
 
   /** Return a temporary canvas and context for drawing the video */
   getTempPreviewCanvas = () => {
@@ -424,12 +267,12 @@ class Camera extends Component {
     }
     const { tempCanvas, tempCtx } = this;
     return { tempCanvas, tempCtx };
-  };
+  }
 
   /** Draws the portion of the video visible within the preview onto a canvas, in a loop. */
   drawVideoPreview = () => {
     try {
-      if (!this.vpreview || this.state.matchError) {
+      if (!this.vpreview/*  || this.props.sessionYieldedMatch === null */) {
         return null;
       }
 
@@ -437,8 +280,8 @@ class Camera extends Component {
 
       let previewCanvas = this.vpreview;
       let previewContext = previewCanvas.getContext('2d', { alpha: false });
-      previewCanvas.width = this.cropRect.width;
-      previewCanvas.height = this.cropRect.height;
+      previewCanvas.width = this.cropRectangle.width;
+      previewCanvas.height = this.cropRectangle.height;
 
       tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
       tempCtx.drawImage(this.video, 0, 0, tempCanvas.width, tempCanvas.height);
@@ -446,15 +289,17 @@ class Camera extends Component {
       previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
       previewContext.drawImage(
         tempCanvas,
-        this.cropRect.x,
-        this.cropRect.y,
-        this.cropRect.width,
-        this.cropRect.height,
+        this.cropRectangle.x,
+        this.cropRectangle.y,
+        this.cropRectangle.width,
+        this.cropRectangle.height,
         0,
         0,
         previewCanvas.width,
         previewCanvas.height
-      );
+	  );
+	  
+	  this.previewCanvas = previewContext.canvas;
 
       this.stopPreview();
       this.drawPreview = setTimeout(() => {
@@ -469,62 +314,50 @@ class Camera extends Component {
         eventLabel: constants.GA_EVENT_LABEL.SCANNER_MOUNT_FAILURE
       });
     }
-  };
+  }
 
-  /** Transitions the alert screen back to camera focus when scan button is clicked */
-  handleScan = () => {
-    console.log('Back to scan mode');
-    this.setState({ matchError: false, scanSeqId: Date.now() });
-  };
-
+  
   render() {
-    const { showVideo, matchError } = this.state;
+	const { beginScanning, sessionYieldedMatch, shouldBeScanning } = this.props;
 
-    let videoStyle = {
-      filter: `blur(25px)`,
-      transform: `scale(1.2)`
-    };
+    let videoStyle = { filter: `blur(25px)`, transform: `scale(1.2)` };
 
-    return (
-      <Container className="camera-container" initialPose="exit" pose="enter">
-        <div className="camera">
-          {showVideo && (
-            <div>
-              <video
-                id="video"
-                ref={c => (this.video = c)}
-                width="100%"
-                autoPlay
-                playsInline
-                muted
-                style={videoStyle}
-              />
-              {!matchError && <canvas id="video-preview" ref={el => (this.vpreview = el)} />}
+	return (
+			<div className="camera">
 
-              <ReactCSSTransitionGroup transitionName="fade" transitionEnterTimeout={500} transitionLeaveTimeout={100}>
-                {matchError && (
-                  <div id="no-match-overlay" className="no-match-overlay">
-                    <div className="hint h2">
-                      <span>
-                        {this.props.getTranslation('No_Result_page', 'text_1')} <br />
-                        {this.props.getTranslation('No_Result_page', 'text_2')}
-                        <br />
-                        {this.props.getTranslation('No_Result_page', 'text_3')}
-                      </span>
-                    </div>
-                    <div
-                      className="scan-button"
-                      onClick={this.handleScan}
-                      style={{ position: 'absolute', bottom: '37px' }}>
-                      <img src={scan_button} alt="scan" />
-                    </div>
-                  </div>
-                )}
-              </ReactCSSTransitionGroup>
-            </div>
-          )}
-        </div>
-      </Container>
+				{/* If scanning should be occurring */}
+				{
+					<div> 
+						{/* Get video */}
+						{ <video id="video" ref={c => (this.video = c)} width="100%" autoPlay playsInline muted style={videoStyle} />}
+
+						{/* Show the video preview if an unsuccessful attempt has not occurred */}
+						{(sessionYieldedMatch !== false) && <canvas id="video-preview" ref={el => (this.vpreview = el)} />}
+
+						{/* If there was an unsuccessful attempt, transition into the no result found */}
+						<ReactCSSTransitionGroup transitionName="fade" transitionEnterTimeout={500} transitionLeaveTimeout={100}>
+							{(shouldBeScanning === false && sessionYieldedMatch === false) && (
+								<div id="no-match-overlay" className="no-match-overlay">
+									<div className="hint h2">
+										<span>
+											{this.props.getTranslation('No_Result_page', 'text_1')} <br />
+											{this.props.getTranslation('No_Result_page', 'text_2')}
+											<br />
+											{this.props.getTranslation('No_Result_page', 'text_3')}
+										</span>
+									</div>
+									<div
+										className="scan-button"
+										onClick={() => { beginScanning() }}
+										style={{ position: 'absolute', bottom: '37px' }}>
+										<img src={scan_button} alt="scan" />
+									</div>
+								</div>
+							)}
+						</ReactCSSTransitionGroup>
+					</div>
+				}
+			</div>
     );
   }
 }
@@ -532,5 +365,4 @@ class Camera extends Component {
 export default compose(
   withOrientation,
   withTranslation,
-  withRouter
 )(Camera);

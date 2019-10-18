@@ -6,7 +6,7 @@ class StoryFetcher
   UNIQUE_SEPARATOR = "***"
 
   def initialize
-    @endpoint = "https://api-useast.graphcms.com/v1/cjw53solj3odo01eh6l7trigw/master"
+	@endpoint = ENV['GRAPHCMS_ENDPOINT']
   end
 
   def has_story? obj_id
