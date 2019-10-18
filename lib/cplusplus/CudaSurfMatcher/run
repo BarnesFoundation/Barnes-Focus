@@ -1,5 +1,0 @@
-#!/bin/bash
-
-/home/ubuntu/CudaSurfMatcher/build/CudaSurfMatcher -p 42129 > /home/ubuntu/CudaSurfMatcher/CudaSurfMatcher.log 2>&1 &
-echo "Started"
-exit 0
