@@ -1,3 +1,17 @@
 <div id="app" class="app-container"></div>
 <%= javascript_pack_tag 'snap' %>
 <%= stylesheet_pack_tag 'snap' %>
+
+<script>
+	// Attempt to get the preferred language from local storage in case it was previously set -- will be null if non-existent
+	var storedPreferredLanguage = window.localStorage.getItem('barnes.snap.pref.lang');
+	var detectedPreferredLanguage = "<%= @preferred_language %>"
+
+	// If the stored preferred language was null but detected preferred language was not
+	if (!storedPreferredLanguage && !(detectedPreferredLanguage === 'null')) {
+
+		// Get the preferred language we detected from the server and set it
+		window.localStorage.setItem('barnes.snap.pref.lang', detectedPreferredLanguage);
+	}
+</script>
+<!-- <%= javascript_include_tag 'set-detected-language' %> -->

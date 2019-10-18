@@ -1,8 +1,11 @@
-import scan_button from 'images/scan-button.svg';
 import throttle from 'lodash/throttle';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, TOP_OFFSET, VIEWPORT_HEIGHT } from './Constants';
+import { SearchRequestService } from '../services/SearchRequestService';
+import ScanButton from './ScanButton';
+import { isAndroid } from 'react-device-detect';
+
 
 const withStoryStyles = {
   backgroundColor: '#fff',
@@ -12,10 +15,12 @@ const withStoryStyles = {
 class EmailForm extends Component {
   constructor(props) {
     super(props);
+    this.sr = new SearchRequestService();
     this.state = {
       email: '',
       floatScanBtn: false,
       emailCaptured: false,
+      varificationPending: null,
       errors: {
         email: false
       }
@@ -60,10 +65,6 @@ class EmailForm extends Component {
     }
   };
 
-  handleScan = () => {
-    this.props.history.push({ pathname: '/scan' });
-  };
-
   handleEmailInput = event => {
     const target = event.target;
     const value = target.value;
@@ -74,17 +75,29 @@ class EmailForm extends Component {
     });
   };
 
-  validateEmail = () => {
-    const emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-    return this.state.email.length > 0 && emailRegex.test(this.state.email);
-  };
+	validateEmail = async () => {
+		const validated = await this.sr.validteEmail(this.state.email);
 
-  _saveEmail = () => {
-    console.log('Save email called!!');
-    if (!this.validateEmail()) {
+    console.log(`The email being valid is ${validated}`);
+    this.setState({varificationPending: false})
+		return this.state.email.length > 0 && validated === true;
+	};
+
+  _saveEmail = async () => {
+    this.setState({varificationPending: true});
+	// Get whether or not the email is valid
+	const emailIsValid = await this.validateEmail();
+
+	// If email is not valid
+    if (!emailIsValid) {
+      this.setState({varificationPending: false});
       this.setState({ errors: { email: true } });
-    } else {
+	} 
+	
+	// Otherwise, it is valid
+	else {
       console.log('Valid email. Call backend API to save email.');
+      this.setState({varificationPending: false});
       const userEmail = this.state.email;
       this.setState({ email: '', emailCaptured: true });
       localStorage.setItem(SNAP_USER_EMAIL, userEmail);
@@ -136,7 +149,8 @@ class EmailForm extends Component {
                 className="form-control"
                 name="email"
                 value={this.state.email}
-                onChange={this.handleEmailInput}
+				onChange={this.handleEmailInput}
+				aria-label="email"
               />
               <div className="input-group-append">
                 <button
@@ -145,6 +159,9 @@ class EmailForm extends Component {
                   type="button"
                   onClick={() => this._saveEmail()}>
                   {this.props.getTranslation('Bookmark_capture', 'text_7')}
+                  {this.state.varificationPending === true && 
+                    <div className="loader-container"><div className="loader"></div></div>
+                  }
                 </button>
               </div>
             </div>
@@ -164,26 +181,21 @@ class EmailForm extends Component {
   };
 
   render() {
-    const { floatScanBtn, emailCaptured } = this.state;
-    let scanBtnClass = ['scan-button'];
-    if (floatScanBtn) {
-      scanBtnClass.push('floating');
-    }
+	const { floatScanBtn, emailCaptured } = this.state;
+	const { history } = this.props;
+	const peekOffset = (isAndroid) ? 123 : 67;
+	
     return (
-      <div
-        id="email-form"
-        className="email-container"
-        style={this.props.withStory ? withStoryStyles : {}}
-        ref={this.setEmailRef}>
-        <div className="scan-wrapper">
-          <div className={scanBtnClass.join(' ')} onClick={this.handleScan}>
-            <img src={scan_button} alt="scan" />
-          </div>
-        </div>
-        {!emailCaptured && this.renderEmailForm()}
-        {emailCaptured && this.renderEmailSuccess()}
-      </div>
-    );
+		<div id="email-form" className="email-container" style={this.props.withStory ? withStoryStyles : { top: `-${peekOffset}px`}} ref={this.setEmailRef}>
+
+			{/* Render the scan button and whether or not it should float */}
+			<ScanButton history={history} float={floatScanBtn} />
+
+			{/* Render the email form based on whether or not captured/success */}
+			{!emailCaptured && this.renderEmailForm()}
+			{emailCaptured && this.renderEmailSuccess()}
+		</div>
+    )
   }
 }
 

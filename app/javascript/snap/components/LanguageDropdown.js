@@ -55,11 +55,11 @@ class LanguageDropdown extends Component {
           </div>
           {this.state.listVisible ? (
             <span>
-              <img src={this.getDropdownIcon(DROP_UP)} />
+              <img src={this.getDropdownIcon(DROP_UP)} alt="Upward facing gray arrow to close the language menu" />
             </span>
           ) : (
             <span>
-              <img src={this.getDropdownIcon(DROP_DOWN)} />
+              <img src={this.getDropdownIcon(DROP_DOWN)} alt="Down facing gray arrow to expand the language menu" />
             </span>
           )}
         </div>
@@ -72,7 +72,7 @@ class LanguageDropdown extends Component {
                 onClick={() => this.selectItem(item)}
               >
                 <span className="language-select-s">{item.name}</span>
-                {item.selected && <img src={check} />}
+                {item.selected && <img src={check} alt="Gray checkmark indicating currently selected language"/>}
               </li>
             ))}
           </ul>

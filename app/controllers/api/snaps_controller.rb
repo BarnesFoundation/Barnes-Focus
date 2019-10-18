@@ -14,6 +14,14 @@ class Api::SnapsController < Api::BaseController
     render json: translator.supported_languages(preferred_language)
   end
 
+  ## Returns true/false depending on if the email is reachable
+  def validateEmail
+	email = params[:email]
+	emailValid = Truemail.valid?(email)
+
+	render json: emailValid 
+  end
+
   ## Retrieves the artwork information response for a provided image id
   def getArtworkInformation
     # Get parameters from the request
@@ -239,19 +247,16 @@ private
       return true
     end
 
-    # if story has been read by user
-    return false if session_blob[ story[:story_id] ].has_key?("read") && session_blob[ story[:story_id] ]["read"]
+    # if story has been read by user -- return true to show story anyway
+    return true if session_blob[ story[:story_id] ].has_key?("read") && session_blob[ story[:story_id] ]["read"]
 
-    # if same story has been offered 3 times
+    # increment times it has been read
     if session_blob.keys.include?(story[:story_id])
-      if session_blob[ story[:story_id] ]["read_count"] < 3
         session_blob[ story[:story_id] ]["read_count"] += 1
-        session.update_column(:blob, session_blob)
-        return true
-      end
-    end
+		session.update_column(:blob, session_blob)
+	end
 
-    return false
+    return true
   end
 
   def fetch_session

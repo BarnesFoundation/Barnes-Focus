@@ -19,7 +19,7 @@ body {
   font-variant-ligatures: common-ligatures;
   //position: absolute;
   //overflow: hidden;
-  //-webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch;
   //overflow-y:scroll;
   scroll-behavior: smooth;
 }
@@ -121,6 +121,7 @@ p {
 }
 
 .scan-button {
+  pointer-events: auto;
   width: 60px;
   height: 60px;
   right: 32px;
