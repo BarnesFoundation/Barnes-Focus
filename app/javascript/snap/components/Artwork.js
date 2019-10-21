@@ -5,11 +5,9 @@ import { compose } from 'redux';
 import * as constants from './Constants';
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
-import shareButton from 'images/share-icon.svg';
 
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
-import { Popover, PopoverBody } from 'reactstrap';
 
 import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
@@ -20,7 +18,9 @@ import StoryItem from './StoryItem';
 import { isTablet } from 'react-device-detect';
 import ScrollMagic from 'scrollmagic';
 import { isAndroid, isIOS } from 'react-device-detect';
+
 import ScanButton from './ScanButton';
+import { Share } from './Share';
 
 
 /**
@@ -79,7 +79,6 @@ class Artwork extends Component {
 
     this.state = {
       ...props.location.state,
-      sharePopoverIsOpen: false,
       showEmailScreen: false,
       emailCaptured: false,
       emailCaptureAck: false,
@@ -331,81 +330,7 @@ class Artwork extends Component {
   onSelectInRoomArt = aitrId => {
     localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
     this.props.history.push({ pathname: `/artwork/${aitrId}` });
-  };
-
-  getFacebookShareUrl = () => {
-    let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
-    return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare);
   }
-
-  /* Fallback for sharing functionality when native sharing is not available. Opens the web intent in a new window */
-  webFallbackForShare = e => {
-    const socialMediaType = e.currentTarget.dataset.id;
-	this.setState({ sharePopoverIsOpen: false });
-	
-	let appUriScheme;
-    let webFallbackURL;
-    let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
-
-    switch (socialMediaType) {
-      case constants.SOCIAL_MEDIA_TWITTER: {
-        let hashtag = 'barnesfoundation';
-
-		let title_author = this.state.artwork.title;
-        if (this.state.artwork.artist) {
-          title_author += ' by ' + this.state.artwork.artist;
-          hashtag +=
-            ',' +
-            this.state.artwork.artist
-              .split(' ')
-              .join('')
-              .split('-')
-              .join('');
-        }
-		title_author = title_author.split(' ').join('+');
-
-        //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.artwork.id;
-		//appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
-		
-        webFallbackURL = 'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
-
-        window.open(webFallbackURL, '_blank');
-        break;
-      }
-    }
-    e.preventDefault();
-  }
-
-	_onClickShare = async () => {
-
-		// For mobile devices where native share is available
-		if (navigator.share) {
-			const url = `https://collection.barnesfoundation.org/objects/${this.state.artwork.id}`;
-			const title = `Barnes Foundation`
-
-			let hashtag = '#barnesfoundation';
-			let titleAuthor = this.state.artwork.title;
-
-			if (this.state.artwork.artist) {
-				
-				const { artist } = this.state.artwork;
-				titleAuthor += ` by ${artist}`;
-				hashtag += ` #${artist.split(' ').join('')}`;
-			}
-
-			titleAuthor = `${titleAuthor}. `;
-			const text = `${titleAuthor} ${hashtag}`;
-
-			try { await navigator.share({ title, text, url }); }
-
-			catch (error) { console.log(`An error occurred during sharing`, error); }
-		}
-
-		// Otherwise, normal share modal
-		else { this.toggleShareModal(); }
-	}
-
-  toggleShareModal = () => { this.setState({ sharePopoverIsOpen: !this.state.sharePopoverIsOpen }); }
 
   /** Updates state that email was captured and submits it to the server session */
   onSubmitEmail = (email) => {
@@ -553,10 +478,10 @@ class Artwork extends Component {
 
   /* Renders the focused artwork card */
   renderArtwork = () => {
-    const { artwork, selectedLanguage, sharePopoverIsOpen } = this.state;
+    const { artwork, selectedLanguage } = this.state;
 	const shortDescFontStyle = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `14px` } : {};
 
-	const { refCallbackInfo, setArtworkRef, langOptions, onSelectLanguage, _onClickShare, webFallbackForShare, getFacebookShareUrl } = this;
+	const { refCallbackInfo, setArtworkRef, langOptions, onSelectLanguage } = this;
 
     return (
       <div className="container-fluid artwork-container" id="search-result">
@@ -602,24 +527,7 @@ class Artwork extends Component {
                   </div>
 
 				  {/* Share options button */}
-                  <div id="share-it"  className="btn-share-result" onClick={_onClickShare}>
-                    <img src={shareButton} alt="share" />
-                    <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
-                  </div>
-
-				  {/* Share popup that displays upon share button click when native sharing isn't available */}
-                  <Popover placement="top" isOpen={sharePopoverIsOpen} target="share-it">
-                    <PopoverBody>
-                      <div className="share">
-                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={webFallbackForShare}>
-                          <i className="fa fa-lg fa-twitter" aria-hidden="true" />
-                        </a>
-                        <a target="_blank" href={getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
-                          <i className="fa fa-lg fa-facebook" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </PopoverBody>
-                  </Popover>
+                  <Share shareText={this.props.getTranslation('Result_page', 'text_1')} artwork={artwork} />
 
                 </div>
 
