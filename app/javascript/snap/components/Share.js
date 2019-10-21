@@ -33,6 +33,7 @@ export class Share extends Component {
 		return { bTitle, titleAuthorLine, hashtags, url };
 	}
 
+	/** Handles sharing click, attempts to use native sharing. Otherwise, opens the share modal */
 	onClickShare = async () => {
 
 		// For mobile devices where native share is available
@@ -53,6 +54,7 @@ export class Share extends Component {
 		else { this.toggleShareModal(); }
 	}
 
+	/** Toggles display of the share modal */
 	toggleShareModal = () => { this.setState({ sharePopoverIsOpen: !this.state.sharePopoverIsOpen }); }
 
 	getFacebookShareUrl = () => {
