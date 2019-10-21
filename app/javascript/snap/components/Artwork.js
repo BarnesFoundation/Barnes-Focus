@@ -338,7 +338,8 @@ class Artwork extends Component {
     return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare);
   }
 
-  nativeAppShareWithWebFallback = e => {
+  /* Fallback for sharing functionality when native sharing is not available. Opens the web intent in a new window */
+  webFallbackForShare = e => {
     const socialMediaType = e.currentTarget.dataset.id;
 	this.setState({ sharePopoverIsOpen: false });
 	
@@ -555,7 +556,7 @@ class Artwork extends Component {
     const { artwork, selectedLanguage, sharePopoverIsOpen } = this.state;
 	const shortDescFontStyle = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `14px` } : {};
 
-	const { refCallbackInfo, setArtworkRef, langOptions, onSelectLanguage, _onClickShare, nativeAppShareWithWebFallback, getFacebookShareUrl } = this;
+	const { refCallbackInfo, setArtworkRef, langOptions, onSelectLanguage, _onClickShare, webFallbackForShare, getFacebookShareUrl } = this;
 
     return (
       <div className="container-fluid artwork-container" id="search-result">
@@ -610,7 +611,7 @@ class Artwork extends Component {
                   <Popover placement="top" isOpen={sharePopoverIsOpen} target="share-it">
                     <PopoverBody>
                       <div className="share">
-                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={nativeAppShareWithWebFallback}>
+                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={webFallbackForShare}>
                           <i className="fa fa-lg fa-twitter" aria-hidden="true" />
                         </a>
                         <a target="_blank" href={getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
