@@ -530,10 +530,9 @@ class Artwork extends Component {
     }
   };
 
-  onEmailHeightReady = height => {
-    //const computedHeight = Math.max(height, screen.height / 2);
-    this.emailFormHeight = height * 2 / 2.2;
-  };
+	onEmailHeightReady = height => {
+		this.emailFormHeight = height * 2 / 2.2;
+	}
 
   storySceneCallback = showTitle => {
     if (showTitle) {
@@ -734,9 +733,10 @@ class Artwork extends Component {
 			const peekHeight = isAndroid && index === 0 ? 123 : 67;
 			const peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
 			const pointerEvent = this.state.storyTopsClickable[index] ? 'none' : 'auto';
-      const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
-      // after email is captured, set padding botttom to 200px on the last story card
-      const emailCapturedBottomStyle = stories.length === index + 1 && emailCaptured ? {paddingBottom: `200px`} : {paddingBottom: `0`};
+			const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
+
+      		// After email is captured, set padding botttom to 200px on the last story card
+      		const emailCapturedBottomStyle = stories.length === index + 1 && emailCaptured ? {paddingBottom: `200px`} : {paddingBottom: `0`};
 
 			return (
 				<Scene
