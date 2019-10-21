@@ -372,9 +372,8 @@ class Artwork extends Component {
         break;
       }
     }
-
     e.preventDefault();
-  };
+  }
 
 	_onClickShare = async () => {
 
@@ -589,6 +588,8 @@ class Artwork extends Component {
               </div>
               <div className="card-body" id="focussed-artwork-body" ref={setArtworkRef}>
               <div className="share-wrapper">
+
+				  {/* Language options button */}
                   <div className="language-dropdown-wrapper">
                     <div className="language-dropdown">
                       <LanguageDropdown
@@ -598,13 +599,14 @@ class Artwork extends Component {
                       />
                     </div>
                   </div>
-                  <div
-                    id="share-it"
-                    className="btn-share-result"
-                    onClick={_onClickShare}>
+
+				  {/* Share options button */}
+                  <div id="share-it"  className="btn-share-result" onClick={_onClickShare}>
                     <img src={shareButton} alt="share" />
                     <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
-                    </div>
+                  </div>
+
+				  {/* Share popup that displays upon share button click when native sharing isn't available */}
                   <Popover placement="top" isOpen={sharePopoverIsOpen} target="share-it">
                     <PopoverBody>
                       <div className="share">
@@ -617,7 +619,9 @@ class Artwork extends Component {
                       </div>
                     </PopoverBody>
                   </Popover>
+
                 </div>
+
                 <div className="short-desc-container" ref={elem => (this.shortDescContainer = elem)}>
                   {artwork.shortDescription && (
                     <div className="card-text paragraph" style={shortDescFontStyle}>
