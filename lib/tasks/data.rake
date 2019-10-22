@@ -364,7 +364,13 @@ namespace :data do
       parent_id: email_header.id,
       english_translation: 'Buy Tickets',
       unique_identifier: 'text_6'
-    )
+	)
+	Translation.create(
+		screen_text: 'Get more art in your inbox. Sign up for Barnes emails to stay on top of special offers and happenings all year round.',
+		parent_id: email_header.id,
+		english_translation: 'Get more art in your inbox. Sign up for Barnes emails to stay on top of special offers and happenings all year round.',
+		unique_identifier: 'text_7'
+	)
   end
 
   def stream_query_rows(sql_query, options="WITH CSV HEADER")
