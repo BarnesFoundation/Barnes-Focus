@@ -487,7 +487,7 @@ class Artwork extends Component {
       <div className="container-fluid artwork-container" id="search-result">
         <div className="row" ref={refCallbackInfo}>
           <div className="artwork-top-bg">
-            <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" />
+            <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" aria-hidden={true} />
           </div>
           <div className="col-12 col-md-12">
             <div
