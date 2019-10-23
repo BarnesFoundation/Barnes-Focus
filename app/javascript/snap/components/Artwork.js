@@ -119,7 +119,7 @@ class Artwork extends Component {
 
 				// Extract needed data from the art object 
 				const artObject = artworkResult['data']['records'][0];
-				const { id, title, shortDescription, people: artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions } = artObject;
+				const { id, title, shortDescription, people: artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions, visualDescription } = artObject;
 
 				// Determine the flags
 				const curatorialApproval = (artObject.curatorialApproval === 'false') ? false : true;
@@ -127,7 +127,7 @@ class Artwork extends Component {
 
 				// Assign into artwork
 				artwork = {
-					id, title, shortDescription, artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions,
+					id, title, shortDescription, artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions, visualDescription,
 
 					// Set the urls	
 					url: `${artObject.art_url}${artUrlParams}`,
@@ -503,7 +503,7 @@ class Artwork extends Component {
                   <div className="card-header h1">Focused Artwork</div>
                   <div className="card-img-result">
                     <ProgressiveImage src={artwork.url} placeholder={artwork.url_low_quality}>
-                      {src => <img src={src} alt="match_image" />}
+                      {src => <img src={src} alt="match_image" role="img" aria-label={`${artwork.title} by ${artwork.artist}${(artwork.culture) ? `, ${artwork.culture}.` : '.'} ${artwork.visualDescription}`}/>}
                     </ProgressiveImage>
                     {/* <img src={artwork.url} alt="match_image" /> */}
                   </div>
