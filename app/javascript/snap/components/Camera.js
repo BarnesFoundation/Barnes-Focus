@@ -349,7 +349,8 @@ class Camera extends Component {
 									<div
 										className="scan-button"
 										onClick={() => { beginScanning() }}
-										style={{ position: 'absolute', bottom: '37px' }}>
+										style={{ position: 'absolute', bottom: '37px' }}
+										role="button" aria-roledescription="camera button" >
 										<img src={scan_button} alt="scan" />
 									</div>
 								</div>
