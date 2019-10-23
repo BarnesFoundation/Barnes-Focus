@@ -166,7 +166,7 @@ class StoryItem extends React.Component {
               totalProgress={progress * 5}
               paused
               target={
-                <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} />
+                <img className="card-img-top" src={this.getArtUrl()} alt="story_item" style={{ width: `100%` }} role="img" aria-label={`${story.detail.title} by ${story.detail.people}${this.isUnidentifiedArtist() ? `, ${story.detail.culture}` : ''} used as a background image`} />
               }
               ref={ref => (this.imgTopTimeline = ref)}>
               {
