@@ -548,7 +548,7 @@ class Artwork extends Component {
                   <table className="detail-table">
                     <tbody>
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_3')}:`}</td>
                         <td className="text-left item-info">
                           {artwork.artist}{' '}
                           {!artwork.unIdentified && artwork.nationality
@@ -559,31 +559,31 @@ class Artwork extends Component {
                       {artwork.unIdentified && (
                         <tr>
                           <td className="text-left item-label">
-                            {this.props.getTranslation('Result_page', 'text_10')}:
+                            {`${this.props.getTranslation('Result_page', 'text_10')}:`}
                           </td>
                           <td className="text-left item-info">{artwork.culture}</td>
                         </tr>
                       )}
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_4')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_4')}:`}</td>
                         <td className="text-left item-info">{artwork.title}</td>
                       </tr>
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_5')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_5')}:`}</td>
                         <td className="text-left item-info">{artwork.displayDate}</td>
                       </tr>
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_6')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_6')}:`}</td>
                         <td className="text-left item-info">{artwork.medium}</td>
                       </tr>
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_7')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_7')}:`}</td>
                         <td className="text-left item-info">{artwork.dimensions}</td>
                       </tr>
                       {!artwork.curatorialApproval && (
                         <tr>
                           <td className="text-left item-label">
-                            {this.props.getTranslation('Result_page', 'text_8')}:
+                            {`${this.props.getTranslation('Result_page', 'text_8')}:`}
                           </td>
                           <td className="text-left item-info">{this.props.getTranslation('Result_page', 'text_9')}</td>
                         </tr>
