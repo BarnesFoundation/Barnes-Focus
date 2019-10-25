@@ -221,13 +221,14 @@ class StoryItem extends React.Component {
 
 									{/** Story footer section */}
 									<div className="story-footer" style={{ paddingBottom: this.props.selectedLanguage.code === LANGUAGE_EN ? `200px` : 0 }}>
-										{story.detail.title}, {story.detail.displayDate}
+										{`${story.detail.title}, ${story.detail.displayDate}`}
 										<br />
-										{story.detail.people}
 
 										{/** Display additional information about the artist */}
-										{this.isUnidentifiedArtist() ? '' : ` (${story.detail.nationality}, ${story.detail.birthDate} - ${story.detail.deathDate})`}
-										{this.isUnidentifiedArtist() ? `, ${story.detail.culture}` : ''}
+										{`${story.detail.people}
+										
+										${this.isUnidentifiedArtist() ? '' : ` (${ story.detail.nationality }, ${ story.detail.birthDate } - ${ story.detail.deathDate })`}
+										${this.isUnidentifiedArtist() ? `, ${story.detail.culture}` : ''}`}
 									</div>
 
 									{/** Display the translation disclaimer */}
