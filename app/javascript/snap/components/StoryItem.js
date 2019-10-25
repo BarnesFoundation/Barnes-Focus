@@ -136,28 +136,8 @@ class StoryItem extends React.Component {
 	/** Generates the url for retrieving the artwork with transformation parameters */
 	getArtUrl = () => { return `${this.props.story.detail.art_url}?crop=faces,entropy&fit=crop&w=${screen.width}&h=${screen.height}`; }
 
-	refContentCallback = (element) => {
-		if (element) {
-			this.contentRef = element;
-		}
-	}
-
-	refTitleCallback = (element) => {
-		if (element) {
-			this.titleRef = element;
-		}
-	}
-
-	refOverlayCallback = (element) => {
-		if (element) {
-			this.overlayRef = element;
-		}
-	}
-
-	refScrollTextCallback = (element) => {
-		if (element) {
-			this.scrollCtaRef = element;
-		}
+	refCallback = (element) => {
+		if (element) { this[element.id] = element; }
 	}
 
 	/** Returns boolean whether or not the artist is unidentified */
@@ -175,6 +155,7 @@ class StoryItem extends React.Component {
 		const { story, storyTitle, progress, storyIndex, storyEmailPage, onVisChange } = this.props;
 		const { showTitle } = this.state;
 
+		// Change the font size for russian language
 		const paragraphFontStyle = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `16px` } : {};
 
 		// Determines appropriate offset of the story card peeking. 67 + 56 = 123 (address bar height compensation for Android)
@@ -203,7 +184,7 @@ class StoryItem extends React.Component {
 							<Tween from={{ autoAlpha: 0, borderRadius: '24px 24px 0px 0px' }} to={{ autoAlpha: 0.6, borderRadius: '0px 0px 0px 0px' }} ease="easeOut" duration={0.1} />
 						</Timeline>
 
-						{this.props.storyIndex === 0 && <div className="overlay" ref={this.refOverlayCallback} />}
+						{this.props.storyIndex === 0 && <div className="overlay" ref={this.refCallback} id="overlayRef" />}
 
 						<div className="content-mask">
 							<div className="card-img-overlay">
@@ -211,13 +192,13 @@ class StoryItem extends React.Component {
 								{/** In the email page, for the first story item */}
 								{storyEmailPage && storyIndex === 0 && (
 									<div>
-										<div className="intro" ref={this.refTitleCallback}>
+										<div className="intro" ref={this.refCallback} id="titleRef">
 											<div className="barnes-logo">
 												<img src={barnes_logo} alt="barnes_logo" />
 												<div className="story-name">{storyTitle}</div>
 											</div>
 										</div>
-										<div className="scroll-cta" ref={this.refScrollTextCallback}>
+										<div className="scroll-cta" ref={this.refCallback} id="scrollCtaRef">
 											<div className="scroll-icon">
 												<img src={scroll_up} alt="scroll" />
 											</div>
@@ -227,7 +208,7 @@ class StoryItem extends React.Component {
 								)}
 
 								{/** Scroll text section */}
-								<div className="scroll-text" ref={this.refContentCallback}>
+								<div className="scroll-text" ref={this.refCallback} id="contentRef">
 
 									{/** Display the story title for non-story email pages */}
 									{!storyEmailPage && <div className="story-name" id={`story-here-${storyIndex}`}>{storyTitle}</div>}
