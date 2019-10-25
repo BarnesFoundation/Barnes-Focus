@@ -30,7 +30,6 @@ class StoryItem extends React.Component {
   }
 
   componentDidMount() {
-    //console.log('StoryItem >> componentDidMount');
     this.scrollInProgress = false;
     this.setState({ scrollHeight: this.contentRef.clientHeight });
     this.t2 = new TimelineLite({ paused: true });
@@ -40,65 +39,82 @@ class StoryItem extends React.Component {
     this.overlayTimelineGSAP = this.overlayTimeline.getGSAP();
   }
 
-  componentWillReceiveProps(nextProps) {
-    // console.log(nextProps.sceneStatus)
-    if (nextProps.sceneStatus.type === 'start' && nextProps.storyIndex === 2) {
-      if (!this.state.storyRead) {
-        this.setState({ storyRead: true });
-        this.props.onStoryReadComplete();
-      }
-    }
-    if (nextProps.sceneStatus.type === 'start' && nextProps.storyIndex === 0) {
-      // console.log("First Card Started", nextProps.sceneStatus.type, this.props.sceneStatus.type)
-      let showTitle = nextProps.sceneStatus.type === 'start' && nextProps.sceneStatus.state === 'DURING';
-      if (this.props.sceneStatus.state != nextProps.sceneStatus.state || this.props.sceneStatus.type === 'enter') {
-        this.props.statusCallback(showTitle);
-        this.setState({ showTitle: !showTitle });
-      }
-    }
-  }
+	componentWillReceiveProps(nextProps) {
 
-  componentDidUpdate() {
-    //console.log("StoryItem >> ComponentDidUpdate");
-    // console.log("Did Update Scene Status", this.props.sceneStatus)
-    if (!this.state.heightUpdated) {
-      var contentHeight = this.contentRef.getBoundingClientRect().height;
-      var offset;
-      offset = contentHeight > VIEWPORT_HEIGHT ? contentHeight - VIEWPORT_HEIGHT + 67 : 0;
-      if (offset < 0) offset = 0;
-      // console.log("SCROLL OFFSET", offset);
+		// Handles marking this story as being read by the user
+		if (nextProps.sceneStatus.type === 'start' && nextProps.storyIndex === 2) {
+			if (!this.state.storyRead) {
+				this.setState({ storyRead: true });
+				this.props.onStoryReadComplete();
+			}
+		}
 
-      this.props.getSize(offset, this.props.storyIndex);
-      this.setState({ heightUpdated: true, scrollOffset: offset });
+		if (nextProps.sceneStatus.type === 'start' && nextProps.storyIndex === 0) {
 
-      // console.log("Setting TWEEN OFFSET", offset, contentHeight, h);
-      if (this.props.storyIndex === 0) {
-        if (this.props.storyEmailPage) {
-          this.t2
-            .fromTo(this.overlayRef, 0.1, { autoAlpha: 0.5 }, { autoAlpha: 0 })
-            .fromTo(this.titleRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
-            .fromTo(this.scrollCtaRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
-            .fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, '-=0.1')
-            .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, '-=0.1');
-        } else {
-          this.t2
-            .fromTo(this.overlayRef, 0.1, { autoAlpha: 0.5 }, { autoAlpha: 0 }, 0)
-            .fromTo(this.contentRef, 0.15, { autoAlpha: 0.01, y: '50px' }, { autoAlpha: 1, y: '0px' }, 0)
-            .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, '-=0.16');
-        }
-      } else if (this.props.isLastStoryItem) {
-        this.t2
-          .fromTo(this.contentRef, 0.15, { autoAlpha: 0.01, y: '50px' }, { autoAlpha: 1, y: '0px' })
-          .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, '-=0.16');
-      } else {
-        this.t2
-          .fromTo(this.contentRef, 0.15, { autoAlpha: 0.01, y: '50px' }, { autoAlpha: 1, y: '0px' })
-          .fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -offset, ease: Linear.easeNone }, '-=0.16');
-      }
-    }
+			// Whether title should be shown 
+			let showTitle = nextProps.sceneStatus.type === 'start' && nextProps.sceneStatus.state === 'DURING';
 
-    if (this.t2) this.t2.progress(this.props.progress * 4);
-  }
+			if (this.props.sceneStatus.state != nextProps.sceneStatus.state || this.props.sceneStatus.type === 'enter') {
+				this.props.statusCallback(showTitle);
+				this.setState({ showTitle: !showTitle });
+			}
+		}
+	}
+
+	componentDidUpdate() {
+
+		if (!this.state.heightUpdated) {
+			const contentHeight = this.contentRef.getBoundingClientRect().height;
+			let scrollOffset = (contentHeight > VIEWPORT_HEIGHT) ? contentHeight - VIEWPORT_HEIGHT + 67 : 0;
+
+			if (scrollOffset < 0) {
+				scrollOffset = 0;
+			}
+
+			this.props.getSize(scrollOffset, this.props.storyIndex);
+			this.setState({ heightUpdated: true, scrollOffset });
+
+			// Handleing for the for story in the list
+			if (this.props.storyIndex === 0) {
+
+				// Handling for story email page
+				if (this.props.storyEmailPage) {
+					this.t2
+						.fromTo(this.overlayRef, 0.1, { autoAlpha: 0.5 }, { autoAlpha: 0 })
+						.fromTo(this.titleRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
+						.fromTo(this.scrollCtaRef, 1, { opacity: 1 }, { opacity: 0 }, 0)
+						.fromTo(this.contentRef, 0.1, { autoAlpha: 0, y: '50px' }, { autoAlpha: 1, y: '0px' }, '-=0.1')
+						.fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -scrollOffset, ease: Linear.easeNone }, '-=0.1');
+				} 
+				
+				// Handling for normal story component
+				else {
+					this.t2
+						.fromTo(this.overlayRef, 0.1, { autoAlpha: 0.5 }, { autoAlpha: 0 }, 0)
+						.fromTo(this.contentRef, 0.15, { autoAlpha: 0.01, y: '50px' }, { autoAlpha: 1, y: '0px' }, 0)
+						.fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -scrollOffset, ease: Linear.easeNone }, '-=0.16');
+				}
+			} 
+			
+			// Handling for the last story in the list
+			else if (this.props.isLastStoryItem) {
+				this.t2
+					.fromTo(this.contentRef, 0.15, { autoAlpha: 0.01, y: '50px' }, { autoAlpha: 1, y: '0px' })
+					.fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -scrollOffset, ease: Linear.easeNone }, '-=0.16');
+			} 
+			
+			// Handling for all other stories in the list
+			else {
+				this.t2
+					.fromTo(this.contentRef, 0.15, { autoAlpha: 0.01, y: '50px' }, { autoAlpha: 1, y: '0px' })
+					.fromTo(this.contentRef, 1.0, { y: '0px' }, { y: -scrollOffset, ease: Linear.easeNone }, '-=0.16');
+			}
+		}
+
+		if (this.t2) {
+			this.t2.progress(this.props.progress * 4);
+		}
+	}
 
   componentWillUnmount() {
     this.masterTimelineGSAP.remove();
