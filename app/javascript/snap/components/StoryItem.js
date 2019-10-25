@@ -211,7 +211,7 @@ class StoryItem extends React.Component {
 								<div className="scroll-text" ref={this.refCallback} id="contentRef">
 
 									{/** Display the story title for non-story email pages */}
-									{!storyEmailPage && <div className="story-name" id={`story-here-${storyIndex}`}>{storyTitle}</div>}
+									{!storyEmailPage && <div className="story-name" id={`story-here-${storyIndex}`} aria-hidden={(storyIndex === 0) ? false : true}>{storyTitle}</div>}
 
 									{/** Captures when the story paragraph is in view to notify the parent component */}
 									<VizSensor onChange={(isVisible) => { onVisChange(isVisible, storyIndex) }}>
