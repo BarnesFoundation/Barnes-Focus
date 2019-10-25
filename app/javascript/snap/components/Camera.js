@@ -339,11 +339,10 @@ class Camera extends Component {
 							{(shouldBeScanning === false && sessionYieldedMatch === false) && (
 								<div id="no-match-overlay" className="no-match-overlay">
 									<div className="hint h2">
-										<span>
-											{this.props.getTranslation('No_Result_page', 'text_1')} <br />
-											{this.props.getTranslation('No_Result_page', 'text_2')}
-											<br />
-											{this.props.getTranslation('No_Result_page', 'text_3')}
+										<span style={{ whiteSpace: "pre-line" }}>
+											{`${this.props.getTranslation('No_Result_page', 'text_1')}
+											${this.props.getTranslation('No_Result_page', 'text_2')}
+											${this.props.getTranslation('No_Result_page', 'text_3')}`} 
 										</span>
 									</div>
 									<div
