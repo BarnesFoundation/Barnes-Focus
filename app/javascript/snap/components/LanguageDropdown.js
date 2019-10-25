@@ -49,17 +49,17 @@ class LanguageDropdown extends Component {
   render = () => {
     return (
       <div className="dd-wrapper">
-        <div className="dd-header" onClick={this.show}>
-          <div className="dd-header-title">
+        <div className="dd-header" aria-haspopup="true" id="language-btn" onClick={this.show}>
+          <div className="dd-header-title" aria-labelledby="language-btn">
             {this.getDropdownText(this.props.selected)}
           </div>
           {this.state.listVisible ? (
             <span>
-              <img src={this.getDropdownIcon(DROP_UP)} alt="Upward facing gray arrow to close the language menu" />
+              <img src={this.getDropdownIcon(DROP_UP)} aria-hidden={true} />
             </span>
           ) : (
             <span>
-              <img src={this.getDropdownIcon(DROP_DOWN)} alt="Down facing gray arrow to expand the language menu" />
+              <img src={this.getDropdownIcon(DROP_DOWN)} aria-hidden={true} />
             </span>
           )}
         </div>
