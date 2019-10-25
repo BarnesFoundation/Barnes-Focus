@@ -10,34 +10,37 @@ import VizSensor from 'react-visibility-sensor';
 
 
 class StoryItem extends React.Component {
-  constructor(props) {
-    super(props);
-    this.contentRef = React.createRef();
-    this.titleRef = React.createRef();
-    this.overlayRef = React.createRef();
-    this.scrollCtaRef = React.createRef();
+	constructor(props) {
+		super(props);
 
-    this.state = {
-      storyRead: false,
-      heightUpdated: false,
-      scrollHeight: 0,
-      showTitle: true
-    };
+		// Setup refs
+		this.contentRef = React.createRef();
+		this.titleRef = React.createRef();
+		this.overlayRef = React.createRef();
+		this.scrollCtaRef = React.createRef();
 
-    this.masterTimelineGSAP = null;
-    this.imgTopTimelineGSAP = null;
-    this.overlayTimelineGSAP = null;
-  }
+		this.state = {
+			storyRead: false,
+			heightUpdated: false,
+			scrollHeight: 0,
+			showTitle: true
+		};
 
-  componentDidMount() {
-    this.scrollInProgress = false;
-    this.setState({ scrollHeight: this.contentRef.clientHeight });
-    this.t2 = new TimelineLite({ paused: true });
+		// Initialize GSAPs
+		this.masterTimelineGSAP = null;
+		this.imgTopTimelineGSAP = null;
+		this.overlayTimelineGSAP = null;
+	}
 
-    this.masterTimelineGSAP = this.masterTimeline.getGSAP();
-    this.imgTopTimelineGSAP = this.imgTopTimeline.getGSAP();
-    this.overlayTimelineGSAP = this.overlayTimeline.getGSAP();
-  }
+	componentDidMount() {
+		this.scrollInProgress = false;
+		this.setState({ scrollHeight: this.contentRef.clientHeight });
+		this.t2 = new TimelineLite({ paused: true });
+
+		this.masterTimelineGSAP = this.masterTimeline.getGSAP();
+		this.imgTopTimelineGSAP = this.imgTopTimeline.getGSAP();
+		this.overlayTimelineGSAP = this.overlayTimeline.getGSAP();
+	}
 
 	componentWillReceiveProps(nextProps) {
 
@@ -54,6 +57,7 @@ class StoryItem extends React.Component {
 			// Whether title should be shown 
 			let showTitle = nextProps.sceneStatus.type === 'start' && nextProps.sceneStatus.state === 'DURING';
 
+			// Executes display of the title
 			if (this.props.sceneStatus.state != nextProps.sceneStatus.state || this.props.sceneStatus.type === 'enter') {
 				this.props.statusCallback(showTitle);
 				this.setState({ showTitle: !showTitle });
@@ -116,58 +120,61 @@ class StoryItem extends React.Component {
 		}
 	}
 
-  componentWillUnmount() {
-    this.masterTimelineGSAP.remove();
-    this.masterTimelineGSAP.kill();
-    this.imgTopTimelineGSAP.remove();
-    this.imgTopTimelineGSAP.kill();
-    this.overlayTimelineGSAP.remove();
-    this.overlayTimelineGSAP.kill();
+	componentWillUnmount() {
+		// Unhook the GSAP plugins and timelines when this component is unmounting
+		this.masterTimelineGSAP.remove();
+		this.masterTimelineGSAP.kill();
+		this.imgTopTimelineGSAP.remove();
+		this.imgTopTimelineGSAP.kill();
+		this.overlayTimelineGSAP.remove();
+		this.overlayTimelineGSAP.kill();
 
-    this.t2.remove();
-    this.t2.kill();
-  }
+		this.t2.remove();
+		this.t2.kill();
+	}
 
-  getArtUrl = () => {
-    return this.props.story.detail.art_url + `?crop=faces,entropy&fit=crop&w=` + screen.width + `&h=` + screen.height;
-  };
+	/** Generates the url for retrieving the artwork with transformation parameters */
+	getArtUrl = () => { return `${this.props.story.detail.art_url}?crop=faces,entropy&fit=crop&w=${screen.width}&h=${screen.height}`; }
 
-  refContentCallback = element => {
-    if (element) {
-      this.contentRef = element;
-      // this.props.getSize(element.getBoundingClientRect().height, this.props.key);
-    }
-  };
+	refContentCallback = (element) => {
+		if (element) {
+			this.contentRef = element;
+		}
+	}
 
-  refTitleCallback = element => {
-    if (element) {
-      this.titleRef = element;
-    }
-  };
+	refTitleCallback = (element) => {
+		if (element) {
+			this.titleRef = element;
+		}
+	}
 
-  refOverlayCallback = element => {
-    if (element) {
-      this.overlayRef = element;
-    }
-  };
+	refOverlayCallback = (element) => {
+		if (element) {
+			this.overlayRef = element;
+		}
+	}
 
-  refScrollTextCallback = element => {
-    if (element) {
-      this.scrollCtaRef = element;
-    }
-  };
+	refScrollTextCallback = (element) => {
+		if (element) {
+			this.scrollCtaRef = element;
+		}
+	}
 
-  isUnidentifiedArtist = () => {
-    return this.props.story.detail.people.toLowerCase().includes('unidentified');
-  };
+	/** Returns boolean whether or not the artist is unidentified */
+	isUnidentifiedArtist = () => {
+		return this.props.story.detail.people.toLowerCase().includes('unidentified');
+	}
 
   render() {
 	const { story, storyTitle, progress, storyIndex } = this.props;
+	const paragraphFontStyle = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `16px` } : {};
+
+	// Determines appropriate offset of the story card peeking. 67 + 56 = 123 (address bar height compensation for Android)
     const peekOffsetStyle =
-      isAndroid && storyIndex === 0
-        ? { transform: 'translate3d(0px, -123px, 0px)' } // 67 + 56 (address bar height compensation for android)
+      (isAndroid && storyIndex === 0)
+        ? { transform: 'translate3d(0px, -123px, 0px)' }
         : { transform: 'translate3d(0px, -67px, 0px)' };
-    const paragraphFontStyle = localStorage.getItem(SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `16px` } : {};
+    
     return (
       <div>
         <Timeline totalProgress={progress} paused ref={ref => (this.masterTimeline = ref)}>
