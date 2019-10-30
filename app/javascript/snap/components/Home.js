@@ -74,18 +74,14 @@ class HomeComponent extends Component {
 		}
 	};
 
-	onSelectNo = () => {
-		this.setState({ userAtBarnes: false });
-	};
+	onSelectNo = () => { this.setState({ userAtBarnes: false }); }
 
-	clearUserAtBarnes = () => {
-		this.setState({ userAtBarnes: null });
-	};
+	clearUserAtBarnes = () => { this.setState({ userAtBarnes: null }); }
 
 	closeCameraErrorScreen = () => {
 		// The user has seen that camera is not accessible, so essentially close the screen and reset camera access and them being at the Barnes
 		this.setState({ cameraAccessible: null, userAtBarnes: null });
-	};
+	}
 
 	render() {
 		const { unsupportedIOSBrowser, unsupportedIOSVersion } = this.state;
@@ -108,9 +104,9 @@ class HomeComponent extends Component {
 
 				{/* Only show the initial Welcome Screen prompt if they haven't selected any value for userAtBarnes */}
 				{((this.state.userAtBarnes == null) && <div className="landing-screen">
-					<img src={barnes_logo} alt="barnes_logo" className="logo-center" />
+					<img src={barnes_logo} alt="barnes_logo" className="logo-center" role="img" aria-label="Welcome to the Barnes Focus Digital Guide" />
 					<div className="user-loc-prompt">
-						{this.props.getTranslation('Welcome_screen', 'text_1')} <br />
+						{this.props.getTranslation('Welcome_screen', 'text_1')} <br aria-hidden={true}/>
 						{this.props.getTranslation('Welcome_screen', 'text_2')}
 					</div>
 					<div className="home-action">

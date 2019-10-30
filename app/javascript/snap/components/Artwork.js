@@ -5,11 +5,9 @@ import { compose } from 'redux';
 import * as constants from './Constants';
 import withOrientation from './withOrientation';
 import withTranslation from './withTranslation';
-import shareButton from 'images/share-icon.svg';
 
 import LanguageDropdown from './LanguageDropdown';
 import EmailForm from './EmailForm';
-import { Popover, PopoverBody } from 'reactstrap';
 
 import google_logo from 'images/google_translate.svg';
 import { SearchRequestService } from '../services/SearchRequestService';
@@ -20,7 +18,9 @@ import StoryItem from './StoryItem';
 import { isTablet } from 'react-device-detect';
 import ScrollMagic from 'scrollmagic';
 import { isAndroid, isIOS } from 'react-device-detect';
+
 import ScanButton from './ScanButton';
+import { Share } from './Share';
 
 
 /**
@@ -79,7 +79,6 @@ class Artwork extends Component {
 
     this.state = {
       ...props.location.state,
-      sharePopoverIsOpen: false,
       showEmailScreen: false,
       emailCaptured: false,
       emailCaptureAck: false,
@@ -120,7 +119,7 @@ class Artwork extends Component {
 
 				// Extract needed data from the art object 
 				const artObject = artworkResult['data']['records'][0];
-				const { id, title, shortDescription, people: artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions } = artObject;
+				const { id, title, shortDescription, people: artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions, visualDescription } = artObject;
 
 				// Determine the flags
 				const curatorialApproval = (artObject.curatorialApproval === 'false') ? false : true;
@@ -128,7 +127,7 @@ class Artwork extends Component {
 
 				// Assign into artwork
 				artwork = {
-					id, title, shortDescription, artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions,
+					id, title, shortDescription, artist, nationality, birthDate, deathDate, culture, classification, locations, medium, invno, displayDate, dimensions, visualDescription,
 
 					// Set the urls	
 					url: `${artObject.art_url}${artUrlParams}`,
@@ -331,80 +330,7 @@ class Artwork extends Component {
   onSelectInRoomArt = aitrId => {
     localStorage.setItem(constants.SNAP_ATTEMPTS, parseInt(this.state.snapAttempts) + 1);
     this.props.history.push({ pathname: `/artwork/${aitrId}` });
-  };
-
-  getFacebookShareUrl = () => {
-    let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
-    return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(urlToShare);
   }
-
-  nativeAppShareWithWebFallback = e => {
-    const socialMediaType = e.currentTarget.dataset.id;
-	this.setState({ sharePopoverIsOpen: false });
-	
-	let appUriScheme;
-    let webFallbackURL;
-    let urlToShare = 'https://collection.barnesfoundation.org/objects/' + this.state.artwork.id;
-
-    switch (socialMediaType) {
-      case constants.SOCIAL_MEDIA_TWITTER: {
-        let hashtag = 'barnesfoundation';
-
-		let title_author = this.state.artwork.title;
-        if (this.state.artwork.artist) {
-          title_author += ' by ' + this.state.artwork.artist;
-          hashtag +=
-            ',' +
-            this.state.artwork.artist
-              .split(' ')
-              .join('')
-              .split('-')
-              .join('');
-        }
-		title_author = title_author.split(' ').join('+');
-        //urlToShare += '?utm_source=barnes_snap&utm_medium=twitter&utm_term=' + this.state.artwork.id;
-        //appUriScheme = 'twitter://post?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
-        webFallbackURL =
-          'https://twitter.com/intent/tweet?&text=' + title_author + '&url=' + urlToShare + '&hashtags=' + hashtag;
-
-        window.open(webFallbackURL, '_blank');
-        break;
-      }
-    }
-
-    e.preventDefault();
-  };
-
-	_onClickShare = async () => {
-
-		// For mobile devices where native share is available
-		if (navigator.share) {
-			const url = `https://collection.barnesfoundation.org/objects/${this.state.artwork.id}`;
-			const title = `Barnes Foundation`
-
-			let hashtag = '#barnesfoundation';
-			let titleAuthor = this.state.artwork.title;
-
-			if (this.state.artwork.artist) {
-				
-				const { artist } = this.state.artwork;
-				titleAuthor += ` by ${artist}`;
-				hashtag += ` #${artist.split(' ').join('')}`;
-			}
-
-			titleAuthor = `${titleAuthor}. `;
-			const text = `${titleAuthor} ${hashtag}`;
-
-			try { await navigator.share({ title, text, url }); }
-
-			catch (error) { console.log(`An error occurred during sharing`, error); }
-		}
-
-		// Otherwise, normal share modal
-		else { this.toggleShareModal(); }
-	}
-
-  toggleShareModal = () => { this.setState({ sharePopoverIsOpen: !this.state.sharePopoverIsOpen }); }
 
   /** Updates state that email was captured and submits it to the server session */
   onSubmitEmail = (email) => {
@@ -530,10 +456,9 @@ class Artwork extends Component {
     }
   };
 
-  onEmailHeightReady = height => {
-    //const computedHeight = Math.max(height, screen.height / 2);
-    this.emailFormHeight = height * 2 / 2.2;
-  };
+	onEmailHeightReady = height => {
+		this.emailFormHeight = height * 2 / 2.2;
+	}
 
   storySceneCallback = showTitle => {
     if (showTitle) {
@@ -553,16 +478,16 @@ class Artwork extends Component {
 
   /* Renders the focused artwork card */
   renderArtwork = () => {
-    const { artwork, selectedLanguage, sharePopoverIsOpen } = this.state;
+    const { artwork, selectedLanguage } = this.state;
 	const shortDescFontStyle = localStorage.getItem(constants.SNAP_LANGUAGE_PREFERENCE) === 'Ru' ? { fontSize: `14px` } : {};
 
-	const { refCallbackInfo, setArtworkRef, langOptions, onSelectLanguage, _onClickShare, nativeAppShareWithWebFallback, getFacebookShareUrl } = this;
+	const { refCallbackInfo, setArtworkRef, langOptions, onSelectLanguage } = this;
 
     return (
       <div className="container-fluid artwork-container" id="search-result">
         <div className="row" ref={refCallbackInfo}>
           <div className="artwork-top-bg">
-            <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" />
+            <img className="card-img-top" src={artwork.bg_url} alt="match_image_background" aria-hidden={true} />
           </div>
           <div className="col-12 col-md-12">
             <div
@@ -578,7 +503,7 @@ class Artwork extends Component {
                   <div className="card-header h1">Focused Artwork</div>
                   <div className="card-img-result">
                     <ProgressiveImage src={artwork.url} placeholder={artwork.url_low_quality}>
-                      {src => <img src={src} alt="match_image" />}
+                      {src => <img src={src} alt="match_image" role="img" aria-label={`${artwork.title} by ${artwork.artist}${(artwork.culture) ? `, ${artwork.culture}.` : '.'} ${artwork.visualDescription}`}/>}
                     </ProgressiveImage>
                     {/* <img src={artwork.url} alt="match_image" /> */}
                   </div>
@@ -589,6 +514,8 @@ class Artwork extends Component {
               </div>
               <div className="card-body" id="focussed-artwork-body" ref={setArtworkRef}>
               <div className="share-wrapper">
+
+				  {/* Language options button */}
                   <div className="language-dropdown-wrapper">
                     <div className="language-dropdown">
                       <LanguageDropdown
@@ -598,26 +525,12 @@ class Artwork extends Component {
                       />
                     </div>
                   </div>
-                  <div
-                    id="share-it"
-                    className="btn-share-result"
-                    onClick={_onClickShare}>
-                    <img src={shareButton} alt="share" />
-                    <span className="text-share">{this.props.getTranslation('Result_page', 'text_1')}</span>
-                    </div>
-                  <Popover placement="top" isOpen={sharePopoverIsOpen} target="share-it">
-                    <PopoverBody>
-                      <div className="share">
-                        <a data-id={constants.SOCIAL_MEDIA_TWITTER} onClick={nativeAppShareWithWebFallback}>
-                          <i className="fa fa-lg fa-twitter" aria-hidden="true" />
-                        </a>
-                        <a target="_blank" href={getFacebookShareUrl()} data-id={constants.SOCIAL_MEDIA_FACEBOOK}>
-                          <i className="fa fa-lg fa-facebook" aria-hidden="true" />
-                        </a>
-                      </div>
-                    </PopoverBody>
-                  </Popover>
+
+				  {/* Share options button */}
+                  <Share shareText={this.props.getTranslation('Result_page', 'text_1')} artwork={artwork} />
+
                 </div>
+
                 <div className="short-desc-container" ref={elem => (this.shortDescContainer = elem)}>
                   {artwork.shortDescription && (
                     <div className="card-text paragraph" style={shortDescFontStyle}>
@@ -635,7 +548,7 @@ class Artwork extends Component {
                   <table className="detail-table">
                     <tbody>
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_3')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_3')}:`}</td>
                         <td className="text-left item-info">
                           {artwork.artist}{' '}
                           {!artwork.unIdentified && artwork.nationality
@@ -646,31 +559,31 @@ class Artwork extends Component {
                       {artwork.unIdentified && (
                         <tr>
                           <td className="text-left item-label">
-                            {this.props.getTranslation('Result_page', 'text_10')}:
+                            {`${this.props.getTranslation('Result_page', 'text_10')}:`}
                           </td>
                           <td className="text-left item-info">{artwork.culture}</td>
                         </tr>
                       )}
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_4')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_4')}:`}</td>
                         <td className="text-left item-info">{artwork.title}</td>
                       </tr>
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_5')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_5')}:`}</td>
                         <td className="text-left item-info">{artwork.displayDate}</td>
                       </tr>
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_6')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_6')}:`}</td>
                         <td className="text-left item-info">{artwork.medium}</td>
                       </tr>
                       <tr>
-                        <td className="text-left item-label">{this.props.getTranslation('Result_page', 'text_7')}:</td>
+                        <td className="text-left item-label">{`${this.props.getTranslation('Result_page', 'text_7')}:`}</td>
                         <td className="text-left item-info">{artwork.dimensions}</td>
                       </tr>
                       {!artwork.curatorialApproval && (
                         <tr>
                           <td className="text-left item-label">
-                            {this.props.getTranslation('Result_page', 'text_8')}:
+                            {`${this.props.getTranslation('Result_page', 'text_8')}:`}
                           </td>
                           <td className="text-left item-info">{this.props.getTranslation('Result_page', 'text_9')}</td>
                         </tr>
@@ -734,9 +647,10 @@ class Artwork extends Component {
 			const peekHeight = isAndroid && index === 0 ? 123 : 67;
 			const peekOffset = (screen.height < 800) ? 158 : screen.height / 3;
 			const pointerEvent = this.state.storyTopsClickable[index] ? 'none' : 'auto';
-      const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
-      // after email is captured, set padding botttom to 200px on the last story card
-      const emailCapturedBottomStyle = stories.length === index + 1 && emailCaptured ? {paddingBottom: `200px`} : {paddingBottom: `0`};
+			const peekOffsetStyle = { height: `${peekOffset}px`, top: `-${peekHeight}px`, pointerEvents: pointerEvent };
+
+      		// After email is captured, set padding botttom to 200px on the last story card
+      		const emailCapturedBottomStyle = stories.length === index + 1 && emailCaptured ? {paddingBottom: `200px`} : {paddingBottom: `0`};
 
 			return (
 				<Scene
