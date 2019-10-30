@@ -107,9 +107,11 @@ It will run two processes simultaneously
 
 ## Environment Variables
 
-You can find the `localhost.env.development` file is committed into the `private` folder but in order to setup everything locally, you'll have to:
+You can find the `private/.env.template` file is committed. In order to setup everything locally, you'll have to:
 
-- Copy this file into root and rename to `.env`
-- Change the path of: `GOOGLE_APPLICATION_CREDENTIALS`. - To do so, the file `SNAP-865144db2e55` lies under: `private` folder
+- Copy this file into root and rename to `.env`. Populate it with your own correct values
+- Update line 9 of `lib/google_translate.rb` - It should point to your own `.json` Google Credentials file, in order to get Google Translate working. the file
 
-If you need to add new environment variables, be sure to add a value into the `localhost.env.development` file so it's known in the repository as well.
+**Internal note for the Barnes developers**: Request access to the additional contents of the `private` folder, necessary for SSH and the Google Credentials .json file.
+
+If you need to add new environment variables, be sure to add a value into the `.env.template` file so it's known in the repository as well.
