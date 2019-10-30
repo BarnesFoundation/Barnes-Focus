@@ -37,3 +37,11 @@ yarn-error.log*
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Private files needed for deployment
+private/private.zip
+private/barnes-snap-keypair
+private/barnes-snap-keypair.pub
+private/localhost.env.development
+private/SNAP-77de5816b87e.json.bak
+private/SNAP-865144db2e55.json

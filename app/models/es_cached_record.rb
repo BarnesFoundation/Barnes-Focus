@@ -24,7 +24,8 @@ class EsCachedRecord < ApplicationRecord
     'birthDate',
     'deathDate',
     'nationality',
-    'culture'
+	'culture',
+	'visualDescription'
   ]
 
   ## Determines whether a cached record has expired data or not
