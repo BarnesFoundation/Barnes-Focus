@@ -1,4 +1,4 @@
-# What is not in the .env/local.env.development file t
+# What is not in the .env.template file
 
 There are certain variables that are created for us by Beanstalk while we are setting up the Rails application. And some of ENV variables are created by us.
 
