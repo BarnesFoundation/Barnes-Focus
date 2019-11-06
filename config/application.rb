@@ -39,10 +39,10 @@ module BarnesSnap
     })
 
     ActionMailer::Base.smtp_settings = {
-      :user_name => "barnesfoundation",
-      :password => "mQxeS1jlb93lVR4pg#",
-      :domain => 'barnesfoundation.org',
-      :address => 'smtp.sendgrid.net',
+      :user_name => Rails.application.secrets[:sendgrid][:user_name],
+      :password => Rails.application.secrets[:sendgrid][:password],
+      :domain => Rails.application.secrets[:sendgrid][:domain],
+      :address => Rails.application.secrets[:sendgrid][:address],
       :port => 587,
       :authentication => :plain,
       :enable_starttls_auto => true
