@@ -1,7 +1,7 @@
 class UserMailer < ApplicationMailer
     def send_csv(s3_url, dump_type, time_taken)
         mail(
-            to: 'focus-notify@barnesfoundation.org; puneet@happyfuncorp.com',
+            to: 'focus-notify@barnesfoundation.org; cjativa@barnesfoundation.org',
             subject: 'Scanned history dump',
             body: "Please find the link to download CSV file: #{s3_url} of #{dump_type} (Time taken: #{time_taken})"
         )
