@@ -533,8 +533,7 @@ class Artwork extends Component {
 
                 <div className="short-desc-container" ref={elem => (this.shortDescContainer = elem)}>
                   {artwork.shortDescription && (
-                    <div className="card-text paragraph" style={shortDescFontStyle}>
-                      {artwork.shortDescription}
+                    <div className="card-text paragraph" style={shortDescFontStyle} dangerouslySetInnerHTML={{ __html: artwork.shortDescription }}>
                     </div>
                   )}
                 </div>
