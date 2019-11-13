@@ -200,8 +200,7 @@ private
 
     # If short description exists
     if !image_info.nil? && image_info["shortDescription"]
-      # Remove html tags
-      image_info["shortDescription"] = strip_tags(image_info["shortDescription"]).html_safe
+      image_info["shortDescription"] = image_info["shortDescription"]
 
       # Translate if needed
       if preferred_language.present?

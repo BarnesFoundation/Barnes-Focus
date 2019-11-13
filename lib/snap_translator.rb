@@ -6,11 +6,11 @@ module SnapTranslator
 
     # Strip unwanted content
     begin
-      document = Nokogiri::HTML(text)
-      document.remove_namespaces!
-      short_description = document.xpath("//p")[0].content
+      # document = Nokogiri::HTML(text)
+      # document.remove_namespaces!
+      # short_description = document.xpath("//p")[0].content
 
-      return short_description if preferred_language && preferred_language.downcase == 'en'
+      return text if preferred_language && preferred_language.downcase == 'en'
 
       # Configure language translator
       translator = GoogleTranslate.new preferred_language
