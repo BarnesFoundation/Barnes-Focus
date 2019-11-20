@@ -134,7 +134,7 @@ class EmailForm extends Component {
 
     return (
       <div>
-        <div className="email-intent" style={intentStyle}>
+        <div className="email-intent" style={intentStyle} aria-hidden={true}>
           {this.props.getTranslation('Bookmark_capture', 'text_8')}
         </div>
         <div className="email-head" style={emailHeadFontStyle}>
