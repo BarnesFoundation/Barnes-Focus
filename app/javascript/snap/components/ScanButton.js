@@ -17,8 +17,8 @@ class ScanButton extends Component {
 
 		return (
 			<div className="scan-wrapper">
-				<div id="camera-btn" className={`scan-button ${(float) ? 'floating' : ''}`} onClick={handleScan} role="button" aria-roledescription="camera button" >
-					<img src={scan_button} alt="scan" aria-labelledby="camera-btn" />
+				<div id="camera-btn" className={`scan-button ${(float) ? 'floating' : ''}`} onClick={handleScan} role="button" aria-label="camera" >
+					<img src={scan_button} alt="scan" aria-hidden="true" />
 				</div>
 			</div>
 		)
