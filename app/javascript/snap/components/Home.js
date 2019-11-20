@@ -100,7 +100,7 @@ class HomeComponent extends Component {
 				{unsupportedIOSVersion ? <UnsupportedDialog unsupportedIOSVersion={true} /> : null}
 
 
-				<img src={home_background} alt="home_background" style={{ width: screen.width, height: screen.height }} />
+				<img src={home_background} aria-hidden={true} style={{ width: screen.width, height: screen.height }} />
 
 				{/* Only show the initial Welcome Screen prompt if they haven't selected any value for userAtBarnes */}
 				{((this.state.userAtBarnes == null) && <div className="landing-screen">
