@@ -3,31 +3,6 @@ require 'barnes_elastic_search'
 class EsCachedRecord < ApplicationRecord
   validates :image_id, presence: true
 
-  @es_fields = [
-    'id',
-    'imageSecret',
-    'title',
-    'shortDescription',
-    'people',
-    'classification',
-    'locations',
-    'medium',
-    'url',
-    'invno',
-    'displayDate',
-    'dimensions',
-    'objRightsTypeID',
-    'creditLine',
-    'room',
-    'ensembleIndex',
-    'curatorialApproval',
-    'birthDate',
-    'deathDate',
-    'nationality',
-	'culture',
-	'visualDescription'
-  ]
-
   ## Determines whether a cached record has expired data or not
   def not_expired?
     expired = false
@@ -92,13 +67,9 @@ class EsCachedRecord < ApplicationRecord
   def self.connect_with_es_endpoint image_id
     # Query elastic search and extract the desired fields
     searched_data = BarnesElasticSearch.instance.get_object(image_id)
-    searched_data = searched_data.slice(*@es_fields) unless searched_data.nil?
+    searched_data = searched_data unless searched_data.nil?
 
     return searched_data
-  end
-
-  def self.keep_es_fields result_hash
-    result_hash.slice( *@es_fields )
   end
 
   ## While you're in this room feature ##
