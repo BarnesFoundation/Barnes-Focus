@@ -27,11 +27,11 @@ class BarnesElasticSearch
 
   def total
     total   = 0
-    results = @elastic_search.search index: 'collection'
-
-    if results && results[ 'hits' ] && results[ 'hits' ][ 'total' ] > 0
-      total = results[ 'hits' ][ 'total' ]
-    end
+	results = @elastic_search.count index: 'collection'
+	
+    if results && results[ 'count' ] && results[ 'count' ] > 0
+		total = results[ 'count' ]
+	end
 
     total
   end
