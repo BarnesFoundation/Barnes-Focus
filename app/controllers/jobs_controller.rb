@@ -20,7 +20,6 @@ class JobsController < ApplicationController
       results = BarnesElasticSearch.instance.find_all start, batch_size
 
       results.each do | result |
-        result = EsCachedRecord.keep_es_fields result
 
         es_cached_record = EsCachedRecord.find_by image_id: result[ 'id' ]
         es_cached_record = EsCachedRecord.new image_id: result[ 'id' ] if es_cached_record.nil?
