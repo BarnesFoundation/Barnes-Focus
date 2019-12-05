@@ -56,11 +56,39 @@ class BarnesElasticSearch
 
   private
 
+  @@es_fields = [
+    'id',
+    'imageSecret',
+    'title',
+    'shortDescription',
+    'people',
+    'classification',
+    'locations',
+    'medium',
+    'url',
+    'invno',
+    'displayDate',
+    'dimensions',
+    'objRightsTypeID',
+    'creditLine',
+    'room',
+    'ensembleIndex',
+    'curatorialApproval',
+    'birthDate',
+    'deathDate',
+    'nationality',
+	'culture',
+	'visualDescription'
+  ]
+
   ## Builds query for retrieving specified object id from Elastic Search 
   def get_image_query object_id
     query = Jbuilder.encode do |json|
       json.from 0
-      json.size 25
+	  json.size 25
+	  json._source do
+		json.array! @@es_fields
+	  end
       json.query do
         json.bool do
           json.filter do
@@ -112,9 +140,14 @@ class BarnesElasticSearch
   end
 
   def fetch_all offset, limit
+
+	
     query = Jbuilder.encode do |json|
       json.from offset
-      json.size limit
+	  json.size limit
+	  json._source do
+		json.array! @@es_fields
+	  end
       json.query do
         json.bool do
           json.filter do
