@@ -26,10 +26,10 @@ class BarnesElasticSearch
   end
 
   def total
-    total   = 0
+	total   = 0
 	results = @elastic_search.count index: 'collection'
 	
-    if results && results[ 'count' ] && results[ 'count' ] > 0
+	if results && results[ 'count' ] && results[ 'count' ] > 0
 		total = results[ 'count' ]
 	end
 
@@ -83,8 +83,8 @@ class BarnesElasticSearch
 
   ## Builds query for retrieving specified object id from Elastic Search 
   def get_image_query object_id
-    query = Jbuilder.encode do |json|
-      json.from 0
+	query = Jbuilder.encode do |json|
+	  json.from 0
 	  json.size 25
 	  json._source do
 		json.array! @@es_fields
@@ -142,8 +142,8 @@ class BarnesElasticSearch
   def fetch_all offset, limit
 
 	
-    query = Jbuilder.encode do |json|
-      json.from offset
+	query = Jbuilder.encode do |json|
+	  json.from offset
 	  json.size limit
 	  json._source do
 		json.array! @@es_fields
