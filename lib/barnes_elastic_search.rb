@@ -26,12 +26,12 @@ class BarnesElasticSearch
   end
 
   def total
-	total   = 0
-	results = @elastic_search.count index: 'collection'
+    total   = 0
+    results = @elastic_search.count index: 'collection'
 	
 	if results && results[ 'count' ] && results[ 'count' ] > 0
-		total = results[ 'count' ]
-	end
+	   total = results[ 'count' ]
+    end
 
     total
   end
@@ -87,7 +87,7 @@ class BarnesElasticSearch
 	  json.from 0
 	  json.size 25
 	  json._source do
-		json.array! @@es_fields
+	     json.array! @@es_fields
 	  end
       json.query do
         json.bool do
@@ -146,7 +146,7 @@ class BarnesElasticSearch
 	  json.from offset
 	  json.size limit
 	  json._source do
-		json.array! @@es_fields
+	     json.array! @@es_fields
 	  end
       json.query do
         json.bool do
