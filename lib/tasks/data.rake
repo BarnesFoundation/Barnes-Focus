@@ -323,7 +323,7 @@ namespace :data do
     Translation.create(
       screen_text: "The digital guide is best viewed in Portrait mode.",
       parent_id: screen_9.id,
-      english_translation: "This digital guide is best viewed in Portrait mode.",
+      english_translation: "The digital guide is best viewed in Portrait mode.",
       unique_identifier: 'text_1'
     )
 
