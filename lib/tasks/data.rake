@@ -321,9 +321,9 @@ namespace :data do
     #====================== screen 9 ======================#
     screen_9 = Translation.find_or_create_by(screen_text: "Orientation_Error_Screen", display_order: 9)
     Translation.create(
-      screen_text: "This app is best viewed in Portrait mode.",
+      screen_text: "The digital guide is best viewed in Portrait mode.",
       parent_id: screen_9.id,
-      english_translation: "This app is best viewed in Portrait mode.",
+      english_translation: "This digital guide is best viewed in Portrait mode.",
       unique_identifier: 'text_1'
     )
 
