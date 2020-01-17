@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   health_check_routes
   root to: "pages#home"
 
+  if Rails.env.development?
+	mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
+
   namespace :api, defaults: { format: :json } do
     resources :snaps, only: [ :show ] do
       collection do
