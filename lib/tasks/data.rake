@@ -45,9 +45,9 @@ namespace :data do
     #====================== screen 2 ======================#
     screen_2 = Translation.find_or_create_by(screen_text: "Visit_soon", display_order: 2)
     Translation.create(
-      screen_text: "The Barnes Focus app is meant for use at the Barnes.",
+      screen_text: "The Barnes Focus Digital Guide is meant for use at the Barnes.",
       parent_id: screen_2.id,
-      english_translation: "The Barnes Focus app is meant for use at the Barnes.",
+      english_translation: "The Barnes Focus Digital Guide is meant for use at the Barnes.",
       unique_identifier: 'text_1'
     )
     Translation.create(
