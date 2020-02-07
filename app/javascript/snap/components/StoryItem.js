@@ -164,7 +164,13 @@ class StoryItem extends React.Component {
 		return (
 			<div>
 				<Timeline totalProgress={progress} paused ref={ref => (this.masterTimeline = ref)}>
-					<div className="card story-item" style={peekOffsetStyle}>
+					<div
+						className="card story-item"
+						style={peekOffsetStyle}
+						data-story-card={storyIndex}
+						id={this.props.isLastStoryItem ? "story-item-last" : "story-item"}
+						data-story-card-last={this.props.isLastStoryItem}
+					>
 
 						{/** Only show the story title for the first card */}
 						{storyIndex === 0 && showTitle && !storyEmailPage && (
