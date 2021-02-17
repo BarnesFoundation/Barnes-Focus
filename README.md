@@ -92,6 +92,16 @@ Updates and modifications can be done from the Administrative panel directly. Fo
 
 Adding to the translations can be done via a one-time job. Preferably, a `rake` task. You can refer to file: `/lib/tasks/data.rake` on how translations are added.
 
+## Environment Variables
+
+You can find the `private/.env.template` file is committed. In order to setup everything locally, you'll have to:
+
+- Copy this file into root and rename to `.env`. Populate it with your own correct values
+- Update line 9 of `lib/google_translate.rb` - It should point to your own `.json` Google Credentials file, in order to get Google Translate working. the file
+
+**Internal note for the Barnes developers**: Request access to the additional contents of the `private` folder, necessary for SSH and the Google Credentials .json file.
+
+If you need to add new environment variables, be sure to add a value into the `.env.template` file so it's known in the repository as well.
 
 ## Run the application
 
@@ -103,15 +113,3 @@ It will run two processes simultaneously
 1. `rails server`
 
 2. `webpack-dev-server` - this will analyse changes in our `app/javascript` folder and rebuild the front end on the fly
-
-
-## Environment Variables
-
-You can find the `private/.env.template` file is committed. In order to setup everything locally, you'll have to:
-
-- Copy this file into root and rename to `.env`. Populate it with your own correct values
-- Update line 9 of `lib/google_translate.rb` - It should point to your own `.json` Google Credentials file, in order to get Google Translate working. the file
-
-**Internal note for the Barnes developers**: Request access to the additional contents of the `private` folder, necessary for SSH and the Google Credentials .json file.
-
-If you need to add new environment variables, be sure to add a value into the `.env.template` file so it's known in the repository as well.
