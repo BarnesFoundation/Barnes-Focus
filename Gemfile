@@ -40,6 +40,7 @@ gem 'owlcarousel-rails'
 gem 'pg_csv'
 gem 'truemail'
 gem 'http-accept'
+gem 'graphql-client'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
