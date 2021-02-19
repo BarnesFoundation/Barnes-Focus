@@ -6,84 +6,42 @@ class StoryFetcher
   UNIQUE_SEPARATOR = "***"
 
   def initialize
-	@endpoint = ENV['GRAPHCMS_ENDPOINT']
+    @endpoint = ENV['GRAPHCMS_ENDPOINT']
   end
 
   def has_story? obj_id
-    params = "
-      {
-        storiesForObjectIds(where: {objectID: #{obj_id}}) {
-          id
-          objectID
-          relatedStories {
-            id
-          }
-        }
-      }
-    "
+    response = GraphCms::Client.query(
+      GraphCms::StoriesForObjectIdsQuery, variables: { objectID: obj_id }
+    )
 
-    response = query_grapql params
-    response_body = response.body.force_encoding 'utf-8'
-    response_body = JSON.parse(response_body)
+    return { story_id: nil, has_story: false } if  response.original_hash["data"]["storiesForObjectIds"].empty? || response.original_hash["data"]["storiesForObjectIds"][0]["relatedStories"].empty?
 
-    return { story_id: nil, has_story: false } if response_body["data"]["storiesForObjectIds"].empty? || response_body["data"]["storiesForObjectIds"][0]["relatedStories"].empty?
-
-    story_id = response_body["data"]["storiesForObjectIds"][0]["relatedStories"][0]["id"]
+    story_id = response.original_hash["data"]["storiesForObjectIds"][0]["relatedStories"][0]["id"]
     return { story_id: story_id, has_story: true }
   end
 
   def find_by_object_id obj_id, preferred_lang = 'en'
-    params = "
-      {
-        storiesForObjectIds(where: {objectID: #{obj_id}}) {
-          id
-          objectID
-          #{related_stories}
-        }
-      }
-    "
+    response = GraphCms::Client.query(
+      GraphCms::RelatedStoriesByObjIdQuery, variables: { objectID: obj_id }
+    )
 
-    response = query_grapql params
-    response = response.body.force_encoding 'utf-8' # Another way of doing this: response.body.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
-    original_response = JSON.parse(response)
-
-    return parse_response_and_fetch_metadata original_response, obj_id, preferred_lang
+    return parse_response_and_fetch_metadata response.original_hash, obj_id, preferred_lang
   end
 
   def find_by_title title, preferred_lang = 'en'
-    params = "
-      {
-        storiesForObjectIds(where: {relatedStories_some: {storyTitle: \"#{CGI::escape(title).gsub('%22', '%5C%22')}\"}}) {
-          id
-          objectID
-          #{related_stories}
-        }
-      }
-    "
+    response = GraphCms::Client.query(
+      GraphCms::RelatedStoriesByTitleQuery, variables: { storyTitle: "#{CGI::escape(title).gsub('%22', '%5C%22')}"}
+    )
 
-    response = query_grapql params
-    response = response.body.force_encoding 'utf-8' # Another way of doing this: response.body.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
-    original_response = JSON.parse(response)
-
-    return parse_response_and_fetch_metadata original_response, nil, preferred_lang
+    return parse_response_and_fetch_metadata response.original_hash, nil, preferred_lang
   end
 
   def find_by_room_id room_id, preferred_lang
-    params = "
-      {
-        storiesForRoomIds(where: {roomID: #{room_id}}) {
-          id
-          roomID
-          #{related_stories}
-        }
-      }
-    "
+    response = GraphCms::Client.query(
+      GraphCms::RelatedStoriesByRoomIdQuery, variables: { roomId: room_id }
+    )
 
-    response = query_grapql params
-    resp = response.body.force_encoding 'utf-8'
-    original_response = JSON.parse(response)
-
-    return parse_response_and_fetch_metadata original_response, room_id, preferred_lang
+    return parse_response_and_fetch_metadata response.original_hash, room_id, preferred_lang
   end
 
   def related_stories
@@ -124,23 +82,6 @@ class StoryFetcher
         {html}
       }
     "
-  end
-
-  def query_grapql params
-    begin
-      uri = URI.parse(@endpoint + "?query=" + params)
-    rescue URI::InvalidURIError
-      uri = URI.parse(URI.escape(@endpoint + "?query=" + params))
-    end
-
-    req = Net::HTTP::Post.new(uri.to_s)
-    response = nil
-
-    Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-      response = http.request req
-    end
-
-    return response
   end
 
   def get_stories(story_attrs, searched_object_id, translatable_content)

@@ -9,62 +9,62 @@ module GraphCms
     Client = GraphQL::Client.new(schema: Schema, execute: HTTP)
 
     # Fragment definitions
-    # RelatedStoriesFragment = Client.parse <<-'GRAPHQL'
-    #   fragment on StoriesForObjectId {
-    #     relatedStories {
-    #       id
-    #       storyTitle
-    #       alternativeHeroImageObjectID
-    #       objectID1
-    #       shortParagraph1 {
-    #         html
-    #       }
-    #       longParagraph1 {
-    #         html
-    #       }
-    #       objectID2
-    #       shortParagraph2 {
-    #         html
-    #       }
-    #       longParagraph2 {
-    #         html
-    #       }
-    #       objectID3
-    #       shortParagraph3 {
-    #         html
-    #       }
-    #       longParagraph3 {
-    #         html
-    #       }
-    #       objectID4
-    #       shortParagraph4 {
-    #         html
-    #       }
-    #       longParagraph4 {
-    #         html
-    #       }
-    #       objectID5
-    #       shortParagraph5 {
-    #         html
-    #       }
-    #       longParagraph5 {
-    #         html
-    #       }
-    #       objectID6
-    #       shortParagraph6 {
-    #         html
-    #       }
-    #       longParagraph6 {
-    #         html
-    #       }
-    #     }
-    #   }
-    # GRAPHQL
+    StoriesFragment = Client.parse <<-'GRAPHQL'
+      fragment  on Stories {
+          id
+          storyTitle
+          alternativeHeroImageObjectID
+          objectID1
+          shortParagraph1 {
+            html
+          }
+          longParagraph1 {
+            html
+          }
+          objectID2
+          shortParagraph2 {
+            html
+          }
+          longParagraph2 {
+            html
+          }
+          objectID3
+          shortParagraph3 {
+            html
+          }
+          longParagraph3 {
+            html
+          }
+          objectID4
+          shortParagraph4 {
+            html
+          }
+          longParagraph4 {
+            html
+          }
+          objectID5
+          shortParagraph5 {
+            html
+          }
+          longParagraph5 {
+            html
+          }
+          objectID6
+          shortParagraph6 {
+            html
+          }
+          longParagraph6 {
+            html
+          }
+      }
+    GRAPHQL
     
     # Query definitions
     StoriesForObjectIdsQuery = Client.parse <<-'GRAPHQL'
       query($objectID: Int) {
         storiesForObjectIds(where: { objectID: $objectID }) {
+          id
+          objectID
           relatedStories {
             id
           }
@@ -72,57 +72,37 @@ module GraphCms
       }
     GRAPHQL
 
-    RelatedStoriesQuery = Client.parse <<-'GRAPHQL'
+    RelatedStoriesByObjIdQuery = Client.parse <<-'GRAPHQL'
       query($objectID: Int) {
         storiesForObjectIds(where: { objectID: $objectID }) {
           id
           objectID
+          relatedStories{
+            ...GraphCms::StoriesFragment
+          }
+        }
+      }
+    GRAPHQL
+
+    RelatedStoriesByTitleQuery = Client.parse <<-'GRAPHQL'
+      query($storyTitle: String) {
+        storiesForObjectIds(where: { relatedStories_some: { storyTitle: $storyTitle } }) {
+          id
+          objectID
+          relatedStories{
+            ...GraphCms::StoriesFragment
+          }
+        }
+      }
+    GRAPHQL
+
+    RelatedStoriesByRoomIdQuery = Client.parse <<-'GRAPHQL'
+      query($roomID: Int) {
+        storiesForRoomIds(where: { roomID: $roomID }) {
+          id
+          roomID
           relatedStories {
-            id
-            storyTitle
-            alternativeHeroImageObjectID
-            objectID1
-            shortParagraph1 {
-              html
-            }
-            longParagraph1 {
-              html
-            }
-            objectID2
-            shortParagraph2 {
-              html
-            }
-            longParagraph2 {
-              html
-            }
-            objectID3
-            shortParagraph3 {
-              html
-            }
-            longParagraph3 {
-              html
-            }
-            objectID4
-            shortParagraph4 {
-              html
-            }
-            longParagraph4 {
-              html
-            }
-            objectID5
-            shortParagraph5 {
-              html
-            }
-            longParagraph5 {
-              html
-            }
-            objectID6
-            shortParagraph6 {
-              html
-            }
-            longParagraph6 {
-              html
-            }
+            ...GraphCms::StoriesFragment
           }
         }
       }
