@@ -86,6 +86,7 @@ GEM
     bindex (0.8.1)
     builder (3.2.3)
     byebug (11.0.1)
+    coderay (1.1.3)
     coffee-rails (4.2.2)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0)
@@ -238,6 +239,9 @@ GEM
       pg (~> 0.17)
     polyamorous (2.3.0)
       activerecord (>= 5.0)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     public_suffix (4.0.1)
     puma (3.12.1)
     rack (2.0.7)
@@ -414,6 +418,7 @@ DEPENDENCIES
   owlcarousel-rails
   pg (~> 0.18)
   pg_csv
+  pry
   puma (~> 3.7)
   rails (~> 5.1.4)
   redis
