@@ -40,12 +40,14 @@ gem 'owlcarousel-rails'
 gem 'pg_csv'
 gem 'truemail'
 gem 'http-accept'
+gem 'graphql-client'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails'
   gem 'dotenv-rails'
   gem 'letter_opener_web'
+  gem 'pry'
 end
 
 group :development do
