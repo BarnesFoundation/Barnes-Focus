@@ -11,7 +11,7 @@ class StoryFetcher
 
   def has_story? obj_id
     response = GraphCms::Client.query(
-      GraphCms::StoriesForObjectIdsQuery, variables: { objectID: obj_id }
+      GraphCms::StoriesForObjectIdsQuery, variables: { objectID: obj_id.to_i }
     )
 
     return { story_id: nil, has_story: false } if  response.original_hash["data"]["storiesForObjectIds"].empty? || response.original_hash["data"]["storiesForObjectIds"][0]["relatedStories"].empty?
@@ -22,7 +22,7 @@ class StoryFetcher
 
   def find_by_object_id obj_id, preferred_lang = 'en'
     response = GraphCms::Client.query(
-      GraphCms::RelatedStoriesByObjIdQuery, variables: { objectID: obj_id }
+      GraphCms::RelatedStoriesByObjIdQuery, variables: { objectID: obj_id.to_i }
     )
 
     return parse_response_and_fetch_metadata response.original_hash, obj_id, preferred_lang
@@ -38,7 +38,7 @@ class StoryFetcher
 
   def find_by_room_id room_id, preferred_lang
     response = GraphCms::Client.query(
-      GraphCms::RelatedStoriesByRoomIdQuery, variables: { roomId: room_id }
+      GraphCms::RelatedStoriesByRoomIdQuery, variables: { roomId: room_id.to_i }
     )
 
     return parse_response_and_fetch_metadata response.original_hash, room_id, preferred_lang
