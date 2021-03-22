@@ -1,11 +1,5 @@
 version: 1
 cron:
- - name: "Every hour run and validate bookmark entries and send email"
-   url: "/jobs/send_bookmarks_email"
-   schedule: "0 */1 * * *"
- - name: "Every hour run and validate bookmark entries for story content and send email"
-   url: "/jobs/send_stories_email"
-   schedule: "0 */1 * * *"
  - name: "delete all sessions that have not been updated in the last 7 days"
    url: "/jobs/clear_sessions"
    schedule: "0 5 * * *"

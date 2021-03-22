@@ -9,7 +9,7 @@
 
 .vscode/*
 *.dump
-.env
+.env*
 
 # Ignore all logfiles and tempfiles.
 /.idea/*
