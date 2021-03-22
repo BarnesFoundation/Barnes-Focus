@@ -85,27 +85,27 @@ class StoryFetcher
   end
 
   def get_stories(story_attrs, searched_object_id, translatable_content)
-    content = Hash.new
-    content["stories"] = Array.new
+    stories = Array.new
 
     [1, 2, 3, 4, 5, 6].each do |i|
-          next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
-    
-          img_id = ("objectID1" == object_id && searched_object_id.to_s == story_attrs[object_id].to_s) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s]
-    
-          h = {
-            "image_id"        => img_id,
-            "short_paragraph" => story_attrs["shortParagraph"+i.to_s],
-            "long_paragraph"  => story_attrs["longParagraph"+i.to_s],
-            "detail"          => nil
-          }
-    
-          content["stories"].push h
-        end
+      next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
 
-    arts = EsCachedRecord.fetch_all(content["stories"].map{|s| s["image_id"]})
+      img_id = ("objectID1" == object_id && searched_object_id.to_s == story_attrs[object_id].to_s) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s]
 
-    content["stories"].each do |story|
+      h = {
+        "image_id"        => img_id,
+        "short_paragraph" => story_attrs["shortParagraph"+i.to_s],
+        "long_paragraph"  => story_attrs["longParagraph"+i.to_s],
+        "detail"          => nil
+      }
+
+      stories.push h
+    end
+    return stories
+  end
+
+  def get_stories_details(stories, arts, translatable_content)
+    stories.each do |story|
       arts.map {|art|
         story["detail"] = art if story["image_id"].to_s == art["id"].to_s
       }
@@ -116,15 +116,7 @@ class StoryFetcher
       }
     end
 
-    return content["stories"]
-  end
-
-  def get_stories_details(stories, arts)
-    stories.tap do |s|
-      s.map do |story|
-        story["detail"] = arts.find { |art| art["id"].to_s == story["image_id"].to_s}
-      end
-    end
+    return stories
   end
 
   def get_translatable_content(story_attrs, searched_object_id, preferred_lang)
@@ -166,7 +158,9 @@ class StoryFetcher
     translatable_content = get_translatable_content(story_attrs, searched_object_id, preferred_lang)
     content["story_title"] = preferred_lang == "en" ? story_attrs["storyTitle"] : SnapTranslator.translate_story_title(story_attrs["storyTitle"], preferred_lang)
     content["original_story_title"] = story_attrs["storyTitle"]
-    content["stories"] = get_stories(story_attrs, searched_object_id, translatable_content)
+    stories = get_stories(story_attrs, searched_object_id, translatable_content)
+    arts = EsCachedRecord.fetch_all(stories.map{|s| s["image_id"]})
+    content["stories"] = get_stories_details(stories, arts, translatable_content)
 
     unique_identifier = story_attrs["id"]
     total = content["stories"].count
