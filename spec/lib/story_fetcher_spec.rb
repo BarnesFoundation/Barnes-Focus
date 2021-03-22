@@ -267,9 +267,12 @@ describe StoryFetcher do
     end 
 
     describe "get_translatable_content" do 
-        it "should return formatted translations hash" do 
+        it "should return empty hash for english translations" do 
             story_attrs = original_response["data"]["storiesForObjectIds"][0]["relatedStories"].first
             expect(StoryFetcher.new.get_translatable_content(story_attrs, 5323, 'en')).to eq({})
+        end
+
+        it "should return formatted has for translations" do
         end
     end
 end 
