@@ -85,59 +85,55 @@ class StoryFetcher
   end
 
   def get_stories(story_attrs, searched_object_id, translatable_content)
-    stories = Array.new.tap do |s|
-      [1, 2, 3, 4, 5, 6].each do |i|
-        next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
-        object_id = "objectID#{i.to_s}"
-  
-        img_id = ("objectID1" == object_id && searched_object_id.to_s == story_attrs[object_id].to_s) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s]
-       
-        h = {
-          "image_id"        => img_id,
-          "short_paragraph" => story_attrs["shortParagraph"+i.to_s],
-          "long_paragraph"  => story_attrs["longParagraph"+i.to_s],
-          "detail"          => nil
-        }
+    stories = Array.new
 
-        paragraphs = translatable_content.find { |t| t["img_id"].to_s == h["img_id"].to_s}
+    [1, 2, 3, 4, 5, 6].each do |i|
+      next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
 
-        if paragraphs && ENV['STORY_PARAGRAPH_TO_USE'].present?
-          case ENV['STORY_PARAGRAPH_TO_USE']
-          when 'short'
-            h["short_paragraph"] = {"html" => paragraphs["content"]}
-          when 'long'
-            h["long_paragraph"] = {"html" => paragraphs["content"]}
-          end
-        end
+      img_id = ("objectID1" == object_id && searched_object_id.to_s == story_attrs[object_id].to_s) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s]
 
-        s.push h
-      end
-    end 
+      h = {
+        "image_id"        => img_id,
+        "short_paragraph" => story_attrs["shortParagraph"+i.to_s],
+        "long_paragraph"  => story_attrs["longParagraph"+i.to_s],
+        "detail"          => nil
+      }
+
+      stories.push h
+    end
+    return stories
   end
 
-  def get_stories_details(stories, arts)
-    stories.tap do |s|
-      s.map do |story|
-        story["detail"] = arts.find { |art| art["id"].to_s == story["image_id"].to_s}
-      end
+  def get_stories_details(stories, arts, translatable_content)
+    stories.each do |story|
+      arts.map {|art|
+        story["detail"] = art if story["image_id"].to_s == art["id"].to_s
+      }
+
+      translatable_content.each { |img_id, content|
+        story["short_paragraph"] = {"html" => content} if story["image_id"].to_s == img_id.to_s && ENV['STORY_PARAGRAPH_TO_USE'].present? && ENV['STORY_PARAGRAPH_TO_USE'] == 'short'
+        story["long_paragraph"] = {"html" => content} if story["image_id"].to_s == img_id.to_s && ENV['STORY_PARAGRAPH_TO_USE'].present? && ENV['STORY_PARAGRAPH_TO_USE'] == 'long'
+      }
     end
+
+    return stories
   end
 
   def get_translatable_content(story_attrs, searched_object_id, preferred_lang)
-    translatable_content = Hash.new.tap do |t|
-      [1, 2, 3, 4, 5, 6].each do |i|
-        next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
-        object_id = "objectID#{i.to_s}"
-  
-        img_id = ("objectID1" == object_id && searched_object_id.to_s == story_attrs[object_id].to_s) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s]
-  
-        if ENV.has_key?('STORY_PARAGRAPH_TO_USE') && ENV['STORY_PARAGRAPH_TO_USE'] == 'short' && preferred_lang != "en"
-          t[img_id] = "#{UNIQUE_SEPARATOR} #{story_attrs['shortParagraph'+i.to_s]['html']}"
-        end
-  
-        if ENV.has_key?('STORY_PARAGRAPH_TO_USE') && ENV['STORY_PARAGRAPH_TO_USE'] == 'long' && preferred_lang != "en"
-          t[img_id] =  "#{UNIQUE_SEPARATOR} #{story_attrs['longParagraph'+i.to_s]['html']}"
-        end
+    translatable_content = {}
+
+    [1, 2, 3, 4, 5, 6].each do |i|
+      next if !story_attrs.has_key?("objectID"+i.to_s) || story_attrs["objectID"+i.to_s].nil?
+      object_id = "objectID#{i.to_s}"
+
+      img_id = ("objectID1" == object_id && searched_object_id.to_s == story_attrs[object_id].to_s) ? story_attrs["alternativeHeroImageObjectID"] : story_attrs["objectID"+i.to_s]
+
+      if ENV.has_key?('STORY_PARAGRAPH_TO_USE') && ENV['STORY_PARAGRAPH_TO_USE'] == 'short' && preferred_lang != "en"
+        translatable_content[img_id] = "#{UNIQUE_SEPARATOR} #{story_attrs['shortParagraph'+i.to_s]['html']}"
+      end
+
+      if ENV.has_key?('STORY_PARAGRAPH_TO_USE') && ENV['STORY_PARAGRAPH_TO_USE'] == 'long' && preferred_lang != "en"
+        translatable_content[img_id] =  "#{UNIQUE_SEPARATOR} #{story_attrs['longParagraph'+i.to_s]['html']}"
       end
     end
 
@@ -145,9 +141,7 @@ class StoryFetcher
       translatable_text = translatable_content.values.join(" ")
       translatable_text = SnapTranslator.translate_story_content(translatable_text, preferred_lang)["html"]
       translatable_text = translatable_text.split("#{UNIQUE_SEPARATOR}").drop(1).map(&:lstrip)
-
       keys = translatable_content.keys
-
       translatable_content = Hash[keys.zip(translatable_text)]
     end
 
@@ -162,12 +156,11 @@ class StoryFetcher
     related_stories = original_response["data"]["storiesForObjectIds"][0]["relatedStories"]
     story_attrs = related_stories.size > 1 ? related_stories.last : related_stories.first
     translatable_content = get_translatable_content(story_attrs, searched_object_id, preferred_lang)
-    stories = get_stories(story_attrs, searched_object_id, translatable_content)
-    arts = EsCachedRecord.fetch_all(stories.map{|s| s["image_id"]})
-
     content["story_title"] = preferred_lang == "en" ? story_attrs["storyTitle"] : SnapTranslator.translate_story_title(story_attrs["storyTitle"], preferred_lang)
     content["original_story_title"] = story_attrs["storyTitle"]
-    content["stories"] = get_stories_details(stories, arts)
+    stories = get_stories(story_attrs, searched_object_id, translatable_content)
+    arts = EsCachedRecord.fetch_all(stories.map{|s| s["image_id"]})
+    content["stories"] = get_stories_details(stories, arts, translatable_content)
 
     unique_identifier = story_attrs["id"]
     total = content["stories"].count
