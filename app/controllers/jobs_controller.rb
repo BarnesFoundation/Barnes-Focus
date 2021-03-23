@@ -86,61 +86,62 @@ class JobsController < ApplicationController
   end
 
   def send_stories_email
-    stories_in_bookmarks = Bookmark.where("email IS NOT NULL").stories_to_deliver.order('created_at DESC')
+    p 'send stories email disabled'
+    # stories_in_bookmarks = Bookmark.where("email IS NOT NULL").stories_to_deliver.order('created_at DESC')
 
-    if stories_in_bookmarks.any?
-      stories_in_bookmarks.group_by(&:email).each do | mail, story_in_bookmark |
-        next if mail.blank?
+    # if stories_in_bookmarks.any?
+    #   stories_in_bookmarks.group_by(&:email).each do | mail, story_in_bookmark |
+    #     next if mail.blank?
 
-        data                  = Hash.new
-        data[mail]            = Array.new
-        latest_bookmark_entry = story_in_bookmark.first
-        time_in_seconds       = 22 * 60 * 60
+    #     data                  = Hash.new
+    #     data[mail]            = Array.new
+    #     latest_bookmark_entry = story_in_bookmark.first
+    #     time_in_seconds       = 22 * 60 * 60
 
-        if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
-          language  = latest_bookmark_entry.language
-          language  = language || 'en'
-          language  = language.downcase
-          stories   = Array.new
+    #     if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
+    #       language  = latest_bookmark_entry.language
+    #       language  = language || 'en'
+    #       language  = language.downcase
+    #       stories   = Array.new
 
-          story_in_bookmark.each { | obj |
-            next if data[mail].include?(obj.image_id)
+    #       story_in_bookmark.each { | obj |
+    #         next if data[mail].include?(obj.image_id)
 
-            response = StoryFetcher.new.find_by_object_id(obj.image_id, language)
-            next if response.nil?
+    #         response = StoryFetcher.new.find_by_object_id(obj.image_id, language)
+    #         next if response.nil?
 
-            story = Story.find_by(title: response[:content]["original_story_title"])
-            story = Story.create(title: response[:content]["original_story_title"]) if story.nil?
+    #         story = Story.find_by(title: response[:content]["original_story_title"])
+    #         story = Story.create(title: response[:content]["original_story_title"]) if story.nil?
 
-            host = Rails.env.development? ? 'http://localhost:3000' : ENV['ASSET_HOST']
+    #         host = Rails.env.development? ? 'http://localhost:3000' : ENV['ASSET_HOST']
 
-            h = {
-              total: response[:total],
-              unique_identifier: response[:unique_identifier],
-              #artwork_info: EsCachedRecord.search(obj.image_id),
-              content: response[:content],
-              translated_title: response[:content]["story_title"],
-              link: "#{host}/story/#{story.slug}"
-            }
-            stories.push h
-            data[mail].push obj.image_id
-          }
+    #         h = {
+    #           total: response[:total],
+    #           unique_identifier: response[:unique_identifier],
+    #           #artwork_info: EsCachedRecord.search(obj.image_id),
+    #           content: response[:content],
+    #           translated_title: response[:content]["story_title"],
+    #           link: "#{host}/story/#{story.slug}"
+    #         }
+    #         stories.push h
+    #         data[mail].push obj.image_id
+    #       }
 
-          begin
-            unless mail.blank?
-              BookmarkNotifierMailer.send_stories_email(mail, stories, language).deliver_now
-              story_in_bookmark.each {|b| b.update_attributes(story_mail_sent: true)}
-            end
-          rescue Exception => ex
-            p "Unable to send email due to #{ex.to_s}"
-            p ex.backtrace.join("\n\t")
-          end
-        end
-      end
-      p 'done sending stories emails'
-    end
+    #       begin
+    #         unless mail.blank?
+    #           BookmarkNotifierMailer.send_stories_email(mail, stories, language).deliver_now
+    #           story_in_bookmark.each {|b| b.update_attributes(story_mail_sent: true)}
+    #         end
+    #       rescue Exception => ex
+    #         p "Unable to send email due to #{ex.to_s}"
+    #         p ex.backtrace.join("\n\t")
+    #       end
+    #     end
+    #   end
+    #   p 'done sending stories emails'
+    # end
 
-    head :ok, content_type: "text/html"
+    # head :ok, content_type: "text/html"
   end
 
   def cleanup_bookmarks
