@@ -3,7 +3,6 @@ require 'story_fetcher'
 require 'snap_translator'
 require 'google_translate'
 require 'rails'
-require 'pry'
 
 describe StoryFetcher do
     original_response = {
