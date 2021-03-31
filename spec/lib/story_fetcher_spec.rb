@@ -1,6 +1,8 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'story_fetcher'
-require 'pry'
+require 'snap_translator'
+require 'google_translate'
+require 'rails'
 
 describe StoryFetcher do
     original_response = {
@@ -262,14 +264,24 @@ describe StoryFetcher do
             story_attrs = original_response["data"]["storiesForObjectIds"][0]["relatedStories"].first
             translatable_content = story_fetcher.get_translatable_content(story_attrs, 5323, 'en')
             stories = (story_fetcher.get_stories(story_attrs, 5323, translatable_content))
-            expect(story_fetcher.get_stories_details(stories, arts)).to eq(formatted_data[:content]['stories'])
+            expect(story_fetcher.get_stories_details(stories, arts, translatable_content)).to eq(formatted_data[:content]['stories'])
         end
     end 
 
     describe "get_translatable_content" do 
-        it "should return formatted translations hash" do 
+        it "should return empty hash for english translations" do 
             story_attrs = original_response["data"]["storiesForObjectIds"][0]["relatedStories"].first
             expect(StoryFetcher.new.get_translatable_content(story_attrs, 5323, 'en')).to eq({})
+        end
+
+        it "should return formatted hash for other translations" do
+            story_attrs = original_response["data"]["storiesForObjectIds"][0]["relatedStories"].first
+            expect(StoryFetcher.new.get_translatable_content(story_attrs, 5323, 'it')).to eq({"5230"=>"<p> Il nudo femminile era un soggetto estremamente popolare nel XIX secolo.</p> ",
+            "5323"=>
+             "<p> Questo Renoir ha scioccato il pubblico quando è stato mostrato per la prima volta nel 1875.</p> ",
+            "5221"=>
+             "<p> Piuttosto che una Venere immaginaria, Courbet presenta una scena di sesso schietta in vendita.</p> ",
+            "5226"=>"<p> Degas ha anche spinto contro le convenzioni.</p>"})
         end
     end
 end 

@@ -41,107 +41,106 @@ class JobsController < ApplicationController
     head :ok, content_type: "text/html"
   end
 
-  def send_bookmarks_email
-    bookmarks = Bookmark.where("email IS NOT NULL").ready_to_deliver.order('created_at DESC')
+  # def send_bookmarks_email
+  #   bookmarks = Bookmark.where("email IS NOT NULL").ready_to_deliver.order('created_at DESC')
 
-    if bookmarks.any?
-      bookmarks.group_by(&:email).each do | mail, bukmarks |
+  #   if bookmarks.any?
+  #     bookmarks.group_by(&:email).each do | mail, bukmarks |
+  #       next if mail.blank?
+
+  #       unique_arts           = Hash.new
+  #       unique_arts[mail]     = Array.new
+  #       latest_bookmark_entry = bukmarks.first
+  #       time_in_seconds       = ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].present? ? ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].to_i : 10800
+
+  #       if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
+  #         language = latest_bookmark_entry.language
+  #         language = language || 'en'
+  #         language = language.downcase
+  #         els_arr = Array.new
+
+  #         bukmarks.each { | obj |
+  #           next if unique_arts[mail].include?(obj.image_id)
+  #           els_obj = BarnesElasticSearch.instance.get_object(obj.image_id)
+
+  #           next if els_obj.nil?
+  #           els_arr.push els_obj
+  #           unique_arts[mail].push obj.image_id
+  #         }
+
+  #         begin
+  #           unless mail.blank?
+  #             BookmarkNotifierMailer.send_activity_email(mail, els_arr, language).deliver_now
+  #             bukmarks.each {|b| b.update_attributes(mail_sent: true)}
+  #           end
+  #         rescue Exception => ex
+  #           p "Unable to send email due to #{ex.to_s}"
+  #         end
+  #       end
+  #     end
+
+  #     p 'done sending bookmark emails'
+  #   end
+
+  #   head :ok, content_type: "text/html"
+  # end
+
+  def send_stories_email
+    stories_in_bookmarks = Bookmark.where("email IS NOT NULL").stories_to_deliver.order('created_at DESC')
+
+    if stories_in_bookmarks.any?
+      stories_in_bookmarks.group_by(&:email).each do | mail, story_in_bookmark |
         next if mail.blank?
 
-        unique_arts           = Hash.new
-        unique_arts[mail]     = Array.new
-        latest_bookmark_entry = bukmarks.first
-        time_in_seconds       = ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].present? ? ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].to_i : 10800
+        data                  = Hash.new
+        data[mail]            = Array.new
+        latest_bookmark_entry = story_in_bookmark.first
+        time_in_seconds       = 22 * 60 * 60
 
         if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
-          language = latest_bookmark_entry.language
-          language = language || 'en'
-          language = language.downcase
-          els_arr = Array.new
+          language  = latest_bookmark_entry.language
+          language  = language || 'en'
+          language  = language.downcase
+          stories   = Array.new
 
-          bukmarks.each { | obj |
-            next if unique_arts[mail].include?(obj.image_id)
-            els_obj = BarnesElasticSearch.instance.get_object(obj.image_id)
+          story_in_bookmark.each { | obj |
+            next if data[mail].include?(obj.image_id)
 
-            next if els_obj.nil?
-            els_arr.push els_obj
-            unique_arts[mail].push obj.image_id
+            response = StoryFetcher.new.find_by_object_id(obj.image_id, language)
+            next if response.nil?
+
+            story = Story.find_by(title: response[:content]["original_story_title"])
+            story = Story.create(title: response[:content]["original_story_title"]) if story.nil?
+
+            host = Rails.env.development? ? 'http://localhost:3000' : ENV['ASSET_HOST']
+
+            h = {
+              total: response[:total],
+              unique_identifier: response[:unique_identifier],
+              #artwork_info: EsCachedRecord.search(obj.image_id),
+              content: response[:content],
+              translated_title: response[:content]["story_title"],
+              link: "#{host}/story/#{story.slug}"
+            }
+            stories.push h
+            data[mail].push obj.image_id
           }
 
           begin
             unless mail.blank?
-              BookmarkNotifierMailer.send_activity_email(mail, els_arr, language).deliver_now
-              bukmarks.each {|b| b.update_attributes(mail_sent: true)}
+              BookmarkNotifierMailer.send_stories_email(mail, stories, language).deliver_now
+              story_in_bookmark.each {|b| b.update_attributes(story_mail_sent: true)}
             end
           rescue Exception => ex
             p "Unable to send email due to #{ex.to_s}"
+            p ex.backtrace.join("\n\t")
           end
         end
       end
-
-      p 'done sending bookmark emails'
+      p 'done sending stories emails'
     end
 
     head :ok, content_type: "text/html"
-  end
-
-  def send_stories_email
-    p 'send stories email disabled'
-    # stories_in_bookmarks = Bookmark.where("email IS NOT NULL").stories_to_deliver.order('created_at DESC')
-
-    # if stories_in_bookmarks.any?
-    #   stories_in_bookmarks.group_by(&:email).each do | mail, story_in_bookmark |
-    #     next if mail.blank?
-
-    #     data                  = Hash.new
-    #     data[mail]            = Array.new
-    #     latest_bookmark_entry = story_in_bookmark.first
-    #     time_in_seconds       = 22 * 60 * 60
-
-    #     if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
-    #       language  = latest_bookmark_entry.language
-    #       language  = language || 'en'
-    #       language  = language.downcase
-    #       stories   = Array.new
-
-    #       story_in_bookmark.each { | obj |
-    #         next if data[mail].include?(obj.image_id)
-
-    #         response = StoryFetcher.new.find_by_object_id(obj.image_id, language)
-    #         next if response.nil?
-
-    #         story = Story.find_by(title: response[:content]["original_story_title"])
-    #         story = Story.create(title: response[:content]["original_story_title"]) if story.nil?
-
-    #         host = Rails.env.development? ? 'http://localhost:3000' : ENV['ASSET_HOST']
-
-    #         h = {
-    #           total: response[:total],
-    #           unique_identifier: response[:unique_identifier],
-    #           #artwork_info: EsCachedRecord.search(obj.image_id),
-    #           content: response[:content],
-    #           translated_title: response[:content]["story_title"],
-    #           link: "#{host}/story/#{story.slug}"
-    #         }
-    #         stories.push h
-    #         data[mail].push obj.image_id
-    #       }
-
-    #       begin
-    #         unless mail.blank?
-    #           BookmarkNotifierMailer.send_stories_email(mail, stories, language).deliver_now
-    #           story_in_bookmark.each {|b| b.update_attributes(story_mail_sent: true)}
-    #         end
-    #       rescue Exception => ex
-    #         p "Unable to send email due to #{ex.to_s}"
-    #         p ex.backtrace.join("\n\t")
-    #       end
-    #     end
-    #   end
-    #   p 'done sending stories emails'
-    # end
-
-    # head :ok, content_type: "text/html"
   end
 
   def cleanup_bookmarks
