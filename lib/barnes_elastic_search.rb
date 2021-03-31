@@ -37,6 +37,9 @@ class BarnesElasticSearch
   end
 
   def get_object object_id
+    p "get object # #{object_id}"
+    return nil if !object_id
+
     search_result = @elastic_search.search index: "collection", body: get_image_query(object_id)
     if search_result && search_result['hits']['hits'].length > 0
       search_result['hits']['hits'][0]['_source']
