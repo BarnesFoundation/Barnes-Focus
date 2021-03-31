@@ -41,49 +41,49 @@ class JobsController < ApplicationController
     head :ok, content_type: "text/html"
   end
 
-  def send_bookmarks_email
-    bookmarks = Bookmark.where("email IS NOT NULL").ready_to_deliver.order('created_at DESC')
+  # def send_bookmarks_email
+  #   bookmarks = Bookmark.where("email IS NOT NULL").ready_to_deliver.order('created_at DESC')
 
-    if bookmarks.any?
-      bookmarks.group_by(&:email).each do | mail, bukmarks |
-        next if mail.blank?
+  #   if bookmarks.any?
+  #     bookmarks.group_by(&:email).each do | mail, bukmarks |
+  #       next if mail.blank?
 
-        unique_arts           = Hash.new
-        unique_arts[mail]     = Array.new
-        latest_bookmark_entry = bukmarks.first
-        time_in_seconds       = ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].present? ? ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].to_i : 10800
+  #       unique_arts           = Hash.new
+  #       unique_arts[mail]     = Array.new
+  #       latest_bookmark_entry = bukmarks.first
+  #       time_in_seconds       = ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].present? ? ENV['LATEST_BOOKMARK_ENTRY_THRESHOLD'].to_i : 10800
 
-        if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
-          language = latest_bookmark_entry.language
-          language = language || 'en'
-          language = language.downcase
-          els_arr = Array.new
+  #       if latest_bookmark_entry.created_at.utc < time_in_seconds.seconds.ago.utc
+  #         language = latest_bookmark_entry.language
+  #         language = language || 'en'
+  #         language = language.downcase
+  #         els_arr = Array.new
 
-          bukmarks.each { | obj |
-            next if unique_arts[mail].include?(obj.image_id)
-            els_obj = BarnesElasticSearch.instance.get_object(obj.image_id)
+  #         bukmarks.each { | obj |
+  #           next if unique_arts[mail].include?(obj.image_id)
+  #           els_obj = BarnesElasticSearch.instance.get_object(obj.image_id)
 
-            next if els_obj.nil?
-            els_arr.push els_obj
-            unique_arts[mail].push obj.image_id
-          }
+  #           next if els_obj.nil?
+  #           els_arr.push els_obj
+  #           unique_arts[mail].push obj.image_id
+  #         }
 
-          begin
-            unless mail.blank?
-              BookmarkNotifierMailer.send_activity_email(mail, els_arr, language).deliver_now
-              bukmarks.each {|b| b.update_attributes(mail_sent: true)}
-            end
-          rescue Exception => ex
-            p "Unable to send email due to #{ex.to_s}"
-          end
-        end
-      end
+  #         begin
+  #           unless mail.blank?
+  #             BookmarkNotifierMailer.send_activity_email(mail, els_arr, language).deliver_now
+  #             bukmarks.each {|b| b.update_attributes(mail_sent: true)}
+  #           end
+  #         rescue Exception => ex
+  #           p "Unable to send email due to #{ex.to_s}"
+  #         end
+  #       end
+  #     end
 
-      p 'done sending bookmark emails'
-    end
+  #     p 'done sending bookmark emails'
+  #   end
 
-    head :ok, content_type: "text/html"
-  end
+  #   head :ok, content_type: "text/html"
+  # end
 
   def send_stories_email
     stories_in_bookmarks = Bookmark.where("email IS NOT NULL").stories_to_deliver.order('created_at DESC')
