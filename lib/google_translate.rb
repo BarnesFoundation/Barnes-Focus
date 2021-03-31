@@ -1,5 +1,4 @@
 require "google/cloud/translate"
-require "rails"
 
 class GoogleTranslate
   attr_accessor :project_id , :target_language

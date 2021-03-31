@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'story_fetcher'
 require 'snap_translator'
 require 'google_translate'
