@@ -61,7 +61,6 @@ class JobsController < ApplicationController
 
           bukmarks.each { | obj |
             next if unique_arts[mail].include?(obj.image_id)
-            p "getting object #{obj}"
             els_obj = BarnesElasticSearch.instance.get_object(obj.image_id)
 
             next if els_obj.nil?
