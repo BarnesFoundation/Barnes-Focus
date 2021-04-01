@@ -261,10 +261,12 @@ class Artwork extends Component {
   };
 
   resetEmailSceneTriggerSettings = () => {
-    this.emailSceneTrigger.removePin();
-    this.emailSceneTrigger.duration(this.artworkScrollOffset - 100);
-    this.emailSceneTrigger.setPin('#email-trigger-enter');
-	this.emailSceneTrigger.refresh();
+    if (this.emailSceneTrigger) {
+      this.emailSceneTrigger.removePin();
+      this.emailSceneTrigger.duration(this.artworkScrollOffset - 100);
+      this.emailSceneTrigger.setPin('#email-trigger-enter');
+      this.emailSceneTrigger.refresh();
+    }
   };
 
   getSelectedLanguage = async () => {
