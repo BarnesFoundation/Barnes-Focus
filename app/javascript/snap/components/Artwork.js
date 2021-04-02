@@ -335,18 +335,20 @@ class Artwork extends Component {
   }
 
   /** Updates state that email was captured and submits it to the server session */
-  onSubmitEmail = (email) => {
-	this.setState({ email, emailCaptured: true }, () => {
+  // onSubmitEmail = (email) => {
+    // TODO: investigate why this was causing an error with DOM nodes
+    // and why this fn is needed because everything works without it
+	// this.setState({ email, emailCaptured: true }, () => {
 
-		// Store the email
-		this.sr.submitBookmarksEmail(email);
+	// 	// Store the email
+	// 	this.sr.submitBookmarksEmail(email);
 
-		// Close the email card after 4 secs
-		this.emailSubmitTimeoutCallback = setTimeout(() => {
-		  this.setState({ emailCaptureAck: true });
-		}, 4000);
-	});
-  }
+	// 	// Close the email card after 4 secs
+	// 	this.emailSubmitTimeoutCallback = setTimeout(() => {
+	// 	  this.setState({ emailCaptureAck: true });
+	// 	}, 4000);
+	// });
+  // }
 
   /** Sets up the ScrollMagic scene for the artwork result section */
   setupArtworkScene = () => {
@@ -609,17 +611,11 @@ class Artwork extends Component {
 		const peekOffsetValue = (isAndroid) ? 123 : 67;
 		const peekOffset = (showStory) ? '0' : `${peekOffsetValue}`;
 
-		return (
-			<div id="email-panel" className="panel-email" style={{ pointerEvents: pointerSetting, height: `calc(60vh - ${peekOffset}px)` }} onClick={() => { this.handleClickScroll(null, false); }}>
-				<EmailForm
-					withStory={showStory}
-					isEmailScreen={false}
-					onSubmitEmail={this.onSubmitEmail}
-					getTranslation={this.props.getTranslation}
-					getSize={this.onEmailHeightReady}
-				/>
-			</div>
-		);
+		return <div id="email-panel" className="panel-email" style={{ pointerEvents: pointerSetting, height: `calc(60vh - ${peekOffset}px)` }} onClick={() => {
+          this.handleClickScroll(null, false);
+        }}>
+        <EmailForm withStory={showStory} isEmailScreen={false} getTranslation={this.props.getTranslation} getSize={this.onEmailHeightReady} />
+      </div>;
 	}
 
   /** Renders the title bar with language dropdown */
