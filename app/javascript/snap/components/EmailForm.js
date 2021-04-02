@@ -1,10 +1,12 @@
 import throttle from 'lodash/throttle';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
+import { compose } from "redux";
 import { SNAP_LANGUAGE_PREFERENCE, SNAP_USER_EMAIL, TOP_OFFSET, VIEWPORT_HEIGHT } from './Constants';
 import { SearchRequestService } from '../services/SearchRequestService';
 import ScanButton from './ScanButton';
 import { isAndroid } from 'react-device-detect';
+import withTranslation from "./withTranslation";
 
 
 const withStoryStyles = {
@@ -96,13 +98,13 @@ class EmailForm extends Component {
 	
 	// Otherwise, it is valid
 	else {
-      console.log('Valid email. Call backend API to save email.');
-      this.setState({varificationPending: false});
-      const userEmail = this.state.email;
-      this.setState({ email: '', emailCaptured: true });
-      localStorage.setItem(SNAP_USER_EMAIL, userEmail);
-      this.props.onSubmitEmail(userEmail);
-    }
+         console.log("Valid email. Call backend API to save email.");
+         this.setState({ varificationPending: false });
+         const userEmail = this.state.email;
+         this.setState({ email: "", emailCaptured: true });
+         localStorage.setItem(SNAP_USER_EMAIL, userEmail);
+         // this.props.onSubmitEmail(userEmail);
+       }
   };
 
   setEmailRef = elem => {
@@ -199,4 +201,7 @@ class EmailForm extends Component {
   }
 }
 
-export default withRouter(EmailForm);
+export default compose(
+  withRouter,
+  withTranslation
+)(EmailForm);
