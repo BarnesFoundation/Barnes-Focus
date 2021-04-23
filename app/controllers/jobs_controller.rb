@@ -42,7 +42,7 @@ class JobsController < ApplicationController
   end
 
   def send_bookmarks_email
-    bookmarks = Bookmark.where("email IS NOT NULL").ready_to_deliver.order('created_at DESC')
+    bookmarks = Bookmark.where.not(email: [nil, ""]).ready_to_deliver.order('created_at DESC')
 
     if bookmarks.any?
       bookmarks.group_by(&:email).each do | mail, bukmarks |
