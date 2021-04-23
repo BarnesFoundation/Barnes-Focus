@@ -53,3 +53,5 @@ The application is located at **`/var/app/current`** as root.
 
 If you need to access the Ruby console, you can use
 `bundle exec rails c production`
+
+If you get a permission error when trying to access the console, change the user with `sudo su`.
