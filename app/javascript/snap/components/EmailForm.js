@@ -76,12 +76,11 @@ class EmailForm extends Component {
   };
 
 	validateEmail = async () => {
-		const validated = await this.sr.validteEmail(this.state.email);
+    const validated = await this.sr.validteEmail(this.state.email);
 
-    console.log(`The email being valid is ${validated}`);
-    this.setState({varificationPending: false})
-		return this.state.email.length > 0 && validated === true;
-	};
+    this.setState({ varificationPending: false });
+    return this.state.email.length > 0 && validated === true;
+  };
 
   _saveEmail = async () => {
     this.setState({varificationPending: true});
@@ -101,7 +100,7 @@ class EmailForm extends Component {
          const userEmail = this.state.email;
          this.setState({ email: "", emailCaptured: true });
          localStorage.setItem(SNAP_USER_EMAIL, userEmail);
-         // this.props.onSubmitEmail(userEmail);
+         this.props.onSubmitEmail(userEmail);
        }
   };
 
