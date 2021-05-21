@@ -43,5 +43,5 @@ private/private.zip
 private/barnes-snap-keypair
 private/barnes-snap-keypair.pub
 private/localhost.env.development
-private/SNAP-77de5816b87e.json.bak
-private/SNAP-865144db2e55.json
+private/SNAP*
+private/snap*
