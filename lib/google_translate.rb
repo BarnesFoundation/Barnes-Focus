@@ -6,7 +6,7 @@ class GoogleTranslate
   def initialize(language)
     self.project_id = ENV['GC_PROJECT_ID']
     self.target_language = language
-    @google_translate = Google::Cloud::Translate.new project: project_id, keyfile: "#{Rails.root || '.'}/private/SNAP-865144db2e55.json"
+    @google_translate = Google::Cloud::Translate.new project: project_id, keyfile: "#{Rails.root || '.'}/private/snap-198215-dea896d15e75.json"
   end
 
   def translate text
