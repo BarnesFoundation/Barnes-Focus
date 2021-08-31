@@ -144,19 +144,20 @@ class JobsController < ApplicationController
   end
 
   def cleanup_bookmarks
-    p 'Fetching bookmarks for blank/null emails'
-    bookmarks_with_blank_emails = Bookmark.where("email IS NULL OR email = ''").where("DATE(bookmarks.created_at) < ?", (Time.now.utc - 30.days).to_date)
+    p 'jobs/cleanup_bookmarks called -- No emails purged.'
+    # p 'Fetching bookmarks for blank/null emails'
+    # bookmarks_with_blank_emails = Bookmark.where("email IS NULL OR email = ''").where("DATE(bookmarks.created_at) < ?", (Time.now.utc - 30.days).to_date)
 
-    p 'There are total ' + bookmarks_with_blank_emails.count.to_s + ' bookmark entries where email is not present. Purging those entries now'
-    bookmarks_with_blank_emails.delete_all
+    # p 'There are total ' + bookmarks_with_blank_emails.count.to_s + ' bookmark entries where email is not present. Purging those entries now'
+    # bookmarks_with_blank_emails.delete_all
 
-    p 'Fetching bookmarks where mail_sent flag is true'
-    bookmarks_with_sent_emails = Bookmark.where(mail_sent: true).where("DATE(bookmarks.created_at) < ?", (Time.now.utc - 30.days).to_date)
+    # p 'Fetching bookmarks where mail_sent flag is true'
+    # bookmarks_with_sent_emails = Bookmark.where(mail_sent: true).where("DATE(bookmarks.created_at) < ?", (Time.now.utc - 30.days).to_date)
 
-    p 'There are total ' + bookmarks_with_sent_emails.count.to_s + ' bookmark entries where email_sent flag is true. Purging those entries now'
-    bookmarks_with_sent_emails.delete_all
+    # p 'There are total ' + bookmarks_with_sent_emails.count.to_s + ' bookmark entries where email_sent flag is true. Purging those entries now'
+    # bookmarks_with_sent_emails.delete_all
 
-    head :ok, content_type: "text/html"
+    # head :ok, content_type: "text/html"
   end
 
 private
