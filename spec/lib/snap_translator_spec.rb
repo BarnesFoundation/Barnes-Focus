@@ -21,6 +21,11 @@ describe 'SnapTranslator' do
             expect_any_instance_of(GoogleTranslate).to receive(:translate).with(short_description)
             SnapTranslator.translate_short_desc(short_description, 'it')
         end
+
+        it 'returns text if there is an error calling GoogleTranslate API' do
+            GoogleTranslate.any_instance.stub(:translate).and_raise(StandardError)
+            expect(SnapTranslator.translate_short_desc(short_description, 'it')).to eq(short_description)
+        end
     end
 
     describe 'translate_story_content' do
@@ -38,6 +43,11 @@ describe 'SnapTranslator' do
             expect_any_instance_of(GoogleTranslate).to receive(:translate).with(short_description)
             SnapTranslator.translate_story_content(short_description, 'it')
         end
+
+        it 'returns text if there is an error calling GoogleTranslate API' do
+            GoogleTranslate.any_instance.stub(:translate).and_raise(StandardError)
+            expect(SnapTranslator.translate_story_content(short_description, 'it')).to eq({"html" => short_description})
+        end
     end
 
     describe 'translate_story_title' do 
@@ -54,6 +64,11 @@ describe 'SnapTranslator' do
         it 'calls GoogleTranslate if preferred_language is not "en"' do
             expect_any_instance_of(GoogleTranslate).to receive(:translate).with(title)
             SnapTranslator.translate_story_title(title, 'it')
+        end
+
+        it 'returns text if there is an error calling GoogleTranslate API' do
+            GoogleTranslate.any_instance.stub(:translate).and_raise(StandardError)
+            expect(SnapTranslator.translate_story_title(title, 'it')).to eq(title)
         end
     end
 end 

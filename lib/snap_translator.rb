@@ -16,7 +16,7 @@ module SnapTranslator
       translator = GoogleTranslate.new preferred_language
       text = translator.translate(text)
       text = CGI::unescapeHTML(text) if !text.nil?
-    rescue Exception => error
+    rescue => error
       p error
       text = text if text
     end
@@ -28,10 +28,16 @@ module SnapTranslator
   def translate_story_content text, preferred_language
     return {"html" => text} if text.nil? || text.empty? || text.blank?
     return {"html" => text} if preferred_language.downcase == 'en'
-    # Configure language translator
-    translator = GoogleTranslate.new preferred_language
-    text = translator.translate(text)
-    text = CGI::unescapeHTML(text) if !text.nil?
+
+    begin 
+      # Configure language translator
+      translator = GoogleTranslate.new preferred_language
+      text = translator.translate(text)
+      text = CGI::unescapeHTML(text) if !text.nil?
+    rescue => error
+      p error
+      text = text if text
+    end
 
     return {"html" => text}
   end
@@ -41,8 +47,13 @@ module SnapTranslator
     return title if title.nil? || title.empty? || title.blank?
     return title if preferred_language.downcase == 'en'
 
-    translator = GoogleTranslate.new preferred_language
-    title = translator.translate(title)
+    begin
+      translator = GoogleTranslate.new preferred_language
+      title = translator.translate(title)
+    rescue => error 
+      p error
+      title = title if title
+    end
 
     return title
   end
