@@ -10,5 +10,3 @@ yum -y install yarn;
 echo $PWD; yarn; echo $(ls)
 chown webapp:webapp .bundle/config; mkdir -p /home/webapp
 chown webapp:webapp /home/webapp; chmod 700 /home/webapp; echo $(ls /var/app/staging)
-
-/opt/elasticbeanstalk/bin/get-config environment | jq -r 'to_entries | .[] | "export \(.key)=\"\(.value)\""' > /etc/profile.d/sh.local
