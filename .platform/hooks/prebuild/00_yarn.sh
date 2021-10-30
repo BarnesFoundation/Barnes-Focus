@@ -13,3 +13,4 @@ chown webapp:webapp /home/webapp; chmod 700 /home/webapp; echo $(ls /var/app/sta
 
 echo "Making environment variables available"
 export $(cat /opt/elasticbeanstalk/deployment/env | xargs)
+/opt/elasticbeanstalk/bin/get-config environment | jq -r 'to_entries | .[] | "export \(.key)=\"\(.value)\""' > /etc/profile.d/env_vars.sh
