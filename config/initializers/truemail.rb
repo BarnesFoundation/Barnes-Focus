@@ -3,7 +3,7 @@ require 'truemail'
 Truemail.configure do |config|
 
   # Required parameter. Must be an existing email on behalf of which verification will be performed
-  config.verifier_email = ENV['VERIFIER_EMAIL']
+  config.verifier_email = 'admin@barnesfoc.us' # ENV['VERIFIER_EMAIL']
 
   config.default_validation_type = :mx
 
