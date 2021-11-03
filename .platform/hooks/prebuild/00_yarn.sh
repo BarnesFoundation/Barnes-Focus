@@ -6,6 +6,7 @@ wget https://dl.yarnpkg.com/rpm/yarn.repo -O /etc/yum.repos.d/yarn.repo;
 
 echo "Installing packages"
 yum -y install yarn;
+bundle install;
 
 echo "Performing permissions work"
 chown -R webapp:webapp .bundle; 
