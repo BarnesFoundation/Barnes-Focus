@@ -7,10 +7,17 @@ wget https://dl.yarnpkg.com/rpm/yarn.repo -O /etc/yum.repos.d/yarn.repo;
 echo "Installing packages"
 yum -y install yarn;
 
-echo $PWD; yarn; echo $(ls)
-chown webapp:webapp .bundle; chmod 777 .bundle/config;
+echo "Performing permissions work"
+chown -R webapp:webapp .bundle; 
+chmod -R 777 .bundle;
+chown -R webapp:webapp vendor; 
+chmod -R 777 vendor;
+
+
+echo "Permission for home/webapp"
 mkdir -p /home/webapp
-chown webapp:webapp /home/webapp; chmod 700 /home/webapp; echo $(ls /var/app/staging)
+chown webapp:webapp /home/webapp; 
+chmod 700 /home/webapp;
 
 echo "Making environment variables available"
 export $(cat /opt/elasticbeanstalk/deployment/env | xargs)
