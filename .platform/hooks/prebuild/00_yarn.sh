@@ -4,9 +4,10 @@ curl --silent --location https://rpm.nodesource.com/setup_12.x | sudo bash -
 yum -y install nodejs
 wget https://dl.yarnpkg.com/rpm/yarn.repo -O /etc/yum.repos.d/yarn.repo;
 
-echo "Installing packages"
-yum -y install yarn;
+echo "Installing packages with bundle and yarn"
 bundle install;
+yum -y install yarn;
+yarn;
 
 echo "Performing permissions work"
 chown -R webapp:webapp .bundle; 
