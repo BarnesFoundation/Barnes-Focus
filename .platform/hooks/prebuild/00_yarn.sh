@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-echo "Starting yarn steps..."; mkdir -p /home/my_random_dir_1
+echo "Starting yarn steps...";
 curl --silent --location https://rpm.nodesource.com/setup_12.x | sudo bash -
 yum -y install nodejs
 wget https://dl.yarnpkg.com/rpm/yarn.repo -O /etc/yum.repos.d/yarn.repo;
