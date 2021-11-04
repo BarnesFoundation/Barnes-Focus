@@ -5,9 +5,9 @@ yum -y install nodejs
 wget https://dl.yarnpkg.com/rpm/yarn.repo -O /etc/yum.repos.d/yarn.repo;
 
 echo "Installing packages with bundle and yarn"
-bundle install;
+su webapp -c "bundle install";
 yum -y install yarn;
-yarn;
+su webapp -c "yarn --production";
 
 echo "Performing permissions work"
 chown -R webapp:webapp .bundle; 
