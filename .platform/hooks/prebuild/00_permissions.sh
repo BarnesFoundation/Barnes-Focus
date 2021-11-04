@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
-echo "Starting yarn steps...";
-curl --silent --location https://rpm.nodesource.com/setup_12.x | sudo bash -
-yum -y install nodejs
-wget https://dl.yarnpkg.com/rpm/yarn.repo -O /etc/yum.repos.d/yarn.repo;
-
-echo "Installing packages with bundle and yarn"
+echo "Bundle install and yarn install"
 su webapp -c "bundle install";
-yum -y install yarn;
 su webapp -c "yarn --production";
 
 echo "Performing permissions work"
@@ -14,7 +8,6 @@ chown -R webapp:webapp .bundle;
 chmod -R 777 .bundle;
 chown -R webapp:webapp vendor; 
 chmod -R 777 vendor;
-
 
 echo "Permission for home/webapp"
 mkdir -p /home/webapp
