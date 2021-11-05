@@ -14,5 +14,5 @@ mkdir -p /home/webapp
 chown webapp:webapp /home/webapp; 
 chmod 700 /home/webapp;
 
-# echo "Making environment variables available"
+echo "Making environment variables available"
 export $(cat /opt/elasticbeanstalk/deployment/env | xargs)
