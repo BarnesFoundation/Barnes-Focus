@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 echo "Bundle install and yarn install"
-su webapp -c "bundle install";
 su webapp -c "yarn --production";
 
 echo "Performing permissions work"
