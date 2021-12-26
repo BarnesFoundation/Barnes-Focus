@@ -6,4 +6,4 @@ su webapp -c "yarn --production";
 
 su webapp -c "bundle install";
 bundle exec rake assets:precompile
-chown -R webapp:webapp /var/app/staging/
+# chown -R webapp:webapp /var/app/staging/
