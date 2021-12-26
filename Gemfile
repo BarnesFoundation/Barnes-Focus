@@ -19,7 +19,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'rest-client', require: false
 gem 'aasm', '~> 4.12.3'
 gem 'aws-sdk',  '~> 2'
-gem 'active_elastic_job'
+gem 'active_elastic_job', '~> 2.3.1'
 gem 'elasticsearch'
 gem "daemons"
 gem 'activeadmin'
