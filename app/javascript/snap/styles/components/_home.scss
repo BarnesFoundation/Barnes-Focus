@@ -24,6 +24,12 @@
    top: 10%; 
    margin-left: -74px;
    margin-top: -23px;
+
+   &.centennial-logo {
+       height: unset;
+       width: 180px;
+       margin-left: -90px;
+   }
 }
 
 .user-loc-prompt {
