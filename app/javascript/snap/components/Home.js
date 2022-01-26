@@ -1,5 +1,6 @@
 import home_background from 'images/barnes-v2-landing.png';
 import barnes_logo from 'images/Barnes_logo.svg';
+import barnes_100_logo from 'images/Barnes_100_logo.svg';
 import close_icon from 'images/cross.svg';
 import kf_logo from 'images/knight-foundation-logo.svg';
 import React, { Component } from 'react';
@@ -19,6 +20,10 @@ class HomeComponent extends Component {
 	constructor(props) {
 		super(props);
 
+		// Get year to determine whether to use centennial logo or original logo
+		const today = new Date()
+		const isCentennial = today.getFullYear() === 2022;
+
 		this.state = {
 			snapAttempts: localStorage.getItem(constants.SNAP_ATTEMPTS) || 0,
 			selectedLanguage: '',
@@ -27,6 +32,7 @@ class HomeComponent extends Component {
 			unsupportedIOSVersion: null,
 			unsupportedIOSBrowser: null,
 			cameraAccessible: null,
+			isCentennial,
 		};
 	}
 
@@ -104,9 +110,14 @@ class HomeComponent extends Component {
 
 				{/* Only show the initial Welcome Screen prompt if they haven't selected any value for userAtBarnes */}
 				{((this.state.userAtBarnes == null) && <div className="landing-screen">
-					<img src={barnes_logo} alt="barnes_logo" className="logo-center" role="img" aria-label="Welcome to the Barnes Focus Digital Guide" />
+					{/* logo */}
+					{this.state.isCentennial ? (
+						<img src={barnes_100_logo} alt="barnes_logo" className="logo-center centennial-logo" role="img" aria-label="Welcome to the Barnes Focus Digital Guide" />
+					) : (
+						<img src={barnes_logo} alt="barnes_logo" className="logo-center" role="img" aria-label="Welcome to the Barnes Focus Digital Guide" />
+					)}
 					<div className="user-loc-prompt">
-						{this.props.getTranslation('Welcome_screen', 'text_1')} <br aria-hidden={true}/>
+						{this.props.getTranslation('Welcome_screen', 'text_1')} <br aria-hidden={true} />
 						{this.props.getTranslation('Welcome_screen', 'text_2')}
 					</div>
 					<div className="home-action">
