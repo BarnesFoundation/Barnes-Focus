@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 echo "Bundle install and yarn install"
 su webapp -c "yarn --production";
 
