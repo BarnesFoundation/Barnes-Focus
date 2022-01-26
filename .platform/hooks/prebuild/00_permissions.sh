@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-chmod -R 777 .platform;
 echo "Bundle install and yarn install"
 su webapp -c "yarn --production";
 
