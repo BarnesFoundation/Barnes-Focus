@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+chmod -R 777 .platform;
 echo "Bundle install and yarn install"
 su webapp -c "yarn --production";
 
@@ -7,7 +8,6 @@ echo "Performing permissions work"
 chmod -R 777 .bundle;
 # chown -R webapp:webapp vendor; 
 chmod -R 777 vendor;
-chmod -R 777 .platform;
 
 echo "Permission for home/webapp"
 mkdir -p /home/webapp
