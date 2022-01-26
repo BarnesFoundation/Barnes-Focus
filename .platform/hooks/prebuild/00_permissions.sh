@@ -7,10 +7,12 @@ echo "Performing permissions work"
 chmod -R 777 .bundle;
 # chown -R webapp:webapp vendor; 
 chmod -R 777 vendor;
+chmod -R 777 .platform;
 
 echo "Permission for home/webapp"
 mkdir -p /home/webapp
 chmod 700 /home/webapp;
+
 
 echo "Making environment variables available"
 export $(cat /opt/elasticbeanstalk/deployment/env | xargs)
