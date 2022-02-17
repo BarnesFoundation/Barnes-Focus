@@ -1,6 +1,6 @@
 #!/bin/sh
 echo "Bundle install and yarn install"
-su webapp -c "yarn --production";
+# su webapp -c "yarn --production";
 
 echo "Performing permissions work"
 # chown -R webapp:webapp .bundle; 
@@ -13,5 +13,5 @@ mkdir -p /home/webapp
 chmod 700 /home/webapp;
 
 
-echo "Making environment variables available"
-export $(cat /opt/elasticbeanstalk/deployment/env | xargs)
+# echo "Making environment variables available"
+# export $(cat /opt/elasticbeanstalk/deployment/env | xargs)
