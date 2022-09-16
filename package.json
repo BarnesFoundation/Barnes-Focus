@@ -9,7 +9,7 @@
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-react": "^6.24.1",
-    "bootstrap": "4.0.0",
+    "bootstrap": "4.3.1",
     "clipboard-polyfill": "^2.5.4",
     "css-loader": "^0.28.9",
     "font-awesome": "^4.7.0",
